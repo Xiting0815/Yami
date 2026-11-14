@@ -6,7 +6,7 @@ import type { ShopCat } from '../types'
  */
 const groups: Record<ShopCat, string[]> = {
   gemuese: [
-    'Ananas', 'Apfel', 'Apfel säuerlich', 'Aubergine', 'Basilikum', 'Birne', 'Blattspinat frisch', 'Blumenkohl', 'Bohnenkraut',
+    'Banane', 'Ananas', 'Apfel', 'Apfel säuerlich', 'Aubergine', 'Basilikum', 'Birne', 'Blattspinat frisch', 'Blumenkohl', 'Bohnenkraut',
     'Brokkoli', 'Champignons', 'Champignons braun', 'Chicorée', 'Chili rot', 'Chinakohl', 'Datteltomaten', 'Dill',
     'Feldsalat', 'Frühlingszwiebel', 'Galgant', 'Grüne Bohnen', 'Grünkohl', 'Hokkaido-Kürbis', 'Ingwer',
     'Kaffirlimettenblätter', 'Kartoffeln festkochend', 'Kartoffeln mehligkochend', 'Kirschtomaten', 'Knoblauch',
@@ -19,6 +19,7 @@ const groups: Record<ShopCat, string[]> = {
     'Zwiebel rot',
   ],
   konserven: [
+    'Chiasamen', 'Leinsamen geschrotet', 'Backkakao', 'Erdnussmus', 'Kokosraspeln', 'Haselnusskerne', 'Kidneybohnen',
     'Alblinsen', 'Apfelmus', 'Austernsauce', 'Bambussprossen', 'Bier hell', 'Borlotti-Bohnen', 'Cannellini-Bohnen',
     'Cashewkerne', 'Chiliöl', 'Chinkiang-Essig', 'Cola', 'Corned Beef', 'Currypaste grün', 'Currypaste Massaman',
     'Currypaste rot', 'Doubanjiang', 'Dunkelbier', 'Erdnüsse geröstet', 'Fermentierte schwarze Bohnen', 'Fischfond',
@@ -34,8 +35,9 @@ const groups: Record<ShopCat, string[]> = {
     'Walnusskerne', 'Weinbrand', 'Weiße Bohnen', 'Weißwein', 'Weizenmehl Tipo 00', 'Wodka', 'Yakisoba-Sauce',
     'Zuckerrübensirup',
   ],
-  backwaren: ['Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
+  backwaren: ['Vollkornbrot', 'Vollkorn-Knäckebrot', 'Vollkorn-Tortilla','Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
   molkerei: [
+    'Skyr', 'Magerquark', 'Hüttenkäse', 'Eiklar', 'Hummus',
     'Bandnudeln', 'Bergkäse', 'Bucatini', 'Butter', 'Butterschmalz', 'Cannelloni', 'Ditalini', 'Ei', 'Eigelb',
     'Ei hart gekocht', 'Emmentaler', 'Emmentaler gerieben', 'Feta', 'Fettuccine', 'Flammkuchenteig', 'Fusilli',
     'Gnocchi', 'Gorgonzola dolce', 'Gouda gerieben', 'Gruyère', 'Hefe frisch', 'Joghurt natur', 'Kartoffelsalat',
@@ -60,10 +62,12 @@ const groups: Record<ShopCat, string[]> = {
     'Seelachsfilet', 'Speckwürfel', 'Suppenfleisch Rind', 'Tafelspitz', 'Venusmuscheln', 'Wiener Würstchen',
   ],
   tk: [
+    'Beerenmischung TK', 'Heidelbeeren TK', 'Himbeeren TK', 'Mango TK',
     'Blattspinat TK', 'Erbsen TK', 'Erbsen und Möhren TK', 'Garnelen roh TK', 'Jiaozi-Teigblätter TK',
     'Pommes frites TK', 'Rahmspinat TK', 'Wan-Tan-Teigblätter TK',
   ],
   vorrat: [
+    'Zimt gemahlen', 'Backpulver', 'Kreuzkümmel',
     'Apfelessig', 'Chili getrocknet', 'Chiliflocken', 'Currypulver', 'Frittieröl', 'Fünf-Gewürze-Pulver',
     'Gemüsebrühe', 'Honig', 'Hühnerbrühe', 'Kümmel', 'Kümmel gemahlen', 'Kürbiskernöl', 'Leinöl', 'Lorbeerblatt',
     'Majoran', 'Muskatnuss', 'Nelke', 'Olivenöl', 'Oregano getrocknet', 'Paprikapulver edelsüß',

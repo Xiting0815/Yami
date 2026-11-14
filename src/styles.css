@@ -310,3 +310,53 @@ li.done .item-name, li.done .item-amt { text-decoration: line-through; opacity: 
 .lot-date::-webkit-calendar-picker-indicator { opacity: .6; margin: 0; }
 .small-pad { padding: 30px 20px; }
 .covered .item-name { display: flex; flex-direction: column; }
+
+/* ───── Frühstück & Meal-Prep ───── */
+.segmented { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 12px; padding: 3px; margin: 4px 0 10px; }
+.segmented button { border: none; background: transparent; border-radius: 10px; padding: 8px; font-weight: 700; font-size: 14px; color: var(--muted); }
+.segmented button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.chips-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 4px 0 6px; }
+.center-block { display: block; margin: 8px auto 0; }
+
+.nutri { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-top: 3px; }
+.nutri.on-card { color: #fff; margin: 0 0 4px; font-size: 13px; }
+.nutri.on-card span { background: rgba(255,255,255,.2); backdrop-filter: blur(6px); padding: 2px 8px; border-radius: 99px; }
+.nutri.tiny { font-size: 11px; gap: 2px 6px; }
+.nutri-table { background: var(--surface); border-radius: 14px; padding: 10px 12px; margin-top: 12px; }
+.nutri-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 6px; text-align: center; }
+.nutri-grid div { display: flex; flex-direction: column; }
+.nutri-grid b { font-size: 15px; }
+.nutri-grid span { font-size: 10.5px; color: var(--muted); }
+.prep-facts { background: var(--surface); border-radius: 14px; padding: 10px 14px; margin-top: 10px; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+.morning { background: color-mix(in srgb, #ffd166 22%, var(--surface)); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.45; }
+
+.bf-empty {
+  width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; border: 2px dashed color-mix(in srgb, #f4a300 55%, var(--line));
+  background: color-mix(in srgb, #ffd166 14%, var(--surface)); border-radius: var(--radius); padding: 14px; margin: 6px 0 4px;
+}
+.bf-empty b { display: block; font-size: 15px; }
+.bf-empty small { color: var(--muted); font-size: 12.5px; }
+.bf-sun { font-size: 30px; }
+.bf-card { background: color-mix(in srgb, #ffd166 14%, var(--surface)); border-radius: var(--radius); padding: 12px; margin: 6px 0 4px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+.bf-head { display: flex; justify-content: space-between; align-items: center; }
+.bf-row { display: flex; gap: 10px; align-items: center; border: none; background: var(--surface); border-radius: 14px; padding: 8px; text-align: left; width: 100%; }
+.thumb.small { width: 54px; height: 54px; }
+.bf-text { display: flex; flex-direction: column; min-width: 0; }
+.bf-days { font-size: 11.5px; font-weight: 800; color: #c97a00; text-transform: uppercase; letter-spacing: .3px; }
+.bf-title { font-weight: 700; font-size: 14.5px; line-height: 1.25; }
+.bf-note { font-size: 12.5px; color: var(--muted); margin: 0; line-height: 1.4; }
+
+.sheet.prep { max-height: 94dvh; }
+.sheet-close.dark { background: var(--surface-2); color: var(--text); }
+.sheet.prep .sheet-body { padding-top: 22px; }
+.prep-block { background: var(--surface); border-radius: var(--radius); padding: 12px 14px; margin: 14px 0; }
+.prep-block h3 { margin: 0 0 2px; }
+.prep-block h4 { margin: 14px 0 6px; font-size: 14px; }
+.ingredients.compact { background: var(--surface-2); }
+.ingredients.compact li { padding: 6px 12px; font-size: 14px; }
+.prep-steps { list-style: none; margin: 0; padding: 0; }
+.prep-steps li { border-top: 1px solid var(--line); }
+.prep-steps label { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; font-size: 14px; line-height: 1.45; cursor: pointer; }
+.prep-steps input { position: absolute; opacity: 0; pointer-events: none; }
+.prep-steps .check { margin-top: 1px; }
+.prep-steps li.done span:last-child { text-decoration: line-through; opacity: .5; }

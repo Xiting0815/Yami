@@ -25,6 +25,7 @@ const LONG = 365
 
 export const PRODUCTS: Record<string, Product> = {
   // ───── Gemüse, Obst & Kräuter ─────
+  Banane: p(1, 'Stk', 0.25, 6),
   Ananas: p(900, 'g', 1.99, 5, 3, 'Stk'),
   Apfel: p(1, 'Stk', 0.35, 21),
   Aubergine: p(1, 'Stk', 0.99, 7),
@@ -99,6 +100,13 @@ export const PRODUCTS: Record<string, Product> = {
   'Zwiebel rot': p(5, 'Stk', 0.99, 30, 30, 'Netz'),
 
   // ───── Konserven & Trockenware ─────
+  Chiasamen: p(200, 'g', 1.99, LONG, LONG, 'Pck'),
+  'Leinsamen geschrotet': p(500, 'g', 1.49, 180, 60, 'Pck'),
+  Backkakao: p(15, 'EL', 2.29, LONG, LONG, 'Pck'),
+  Erdnussmus: p(350, 'g', 2.49, LONG, 90, 'Glas'),
+  Kokosraspeln: p(200, 'g', 1.29, LONG, LONG, 'Pck'),
+  Haselnusskerne: p(200, 'g', 2.29, 180, 60, 'Pck'),
+  Kidneybohnen: p(250, 'g', 0.79, LONG, 3, 'Dose'),
   Alblinsen: p(500, 'g', 2.99, LONG, LONG, 'Pck'),
   Apfelmus: p(1, 'Glas', 0.99, LONG, 7, 'Glas'),
   Austernsauce: p(17, 'EL', 1.99, LONG, 90, 'Flasche'),
@@ -126,7 +134,7 @@ export const PRODUCTS: Record<string, Product> = {
   'Getrocknete Tomaten in Öl': p(280, 'g', 2.29, LONG, 21, 'Glas'),
   Gewürzgurke: p(12, 'Stk', 1.49, LONG, 30, 'Glas'),
   Gochujang: p(30, 'EL', 4.99, LONG, 180, 'Becher'),
-  Haferflocken: p(50, 'EL', 0.79, LONG, LONG, 'Pck'),
+  Haferflocken: p(500, 'g', 0.79, LONG, LONG, 'Pck'),
   Hoisinsauce: p(15, 'EL', 1.99, LONG, 90, 'Flasche'),
   'Japanische Curry-Würfel': p(200, 'g', 3.49, LONG, LONG, 'Pck'),
   Jasminreis: p(1000, 'g', 1.99, LONG, LONG, 'Pck'),
@@ -188,6 +196,9 @@ export const PRODUCTS: Record<string, Product> = {
   Zuckerrübensirup: p(30, 'EL', 1.99, LONG, LONG, 'Becher'),
 
   // ───── Backwaren ─────
+  Vollkornbrot: p(10, 'Scheibe', 1.49, 7, 5, 'Pck'),
+  'Vollkorn-Knäckebrot': p(25, 'Scheibe', 1.19, LONG, 60, 'Pck'),
+  'Vollkorn-Tortilla': p(6, 'Stk', 1.49, 30, 7, 'Pck'),
   'Brötchen vom Vortag': p(1, 'Stk', 0.25, 4),
   Ciabatta: p(1, 'Stk', 0.99, 3),
   Printen: p(10, 'Stk', 2.49, 90, 30, 'Pck'),
@@ -196,6 +207,11 @@ export const PRODUCTS: Record<string, Product> = {
   Weißbrot: p(20, 'Scheibe', 1.29, 4, 4, 'Pck'),
 
   // ───── Käse, Nudeln & Molkerei ─────
+  Skyr: p(450, 'g', 1.49, 21, 5, 'Becher'),
+  Magerquark: p(500, 'g', 0.89, 14, 4, 'Becher'),
+  Hüttenkäse: p(200, 'g', 0.89, 14, 4, 'Becher'),
+  Eiklar: p(500, 'g', 2.49, 14, 4, 'Flasche'),
+  Hummus: p(200, 'g', 1.49, 14, 4, 'Becher'),
   Bandnudeln: p(500, 'g', 1.29, LONG, LONG, 'Pck'),
   Bucatini: p(500, 'g', 1.49, LONG, LONG, 'Pck'),
   Cannelloni: p(24, 'Stk', 1.49, LONG, LONG, 'Pck'),
@@ -324,6 +340,10 @@ export const PRODUCTS: Record<string, Product> = {
   'Wiener Würstchen': p(6, 'Stk', 1.99, 21, 4, 'Pck'),
 
   // ───── Tiefkühl ─────
+  'Beerenmischung TK': p(500, 'g', 2.49, 180, 180, 'Beutel'),
+  'Heidelbeeren TK': p(300, 'g', 2.29, 180, 180, 'Beutel'),
+  'Himbeeren TK': p(300, 'g', 2.29, 180, 180, 'Beutel'),
+  'Mango TK': p(500, 'g', 2.49, 180, 180, 'Beutel'),
   'Blattspinat TK': p(750, 'g', 1.49, 180, 180, 'Pck'),
   'Erbsen TK': p(750, 'g', 1.29, 180, 180, 'Pck'),
   'Erbsen und Möhren TK': p(750, 'g', 1.29, 180, 180, 'Pck'),
@@ -351,4 +371,10 @@ export const CONVERT: Record<string, Record<string, number>> = {
   Möhre: { g: 1 / 100 },
   Butter: { EL: 15 },
   Butterschmalz: { EL: 15 },
+  Haferflocken: { EL: 10 },
+  Backkakao: { TL: 1 / 3 },
+  Kidneybohnen: { Dose: 250 },
+  Kopfsalat: { g: 1 / 300 },
+  'Gehackte Tomaten': { g: 1 / 400 },
+  Kichererbsen: { g: 1 / 240 },
 }

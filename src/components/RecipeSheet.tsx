@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Recipe } from '../types'
-import { CUISINE_LABEL, TYPE_LABEL } from '../types'
+import { BREAKFAST_LABEL, CUISINE_LABEL, TYPE_LABEL } from '../types'
+import { NutritionTable } from './NutritionRow'
 import { formatTime } from '../filter'
 import { formatAmount, scale } from '../shopping'
 import { RecipeImage } from './RecipeImage'
@@ -44,9 +45,18 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
         </div>
         <div className="sheet-body">
           <div className="card-tags dark">
-            <span>{CUISINE_LABEL[recipe.cuisine]}</span>
-            <span>{TYPE_LABEL[recipe.type]}</span>
-            {recipe.vegetarian && <span>🌱 Veggie</span>}
+            {recipe.breakfast ? (
+              <>
+                <span>☀️ Frühstück</span>
+                <span>{BREAKFAST_LABEL[recipe.breakfast.type]}</span>
+              </>
+            ) : (
+              <>
+                <span>{CUISINE_LABEL[recipe.cuisine]}</span>
+                <span>{TYPE_LABEL[recipe.type]}</span>
+                {recipe.vegetarian && <span>🌱 Veggie</span>}
+              </>
+            )}
             <span>⏱ {formatTime(recipe.time)}</span>
           </div>
           <h2>{recipe.title}</h2>
@@ -60,6 +70,16 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               <button onClick={() => setServings((s) => Math.min(12, s + 1))} aria-label="mehr">+</button>
             </div>
           </div>
+
+          <NutritionTable n={recipe.nutrition} servings={1} />
+
+          {recipe.breakfast && (
+            <div className="prep-facts">
+              <div>🧊 Hält <b>{recipe.breakfast.fridgeDays} Tage</b> im Kühlschrank</div>
+              <div>{recipe.breakfast.freezer ? '❄️ Lässt sich portionsweise einfrieren' : '🚫 Nicht zum Einfrieren geeignet'}</div>
+              <div>🫙 Pro Portion: 1 {recipe.breakfast.container}</div>
+            </div>
+          )}
 
           <p className="muted small cost-line">
             Warenwert ≈ {formatEuro(recipeCost(recipe, servings, prices))} · {formatEuro(recipeCost(recipe, servings, prices) / servings)} pro Portion (ohne Gewürze)
@@ -75,12 +95,19 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             ))}
           </ul>
 
-          <h3>Zubereitung</h3>
+          <h3>{recipe.breakfast ? 'Vorbereitung (am Prep-Tag)' : 'Zubereitung'}</h3>
           <ol className="steps">
             {recipe.steps.map((s, i) => (
               <li key={i}>{s}</li>
             ))}
           </ol>
+
+          {recipe.breakfast && (
+            <>
+              <h3>Morgens / auf der Arbeit</h3>
+              <p className="morning">☀️ {recipe.breakfast.morning}</p>
+            </>
+          )}
 
           {credit && (
             <p className="credit">

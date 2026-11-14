@@ -42,9 +42,37 @@ export interface Ingredient {
   unit: string
 }
 
+export type BreakfastType = 'suess' | 'herzhaft' | 'warm'
+
+export const BREAKFAST_LABEL: Record<BreakfastType, string> = { suess: 'Süß & kalt', herzhaft: 'Herzhaft', warm: 'Warm (Mikrowelle)' }
+
+/** Nährwerte (pro Portion) */
+export interface Nutrition {
+  kcal: number
+  protein: number
+  fat: number
+  carbs: number
+  fiber: number
+}
+
 export interface Recipe {
   id: string
   title: string
+  meal: 'dinner' | 'breakfast'
+  /** nur Frühstück */
+  breakfast?: {
+    type: BreakfastType
+    /** Tage haltbar im Kühlschrank nach dem Vorbereiten */
+    fridgeDays: number
+    /** lässt sich portionsweise einfrieren */
+    freezer: boolean
+    /** Behälter pro Portion, z. B. "Glas" */
+    container: string
+    /** was morgens bzw. auf der Arbeit zu tun ist */
+    morning: string
+  }
+  /** pro Portion, berechnet aus den Zutaten */
+  nutrition: Nutrition
   cuisine: Cuisine
   type: DishType
   /** Gesamtzeit in Minuten */

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { PlanEntry, Recipe, WeekPlan } from '../types'
 import { RECIPE_BY_ID } from '../data/recipes'
 import { shortDate, weekdayName } from '../store'
@@ -19,10 +20,12 @@ interface Props {
   onRecook: (day: string) => void
   onShop: () => void
   onPantry: () => void
+  /** Frühstückskarte (Meal-Prep) oberhalb der Tage */
+  breakfastSlot?: ReactNode
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, urgentCount, onSwipeDay, onOpen, onUpdate, onUncook, onRecook, onShop, onPantry } = props
+  const { days, plan, today, total, prices, urgentCount, onSwipeDay, onOpen, onUpdate, onUncook, onRecook, onShop, onPantry, breakfastSlot } = props
   const planned = days.filter((d) => plan[d]).length
   const firstEmpty = days.find((d) => !plan[d] && d >= today) ?? days.find((d) => !plan[d])
 
@@ -39,9 +42,11 @@ export function WeekView(props: Props) {
         </button>
       )}
 
+      {breakfastSlot}
+
       {firstEmpty && (
         <button className="btn primary wide big" onClick={() => onSwipeDay(firstEmpty)}>
-          👆 {planned === 0 ? 'Woche planen – los geht’s' : `Weiter wischen ab ${weekdayName(firstEmpty)}`}
+          🌙 {planned === 0 ? 'Abendessen planen – los geht’s' : `Abendessen weiter wischen ab ${weekdayName(firstEmpty)}`}
         </button>
       )}
 

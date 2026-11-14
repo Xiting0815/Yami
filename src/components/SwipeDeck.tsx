@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Recipe } from '../types'
-import { CUISINE_LABEL, TYPE_LABEL } from '../types'
+import { BREAKFAST_LABEL, CUISINE_LABEL, TYPE_LABEL } from '../types'
+import { NutritionRow } from './NutritionRow'
 import { formatTime } from '../filter'
 import { type Insight, formatEuro } from '../kitchen'
 import { RecipeImage } from './RecipeImage'
@@ -144,10 +145,20 @@ export function SwipeDeck({ deck, insights, onTake, onReject, onInfo }: Props) {
           <div className="card-info">
             <InsightBadges ins={ins} />
             <h2>{top.title}</h2>
-            <div className="card-meta">
-              {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)}
-              {ins ? ` · ≈ ${formatEuro(ins.perPortion)}/P.` : ''}
-            </div>
+            {top.breakfast ? (
+              <>
+                <NutritionRow n={top.nutrition} className="on-card" />
+                <div className="card-meta">
+                  {BREAKFAST_LABEL[top.breakfast.type]} · 🧊 hält {top.breakfast.fridgeDays} Tage{top.breakfast.freezer ? ' · ❄️ einfrierbar' : ''}
+                  {ins ? ` · ≈ ${formatEuro(ins.perPortion)}` : ''}
+                </div>
+              </>
+            ) : (
+              <div className="card-meta">
+                {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)} · ≈ {top.nutrition.kcal} kcal
+                {ins ? ` · ≈ ${formatEuro(ins.perPortion)}/P.` : ''}
+              </div>
+            )}
           </div>
         </div>
       </div>

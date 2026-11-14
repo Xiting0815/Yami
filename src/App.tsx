@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { PlanEntry, Recipe } from './types'
-import { RECIPES, RECIPE_BY_ID } from './data/recipes'
+import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from './data/recipes'
+import { BREAKFAST_LABEL, type BreakfastType } from './types'
+import { assignBreakfasts, prepPlan, workdays } from './breakfast'
+import { BreakfastCard } from './components/BreakfastCard'
+import { PrepSheet } from './components/PrepSheet'
 import { addDays, mondayOf, isoDate, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
 import { matches } from './filter'
 import { formatAmount } from './shopping'
@@ -49,6 +53,10 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [rejected, setRejected] = useState<string[]>([])
+  /** Wischen & Rezepte: Abendessen oder Frühstück */
+  const [meal, setMeal] = useState<'dinner' | 'breakfast'>('dinner')
+  const [bTypes, setBTypes] = useState<BreakfastType[]>([])
+  const [showPrep, setShowPrep] = useState(false)
 
   // Datum aktuell halten (App bleibt oft tagelang offen)
   useEffect(() => {
@@ -65,7 +73,8 @@ export default function App() {
   useEffect(() => {
     setState((s) => {
       const r = cookDue(s.plan, s.pantry, today)
-      return r.changed ? { ...s, plan: r.plan, pantry: r.pantry } : s
+      const b = cookDue(s.breakfast, r.pantry, today)
+      return r.changed || b.changed ? { ...s, plan: r.plan, breakfast: b.plan, pantry: b.pantry } : s
     })
   }, [today, setState])
 
@@ -93,8 +102,8 @@ export default function App() {
 
   // ───── Planung, Vorrat & Empfehlungen ─────
   const week = useMemo(
-    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount),
-    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices],
+    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast),
+    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast],
   )
   const weekRecipes = useMemo(
     () => days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => RECIPE_BY_ID[e!.recipeId]).filter(Boolean),
@@ -131,9 +140,63 @@ export default function App() {
     return [...fresh, ...later]
   }, [state.filters, perPortion, plannedIds, rejected, insights])
 
+  // ───── Frühstück ─────
+  const picks = state.breakfastPicks[weekKey] ?? []
+  const assignment = useMemo(() => assignBreakfasts(picks, days), [picks, days])
+  const prepItems = useMemo(() => prepPlan(assignment), [assignment])
+  const prepTotal = prepItems.reduce((n, i) => n + i.recipe.steps.length, 0)
+  const prepDone = (state.prepChecked[weekKey] ?? []).filter((k) => prepItems.some((i) => k.startsWith(i.recipe.id + ':'))).length
+  const bLastSeen = useMemo(() => lastSeenMap(state.breakfast, days[0]), [state.breakfast, days])
+  const bInsights = useMemo(
+    () =>
+      new Map(
+        BREAKFASTS.map((r) => [r.id, insight(r, 3, week.leftovers, today, state.prices, bLastSeen, jitter.get(r.id) ?? Math.random(), [])]),
+      ),
+    [week.leftovers, today, state.prices, bLastSeen, jitter],
+  )
+  const bDeck = useMemo(() => {
+    const list = BREAKFASTS.filter((r) => (!bTypes.length || bTypes.includes(r.breakfast!.type)) && !picks.includes(r.id))
+    const rej = new Set(rejected)
+    // beim zweiten Frühstück: Kombinationen bevorzugen, die Mo–Fr komplett abdecken
+    const fits = (r: Recipe) => picks.length !== 1 || Object.keys(assignBreakfasts([picks[0], r.id], days).days).length === 5
+    const score = (r: Recipe) => bInsights.get(r.id)!.score + (fits(r) ? 0 : -30)
+    const fresh = list.filter((r) => !rej.has(r.id)).sort((a, b) => score(b) - score(a))
+    const later = rejected.map((id) => list.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
+    return [...fresh, ...later]
+  }, [bTypes, picks, rejected, bInsights, days])
+
+  /** Frühstücke für die Woche festlegen und auf Mo–Fr verteilen */
+  function setPicks(ids: string[]) {
+    const a = assignBreakfasts(ids, days)
+    setState((s) => {
+      const breakfast = { ...s.breakfast }
+      let pantry = s.pantry
+      for (const d of workdays(days)) {
+        const old = breakfast[d]
+        if (old?.status === 'cooked') pantry = uncook(old, pantry)
+        delete breakfast[d]
+        if (a.days[d]) breakfast[d] = { recipeId: a.days[d], servings: 1 }
+      }
+      return { ...s, breakfast, pantry, breakfastPicks: { ...s.breakfastPicks, [weekKey]: ids } }
+    })
+  }
+
+  function pickBreakfast(r: Recipe) {
+    const next = [...picks.filter((id) => id !== r.id), r.id].slice(-2)
+    setPicks(next)
+    const covered = Object.keys(assignBreakfasts(next, days).days).length
+    if (next.length >= 2 || covered === 5) {
+      flash(`☀️ Frühstück steht: ${next.map((id) => RECIPE_BY_ID[id].title).join(' + ')}`)
+      setTab('woche')
+    } else {
+      flash(`${r.title} ✓ – wähle noch eins für den Rest der Woche`)
+    }
+  }
+
   const urgentNames = new Set(state.pantry.filter((l) => daysUntil(l.expires, today) <= 2).map((l) => l.name))
 
   function startSwipe(day: string) {
+    setMeal('dinner')
     setSwipeDay(day)
     setTab('wischen')
   }
@@ -241,11 +304,68 @@ export default function App() {
             onRecook={recookDay}
             onShop={() => setTab('liste')}
             onPantry={() => setTab('vorrat')}
+            breakfastSlot={
+              <BreakfastCard
+                days={days}
+                picks={picks}
+                assignment={assignment}
+                prepProgress={{ done: prepDone, total: prepTotal }}
+                onPlan={() => {
+                  setMeal('breakfast')
+                  setTab('wischen')
+                }}
+                onPrep={() => setShowPrep(true)}
+                onOpen={(r) => setSheet({ recipe: r, mode: 'view' })}
+                onReset={() => {
+                  setPicks([])
+                  setMeal('breakfast')
+                  setTab('wischen')
+                }}
+              />
+            }
           />
         )}
 
         {tab === 'wischen' && (
           <div className="swipe-screen">
+            <MealToggle meal={meal} onChange={setMeal} />
+            {meal === 'breakfast' ? (
+              <>
+                <div className="swipe-head">
+                  <h1>
+                    ☀️ Frühstück <span className="accent">Mo–Fr</span>
+                  </h1>
+                  <span className="muted small">{picks.length}/2 gewählt</span>
+                </div>
+                <p className="muted small">
+                  Wähle 1–2 Frühstücke zum Vorbereiten am Sonntag. Das kürzer haltbare kommt Mo–Mi, das länger haltbare Do–Fr.
+                </p>
+                <div className="chips-row">
+                  {(Object.keys(BREAKFAST_LABEL) as BreakfastType[]).map((t) => (
+                    <button
+                      key={t}
+                      className={`chip ${bTypes.includes(t) ? 'on' : ''}`}
+                      onClick={() => setBTypes((x) => (x.includes(t) ? x.filter((y) => y !== t) : [...x, t]))}
+                    >
+                      {BREAKFAST_LABEL[t]}
+                    </button>
+                  ))}
+                </div>
+                <SwipeDeck
+                  deck={bDeck}
+                  insights={bInsights}
+                  onTake={pickBreakfast}
+                  onReject={(r) => setRejected((x) => [...x.filter((id) => id !== r.id), r.id])}
+                  onInfo={(r) => setSheet({ recipe: r, mode: 'take' })}
+                />
+                {picks.length === 1 && (
+                  <button className="link center-block" onClick={() => setTab('woche')}>
+                    Nur {RECIPE_BY_ID[picks[0]].title} nehmen → fertig
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
             <div className="day-dots">
               {days.map((d) => (
                 <button
@@ -282,6 +402,8 @@ export default function App() {
               onInfo={(r) => setSheet({ recipe: r, day: swipeDay, mode: 'take' })}
             />
             <p className="hint">← wegwischen · nehmen → · sortiert nach Vorrat, Preis & Abwechslung</p>
+              </>
+            )}
           </div>
         )}
 
@@ -336,6 +458,8 @@ export default function App() {
             onFilters={(f) => setState((s) => ({ ...s, filters: f }))}
             onOpen={(r) => setSheet({ recipe: r, mode: 'pick' })}
             perPortion={perPortion}
+            meal={meal}
+            onMeal={setMeal}
           />
         )}
       </main>
@@ -373,10 +497,25 @@ export default function App() {
           recipe={sheet.recipe}
           prices={state.prices}
           insight={insights.get(sheet.recipe.id)}
-          servings={(sheet.day && state.plan[sheet.day]?.recipeId === sheet.recipe.id ? state.plan[sheet.day]?.servings : undefined) ?? state.defaultServings}
+          servings={
+            sheet.recipe.breakfast
+              ? 1
+              : ((sheet.day && state.plan[sheet.day]?.recipeId === sheet.recipe.id ? state.plan[sheet.day]?.servings : undefined) ??
+                state.defaultServings)
+          }
           onClose={() => setSheet(null)}
           action={
-            sheet.mode === 'take' && sheet.day
+            sheet.recipe.breakfast
+              ? sheet.mode === 'take' || sheet.mode === 'pick'
+                ? {
+                    label: picks.includes(sheet.recipe.id) ? '✓ Schon gewählt' : '☀️ Fürs Frühstück Mo–Fr wählen',
+                    onClick: () => {
+                      if (!picks.includes(sheet.recipe.id)) pickBreakfast(sheet.recipe)
+                      setSheet(null)
+                    },
+                  }
+                : undefined
+              : sheet.mode === 'take' && sheet.day
               ? {
                   label: `Für ${weekdayName(sheet.day)} nehmen`,
                   onClick: (servings) => {
@@ -397,7 +536,7 @@ export default function App() {
         />
       )}
 
-      {sheet?.mode === 'pick' && (
+      {sheet?.mode === 'pick' && !sheet.recipe.breakfast && (
         <DayPicker
           days={days}
           plan={state.plan}
@@ -406,6 +545,23 @@ export default function App() {
             flash(`${sheet.recipe.title} → ${weekdayName(day)} ✓`)
             setSheet(null)
           }}
+        />
+      )}
+
+      {showPrep && (
+        <PrepSheet
+          items={prepItems}
+          notes={assignment.notes}
+          checked={state.prepChecked[weekKey] ?? []}
+          onToggle={(key) =>
+            setState((s) => {
+              const cur = new Set(s.prepChecked[weekKey] ?? [])
+              if (cur.has(key)) cur.delete(key)
+              else cur.add(key)
+              return { ...s, prepChecked: { ...s.prepChecked, [weekKey]: [...cur] } }
+            })
+          }
+          onClose={() => setShowPrep(false)}
         />
       )}
 
@@ -429,3 +585,18 @@ function DayPicker({ days, plan, onPick }: { days: string[]; plan: Record<string
     </div>
   )
 }
+
+function MealToggle({ meal, onChange }: { meal: 'dinner' | 'breakfast'; onChange: (m: 'dinner' | 'breakfast') => void }) {
+  return (
+    <div className="segmented" role="tablist">
+      <button className={meal === 'breakfast' ? 'on' : ''} onClick={() => onChange('breakfast')} role="tab" aria-selected={meal === 'breakfast'}>
+        ☀️ Frühstück
+      </button>
+      <button className={meal === 'dinner' ? 'on' : ''} onClick={() => onChange('dinner')} role="tab" aria-selected={meal === 'dinner'}>
+        🌙 Abendessen
+      </button>
+    </div>
+  )
+}
+
+export { MealToggle }

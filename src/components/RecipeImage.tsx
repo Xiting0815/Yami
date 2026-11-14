@@ -14,14 +14,16 @@ export function RecipeImage({ recipe, className }: { recipe: Recipe; className?:
   if (recipe.image) {
     return <img className={className} src={recipe.image} alt={recipe.title} loading="lazy" draggable={false} />
   }
-  const h = HUE[recipe.cuisine]
+  const bt = recipe.breakfast?.type
+  const h = bt ? 45 : HUE[recipe.cuisine]
+  const emoji = bt ? (bt === 'herzhaft' ? '🍳' : bt === 'warm' ? '🥣' : '🫙') : EMOJI[recipe.type]
   return (
     <div
       className={`${className ?? ''} img-fallback`}
       style={{ background: `linear-gradient(135deg, hsl(${h} 75% 62%), hsl(${h + 25} 70% 45%))` }}
       aria-label={recipe.title}
     >
-      <span>{EMOJI[recipe.type]}</span>
+      <span>{emoji}</span>
     </div>
   )
 }

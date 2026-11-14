@@ -214,8 +214,10 @@ export function planWeek(
   today: string,
   overrides: PriceOverrides,
   formatStaple: (amount: number | null, unit: string) => string,
+  /** Frühstücke der Woche (fließen in Einkauf & Vorrat mit ein) */
+  breakfast: WeekPlan = {},
 ): WeekResult {
-  const entries = activeEntries(plan, days)
+  const entries = [...activeEntries(plan, days), ...activeEntries(breakfast, days)].sort((a, b) => a[0].localeCompare(b[0]))
 
   // Bedarf der Woche
   const req = new Map<string, { amount: number; recipes: Set<string> }>()
@@ -362,11 +364,13 @@ export function insight(
   const lastSeenDays = seen ? -daysUntil(seen, today) : undefined
   const repeatPenalty = lastSeenDays != null && lastSeenDays <= 21 ? 12 : 0
   // Abwechslung: gleiche Gerichtart / Küche in derselben Woche abwerten
-  const sameType = weekRecipes.filter((w) => w.type === recipe.type).length
-  const sameCuisine = weekRecipes.filter((w) => w.cuisine === recipe.cuisine).length
+  const isBreakfast = recipe.meal === 'breakfast'
+  const sameType = isBreakfast ? 0 : weekRecipes.filter((w) => w.type === recipe.type).length
+  const sameCuisine = isBreakfast ? 0 : weekRecipes.filter((w) => w.cuisine === recipe.cuisine).length
   const mixPenalty = sameType * 1.8 + Math.max(0, sameCuisine - 1) * 2.2
   // Vegetarisch nur ca. 15 %: ist das Wochen-Kontingent erreicht, rutschen Veggie-Gerichte weit nach hinten
-  const score = pantryScore * 2 - buyCost * 0.25 + jitter * 4 - repeatPenalty - mixPenalty - vegPenalty(recipe, weekRecipes)
+  const score =
+    pantryScore * 2 - buyCost * 0.25 + jitter * 4 - repeatPenalty - mixPenalty - (isBreakfast ? 0 : vegPenalty(recipe, weekRecipes))
   const cost = recipeCost(recipe, servings, overrides)
   return { fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, score }
 }

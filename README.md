@@ -18,6 +18,15 @@ Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und beko
 - **Smarte Reihenfolge beim Wischen:** Zuerst kommen Gerichte, die Vorrat und Reste verbrauchen (Verderbliches zählt stärker) und wenig Zukauf brauchen. Gerichte der letzten 3 Wochen, gleiche Gerichtart oder Küche in derselben Woche rutschen nach hinten. Vegetarische Gerichte machen nur ca. 15 % aus (≈ 1 pro Woche, Einstellung `VEG_SHARE` in `src/kitchen.ts`).
 - **Preise anpassen:** Die Preise sind grobe Discounter-Schätzungen (Stand 2026, `src/data/products.ts`). In der Einkaufsliste unter ⓘ → „anpassen“ kannst du Packungsgröße und Preis korrigieren. Filter „💶 Günstig“ zeigt Gerichte bis 2,50 € pro Portion.
 
+### Frühstück & Meal-Prep
+
+- **27 Meal-Prep-Frühstücke** (süß & kalt, herzhaft, warm aus der Mikrowelle), je ca. 370–470 kcal, ≥ 25 g Eiweiß, ≥ 8 g Ballaststoffe – sättigend und gut zum Abnehmen. Mengen jeweils für 1 Portion (`src/data/breakfasts.ts`).
+- **Wählen:** Unter „Wischen“ auf „☀️ Frühstück“ umschalten und 1–2 Frühstücke für Mo–Fr wählen. Beim zweiten kommen automatisch Kombinationen nach vorne, die die ganze Woche abdecken.
+- **Haltbarkeit:** Das kürzer haltbare Frühstück kommt Mo–Mi, das länger haltbare Do–Fr. Was nicht so lange hält, aber einfrierbar ist, wird zum Einfrieren eingeplant (mit Hinweis, wann es in den Kühlschrank muss).
+- **Prep-Liste für Sonntag:** Zutaten hochgerechnet, Ofengerichte zuerst, Schritte zum Abhaken und was morgens/auf der Arbeit zu tun ist.
+- **Einkauf & Vorrat:** Frühstückszutaten landen auf derselben Einkaufsliste und werden wie Abendessen vom Vorrat abgezogen.
+- **Nährwerte für alles:** Jede Zutat hat Richtwerte pro 100 g (`src/data/nutrition.ts`), daraus werden kcal, Eiweiß, Ballaststoffe, Kohlenhydrate und Fett pro Portion berechnet – auch für alle Abendessen.
+
 Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine PWA und lässt sich auf den Homescreen legen und offline nutzen.
 
 ## Entwickeln
@@ -28,6 +37,7 @@ npm run dev          # http://localhost:5173
 npm run build        # Produktions-Build nach dist/
 npm run check-data   # prüft Rezeptdatenbank, Produkte & Einheiten
 npx vite-node scripts/test-kitchen.ts   # Logiktests Vorrat/Einkauf/Empfehlungen
+npx vite-node scripts/test-breakfast.ts # Logiktests Frühstück/Meal-Prep
 ```
 
 ## Veröffentlichen (kostenlos)

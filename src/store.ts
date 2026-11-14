@@ -31,6 +31,12 @@ export interface AppState {
   /** Einkäufe je Woche, damit Abhaken den Vorrat füllt (und Rückgängig ihn wieder leert) */
   bought: Record<string, BoughtMap>
   prices: PriceOverrides
+  /** Frühstücke: Tag → Eintrag (1 Portion) */
+  breakfast: WeekPlan
+  /** gewählte Frühstücke je Woche (Schlüssel = Montag) */
+  breakfastPicks: Record<string, string[]>
+  /** abgehakte Prep-Schritte je Woche */
+  prepChecked: Record<string, string[]>
 }
 
 const KEY = 'yami-state-v1'
@@ -44,6 +50,9 @@ const INITIAL: AppState = {
   pantry: [],
   bought: {},
   prices: {},
+  breakfast: {},
+  breakfastPicks: {},
+  prepChecked: {},
 }
 
 function load(): AppState {

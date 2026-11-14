@@ -1,4 +1,4 @@
-import type { Cuisine, DishType, Ingredient } from '../types'
+import type { BreakfastType, Cuisine, DishType, Ingredient } from '../types'
 
 /** Erlaubte Einheiten. Die Reihenfolge ist egal, Schreibweise zählt. */
 export const UNITS = [
@@ -15,6 +15,9 @@ export interface RawRecipe {
   steps: string[]
   /** Suchbegriff für das Foto (Wikimedia Commons), Standard: Titel */
   img?: string
+  /** Basis-Portionen der Mengenangaben (Abendessen 2, Frühstück 1) */
+  servings?: number
+  breakfast?: { type: BreakfastType; fridgeDays: number; freezer: boolean; container: string; morning: string }
 }
 
 /**
@@ -49,5 +52,38 @@ export function r(
     ingredients: ingredients.split('|').map((s) => s.trim()).filter(Boolean).map(parseIngredient),
     steps,
     img,
+  }
+}
+
+const splitIngredients = (s: string) => s.split('|').map((x) => x.trim()).filter(Boolean).map(parseIngredient)
+
+/**
+ * Frühstück für Meal-Prep – Mengen für 1 Portion.
+ * steps = Vorbereitung (am Prep-Tag), morning = was morgens/auf der Arbeit zu tun ist.
+ */
+export function b(
+  id: string,
+  title: string,
+  type: BreakfastType,
+  time: number,
+  fridgeDays: number,
+  freezer: boolean,
+  container: string,
+  ingredients: string,
+  steps: string[],
+  morning: string,
+  img?: string,
+): RawRecipe {
+  return {
+    id,
+    title,
+    cuisine: 'de',
+    type: 'haupt',
+    time,
+    ingredients: splitIngredients(ingredients),
+    steps,
+    img,
+    servings: 1,
+    breakfast: { type, fridgeDays, freezer, container, morning },
   }
 }
