@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Cuisine, DishType, ShopCat, WeekPlan } from './types'
+import type { BoughtMap, PantryLot, PriceOverrides } from './kitchen'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -7,9 +8,11 @@ export interface Filters {
   vegetarian: boolean
   /** maximale Zubereitungszeit in Minuten, 0 = egal */
   maxTime: number
+  /** nur günstige Gerichte (≤ 2,50 € pro Portion) */
+  cheap: boolean
 }
 
-export const EMPTY_FILTERS: Filters = { cuisines: [], types: [], vegetarian: false, maxTime: 0 }
+export const EMPTY_FILTERS: Filters = { cuisines: [], types: [], vegetarian: false, maxTime: 0, cheap: false }
 
 export interface CustomItem {
   id: string
@@ -24,16 +27,32 @@ export interface AppState {
   custom: Record<string, CustomItem[]>
   filters: Filters
   defaultServings: number
+  pantry: PantryLot[]
+  /** Einkäufe je Woche, damit Abhaken den Vorrat füllt (und Rückgängig ihn wieder leert) */
+  bought: Record<string, BoughtMap>
+  prices: PriceOverrides
 }
 
 const KEY = 'yami-state-v1'
 
-const INITIAL: AppState = { plan: {}, checked: {}, custom: {}, filters: EMPTY_FILTERS, defaultServings: 2 }
+const INITIAL: AppState = {
+  plan: {},
+  checked: {},
+  custom: {},
+  filters: EMPTY_FILTERS,
+  defaultServings: 2,
+  pantry: [],
+  bought: {},
+  prices: {},
+}
 
 function load(): AppState {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return { ...INITIAL, ...JSON.parse(raw) }
+    if (raw) {
+      const saved = JSON.parse(raw)
+      return { ...INITIAL, ...saved, filters: { ...EMPTY_FILTERS, ...saved.filters } }
+    }
   } catch {
     /* privates Fenster o. Ä. – mit leerem Zustand starten */
   }

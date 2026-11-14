@@ -60,6 +60,10 @@ export interface Recipe {
 export interface PlanEntry {
   recipeId: string
   servings: number
+  /** cooked = automatisch abgezogen (Tag ist vorbei), skipped = nicht gekocht */
+  status?: 'cooked' | 'skipped'
+  /** beim Kochen aus dem Vorrat entnommene Mengen (für "nicht gekocht") */
+  consumed?: { id: string; name: string; amount: number; unit: string; expires: string }[]
 }
 
 /** Schlüssel = ISO-Datum (YYYY-MM-DD) */

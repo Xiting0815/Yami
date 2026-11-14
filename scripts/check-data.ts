@@ -1,6 +1,8 @@
 // Prüft die Rezeptdatenbank: eindeutige IDs, bekannte Zutaten, gültige Einheiten
 import { RAW_RECIPES } from '../src/data/recipes'
 import { CATALOG } from '../src/data/catalog'
+import { PRODUCTS } from '../src/data/products'
+import { canonical, toBase } from '../src/kitchen'
 
 let errors = 0
 const ids = new Set<string>()
@@ -13,6 +15,14 @@ for (const r of RAW_RECIPES) {
     used.add(i.name)
     if (!CATALOG[i.name]) { console.error(`Unbekannte Zutat in ${r.id}: "${i.name}"`); errors++ }
     if (/^\d/.test(i.name)) { console.error(`Einheit nicht erkannt in ${r.id}: "${i.name}"`); errors++ }
+    const name = canonical(i.name)
+    if (CATALOG[i.name] && CATALOG[i.name] !== 'vorrat') {
+      const prod = PRODUCTS[name]
+      if (!prod) { console.error(`Kein Produkt (Packung/Preis) für "${name}"`); errors++ }
+      else if (i.amount != null && toBase(name, i.amount, i.unit, prod) == null) {
+        console.error(`Einheit ${i.unit} von "${name}" (${r.id}) nicht in ${prod.unit} umrechenbar`); errors++
+      }
+    }
   }
 }
 for (const n of Object.keys(CATALOG)) if (!used.has(n)) console.warn('Unbenutzt im Katalog:', n)

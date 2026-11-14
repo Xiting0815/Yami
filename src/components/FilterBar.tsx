@@ -9,7 +9,7 @@ function toggle<T>(list: T[], v: T): T[] {
 
 export function FilterBar({ filters, onChange, count }: { filters: Filters; onChange: (f: Filters) => void; count: number }) {
   const active =
-    filters.cuisines.length + filters.types.length + (filters.vegetarian ? 1 : 0) + (filters.maxTime ? 1 : 0) > 0
+    filters.cuisines.length + filters.types.length + (filters.vegetarian ? 1 : 0) + (filters.maxTime ? 1 : 0) + (filters.cheap ? 1 : 0) > 0
   return (
     <div className="filterbar">
       <div className="chips">
@@ -35,6 +35,9 @@ export function FilterBar({ filters, onChange, count }: { filters: Filters; onCh
         ))}
       </div>
       <div className="chips">
+        <button className={`chip ${filters.cheap ? 'on' : ''}`} onClick={() => onChange({ ...filters, cheap: !filters.cheap })}>
+          💶 Günstig
+        </button>
         <button
           className={`chip ${filters.vegetarian ? 'on' : ''}`}
           onClick={() => onChange({ ...filters, vegetarian: !filters.vegetarian })}

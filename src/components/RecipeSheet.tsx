@@ -5,6 +5,8 @@ import { formatTime } from '../filter'
 import { formatAmount, scale } from '../shopping'
 import { RecipeImage } from './RecipeImage'
 import imageMap from '../data/images.json'
+import { type Insight, type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
+import { InsightBadges } from './SwipeDeck'
 
 type Credit = { author: string; license: string; source: string } | null | undefined
 const credits = imageMap as unknown as Record<string, Credit>
@@ -15,9 +17,11 @@ interface Props {
   onClose: () => void
   /** Hauptaktion, z. B. "Für Montag nehmen" */
   action?: { label: string; onClick: (servings: number) => void }
+  insight?: Insight
+  prices: PriceOverrides
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
 
@@ -46,6 +50,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action }: Prop
             <span>⏱ {formatTime(recipe.time)}</span>
           </div>
           <h2>{recipe.title}</h2>
+          {insight && <div className="sheet-badges"><InsightBadges ins={insight} /></div>}
 
           <div className="servings">
             <span>Portionen</span>
@@ -55,6 +60,10 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action }: Prop
               <button onClick={() => setServings((s) => Math.min(12, s + 1))} aria-label="mehr">+</button>
             </div>
           </div>
+
+          <p className="muted small cost-line">
+            Warenwert ≈ {formatEuro(recipeCost(recipe, servings, prices))} · {formatEuro(recipeCost(recipe, servings, prices) / servings)} pro Portion (ohne Gewürze)
+          </p>
 
           <h3>Zutaten</h3>
           <ul className="ingredients">

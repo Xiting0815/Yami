@@ -1,30 +1,37 @@
-import { useMemo, useState } from 'react'
-import type { ShopCat, WeekPlan } from '../types'
+import { useState } from 'react'
+import type { ShopCat } from '../types'
 import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER } from '../types'
-import { buildShoppingList } from '../shopping'
+import { formatAmount } from '../shopping'
 import type { CustomItem } from '../store'
+import { type BuyItem, type WeekResult, formatEuro } from '../kitchen'
 
 interface Props {
-  days: string[]
-  plan: WeekPlan
+  result: WeekResult
+  planned: number
   checked: string[]
   custom: CustomItem[]
-  onToggle: (key: string) => void
+  onToggleBuy: (item: BuyItem) => void
+  onToggleKey: (key: string) => void
   onResetChecks: () => void
   onAddCustom: (item: CustomItem) => void
   onRemoveCustom: (id: string) => void
+  onEditPrice: (name: string, pack: number, price: number) => void
   onGoPlan: () => void
 }
 
-export function ShoppingList({ days, plan, checked, custom, onToggle, onResetChecks, onAddCustom, onRemoveCustom, onGoPlan }: Props) {
-  const sections = useMemo(() => buildShoppingList(plan, days, custom), [plan, days, custom])
+export function packText(it: BuyItem): string {
+  const { packs, product: p } = it
+  if (!p.packName) return formatAmount(packs * p.pack, p.unit)
+  return p.pack === 1 ? `${packs} ${p.packName}` : `${packs} ${p.packName} (${formatAmount(p.pack, p.unit)})`
+}
+
+export function ShoppingList(props: Props) {
+  const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan } = props
   const [newName, setNewName] = useState('')
   const [newCat, setNewCat] = useState<ShopCat>('gemuese')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [showCovered, setShowCovered] = useState(false)
   const checkedSet = new Set(checked)
-  const total = sections.reduce((n, s) => n + s.items.length, 0)
-  const done = sections.reduce((n, s) => n + s.items.filter((i) => checkedSet.has(i.key)).length, 0)
-  const planned = days.filter((d) => plan[d]).length
 
   if (planned === 0 && custom.length === 0) {
     return (
@@ -36,50 +43,71 @@ export function ShoppingList({ days, plan, checked, custom, onToggle, onResetChe
     )
   }
 
+  const keys = [...result.buy.map((b) => b.key), ...custom.map((c) => `custom:${c.id}`)]
+  const done = keys.filter((k) => checkedSet.has(k)).length
+
   return (
     <div className="shop">
-      <div className="week-progress">
-        <div className="bar"><div style={{ width: `${total ? (done / total) * 100 : 0}%` }} /></div>
-        <span>
-          {done} von {total} im Wagen
-        </span>
-        {done > 0 && (
-          <button className="link" onClick={onResetChecks}>Haken zurücksetzen</button>
-        )}
+      <div className="shop-total">
+        <div>
+          <div className="muted small">Einkauf geschätzt</div>
+          <div className="total">{formatEuro(result.total)}</div>
+        </div>
+        <div className="right muted small">
+          {result.buy.length} Artikel{result.covered.length ? ` · ${result.covered.length} schon im Vorrat` : ''}
+        </div>
       </div>
+      <div className="week-progress">
+        <div className="bar"><div style={{ width: `${keys.length ? (done / keys.length) * 100 : 0}%` }} /></div>
+        <span>{done} von {keys.length} im Wagen</span>
+        {done > 0 && <button className="link" onClick={onResetChecks}>Haken zurücksetzen</button>}
+      </div>
+      <p className="muted small">Abgehakte Artikel wandern automatisch in deinen Vorrat.</p>
 
-      {sections.map((s) => {
-        const items = [...s.items].sort((a, b) => Number(checkedSet.has(a.key)) - Number(checkedSet.has(b.key)))
+      {SHOP_ORDER.filter((c) => c !== 'vorrat').map((cat) => {
+        const items = result.buy.filter((b) => b.cat === cat)
+        const cust = custom.filter((c) => c.cat === cat)
+        if (!items.length && !cust.length) return null
+        const sorted = [...items].sort(
+          (a, b) => Number(checkedSet.has(a.key)) - Number(checkedSet.has(b.key)) || a.name.localeCompare(b.name, 'de'),
+        )
         return (
-          <section key={s.cat} className={`shop-section cat-${s.cat}`}>
+          <section key={cat} className={`shop-section cat-${cat}`}>
             <h3>
-              <span>{SHOP_ICON[s.cat]}</span> {SHOP_LABEL[s.cat]}
-              {s.cat === 'vorrat' && <small> – meist im Haus, kurz prüfen</small>}
+              <span>{SHOP_ICON[cat]}</span> {SHOP_LABEL[cat]}
             </h3>
             <ul>
-              {items.map((it) => {
+              {sorted.map((it) => {
                 const on = checkedSet.has(it.key)
                 return (
                   <li key={it.key} className={on ? 'done' : ''}>
                     <label>
-                      <input type="checkbox" checked={on} onChange={() => onToggle(it.key)} />
+                      <input type="checkbox" checked={on} onChange={() => onToggleBuy(it)} />
                       <span className="check" aria-hidden />
                       <span className="item-name">{it.name}</span>
-                      <span className="item-amt">{it.amount}</span>
+                      <span className="item-amt">
+                        {packText(it)}
+                        <small>{formatEuro(it.cost)}</small>
+                      </span>
                     </label>
-                    {it.custom ? (
-                      <button className="icon-btn tiny" onClick={() => onRemoveCustom(it.key.slice(7))} aria-label="Entfernen">✕</button>
-                    ) : (
-                      <button
-                        className="icon-btn tiny"
-                        onClick={() => setExpanded(expanded === it.key ? null : it.key)}
-                        aria-label="Für welche Gerichte?"
-                        title="Für welche Gerichte?"
-                      >
-                        {it.recipes.length > 1 ? `${it.recipes.length}×` : 'ⓘ'}
-                      </button>
-                    )}
-                    {expanded === it.key && <div className="item-recipes">{it.recipes.join(' · ')}</div>}
+                    <button className="icon-btn tiny" onClick={() => setExpanded(expanded === it.key ? null : it.key)} aria-label="Details">
+                      {it.recipes.length > 1 ? `${it.recipes.length}×` : 'ⓘ'}
+                    </button>
+                    {expanded === it.key && <ItemDetails it={it} onEditPrice={onEditPrice} />}
+                  </li>
+                )
+              })}
+              {cust.map((c) => {
+                const key = `custom:${c.id}`
+                const on = checkedSet.has(key)
+                return (
+                  <li key={key} className={on ? 'done' : ''}>
+                    <label>
+                      <input type="checkbox" checked={on} onChange={() => onToggleKey(key)} />
+                      <span className="check" aria-hidden />
+                      <span className="item-name">{c.name}</span>
+                    </label>
+                    <button className="icon-btn tiny" onClick={() => onRemoveCustom(c.id)} aria-label="Entfernen">✕</button>
                   </li>
                 )
               })}
@@ -87,6 +115,52 @@ export function ShoppingList({ days, plan, checked, custom, onToggle, onResetChe
           </section>
         )
       })}
+
+      {result.staples.length > 0 && (
+        <section className="shop-section cat-vorrat">
+          <h3>
+            <span>{SHOP_ICON.vorrat}</span> {SHOP_LABEL.vorrat}
+            <small> – Gewürze & Grundzutaten, kurz prüfen</small>
+          </h3>
+          <ul>
+            {[...result.staples]
+              .sort((a, b) => Number(checkedSet.has(a.key)) - Number(checkedSet.has(b.key)) || a.name.localeCompare(b.name, 'de'))
+              .map((it) => {
+                const on = checkedSet.has(it.key)
+                return (
+                  <li key={it.key} className={on ? 'done' : ''}>
+                    <label>
+                      <input type="checkbox" checked={on} onChange={() => onToggleKey(it.key)} />
+                      <span className="check" aria-hidden />
+                      <span className="item-name">{it.name}</span>
+                      <span className="item-amt">{it.amount}</span>
+                    </label>
+                  </li>
+                )
+              })}
+          </ul>
+        </section>
+      )}
+
+      {result.covered.length > 0 && (
+        <section className="shop-section covered">
+          <h3>
+            <button className="link plain" onClick={() => setShowCovered((v) => !v)}>
+              ✅ Schon im Vorrat ({result.covered.length}) {showCovered ? '▴' : '▾'}
+            </button>
+          </h3>
+          {showCovered && (
+            <ul>
+              {result.covered.map((it) => (
+                <li key={it.key}>
+                  <span className="item-name">{it.name}</span>
+                  <span className="item-amt">{formatAmount(it.required, it.unit)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       <form
         className="add-custom"
@@ -108,6 +182,46 @@ export function ShoppingList({ days, plan, checked, custom, onToggle, onResetChe
         </select>
         <button className="btn primary" type="submit">+</button>
       </form>
+    </div>
+  )
+}
+
+function ItemDetails({ it, onEditPrice }: { it: BuyItem; onEditPrice: (name: string, pack: number, price: number) => void }) {
+  const [editing, setEditing] = useState(false)
+  const [pack, setPack] = useState(String(it.product.pack))
+  const [price, setPrice] = useState(it.product.price.toFixed(2).replace('.', ','))
+  return (
+    <div className="item-recipes">
+      <div>
+        Brauchst {formatAmount(it.required, it.unit)}
+        {it.fromPantry > 0 && <> · {formatAmount(it.fromPantry, it.unit)} aus dem Vorrat</>}
+        {it.leftover > 0.01 && <> · <b className="accent">{formatAmount(it.leftover, it.unit)} bleiben übrig</b></>}
+      </div>
+      <div>Für: {it.recipes.join(' · ')}</div>
+      {!editing ? (
+        <button className="link small" onClick={() => setEditing(true)}>
+          Packung {formatAmount(it.product.pack, it.unit)} für {formatEuro(it.product.price)} ✎ anpassen
+        </button>
+      ) : (
+        <form
+          className="price-edit"
+          onSubmit={(e) => {
+            e.preventDefault()
+            const pk = parseFloat(pack.replace(',', '.'))
+            const pr = parseFloat(price.replace(',', '.'))
+            if (pk > 0 && pr >= 0) onEditPrice(it.name, pk, pr)
+            setEditing(false)
+          }}
+        >
+          <label>
+            Packung <input inputMode="decimal" value={pack} onChange={(e) => setPack(e.target.value)} /> {it.unit}
+          </label>
+          <label>
+            Preis <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} /> €
+          </label>
+          <button className="btn primary small-btn" type="submit">OK</button>
+        </form>
+      )}
     </div>
   )
 }

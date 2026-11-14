@@ -14,9 +14,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(ROOT, 'public', 'img')
 MAP = os.path.join(ROOT, 'src', 'data', 'images.json')
 OVR = os.path.join(ROOT, 'scripts', 'image-overrides.json')
-UA = 'YamiRecipeApp/0.1 (private non-commercial recipe planner)'
+# Wikimedia verlangt eine Kontaktangabe im User-Agent: https://w.wiki/4wJS
+UA = os.environ.get('YAMI_UA', 'YamiRecipeApp/0.1 (private non-commercial recipe planner)') + ' python-urllib'
 API = 'https://commons.wikimedia.org/w/api.php'
-PAUSE = 4  # Sekunden zwischen Anfragen (Wikimedia drosselt sonst)
+PAUSE = 1.5  # Sekunden zwischen Anfragen (Wikimedia drosselt sonst)
 OK_LICENSE = re.compile(r'^(cc0|public domain|pd|cc by(-sa)? ?[1-4]\.0|cc by(-sa)?$|cc-by(-sa)?-[1-4]\.0)', re.I)
 BAD_WORDS = re.compile(r'(logo|map|karte|svg|diagram|menu|speisekarte|packung|package|schild|sign|plakat|poster|stamp|briefmarke)', re.I)
 

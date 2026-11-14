@@ -1,27 +1,37 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Recipe } from '../types'
 import { CUISINE_LABEL, TYPE_LABEL } from '../types'
-import { shuffle } from '../store'
 import { formatTime } from '../filter'
+import { type Insight, formatEuro } from '../kitchen'
 import { RecipeImage } from './RecipeImage'
 
 interface Props {
-  pool: Recipe[]
+  /** bereits sortiert: beste Empfehlung zuerst */
+  deck: Recipe[]
+  insights: Map<string, Insight>
   onTake: (r: Recipe) => void
+  onReject: (r: Recipe) => void
   onInfo: (r: Recipe) => void
 }
 
 const THRESHOLD = 90
 
-export function SwipeDeck({ pool, onTake, onInfo }: Props) {
-  const poolKey = pool.map((r) => r.id).join(',')
-  const [deck, setDeck] = useState<Recipe[]>(() => shuffle(pool))
-  // bei geänderten Filtern neu mischen
-  useEffect(() => {
-    setDeck(shuffle(pool))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poolKey])
+export function InsightBadges({ ins }: { ins?: Insight }) {
+  if (!ins) return null
+  const others = ins.fromPantry.filter((n) => !ins.urgent.includes(n))
+  return (
+    <div className="badges">
+      {ins.urgent.length > 0 && <span className="badge warn">⚠️ verbraucht {ins.urgent.slice(0, 2).join(', ')}{ins.urgent.length > 2 ? ' …' : ''}</span>}
+      {others.length > 0 && (
+        <span className="badge eco">♻️ {others.length === 1 ? others[0] : `${others.length} Zutaten`} aus dem Vorrat</span>
+      )}
+      <span className="badge">🛒 {ins.buyCost < 0.01 ? 'nichts einkaufen' : `+${formatEuro(ins.buyCost)}`}</span>
+      {ins.lastSeenDays != null && ins.lastSeenDays <= 28 && <span className="badge">🔁 vor {ins.lastSeenDays} Tagen</span>}
+    </div>
+  )
+}
 
+export function SwipeDeck({ deck, insights, onTake, onReject, onInfo }: Props) {
   const [drag, setDrag] = useState({ dx: 0, dy: 0, active: false })
   const [leaving, setLeaving] = useState<null | 'left' | 'right'>(null)
   const start = useRef<{ x: number; y: number; t: number } | null>(null)
@@ -30,29 +40,22 @@ export function SwipeDeck({ pool, onTake, onInfo }: Props) {
   const top = deck[0]
   const next = deck.slice(1, 3)
 
-  function commit(dir: 'left' | 'right') {
-    const card = deck[0]
-    if (!card) return
-    if (dir === 'right') {
-      setDeck((d) => d.slice(1))
-      onTake(card)
-    } else {
-      // weggewischt: ans Ende des Stapels legen
-      setDeck((d) => [...d.slice(1), d[0]])
-    }
+  // neue oberste Karte → Zustand zurücksetzen
+  useEffect(() => {
     setLeaving(null)
     setDrag({ dx: 0, dy: 0, active: false })
-  }
+  }, [top?.id])
 
   function fly(dir: 'left' | 'right') {
     if (leaving || !top) return
     setLeaving(dir)
-    window.setTimeout(() => commit(dir), 260)
+    const card = top
+    window.setTimeout(() => (dir === 'right' ? onTake(card) : onReject(card)), 260)
   }
 
-  // Tastatur: Pfeiltasten
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
+      if (document.querySelector('.sheet')) return
       if (e.key === 'ArrowRight') fly('right')
       if (e.key === 'ArrowLeft') fly('left')
     }
@@ -85,6 +88,7 @@ export function SwipeDeck({ pool, onTake, onInfo }: Props) {
 
   const likeOpacity = Math.min(1, Math.max(0, drag.dx / THRESHOLD))
   const nopeOpacity = Math.min(1, Math.max(0, -drag.dx / THRESHOLD))
+  const ins = insights.get(top.id)
 
   return (
     <div className="deck-wrap">
@@ -138,13 +142,12 @@ export function SwipeDeck({ pool, onTake, onInfo }: Props) {
           <div className="stamp like" style={{ opacity: likeOpacity }}>LECKER</div>
           <div className="stamp nope" style={{ opacity: nopeOpacity }}>NÄCHSTES</div>
           <div className="card-info">
-            <div className="card-tags">
-              <span>{CUISINE_LABEL[top.cuisine]}</span>
-              <span>{TYPE_LABEL[top.type]}</span>
-              {top.vegetarian && <span>🌱 Veggie</span>}
-            </div>
+            <InsightBadges ins={ins} />
             <h2>{top.title}</h2>
-            <div className="card-meta">⏱ {formatTime(top.time)} · {top.ingredients.length} Zutaten · Tippen für Rezept</div>
+            <div className="card-meta">
+              {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)}
+              {ins ? ` · ≈ ${formatEuro(ins.perPortion)}/P.` : ''}
+            </div>
           </div>
         </div>
       </div>

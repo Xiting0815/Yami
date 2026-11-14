@@ -1,4 +1,25 @@
 {
+ "backfisch": {
+  "author": "CLCBhumu",
+  "commonsTitle": "File:Michael Backfisch.jpg",
+  "file": "img/backfisch.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Michael_Backfisch.jpg"
+ },
+ "bauernfruehstueck": {
+  "author": "Josef Türk Reit im Winkl Chiemgau",
+  "commonsTitle": "File:Bauernfrühstück-01.jpg",
+  "file": "img/bauernfruehstueck.webp",
+  "license": "CC BY 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Bauernfr%C3%BChst%C3%BCck-01.jpg"
+ },
+ "bratwurst-sauerkraut": {
+  "author": "Schlurcher",
+  "commonsTitle": "File:Nürnberger Rostbratwürste.JPG",
+  "file": "img/bratwurst-sauerkraut.webp",
+  "license": "CC BY 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:N%C3%BCrnberger_Rostbratw%C3%BCrste.JPG"
+ },
  "carbonara": {
   "author": "Javier Somoza",
   "commonsTitle": "File:Espaguetis carbonara.jpg",
@@ -13,7 +34,69 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cordon_Bleu_01.jpg"
  },
- "frikadellen": null,
+ "currywurst": {
+  "author": "Superbass",
+  "commonsTitle": "File:Curryking-4612.jpg",
+  "file": "img/currywurst.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Curryking-4612.jpg"
+ },
+ "flammkuchen": {
+  "author": "Lulu Durand",
+  "commonsTitle": "File:Tarte flambée alsacienne 514471722.jpg",
+  "file": "img/flammkuchen.webp",
+  "license": "CC BY 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Tarte_flamb%C3%A9e_alsacienne_514471722.jpg"
+ },
+ "frikadellen": {
+  "author": "Jacek Halicki",
+  "commonsTitle": "File:2023 Kotlety mielone.jpg",
+  "file": "img/frikadellen.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:2023_Kotlety_mielone.jpg"
+ },
+ "gefuellte-paprika": {
+  "author": "Vyacheslav Argenberg",
+  "commonsTitle": "File:Stuffed red peppers, dark rye bread, Rostov-on-Don, Russia.jpg",
+  "file": "img/gefuellte-paprika.webp",
+  "license": "CC BY 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Stuffed_red_peppers,_dark_rye_bread,_Rostov-on-Don,_Russia.jpg"
+ },
+ "geschmaelzte-maultaschen": {
+  "author": "Soljaguar",
+  "commonsTitle": "File:Maultaschen beim Metzger.jpg",
+  "file": "img/geschmaelzte-maultaschen.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Maultaschen_beim_Metzger.jpg"
+ },
+ "gruene-sosse": {
+  "author": "Benreis",
+  "commonsTitle": "File:Grüne Soße Ei kartoffeln.JPG",
+  "file": "img/gruene-sosse.webp",
+  "license": "CC BY 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Gr%C3%BCne_So%C3%9Fe_Ei_kartoffeln.JPG"
+ },
+ "hackbraten": {
+  "author": "Indrajit Das",
+  "commonsTitle": "File:Homemade meatloaf 04.jpg",
+  "file": "img/hackbraten.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Homemade_meatloaf_04.jpg"
+ },
+ "himmel-und-erde": {
+  "author": "Anagoria",
+  "commonsTitle": "File:2016-01-03 Himmel und Erde anagoria.JPG",
+  "file": "img/himmel-und-erde.webp",
+  "license": "CC BY 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:2016-01-03_Himmel_und_Erde_anagoria.JPG"
+ },
+ "huehnerfrikassee": {
+  "author": "Chicken_fricassee-01.jpg: Like_the_Grand_Canyon derivative work: Hic et nunc",
+  "commonsTitle": "File:Chicken fricassee-01-3.jpg",
+  "file": "img/huehnerfrikassee.webp",
+  "license": "CC BY 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Chicken_fricassee-01-3.jpg"
+ },
  "jaegerschnitzel": {
   "author": "Xipolis",
   "commonsTitle": "File:Jägerschnitzel DDR.jpg",
@@ -21,13 +104,82 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:J%C3%A4gerschnitzel_DDR.jpg"
  },
- "koenigsberger-klopse": null,
+ "kaesespaetzle": {
+  "author": "Takeaway",
+  "commonsTitle": "File:2015 0718 Käsespätzle Sölden.jpg",
+  "file": "img/kaesespaetzle.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:2015_0718_K%C3%A4sesp%C3%A4tzle_S%C3%B6lden.jpg"
+ },
+ "kartoffelpuffer": {
+  "author": "Xocolatl (talk) 14:34, 16 June 2017 (UTC)",
+  "commonsTitle": "File:Kartoffelpuffer mit Apfelmus.jpg",
+  "file": "img/kartoffelpuffer.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Kartoffelpuffer_mit_Apfelmus.jpg"
+ },
+ "kassler-sauerkraut": {
+  "author": "4028mdk09",
+  "commonsTitle": "File:Sauerkraut, Knödel, Stück Kassler.JPG",
+  "file": "img/kassler-sauerkraut.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Sauerkraut,_Kn%C3%B6del,_St%C3%BCck_Kassler.JPG"
+ },
+ "koenigsberger-klopse": {
+  "author": "Anagoria",
+  "commonsTitle": "File:2022-11-13 Königsberger Klopse Restaurant Dicke Paula Berlin anagoria.jpg",
+  "file": "img/koenigsberger-klopse.webp",
+  "license": "CC BY 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:2022-11-13_K%C3%B6nigsberger_Klopse_Restaurant_Dicke_Paula_Berlin_anagoria.jpg"
+ },
+ "kohlrouladen": {
+  "author": "Silar",
+  "commonsTitle": "File:00101 Vorkarpatische Küche Piroggen, Kohlrouladen, Kroketten.JPG",
+  "file": "img/kohlrouladen.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:00101_Vorkarpatische_K%C3%BCche_Piroggen,_Kohlrouladen,_Kroketten.JPG"
+ },
+ "krautschupfnudeln": {
+  "author": "MarkusHagenlocher",
+  "commonsTitle": "File:Schupfnudeln mit Sauerkraut-RZ.jpg",
+  "file": "img/krautschupfnudeln.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Schupfnudeln_mit_Sauerkraut-RZ.jpg"
+ },
+ "labskaus": {
+  "author": "GeoTrinity",
+  "commonsTitle": "File:Hamburger Labskaus 1.jpg",
+  "file": "img/labskaus.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Hamburger_Labskaus_1.jpg"
+ },
+ "lachs-senf-dill": {
+  "author": "DanaTentis",
+  "commonsTitle": "File:Grilled plated salmon fillet (cropped).jpg",
+  "file": "img/lachs-senf-dill.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Grilled_plated_salmon_fillet_(cropped).jpg"
+ },
+ "leberkaese": {
+  "author": "Kritzolina",
+  "commonsTitle": "File:Leberkäs mit Spiegelei in Prien 02.jpg",
+  "file": "img/leberkaese.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Leberk%C3%A4s_mit_Spiegelei_in_Prien_02.jpg"
+ },
  "mapo-tofu": {
   "author": "Archon6812",
   "commonsTitle": "File:Billyfoodmabodofu3.jpg",
   "file": "img/mapo-tofu.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Billyfoodmabodofu3.jpg"
+ },
+ "matjes-hausfrauenart": {
+  "author": "Jessica from Hove, United Kingdom",
+  "commonsTitle": "File:Herring with sour cream and onion and fried potato.jpg",
+  "file": "img/matjes-hausfrauenart.webp",
+  "license": "CC BY 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Herring_with_sour_cream_and_onion_and_fried_potato.jpg"
  },
  "paprikaschnitzel": {
   "author": "Benreis",
@@ -36,12 +188,26 @@
   "license": "CC BY 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Zigeunerschnitzel_Jennrkaser.JPG"
  },
+ "pellkartoffeln-kraeuterquark": {
+  "author": "abnehmen.net",
+  "commonsTitle": "File:Kartoffeln-quark.jpg",
+  "file": "img/pellkartoffeln-kraeuterquark.webp",
+  "license": "CC BY-SA 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Kartoffeln-quark.jpg"
+ },
  "rahmschnitzel": {
   "author": "Christian Michelides",
   "commonsTitle": "File:Kaiserschnitzel Waldviertlerhof 2020 (Wien).jpg",
   "file": "img/rahmschnitzel.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kaiserschnitzel_Waldviertlerhof_2020_(Wien).jpg"
+ },
+ "rindergulasch": {
+  "author": "Jiří Sedláček",
+  "commonsTitle": "File:Caultron with goulash at Tripod near Kouty, Třebíč District.jpg",
+  "file": "img/rindergulasch.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Caultron_with_goulash_at_Tripod_near_Kouty,_T%C5%99eb%C3%AD%C4%8D_District.jpg"
  },
  "rinderrouladen": {
   "author": "Matt Lancashire",
@@ -57,12 +223,74 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Sauerbraten_with_potato_dumplings.jpg"
  },
- "schweinebraten": null,
+ "schweinebraten": {
+  "author": "Benreis",
+  "commonsTitle": "File:Schweinebraten Goldener Adler Mürsbach.jpg",
+  "file": "img/schweinebraten.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Schweinebraten_Goldener_Adler_M%C3%BCrsbach.jpg"
+ },
+ "schweinemedaillons-pfefferrahm": {
+  "author": "Manfred&amp;Barbara Aulbach",
+  "commonsTitle": "File:Schweinemedaillons - indische Art.jpg",
+  "file": "img/schweinemedaillons-pfefferrahm.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Schweinemedaillons_-_indische_Art.jpg"
+ },
+ "schweinshaxe": {
+  "author": "Takeaway",
+  "commonsTitle": "File:Schweinshaxe Chiang Mai.JPG",
+  "file": "img/schweinshaxe.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Schweinshaxe_Chiang_Mai.JPG"
+ },
+ "senfeier": {
+  "author": "Raboe001",
+  "commonsTitle": "File:Hannover 2026 - Café Ausblick - Senfeier - by-RaBoe 006.jpg",
+  "file": "img/senfeier.webp",
+  "license": "CC BY-SA 3.0 de",
+  "source": "https://commons.wikimedia.org/wiki/File:Hannover_2026_-_Caf%C3%A9_Ausblick_-_Senfeier_-_by-RaBoe_006.jpg"
+ },
+ "speckpfannkuchen": {
+  "author": "Xocolatl",
+  "commonsTitle": "File:Speckpfannkuchen 2014.jpg",
+  "file": "img/speckpfannkuchen.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Speckpfannkuchen_2014.jpg"
+ },
+ "spinat-spiegelei": {
+  "author": "Arnold Gatilao",
+  "commonsTitle": "File:Creamed Spinach with Nueske's Bacon.jpg",
+  "file": "img/spinat-spiegelei.webp",
+  "license": "CC BY 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Creamed_Spinach_with_Nueske%27s_Bacon.jpg"
+ },
+ "szegediner-gulasch": {
+  "author": "Nillerdk",
+  "commonsTitle": "File:Segedínský guláš.jpg",
+  "file": "img/szegediner-gulasch.webp",
+  "license": "CC BY 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Seged%C3%ADnsk%C3%BD_gul%C3%A1%C5%A1.jpg"
+ },
+ "tafelspitz": {
+  "author": "Hh2409",
+  "commonsTitle": "File:Tafelspitz in Meerrettichsauce.jpg",
+  "file": "img/tafelspitz.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Tafelspitz_in_Meerrettichsauce.jpg"
+ },
  "wiener-schnitzel": {
   "author": "Burkhard Mücke",
   "commonsTitle": "File:2022-12-29 Wiener Schnitzel im Hotel Kaiserin Elisabeth.jpg",
   "file": "img/wiener-schnitzel.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:2022-12-29_Wiener_Schnitzel_im_Hotel_Kaiserin_Elisabeth.jpg"
+ },
+ "zuercher-geschnetzeltes": {
+  "author": "Jpatokal",
+  "commonsTitle": "File:Zürcher Geschnetzeltes at Zur rote Buech.jpg",
+  "file": "img/zuercher-geschnetzeltes.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Z%C3%BCrcher_Geschnetzeltes_at_Zur_rote_Buech.jpg"
  }
 }

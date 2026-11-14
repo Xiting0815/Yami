@@ -10,6 +10,14 @@ Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und beko
   Abhaken im Laden, eigene Artikel ergänzen.
 - **Rezepte:** ca. 200 Gerichte (≈ 90 deutsch, 70 italienisch, 40 asiatisch) mit Zutaten und Zubereitung, durchsuchbar.
 
+### Vorrat, Resteverwertung & Preise
+
+- **Vorrat füllt sich automatisch:** Was du auf der Einkaufsliste abhakst, landet mit Menge und Haltbarkeit im Vorrat (Tab „Vorrat“). Dort kannst du auch selbst Zutaten eintragen, Mengen und Datum ändern.
+- **Kochen zieht ab:** Am Tag nach einem geplanten Gericht werden dessen Zutaten automatisch abgezogen (FIFO, angebrochene Packungen bekommen die kürzere Haltbarkeit, z. B. Sahne 4 Tage). Mit „Nicht gekocht“ kommen sie zurück.
+- **Einkaufsliste nach Packungen:** Vorhandenes wird abgezogen und auf übliche Packungsgrößen aufgerundet („1 Becher (200 ml)“). Jeder Artikel hat einen geschätzten Preis, oben steht die Summe. Was übrig bleibt, zeigt die Detailansicht ⓘ.
+- **Smarte Reihenfolge beim Wischen:** Zuerst kommen Gerichte, die Vorrat und Reste verbrauchen (Verderbliches zählt stärker) und wenig Zukauf brauchen. Gerichte der letzten 3 Wochen, gleiche Gerichtart oder Küche in derselben Woche und vegetarische Gerichte (Einstellung `VEG_PENALTY` in `src/kitchen.ts`) rutschen nach hinten.
+- **Preise anpassen:** Die Preise sind grobe Discounter-Schätzungen (Stand 2026, `src/data/products.ts`). In der Einkaufsliste unter ⓘ → „anpassen“ kannst du Packungsgröße und Preis korrigieren. Filter „💶 Günstig“ zeigt Gerichte bis 2,50 € pro Portion.
+
 Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine PWA und lässt sich auf den Homescreen legen und offline nutzen.
 
 ## Entwickeln
@@ -18,7 +26,8 @@ Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine 
 npm install
 npm run dev          # http://localhost:5173
 npm run build        # Produktions-Build nach dist/
-npm run check-data   # prüft die Rezeptdatenbank
+npm run check-data   # prüft Rezeptdatenbank, Produkte & Einheiten
+npx vite-node scripts/test-kitchen.ts   # Logiktests Vorrat/Einkauf/Empfehlungen
 ```
 
 ## Veröffentlichen (kostenlos)
@@ -47,7 +56,7 @@ r('id', 'Titel', 'de' | 'it' | 'as', 'haupt' | 'pasta' | 'eintopf' | 'suppe' | '
 ```
 
 Erlaubte Einheiten: `g kg ml l Stk EL TL Prise Bund Zehe Dose Pck Scheibe Zweig Glas Becher Blatt`. Zutaten ohne Menge (z. B. `Salz`) gelten als „nach Bedarf“.
-Neue Zutaten müssen in `src/data/catalog.ts` einer Einkaufslisten-Kategorie zugeordnet werden. `npm run check-data` meldet fehlende Einträge.
+Neue Zutaten müssen in `src/data/catalog.ts` einer Einkaufslisten-Kategorie zugeordnet und (außer Gewürzen) in `src/data/products.ts` mit Packung, Preis und Haltbarkeit eingetragen werden. `npm run check-data` meldet fehlende Einträge.
 
 ## Fotos
 
@@ -55,7 +64,7 @@ Die Fotos stammen von **Wikimedia Commons** und stehen unter freien Lizenzen (CC
 
 ```bash
 npx vite-node scripts/dump-recipes.ts > /tmp/recipes.json
-python3 scripts/fetch_images.py /tmp/recipes.json            # fehlende Fotos laden
+YAMI_UA='YamiRecipeApp/0.1 (deine@mail.de)' python3 scripts/fetch_images.py /tmp/recipes.json   # fehlende Fotos laden (Wikimedia verlangt Kontaktangabe)
 python3 scripts/fetch_images.py /tmp/recipes.json --only lasagne --force   # einzelnes Foto neu suchen
 ```
 
