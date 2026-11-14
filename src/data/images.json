@@ -41,13 +41,7 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Penne_Arrabbiata.jpg"
  },
- "backfisch": {
-  "author": "CLCBhumu",
-  "commonsTitle": "File:Michael Backfisch.jpg",
-  "file": "img/backfisch.webp",
-  "license": "CC BY-SA 4.0",
-  "source": "https://commons.wikimedia.org/wiki/File:Michael_Backfisch.jpg"
- },
+ "backfisch": null,
  "bami-goreng": {
   "author": "Gunawan Kartapranata",
   "commonsTitle": "File:Mi Goreng GM.jpg",
@@ -170,13 +164,7 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chicken_Wings_in_Coca_Cola_Sauce.jpg"
  },
- "cordon-bleu": {
-  "author": "Marife.altabano",
-  "commonsTitle": "File:Cordon Bleu 01.jpg",
-  "file": "img/cordon-bleu.webp",
-  "license": "CC BY-SA 4.0",
-  "source": "https://commons.wikimedia.org/wiki/File:Cordon_Bleu_01.jpg"
- },
+ "cordon-bleu": null,
  "cotoletta": {
   "author": "Paolo Piscolla",
   "commonsTitle": "File:Cotoletta e patate al forno.jpg",
@@ -424,13 +412,7 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:J%C3%A4gerschnitzel_DDR.jpg"
  },
- "jiaozi": {
-  "author": "CEphoto, Uwe Aranas",
-  "commonsTitle": "File:Taipei Taiwan Jiaozi-Restaurant-14th-avenue-02.jpg",
-  "file": "img/jiaozi.webp",
-  "license": "CC BY-SA 3.0",
-  "source": "https://commons.wikimedia.org/wiki/File:Taipei_Taiwan_Jiaozi-Restaurant-14th-avenue-02.jpg"
- },
+ "jiaozi": null,
  "kaese-lauch-suppe": {
   "author": "Katrin Gilger",
   "commonsTitle": "File:Lauch-Käse-Suppe mit Hackfleisch (5526372941).jpg",
@@ -510,13 +492,7 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:00101_Vorkarpatische_K%C3%BCche_Piroggen,_Kohlrouladen,_Kroketten.JPG"
  },
- "kotelett-rahmkohlrabi": {
-  "author": "Peachyeung316",
-  "commonsTitle": "File:Tomahawk Pork Chop from Netherlands.jpg",
-  "file": "img/kotelett-rahmkohlrabi.webp",
-  "license": "CC BY-SA 4.0",
-  "source": "https://commons.wikimedia.org/wiki/File:Tomahawk_Pork_Chop_from_Netherlands.jpg"
- },
+ "kotelett-rahmkohlrabi": null,
  "krautschupfnudeln": {
   "author": "MarkusHagenlocher",
   "commonsTitle": "File:Schupfnudeln mit Sauerkraut-RZ.jpg",
@@ -650,13 +626,7 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Minestrone_soup.jpg"
  },
- "moehreneintopf": {
-  "author": "Katrin Gilger",
-  "commonsTitle": "File:Cereal, Yoghurt, Berries & Banana (4372854652).jpg",
-  "file": "img/moehreneintopf.webp",
-  "license": "CC BY-SA 2.0",
-  "source": "https://commons.wikimedia.org/wiki/File:Cereal,_Yoghurt,_Berries_%26_Banana_(4372854652).jpg"
- },
+ "moehreneintopf": null,
  "nasi-goreng": {
   "author": "Wiki Farazi",
   "commonsTitle": "File:Nasi goreng pattaya 20231028 120535.jpg",
@@ -918,13 +888,7 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Ribollita_toscana.JPG"
  },
- "rigatoni-salsiccia": {
-  "author": "Albarubescens",
-  "commonsTitle": "File:Sagra delle Costarelle a Bassano Romano.jpg",
-  "file": "img/rigatoni-salsiccia.webp",
-  "license": "CC BY-SA 4.0",
-  "source": "https://commons.wikimedia.org/wiki/File:Sagra_delle_Costarelle_a_Bassano_Romano.jpg"
- },
+ "rigatoni-salsiccia": null,
  "rind-brokkoli": {
   "author": "jeffreyw",
   "commonsTitle": "File:Broccoli beef (5457397534).jpg",
@@ -932,13 +896,7 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Broccoli_beef_(5457397534).jpg"
  },
- "rindergulasch": {
-  "author": "Jiří Sedláček",
-  "commonsTitle": "File:Caultron with goulash at Tripod near Kouty, Třebíč District.jpg",
-  "file": "img/rindergulasch.webp",
-  "license": "CC BY-SA 3.0",
-  "source": "https://commons.wikimedia.org/wiki/File:Caultron_with_goulash_at_Tripod_near_Kouty,_T%C5%99eb%C3%AD%C4%8D_District.jpg"
- },
+ "rindergulasch": null,
  "rinderrouladen": {
   "author": "Matt Lancashire",
   "commonsTitle": "File:Rindsroulade-01.jpg",

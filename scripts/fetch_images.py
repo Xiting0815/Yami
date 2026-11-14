@@ -14,6 +14,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(ROOT, 'public', 'img')
 MAP = os.path.join(ROOT, 'src', 'data', 'images.json')
 OVR = os.path.join(ROOT, 'scripts', 'image-overrides.json')
+# bessere Suchbegriffe für einzelne Rezepte
+QPATH = os.path.join(ROOT, 'scripts', 'image-queries.json')
+QUERIES = json.load(open(QPATH)) if os.path.exists(QPATH) else {}
+# Commons-Dateien, die nicht passen (z. B. Porträts statt Essen) – werden nie wieder gewählt
+BLOCK = set(json.load(open(os.path.join(ROOT, 'scripts', 'image-blocklist.json')))) if os.path.exists(os.path.join(ROOT, 'scripts', 'image-blocklist.json')) else set()
 # Wikimedia verlangt eine Kontaktangabe im User-Agent: https://w.wiki/4wJS
 UA = os.environ.get('YAMI_UA', 'YamiRecipeApp/0.1 (private non-commercial recipe planner)') + ' python-urllib'
 API = 'https://commons.wikimedia.org/w/api.php'
@@ -69,7 +74,7 @@ def acceptable(p):
     w, h = ii.get('width', 0), ii.get('height', 0)
     if w < 500 or h < 300 or not (0.6 <= w / max(h, 1) <= 2.2):
         return None
-    if BAD_WORDS.search(p.get('title', '')):
+    if BAD_WORDS.search(p.get('title', '')) or p.get('title') in BLOCK:
         return None
     meta = ii.get('extmetadata', {})
     lic = strip_html(meta.get('LicenseShortName', {}).get('value', ''))
@@ -128,7 +133,7 @@ def main():
                 if c is None and p.get('imageinfo'):  # Override erzwingt Datei, Lizenz trotzdem prüfen
                     print('   override abgelehnt (Lizenz/Format)')
                 chosen = c
-        queries = [r['img'], r['title'].split(' mit ')[0].split(' (')[0]]
+        queries = ([QUERIES[rid]] if rid in QUERIES else []) + [r['img'], r['title'].split(' mit ')[0].split(' (')[0]]
         for q in ([] if chosen else queries):
             for p in candidates_for(q):
                 c = acceptable(p)
