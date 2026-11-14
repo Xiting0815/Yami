@@ -308,8 +308,17 @@ export interface Insight {
   score: number
 }
 
-/** Abwertung vegetarischer Gerichte in der Sortierung (0 = neutral) */
-export const VEG_PENALTY = 3
+/** Ziel-Anteil vegetarischer Gerichte pro Woche (15 % ≈ 1 von 7 Tagen) */
+export const VEG_SHARE = 0.15
+
+/** Abwertung vegetarischer Gerichte, abhängig davon, ob die Woche ihr Veggie-Kontingent schon hat */
+// unter Kontingent: leichter Bonus (−1), damit ca. 1 Veggie-Gericht pro Woche vorkommt
+function vegPenalty(recipe: Recipe, weekRecipes: Recipe[]): number {
+  if (!recipe.vegetarian) return 0
+  const quota = Math.max(1, Math.round(7 * VEG_SHARE))
+  const vegCount = weekRecipes.filter((w) => w.vegetarian).length
+  return vegCount >= quota ? 12 : -1
+}
 
 function urgencyWeight(daysLeft: number): number {
   if (daysLeft <= 1) return 4
@@ -356,9 +365,8 @@ export function insight(
   const sameType = weekRecipes.filter((w) => w.type === recipe.type).length
   const sameCuisine = weekRecipes.filter((w) => w.cuisine === recipe.cuisine).length
   const mixPenalty = sameType * 1.8 + Math.max(0, sameCuisine - 1) * 2.2
-  // Haushalt isst fast nie vegetarisch → Veggie-Gerichte etwas nach hinten (nicht ausblenden)
-  const vegPenalty = recipe.vegetarian ? VEG_PENALTY : 0
-  const score = pantryScore * 2 - buyCost * 0.25 + jitter * 4 - repeatPenalty - mixPenalty - vegPenalty
+  // Vegetarisch nur ca. 15 %: ist das Wochen-Kontingent erreicht, rutschen Veggie-Gerichte weit nach hinten
+  const score = pantryScore * 2 - buyCost * 0.25 + jitter * 4 - repeatPenalty - mixPenalty - vegPenalty(recipe, weekRecipes)
   const cost = recipeCost(recipe, servings, overrides)
   return { fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, score }
 }
