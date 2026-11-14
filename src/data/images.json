@@ -1,0 +1,68 @@
+{
+ "carbonara": {
+  "author": "Javier Somoza",
+  "commonsTitle": "File:Espaguetis carbonara.jpg",
+  "file": "img/carbonara.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Espaguetis_carbonara.jpg"
+ },
+ "cordon-bleu": {
+  "author": "Marife.altabano",
+  "commonsTitle": "File:Cordon Bleu 01.jpg",
+  "file": "img/cordon-bleu.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Cordon_Bleu_01.jpg"
+ },
+ "frikadellen": null,
+ "jaegerschnitzel": {
+  "author": "Xipolis",
+  "commonsTitle": "File:Jägerschnitzel DDR.jpg",
+  "file": "img/jaegerschnitzel.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:J%C3%A4gerschnitzel_DDR.jpg"
+ },
+ "koenigsberger-klopse": null,
+ "mapo-tofu": {
+  "author": "Archon6812",
+  "commonsTitle": "File:Billyfoodmabodofu3.jpg",
+  "file": "img/mapo-tofu.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Billyfoodmabodofu3.jpg"
+ },
+ "paprikaschnitzel": {
+  "author": "Benreis",
+  "commonsTitle": "File:Zigeunerschnitzel Jennrkaser.JPG",
+  "file": "img/paprikaschnitzel.webp",
+  "license": "CC BY 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Zigeunerschnitzel_Jennrkaser.JPG"
+ },
+ "rahmschnitzel": {
+  "author": "Christian Michelides",
+  "commonsTitle": "File:Kaiserschnitzel Waldviertlerhof 2020 (Wien).jpg",
+  "file": "img/rahmschnitzel.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Kaiserschnitzel_Waldviertlerhof_2020_(Wien).jpg"
+ },
+ "rinderrouladen": {
+  "author": "Matt Lancashire",
+  "commonsTitle": "File:Rindsroulade-01.jpg",
+  "file": "img/rinderrouladen.webp",
+  "license": "CC BY 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Rindsroulade-01.jpg"
+ },
+ "sauerbraten": {
+  "author": "Jameres",
+  "commonsTitle": "File:Sauerbraten with potato dumplings.jpg",
+  "file": "img/sauerbraten.webp",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Sauerbraten_with_potato_dumplings.jpg"
+ },
+ "schweinebraten": null,
+ "wiener-schnitzel": {
+  "author": "Burkhard Mücke",
+  "commonsTitle": "File:2022-12-29 Wiener Schnitzel im Hotel Kaiserin Elisabeth.jpg",
+  "file": "img/wiener-schnitzel.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:2022-12-29_Wiener_Schnitzel_im_Hotel_Kaiserin_Elisabeth.jpg"
+ }
+}

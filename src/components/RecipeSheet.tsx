@@ -1,0 +1,95 @@
+import { useEffect, useState } from 'react'
+import type { Recipe } from '../types'
+import { CUISINE_LABEL, TYPE_LABEL } from '../types'
+import { formatTime } from '../filter'
+import { formatAmount, scale } from '../shopping'
+import { RecipeImage } from './RecipeImage'
+import imageMap from '../data/images.json'
+
+type Credit = { author: string; license: string; source: string } | null | undefined
+const credits = imageMap as unknown as Record<string, Credit>
+
+interface Props {
+  recipe: Recipe
+  servings: number
+  onClose: () => void
+  /** Hauptaktion, z. B. "Für Montag nehmen" */
+  action?: { label: string; onClick: (servings: number) => void }
+}
+
+export function RecipeSheet({ recipe, servings: initial, onClose, action }: Props) {
+  const [servings, setServings] = useState(initial)
+  const credit = credits[recipe.id]
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', h)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', h)
+      document.body.style.overflow = ''
+    }
+  }, [onClose])
+
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={recipe.title}>
+        <button className="sheet-close" onClick={onClose} aria-label="Schließen">✕</button>
+        <div className="sheet-hero">
+          <RecipeImage recipe={recipe} className="sheet-img" />
+        </div>
+        <div className="sheet-body">
+          <div className="card-tags dark">
+            <span>{CUISINE_LABEL[recipe.cuisine]}</span>
+            <span>{TYPE_LABEL[recipe.type]}</span>
+            {recipe.vegetarian && <span>🌱 Veggie</span>}
+            <span>⏱ {formatTime(recipe.time)}</span>
+          </div>
+          <h2>{recipe.title}</h2>
+
+          <div className="servings">
+            <span>Portionen</span>
+            <div className="stepper">
+              <button onClick={() => setServings((s) => Math.max(1, s - 1))} aria-label="weniger">−</button>
+              <b>{servings}</b>
+              <button onClick={() => setServings((s) => Math.min(12, s + 1))} aria-label="mehr">+</button>
+            </div>
+          </div>
+
+          <h3>Zutaten</h3>
+          <ul className="ingredients">
+            {recipe.ingredients.map((ing, i) => (
+              <li key={i}>
+                <span className="amt">{formatAmount(scale(ing, recipe.servings, servings), ing.unit) || 'n. B.'}</span>
+                <span>{ing.name}</span>
+              </li>
+            ))}
+          </ul>
+
+          <h3>Zubereitung</h3>
+          <ol className="steps">
+            {recipe.steps.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ol>
+
+          {credit && (
+            <p className="credit">
+              Foto: {credit.author} ·{' '}
+              <a href={credit.source} target="_blank" rel="noreferrer">
+                {credit.license}, Wikimedia Commons
+              </a>
+            </p>
+          )}
+        </div>
+        {action && (
+          <div className="sheet-footer">
+            <button className="btn primary wide" onClick={() => action.onClick(servings)}>
+              {action.label}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
