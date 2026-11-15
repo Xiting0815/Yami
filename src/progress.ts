@@ -65,6 +65,8 @@ export interface Suggestion {
 export function suggestion(list: WeighIn[], p: Profile, decidedAtCount: number): Suggestion | null {
   if (list.length < 3 || list.length - decidedAtCount < 2) return null
   const [a, , c] = list.slice(-3)
+  // die drei Messungen müssen wirklich etwa 2 Wochen abdecken (nicht drei Einträge in 8 Tagen)
+  if (daysUntil(c.date, a.date) < 12) return null
   const twoWeekChange = c.weight - a.weight
   const weekly = twoWeekChange / 2
   const fmt = (v: number) => v.toLocaleString('de-DE', { maximumFractionDigits: 1, signDisplay: 'always' })

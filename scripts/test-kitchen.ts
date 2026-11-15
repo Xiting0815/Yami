@@ -61,5 +61,18 @@ const costs = RECIPES.map((rc) => insight(rc, 2, [], mon, {}, new Map(), 0).perP
 console.log(`  Kosten/Portion: min ${costs[0].toFixed(2)} €, Median ${costs[100].toFixed(2)} €, max ${costs[costs.length - 1].toFixed(2)} €`)
 ok(costs[100] > 1 && costs[100] < 6, 'Median-Kosten pro Portion plausibel')
 
+// 7) Nächste Woche planen, während dieses Wochenende noch offen ist: Zutaten fürs Wochenende sind reserviert
+{
+  const sat = '2026-11-21'
+  const nextDays = Array.from({ length: 7 }, (_, i) => addDaysIso('2026-11-23', i))
+  const p: WeekPlan = { [sat]: { recipeId: 'carbonara', servings: 2 }, [nextDays[0]]: { recipeId: 'carbonara', servings: 2 } }
+  const lots: PantryLot[] = [{ id: 's', name: 'Spaghetti', amount: 250, unit: 'g', expires: '2027-06-01' }]
+  const nw = planWeek(p, nextDays, lots, {}, '2026-11-20', {}, formatAmount)
+  const sp = nw.buy.find((b) => b.name === 'Spaghetti')
+  ok(!!sp && sp.packs === 1 && sp.fromPantry === 0, 'Spaghetti fürs Wochenende reserviert → nächste Woche neu kaufen')
+  const only = planWeek({ [nextDays[0]]: p[nextDays[0]] }, nextDays, lots, {}, '2026-11-20', {}, formatAmount)
+  ok(only.covered.some((b) => b.name === 'Spaghetti'), 'Ohne offenes Wochenend-Gericht reicht der Vorrat')
+}
+
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }
 console.log('Alle Tests OK')

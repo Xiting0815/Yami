@@ -30,6 +30,9 @@ ok(suggestion(list, me, list.length) === null, 'Nach Ja/Nein kein erneuter Vorsc
 s = suggestion([{ date: '2026-11-16', weight: 95 }, { date: '2026-11-23', weight: 94.9 }, { date: '2026-11-30', weight: 94.8 }], me, 0)
 ok(s?.delta === -100, `−0,2 kg in 2 Wochen → ${s?.title}`)
 
+// drei Messungen in 8 Tagen sind keine „2 Wochen“ → kein Vorschlag
+ok(suggestion([{ date: '2026-11-16', weight: 95 }, { date: '2026-11-20', weight: 95 }, { date: '2026-11-24', weight: 95 }], me, 0) === null, 'Zu kurzer Zeitraum → kein Vorschlag')
+
 // zu schnell → +100
 const fast: WeighIn[] = [{ date: '2026-11-16', weight: 95 }, { date: '2026-11-23', weight: 93.6 }, { date: '2026-11-30', weight: 92.2 }]
 s = suggestion(fast, me, 0)

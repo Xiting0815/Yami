@@ -247,12 +247,25 @@ export function planWeek(
   const consumedWeek = new Map<string, number>()
   for (const [, e] of entries) for (const c of e.consumed ?? []) consumedWeek.set(c.name, (consumedWeek.get(c.name) ?? 0) + c.amount)
 
+  // Noch offene Gerichte VOR dieser Woche (z. B. Sa/So, wenn schon die nächste Woche geplant wird)
+  // brauchen ihre Zutaten noch – die dürfen für diese Woche nicht als vorhanden zählen.
+  const earlier = [plan, breakfast]
+    .flatMap((p) => Object.entries(p))
+    .filter((x): x is [string, PlanEntry] => !!x[1] && x[0] < days[0] && !x[1].status && !!RECIPE_BY_ID[x[1].recipeId])
+    .sort((a, b) => a[0].localeCompare(b[0]))
+  const reserved = new Map<string, number>()
+  for (const [, e] of earlier)
+    for (const n of needsOf(RECIPE_BY_ID[e.recipeId], e.servings)) reserved.set(n.name, (reserved.get(n.name) ?? 0) + n.amount)
+
   const buy: BuyItem[] = []
   const covered: BuyItem[] = []
   let total = 0
   for (const [name, { amount: required, recipes }] of req) {
     const product = productFor(name, overrides)!
-    const available = Math.max(0, pantryAmount(pantry, name) - (bought[name]?.amount ?? 0) + (consumedWeek.get(name) ?? 0))
+    const available = Math.max(
+      0,
+      pantryAmount(pantry, name) - (bought[name]?.amount ?? 0) + (consumedWeek.get(name) ?? 0) - (reserved.get(name) ?? 0),
+    )
     const missing = Math.max(0, required - available)
     const packs = missing > 1e-6 ? Math.ceil(missing / product.pack - 1e-6) : 0
     const item: BuyItem = {
@@ -278,7 +291,8 @@ export function planWeek(
     if (bought[b.name]) continue
     lots.push({ id: 'v-' + b.name, name: b.name, amount: b.packs * b.product.pack, unit: b.unit, expires: addDaysIso(today, b.product.shelf) })
   }
-  for (const [day, e] of entries) {
+  // erst die noch offenen Gerichte vor dieser Woche, dann die dieser Woche
+  for (const [day, e] of [...earlier, ...entries]) {
     if (e.status === 'cooked') continue
     for (const n of needsOf(RECIPE_BY_ID[e.recipeId], e.servings)) consume(lots, n.name, n.amount, day < today ? today : day)
   }
