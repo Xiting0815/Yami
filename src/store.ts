@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { RECIPE_BY_ID } from './data/recipes'
 import type { Cuisine, DishType, ShopCat, WeekPlan } from './types'
 import type { BoughtMap, PantryLot, PriceOverrides } from './kitchen'
 import type { Profile } from './energy'
@@ -84,8 +85,26 @@ function load(): AppState {
   try {
     const raw = localStorage.getItem(KEY)
     if (raw) {
-      const saved = JSON.parse(raw)
-      const state: AppState = { ...INITIAL, ...saved, filters: { ...EMPTY_FILTERS, ...saved.filters } }
+      const parsed = JSON.parse(raw)
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return INITIAL
+      // Felder mit falschem Typ (z. B. "plan": null) verwerfen statt die App abstürzen zu lassen
+      const saved: Record<string, unknown> = {}
+      for (const [k, v] of Object.entries(parsed)) {
+        const ref = (INITIAL as unknown as Record<string, unknown>)[k]
+        if (ref === undefined || v == null) {
+          if (v != null) saved[k] = v
+          continue
+        }
+        if (Array.isArray(ref) ? Array.isArray(v) : typeof ref === typeof v && !Array.isArray(v)) saved[k] = v
+      }
+      const state: AppState = { ...INITIAL, ...(saved as Partial<AppState>), filters: { ...EMPTY_FILTERS, ...(saved.filters as object) } }
+      // Einträge zu Rezepten, die es nicht mehr gibt, entfernen
+      const clean = (p: WeekPlan) => Object.fromEntries(Object.entries(p).filter(([, e]) => e && RECIPE_BY_ID[e.recipeId]))
+      state.plan = clean(state.plan)
+      state.breakfast = clean(state.breakfast)
+      state.breakfastPicks = Object.fromEntries(
+        Object.entries(state.breakfastPicks).map(([k, ids]) => [k, (Array.isArray(ids) ? ids : []).filter((id) => RECIPE_BY_ID[id])]),
+      )
       // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
       if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'
       return state

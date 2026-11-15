@@ -11,7 +11,7 @@ import { ProfileSheet } from './components/ProfileSheet'
 import { ProgressSheet } from './components/ProgressSheet'
 import { suggestion as weightSuggestion, upsertWeighIn, weighedThisWeek } from './progress'
 import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
-import { type AppState, addDays, mondayOf, isoDate, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
+import { type AppState, addDays, mondayOf, isoDate, parseIso, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
 import { useBackStack } from './useBackStack'
 import { matches } from './filter'
 import { formatAmount } from './shopping'
@@ -68,6 +68,21 @@ export default function App() {
     return now.getDay() === 6 || now.getDay() === 0 ? addDays(m, 7) : m
   })
   const days = useMemo(() => weekDays(monday), [monday])
+  // App bleibt oft tagelang offen: wer die „aktuelle“ Woche ansieht, wandert beim Wochenwechsel mit
+  const defaultMonday = (iso: string) => {
+    const d = new Date(iso + 'T12:00:00')
+    const m = mondayOf(d)
+    return isoDate(d.getDay() === 6 || d.getDay() === 0 ? addDays(m, 7) : m)
+  }
+  const lastToday = useRef(today)
+  useEffect(() => {
+    const prev = lastToday.current
+    lastToday.current = today
+    if (prev !== today && isoDate(monday) === defaultMonday(prev) && defaultMonday(today) !== defaultMonday(prev)) {
+      setMonday(parseIso(defaultMonday(today)))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [today])
   const weekKey = days[0]
   const [swipeDay, setSwipeDay] = useState<string>(days[0])
   const [sheet, setSheet] = useState<SheetState | null>(null)
@@ -581,7 +596,7 @@ export default function App() {
                     ☀️ Frühstück <span className="accent">Mo–Fr</span>
                   </h1>
                   {picks.length === 1 ? (
-                    <button className="chip" onClick={() => setTab('woche')} aria-label={`Nur ${RECIPE_BY_ID[picks[0]].title} nehmen – fertig`}>
+                    <button className="chip" onClick={() => setTab('woche')} aria-label={`Nur ${RECIPE_BY_ID[picks[0]]?.title ?? 'dieses Frühstück'} nehmen – fertig`}>
                       1/2 · Fertig →
                     </button>
                   ) : (
@@ -880,7 +895,15 @@ export default function App() {
           }}
           onDelete={(date) => {
             flash('Messung gelöscht', snapshot())
-            setState((s) => ({ ...s, weighIns: s.weighIns.filter((x) => x.date !== date) }))
+            setState((s) => {
+              const weighIns = s.weighIns.filter((x) => x.date !== date)
+              const latest = weighIns[weighIns.length - 1]
+              const profile =
+                s.profile && latest
+                  ? { ...s.profile, weightKg: latest.weight, fatPct: [...weighIns].reverse().find((x) => x.fat != null)?.fat }
+                  : s.profile
+              return { ...s, weighIns, profile }
+            })
           }}
           onDecide={(accept) => {
             setState((s) => ({

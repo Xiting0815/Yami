@@ -57,7 +57,10 @@ export function ProgressSheet(props: Props) {
 
   const replaces = weighIns.find((w) => weekOf(w.date) === weekOf(date))
   const w = num(weight)
-  const valid = w != null && w > 30 && w < 300
+  // optionale Werte: leer oder plausibel; kein Datum in der Zukunft
+  const inRange = (s: string, min: number, max: number) => s.trim() === '' || ((v) => v != null && v >= min && v <= max)(num(s))
+  const fieldsOk = inRange(fat, 3, 70) && inRange(muscle, 1, unit === '%' ? 80 : 150) && inRange(water, 20, 80)
+  const valid = w != null && w > 30 && w < 300 && date <= today && fieldsOk
   const prev = weighIns[weighIns.length - 2]
   const first = weighIns[0]
   const gp = goalProgress(weighIns, profile, today)
@@ -108,6 +111,8 @@ export function ProgressSheet(props: Props) {
                 <span>%</span>
               </label>
             </div>
+            {!fieldsOk && <p className="bf-note warn-note">Bitte prüfe die Werte: Körperfett 3–70 %, Wasser 20–80 %{unit === '%' ? ', Muskeln 1–80 %' : ', Muskeln 1–150 kg'}.</p>}
+            {date > today && <p className="bf-note warn-note">Das Datum liegt in der Zukunft.</p>}
             {replaces && <p className="muted small">Ersetzt die Messung vom {shortD(replaces.date)} (1 Messung pro Woche).</p>}
             <button
               className="btn primary wide"

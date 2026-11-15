@@ -62,9 +62,10 @@ export function ProfileSheet({ profile, onSave, onClose }: Props) {
             </p>
           )}
           <div className="form-grid one">
-            <label>Zielgewicht<input inputMode="decimal" value={p.goalWeight != null ? String(p.goalWeight).replace('.', ',') : ''} placeholder="optional" onChange={(e) => {
+            <label>Zielgewicht<input inputMode="decimal" value={typed.goalWeight ?? (p.goalWeight != null ? String(p.goalWeight).replace('.', ',') : '')} placeholder="optional" onChange={(e) => {
               const v = parseFloat(e.target.value.replace(',', '.'))
-              setP({ ...p, goalWeight: isNaN(v) ? undefined : v })
+              setTyped({ ...typed, goalWeight: e.target.value })
+              setP({ ...p, goalWeight: !isNaN(v) && v >= 30 && v <= 300 ? v : undefined })
             }} /><span>kg</span></label>
           </div>
 
