@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react'
+import type { LearnedSummary } from '../learning'
 import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, bmrFormula, floorKcal, leanMass, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
 
 interface Props {
   profile?: Profile
   onSave: (p: Profile) => void
   onClose: () => void
+  /** gelernte Vorlieben */
+  learned?: LearnedSummary
+  onResetLearning?: () => void
 }
 
 const fmt = (n: number) => Math.round(n).toLocaleString('de-DE')
 
-export function ProfileSheet({ profile, onSave, onClose }: Props) {
+export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearning }: Props) {
   const [p, setP] = useState<Profile>(profile ?? DEFAULT_PROFILE)
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -123,6 +127,34 @@ export function ProfileSheet({ profile, onSave, onClose }: Props) {
               {atFloor && <p className="bf-note">ℹ️ Begrenzt auf die Mindestmenge von {fmt(floorKcal(p))} kcal – weniger wäre auf Dauer ungesund.</p>}
             </div>
           )}
+          {learned && (
+            <section className="learned">
+              <h3>🧠 Das habe ich gelernt</h3>
+              {learned.signals < 5 ? (
+                <p className="muted small">Noch zu wenig Daten. Ich lerne aus dem, was du wischst, wirklich kochst und bewertest.</p>
+              ) : (
+                <>
+                  {learned.favorites.length > 0 && (
+                    <p><b>Lieblingsgerichte:</b> {learned.favorites.map((f) => f.title).join(' · ')}</p>
+                  )}
+                  {learned.liked.length > 0 && (
+                    <p><b>Magst du:</b> {learned.liked.map((f) => f.label).join(' · ')}</p>
+                  )}
+                  {learned.disliked.length > 0 && (
+                    <p><b>Eher nicht:</b> {learned.disliked.map((f) => f.label).join(' · ')}</p>
+                  )}
+                  {!learned.favorites.length && !learned.liked.length && !learned.disliked.length && (
+                    <p className="muted small">Noch keine klaren Vorlieben erkennbar.</p>
+                  )}
+                  <p className="muted small">Aus {learned.signals} Signalen; ältere zählen weniger, damit sich dein Geschmack ändern darf.</p>
+                </>
+              )}
+              {onResetLearning && learned.signals > 0 && (
+                <button className="link small" onClick={onResetLearning}>Gelerntes zurücksetzen</button>
+              )}
+            </section>
+          )}
+
           <p className="muted small">
             Richtwerte, keine ärztliche Beratung. Bei Vorerkrankungen das Ziel bitte mit dem Hausarzt abstimmen.
           </p>

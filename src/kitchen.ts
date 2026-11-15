@@ -329,6 +329,8 @@ export interface Insight {
   /** anteiliger Warenwert */
   cost: number
   perPortion: number
+  /** gelernte Vorliebe als kurze Begründung (z. B. „❤️ magst du“) */
+  taste?: string
   /** Tage seit dem letzten Mal, falls in den letzten Wochen geplant */
   lastSeenDays?: number
   /** verderbliche Reste, die nach dem Einkauf übrig blieben (ungenutzt) */

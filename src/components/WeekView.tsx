@@ -35,6 +35,8 @@ interface Props {
   onShop: () => void
   /** Frühstückszeile (Meal-Prep) oberhalb der Tage */
   breakfastSlot?: ReactNode
+  /** Bewertungsfrage nach dem Essen */
+  ratingSlot?: ReactNode
   /** Tagesbilanz Mo–Fr (nur mit Profil) */
   balances: Record<string, DayBalance | undefined>
   portions: Record<string, Portion | undefined>
@@ -55,7 +57,7 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, notice, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, balances, portions } = props
+  const { days, plan, today, total, prices, notice, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions } = props
   const planned = days.filter((d) => plan[d]).length
 
   return (
@@ -74,6 +76,8 @@ export function WeekView(props: Props) {
       )}
 
       {notice && <NoticeRow notice={notice} />}
+
+      {ratingSlot}
 
       {breakfastSlot}
 

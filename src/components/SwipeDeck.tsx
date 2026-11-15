@@ -26,6 +26,7 @@ export function InsightBadges({ ins }: { ins?: Insight }) {
   const others = ins.fromPantry.filter((n) => !ins.urgent.includes(n))
   return (
     <div className="badges">
+      {ins.taste && <span className="badge love">{ins.taste}</span>}
       {ins.urgent.length > 0 && <span className="badge warn">⚠️ verbraucht {ins.urgent.slice(0, 2).join(', ')}{ins.urgent.length > 2 ? ' …' : ''}</span>}
       {others.length > 0 && (
         <span className="badge eco">♻️ {others.length === 1 ? others[0] : `${others.length} Zutaten`} aus dem Vorrat</span>

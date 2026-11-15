@@ -4,6 +4,7 @@ import type { Cuisine, DishType, ShopCat, WeekPlan } from './types'
 import type { BoughtMap, PantryLot, PriceOverrides } from './kitchen'
 import type { Profile } from './energy'
 import type { WeighIn } from './progress'
+import type { Rating, RejectEvent } from './learning'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -48,6 +49,14 @@ export interface AppState {
   weighIns: WeighIn[]
   /** Anzahl Messungen beim letzten Ja/Nein zu einem Anpassungsvorschlag */
   adjustDecidedAt: number
+  /** weggewischte Karten (zum Lernen), höchstens die letzten 400 */
+  rejects: RejectEvent[]
+  /** Bewertungen nach dem Essen: Tag → 👍/🔁/👎 */
+  ratings: Record<string, Rating>
+  /** Tage, deren Bewertungsfrage weggeklickt wurde */
+  ratingDismissed: string[]
+  /** gelernte Vorlieben gelten erst ab diesem Datum (nach „Zurücksetzen“) */
+  tasteSince?: string
   /** Start-Checkliste: fehlt = läuft noch, 'done' = erledigt, 'dismissed' = ausgeblendet */
   onboarding?: 'done' | 'dismissed'
   /** Checkliste Schritt 4: Einkaufsliste wurde angesehen, während etwas geplant war */
@@ -76,6 +85,9 @@ const INITIAL: AppState = {
   adjustDecidedAt: 0,
   // immer gespeichert → daran erkennt load() einen Stand von vor der Start-Checkliste
   onboardingListSeen: false,
+  rejects: [],
+  ratings: {},
+  ratingDismissed: [],
 }
 
 const hasData = (s: AppState) =>

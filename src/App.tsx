@@ -7,6 +7,7 @@ import { BreakfastCard, shortTitle } from './components/BreakfastCard'
 import { DayActionsSheet } from './components/DayActionsSheet'
 import { StartCard, type StartStep } from './components/StartCard'
 import { PrepSheet } from './components/PrepSheet'
+import { type Rating, buildModel, pendingRating, preference, summarize } from './learning'
 import { ProfileSheet } from './components/ProfileSheet'
 import { ProgressSheet } from './components/ProgressSheet'
 import { suggestion as weightSuggestion, upsertWeighIn, weighedThisWeek } from './progress'
@@ -191,19 +192,35 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [weekKey],
   )
+  // ───── Gelernte Vorlieben ─────
+  const taste = useMemo(
+    () =>
+      buildModel({
+        plan: state.plan,
+        breakfast: state.breakfast,
+        breakfastPicks: state.breakfastPicks,
+        rejects: state.rejects,
+        ratings: state.ratings,
+        today,
+        since: state.tasteSince,
+      }),
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, today, state.tasteSince],
+  )
+
   // Einkauf am Wochenanfang (oder heute) → wie viele Tage bis zum gewischten Kochtag?
   const freshDays = Math.max(0, daysUntil(swipeDay, today > days[0] ? today : days[0]))
   const insights = useMemo(
     () =>
       new Map(
-        RECIPES.map((r) => [
-          r.id,
-          insight(r, state.defaultServings, week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
+        RECIPES.map((r) => {
+          const ins = insight(r, state.defaultServings, week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
             freshDays: freshDays,
-          }),
-        ]),
+          })
+          const pref = preference(taste, r, swipeDay)
+          return [r.id, { ...ins, score: ins.score + pref.score, taste: pref.reason }]
+        }),
       ),
-    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays],
+    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 
@@ -239,9 +256,13 @@ export default function App() {
     () =>
       new Map(
         // Portionen, die dieses Frühstück abdecken würde: erstes ≈ 3 Tage, zweites ≈ 2 Tage
-        BREAKFASTS.map((r) => [r.id, insight(r, picks.length ? 2 : 3, week.leftovers, today, state.prices, bLastSeen, jitter.get(r.id) ?? 0, [])]),
+        BREAKFASTS.map((r) => {
+          const ins = insight(r, picks.length ? 2 : 3, week.leftovers, today, state.prices, bLastSeen, jitter.get(r.id) ?? 0, [])
+          const pref = preference(taste, r)
+          return [r.id, { ...ins, score: ins.score + pref.score, taste: pref.reason }]
+        }),
       ),
-    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length],
+    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length, taste],
   )
   const bDeck = useMemo(() => {
     const list = BREAKFASTS.filter(
@@ -366,6 +387,7 @@ export default function App() {
   function reject(r: Recipe) {
     const snap = snapshot()
     setRejected((x) => [...x.filter((id) => id !== r.id), r.id])
+    setState((s) => ({ ...s, rejects: [...s.rejects, { id: r.id, date: today }].slice(-400) }))
     flash(`Übersprungen: ${r.title}`, snap)
   }
 
@@ -545,6 +567,36 @@ export default function App() {
       <main className={`content ${tab === 'wischen' ? 'swipe' : ''}`}>
         {tab === 'woche' && (
           <WeekView
+            ratingSlot={(() => {
+              const day = pendingRating(state.plan, state.ratings, today, state.ratingDismissed)
+              const r = day ? RECIPE_BY_ID[state.plan[day]!.recipeId] : undefined
+              if (!day || !r) return null
+              const rate = (v: Rating) => {
+                setState((s) => ({ ...s, ratings: { ...s.ratings, [day]: v } }))
+                flash(v === 'down' ? 'Gemerkt – kommt seltener ✓' : v === 'again' ? 'Gemerkt – kommt bald wieder ✓' : 'Danke – gemerkt ✓')
+              }
+              return (
+                <section className="rate-card" aria-label="Bewertung">
+                  <div className="rate-head">
+                    <span>
+                      Wie war <b>{r.title}</b> am {weekdayName(day)}?
+                    </span>
+                    <button
+                      className="icon-btn tiny"
+                      aria-label="Nicht bewerten"
+                      onClick={() => setState((s) => ({ ...s, ratingDismissed: [...s.ratingDismissed, day].slice(-60) }))}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="rate-btns">
+                    <button onClick={() => rate('up')}>👍 Gut</button>
+                    <button onClick={() => rate('again')}>🔁 Bald wieder</button>
+                    <button onClick={() => rate('down')}>👎 Nicht so</button>
+                  </div>
+                </section>
+              )
+            })()}
             days={days}
             plan={state.plan}
             today={today}
@@ -930,6 +982,12 @@ export default function App() {
       {showProfile && (
         <ProfileSheet
           profile={profile}
+          learned={summarize(taste)}
+          onResetLearning={() => {
+            const snap = snapshot()
+            setState((s) => ({ ...s, tasteSince: today, rejects: [], ratings: {}, ratingDismissed: [] }))
+            flash('Gelerntes zurückgesetzt', snap)
+          }}
           onClose={() => setShowProfile(false)}
           onSave={(p) => {
             setState((s) => ({ ...s, profile: p, profileCreated: s.profile ? s.profileCreated : today }))

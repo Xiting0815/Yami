@@ -44,6 +44,13 @@ Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und beko
 - **Zielgewicht:** Fortschritt in % und geschätztes Datum – ab 4 Messungen nach deinem echten Trend, vorher nach dem geplanten Tempo.
 - **Vorschläge zum Bestätigen:** frühestens nach 3 Messungen und nicht öfter als alle 2 Wochen: −100 kcal, wenn in 2 Wochen weniger als ¼ der erwarteten Abnahme erreicht wurde; +100 kcal, wenn es schneller als 1 % des Gewichts pro Woche geht. Hinweis, wenn das Gewicht sinkt, der Körperfettanteil aber steigt (Muskelabbau). Bestätigte Anpassungen stehen im Profil und lassen sich zurücksetzen.
 
+### Lernende Vorschläge
+
+- Die App lernt aus dem, was du **wischst** (nehmen / wegwischen), was du **wirklich kochst** (oder als „nicht gekocht“ markierst) und aus der **Bewertung am Tag danach** (👍 Gut · 🔁 Bald wieder · 👎 Nicht so).
+- Gelernt wird pro Gericht **und** pro Muster: Küche, Gerichtart, Hauptzutat (Rind, Schwein, Geflügel, Fisch, Hack, Wurst …), schnell/aufwendig an Werktagen bzw. am Wochenende, Frühstückstyp. So bekommen auch nie gesehene Gerichte einen passenden Platz.
+- Ältere Signale verblassen (Halbwertszeit 60 Tage). Das Gelernte zählt „mittel“ – etwa so viel wie Vorrat und Preis; Abwechslung und Resteverwertung bleiben wichtig.
+- Sichtbar auf den Karten („❤️ magst du“, „👍 Eintopf magst du“) und im Profil unter „Das habe ich gelernt“ (mit Zurücksetzen). Logik in `src/learning.ts`.
+
 Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine PWA und lässt sich auf den Homescreen legen und offline nutzen.
 
 ## Entwickeln
@@ -58,6 +65,7 @@ npx vite-node scripts/test-breakfast.ts # Logiktests Frühstück/Meal-Prep
 npx vite-node scripts/test-leftovers.ts # Logiktests Reste/Vorrat/Frische
 npx vite-node scripts/test-energy.ts    # Logiktests Kalorienbedarf/Portionen
 npx vite-node scripts/test-progress.ts  # Logiktests Wiegen/Trend/Vorschläge
+npx vite-node scripts/test-learning.ts  # Logiktests lernende Vorlieben
 ```
 
 ## Veröffentlichen (kostenlos)

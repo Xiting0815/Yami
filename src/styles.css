@@ -603,3 +603,14 @@ img.thumb { display: block; }
   .segmented button.on { background: color-mix(in srgb, var(--text) 18%, var(--surface-2)); }
   .sheet { box-shadow: 0 -1px 0 color-mix(in srgb, var(--text) 22%, var(--bg)); }
 }
+
+/* ───── Lernen: Badge, Bewertung, Übersicht ───── */
+.badge.love { background: #8e2f5a; color: #fff; }
+.sheet-badges .badge.love { background: color-mix(in srgb, #8e2f5a 16%, var(--surface)); color: var(--text); }
+.rate-card { background: var(--surface); border-radius: 18px; padding: 10px 12px 12px; margin: 0 0 8px; box-shadow: var(--shadow-1, var(--shadow)); }
+.rate-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; font-size: 14px; line-height: 1.35; }
+.rate-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.rate-btns button { min-height: 44px; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 12px; font-weight: 700; font-size: 13px; color: var(--text); }
+.learned { background: var(--surface); border-radius: 14px; padding: 10px 14px; margin: 16px 0 8px; }
+.learned h3 { margin: 0 0 6px; }
+.learned p { margin: 6px 0; font-size: 14px; line-height: 1.45; }
