@@ -6,6 +6,7 @@
  */
 import { CATALOG, SHOP_ALIAS } from './data/catalog'
 import { CONVERT, PRODUCTS, type Product } from './data/products'
+import { inSeason, seasonOf } from './data/season'
 import { RECIPE_BY_ID } from './data/recipes'
 import type { PlanEntry, Recipe, ShopCat, WeekPlan } from './types'
 
@@ -47,11 +48,19 @@ export function canonical(name: string): string {
   return SHOP_ALIAS[name] ?? name
 }
 
-export function productFor(name: string, overrides?: PriceOverrides): Product | undefined {
+/**
+ * Produkt mit aktuellem Preis. Mit `month`: außerhalb der Saison ×1,3, in Saison ×0,85
+ * (nur für Zutaten mit Saisondaten).
+ */
+export function productFor(name: string, overrides?: PriceOverrides, month?: number): Product | undefined {
   const base = PRODUCTS[name]
   if (!base) return undefined
   const o = overrides?.[name]
-  return o ? { ...base, pack: o.pack, price: o.price } : base
+  const p = o ? { ...base, pack: o.pack, price: o.price } : base
+  // selbst eingetragene Preise gelten wie eingegeben – kein Saisonfaktor
+  const inSeas = month != null && !o ? inSeason(name, month) : undefined
+  if (inSeas === undefined) return p
+  return { ...p, price: Math.round(p.price * (inSeas ? 0.85 : 1.3) * 100) / 100 }
 }
 
 export function isTracked(name: string): boolean {
@@ -225,6 +234,8 @@ export function planWeek(
   formatStaple: (amount: number | null, unit: string) => string,
   /** Frühstücke der Woche (fließen in Einkauf & Vorrat mit ein) */
   breakfast: WeekPlan = {},
+  /** Monat (1–12) für Saisonpreise; ohne Angabe keine Anpassung */
+  month?: number,
 ): WeekResult {
   const entries = [...activeEntries(plan, days), ...activeEntries(breakfast, days)].sort((a, b) => a[0].localeCompare(b[0]))
 
@@ -270,7 +281,7 @@ export function planWeek(
   const covered: BuyItem[] = []
   let total = 0
   for (const [name, { amount: required, recipes }] of req) {
-    const product = productFor(name, overrides)!
+    const product = productFor(name, overrides, month)!
     const available = Math.max(
       0,
       pantryAmount(pantry, name) - (bought[name]?.amount ?? 0) + (consumedWeek.get(name) ?? 0) - (reserved.get(name) ?? 0),
@@ -320,6 +331,8 @@ export function planWeek(
 // ───────────── Empfehlungen ─────────────
 
 export interface Insight {
+  /** Saisonbezug (nur mit Monat): Zutaten außerhalb / innerhalb der Saison */
+  season?: { out: string[]; peak: string[] }
   /** Zutaten, die (teilweise) aus dem Vorrat kommen */
   fromPantry: string[]
   /** davon bald ablaufend (≤ 3 Tage) */
@@ -353,6 +366,8 @@ const WASTE_EXEMPT = new Set(['Milch', 'Vollkornbrot', 'Toastbrot', 'Weißbrot',
 export interface InsightOptions {
   /** Tage zwischen Einkauf und Kochtag (für die Frische, nur Abendessen) */
   freshDays?: number
+  /** Monat (1–12) des Kochtags: Saisonbezug und Saisonpreise */
+  month?: number
 }
 
 /** „Nur mit Vorrat kochbar“: höchstens so viel muss zugekauft werden */
@@ -399,7 +414,7 @@ export function insight(
   let wasteEuro = 0
   let longLasting = true
   for (const n of needsOf(recipe, servings)) {
-    const prod = productFor(n.name, overrides)!
+    const prod = productFor(n.name, overrides, opts.month)!
     const mine = leftovers.filter((l) => l.name === n.name)
     const have = mine.reduce((s, l) => s + l.amount, 0)
     if (have > 1e-6) {
@@ -439,7 +454,11 @@ export function insight(
   const wastePenalty = wasteEuro * 2.5 + waste.length * 0.8
   const freshPenalty = stale.length * 4
   const longBonus = longLasting ? 1.5 : 0
+  // Saison: Gerichte mit Zutaten außerhalb der Saison nach hinten, saisonale leicht nach vorne
+  const season = opts.month != null ? seasonOf(recipe, opts.month) : undefined
+  const seasonScore = season ? (season.out.length > 0 ? -3 : season.peak.length > 0 ? 1 : 0) : 0
   const score =
+    seasonScore +
     pantryScore * 2 -
     buyCost * 0.25 +
     jitter * 4 -
@@ -450,7 +469,7 @@ export function insight(
     freshPenalty +
     longBonus
   const cost = recipeCost(recipe, servings, overrides)
-  return { fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, waste, wasteEuro, stale, longLasting, score }
+  return { season, fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, waste, wasteEuro, stale, longLasting, score }
 }
 
 /** Wann wurde ein Rezept zuletzt geplant (vor dem angegebenen Datum)? */

@@ -178,9 +178,12 @@ export default function App() {
   )
 
   // ───── Planung, Vorrat & Empfehlungen ─────
+  // Saison: Monat des gewischten Kochtags (Abendessen) bzw. heute (Frühstück & Wocheneinkauf)
+  const todayMonth = new Date(today + 'T12:00:00').getMonth() + 1
+  const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
   const week = useMemo(
-    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast),
-    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast],
+    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth),
+    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth],
   )
   const weekRecipes = useMemo(
     () => days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => RECIPE_BY_ID[e!.recipeId]).filter(Boolean),
@@ -215,12 +218,13 @@ export default function App() {
         RECIPES.map((r) => {
           const ins = insight(r, state.defaultServings, week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
             freshDays: freshDays,
+            month: swipeMonth,
           })
           const pref = preference(taste, r, swipeDay)
           return [r.id, { ...ins, score: ins.score + pref.score, taste: pref.reason }]
         }),
       ),
-    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay],
+    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 
@@ -257,12 +261,14 @@ export default function App() {
       new Map(
         // Portionen, die dieses Frühstück abdecken würde: erstes ≈ 3 Tage, zweites ≈ 2 Tage
         BREAKFASTS.map((r) => {
-          const ins = insight(r, picks.length ? 2 : 3, week.leftovers, today, state.prices, bLastSeen, jitter.get(r.id) ?? 0, [])
+          const ins = insight(r, picks.length ? 2 : 3, week.leftovers, today, state.prices, bLastSeen, jitter.get(r.id) ?? 0, [], {
+            month: todayMonth,
+          })
           const pref = preference(taste, r)
           return [r.id, { ...ins, score: ins.score + pref.score, taste: pref.reason }]
         }),
       ),
-    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length, taste],
+    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length, taste, todayMonth],
   )
   const bDeck = useMemo(() => {
     const list = BREAKFASTS.filter(
