@@ -9,6 +9,7 @@ import { StartCard, type StartStep } from './components/StartCard'
 import { PrepSheet } from './components/PrepSheet'
 import { type Rating, buildModel, pendingRating, preference, summarize } from './learning'
 import { ProfileSheet } from './components/ProfileSheet'
+import { exportBackup } from './backup'
 import { ProgressSheet } from './components/ProgressSheet'
 import { suggestion as weightSuggestion, upsertWeighIn, weighedThisWeek } from './progress'
 import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
@@ -366,6 +367,14 @@ export default function App() {
   }, [tab, justFinished])
   // Wiegetag: nicht während der Checkliste und frühestens am Tag nach dem Anlegen des Profils
   const weighDue = needsWeighIn && !onboarding && (!state.profileCreated || today > state.profileCreated)
+  // Sicherung: fehlt oder ist älter als 28 Tage – aber erst, wenn es schon Daten gibt, die älter als eine Woche sind
+  const backupDue = (() => {
+    const dates = Object.keys(state.plan)
+    if (!profile && dates.length === 0) return false
+    const weekAgo = isoDate(addDays(parseIso(today), -7))
+    if (!dates.some((d) => d < weekAgo) && !weighIns.some((w) => w.date < weekAgo)) return false
+    return !state.lastBackup || state.lastBackup < isoDate(addDays(parseIso(today), -28))
+  })()
 
   const urgentNames = new Set(state.pantry.filter((l) => daysUntil(l.expires, today) <= 2).map((l) => l.name))
 
@@ -531,7 +540,9 @@ export default function App() {
         ? { text: `Vorschlag: Tagesziel ${pendingSuggestion.title}`, onClick: () => setShowProgress(true) }
         : weighDue
           ? { text: 'Wiegetag – Werte eintragen', onClick: () => setShowProgress(true) }
-          : undefined
+          : backupDue
+            ? { text: '💾 Lange nicht gesichert – jetzt Sicherung speichern', onClick: () => setShowProfile(true) }
+            : undefined
 
   const tabTitle = tab === 'vorrat' ? 'Vorrat' : tab === 'rezepte' ? 'Rezepte' : null
   const actionsEntry = actionsDay ? state.plan[actionsDay] : undefined
@@ -993,6 +1004,26 @@ export default function App() {
             const snap = snapshot()
             setState((s) => ({ ...s, tasteSince: today, rejects: [], ratings: {}, ratingDismissed: [] }))
             flash('Gelerntes zurückgesetzt', snap)
+          }}
+          lastBackup={state.lastBackup}
+          onExport={() => {
+            // Stand mit heutigem Datum speichern, damit die Datei selbst die letzte Sicherung kennt
+            exportBackup({ ...state, lastBackup: today })
+              .then((saved) => {
+                if (!saved) return
+                setState((s) => ({ ...s, lastBackup: today }))
+                flash('Sicherung erstellt ✓')
+              })
+              .catch(() => flash('Sicherung fehlgeschlagen – bitte nochmal versuchen'))
+          }}
+          onImport={(s) => {
+            const snap = snapshot()
+            // wie beim Start: vergangene Gerichte gelten als gekocht
+            const r = cookDue(s.plan, s.pantry, today)
+            const b = cookDue(s.breakfast, r.pantry, today)
+            setState({ ...s, plan: r.plan, breakfast: b.plan, pantry: b.pantry, lastBackup: s.lastBackup ?? today })
+            setShowProfile(false)
+            flash('Sicherung geladen ✓', snap)
           }}
           onClose={() => setShowProfile(false)}
           onSave={(p) => {

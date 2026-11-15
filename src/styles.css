@@ -614,3 +614,8 @@ img.thumb { display: block; }
 .learned { background: var(--surface); border-radius: 14px; padding: 10px 14px; margin: 16px 0 8px; }
 .learned h3 { margin: 0 0 6px; }
 .learned p { margin: 6px 0; font-size: 14px; line-height: 1.45; }
+.backup { background: var(--surface); border-radius: 14px; padding: 10px 14px; margin: 16px 0 8px; }
+.backup h3 { margin: 0 0 6px; }
+.backup p { margin: 6px 0; font-size: 14px; line-height: 1.45; }
+.backup-actions { display: flex; gap: 8px; margin: 10px 0 4px; }
+.backup-actions .btn { flex: 1; }

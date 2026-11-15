@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { LearnedSummary } from '../learning'
 import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, bmrFormula, floorKcal, leanMass, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
+import { parseBackup } from '../backup'
+import { type AppState, parseIso } from '../store'
 
 interface Props {
   profile?: Profile
@@ -9,12 +11,31 @@ interface Props {
   /** gelernte Vorlieben */
   learned?: LearnedSummary
   onResetLearning?: () => void
+  /** Datum (ISO) der letzten Sicherung */
+  lastBackup?: string
+  onExport: () => void
+  onImport: (s: AppState) => void
 }
 
 const fmt = (n: number) => Math.round(n).toLocaleString('de-DE')
 
-export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearning }: Props) {
+export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearning, lastBackup, onExport, onImport }: Props) {
   const [p, setP] = useState<Profile>(profile ?? DEFAULT_PROFILE)
+  const fileInput = useRef<HTMLInputElement>(null)
+  const [backupError, setBackupError] = useState<string | null>(null)
+
+  async function loadFile(file: File) {
+    setBackupError(null)
+    let next: AppState
+    try {
+      next = parseBackup(await file.text())
+    } catch (e) {
+      setBackupError(e instanceof Error ? e.message : 'Die Sicherung konnte nicht gelesen werden.')
+      return
+    }
+    if (!window.confirm('Aktuelle Daten durch die Sicherung ersetzen?')) return
+    onImport(next)
+  }
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => {
@@ -154,6 +175,28 @@ export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearnin
               )}
             </section>
           )}
+
+          <section className="backup">
+            <h3>💾 Datensicherung</h3>
+            <p className="muted small">Plan, Vorrat, Messungen und Gelerntes als Datei sichern – z. B. in Google Drive.</p>
+            <p className="small">Letzte Sicherung: <b>{lastBackup ? parseIso(lastBackup).toLocaleDateString('de-DE') : 'noch nie'}</b></p>
+            <div className="backup-actions">
+              <button className="btn primary" onClick={onExport}>Sicherung speichern</button>
+              <button className="btn ghost" onClick={() => fileInput.current?.click()}>Sicherung laden</button>
+            </div>
+            <input
+              ref={fileInput}
+              type="file"
+              accept="application/json,.json"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                e.target.value = '' // gleiche Datei danach wieder wählbar
+                if (file) void loadFile(file)
+              }}
+            />
+            {backupError && <p className="bf-note" role="alert">⚠ {backupError}</p>}
+          </section>
 
           <p className="muted small">
             Richtwerte, keine ärztliche Beratung. Bei Vorerkrankungen das Ziel bitte mit dem Hausarzt abstimmen.
