@@ -48,9 +48,10 @@ export function PantryView({ pantry, leftovers, today, onChange, onCook }: Props
     return [...m].filter(([, v]) => v.amount > 0.01).sort((a, b) => a[1].expires.localeCompare(b[1].expires))
   }, [leftovers, today])
 
-  const suggestions = query.trim().length >= 2
-    ? TRACKED.filter((n) => n.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 6)
-    : []
+  // Treffer am Wortanfang zuerst („Sa“ → Sahne, Salz … vor Austernsauce)
+  const q = query.trim().toLowerCase()
+  const hits = q.length >= 2 ? TRACKED.filter((n) => n.toLowerCase().includes(q)) : []
+  const suggestions = [...hits.filter((n) => n.toLowerCase().startsWith(q)), ...hits.filter((n) => !n.toLowerCase().startsWith(q))].slice(0, 6)
 
   function add(name: string) {
     const p = PRODUCTS[name]

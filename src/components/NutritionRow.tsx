@@ -4,7 +4,7 @@ import type { Nutrition } from '../types'
 export function NutritionRow({ n, className = '' }: { n: Nutrition; className?: string }) {
   return (
     <div className={`nutri ${className}`}>
-      <span title="Kalorien">🔥 {n.kcal} kcal</span>
+      <span title="Kalorien">🔥 {n.kcal.toLocaleString('de-DE')} kcal</span>
       <span title="Eiweiß">💪 {Math.round(n.protein)} g Eiweiß</span>
       <span title="Ballaststoffe">🌾 {Math.round(n.fiber)} g Ballastst.</span>
     </div>
@@ -14,7 +14,7 @@ export function NutritionRow({ n, className = '' }: { n: Nutrition; className?: 
 /** ausführliche Tabelle für die Rezeptansicht */
 export function NutritionTable({ n, servings }: { n: Nutrition; servings: number }) {
   const rows: [string, string][] = [
-    ['Kalorien', `${n.kcal} kcal`],
+    ['Kalorien', `${n.kcal.toLocaleString('de-DE')} kcal`],
     ['Eiweiß', `${n.protein.toFixed(0)} g`],
     ['Ballaststoffe', `${n.fiber.toFixed(0)} g`],
     ['Kohlenhydrate', `${n.carbs.toFixed(0)} g`],

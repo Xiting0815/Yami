@@ -167,11 +167,11 @@ export function SwipeDeck({ deck, insights, onTake, onReject, onInfo, portionOf 
               </>
             ) : (
               <div className="card-meta">
-                {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)} · ≈ {top.nutrition.kcal} kcal
+                {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)} · ≈ {top.nutrition.kcal.toLocaleString('de-DE')} kcal
                 {ins ? ` · ≈ ${formatEuro(ins.perPortion)}/P.` : ''}
                 {(() => {
                   const po = portionOf?.(top)
-                  return po ? <div className="card-portion">🍽️ Deine Portion: {po.label} · {po.kcal} kcal</div> : null
+                  return po ? <div className="card-portion">🍽️ Deine Portion: {po.label} · {po.kcal.toLocaleString('de-DE')} kcal</div> : null
                 })()}
               </div>
             )}

@@ -18,11 +18,14 @@ export function ProfileSheet({ profile, onSave, onClose }: Props) {
     }
   }, [])
 
+  // getippter Text je Feld – sonst ließe sich kein Komma eingeben (die Zahl „91,“ würde sofort wieder zu „91“)
+  const [typed, setTyped] = useState<Partial<Record<keyof Profile, string>>>({})
   const num = (k: keyof Profile, min: number, max: number) => ({
     inputMode: 'decimal' as const,
-    value: String(p[k]),
+    value: typed[k] ?? String(p[k]).replace('.', ','),
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
       const v = parseFloat(e.target.value.replace(',', '.'))
+      setTyped({ ...typed, [k]: e.target.value })
       setP({ ...p, [k]: isNaN(v) ? 0 : Math.min(max, Math.max(min, v)) })
     },
   })

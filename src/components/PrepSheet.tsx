@@ -33,7 +33,7 @@ export function PrepSheet({ items, notes, checked, onToggle, onClose }: Props) {
         <div className="sheet-body">
           <h2>🧑‍🍳 Meal-Prep für die Woche</h2>
           <p className="muted">
-            ca. {prepMinutes(items)} Min. · {containers} bereitstellen
+            ca. {Math.round(prepMinutes(items))} Min. · {containers} bereitstellen
           </p>
           {notes.map((n) => (
             <p key={n} className="bf-note">ℹ️ {n}</p>

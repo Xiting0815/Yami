@@ -1,16 +1,16 @@
 import { RECIPE_BY_ID } from '../data/recipes'
 import type { BreakfastAssignment } from '../breakfast'
-import { prepDay } from '../breakfast'
-import { shortDate, weekdayName } from '../store'
+import { weekdayName } from '../store'
 import type { Recipe } from '../types'
-import { NutritionRow } from './NutritionRow'
 import { RecipeImage } from './RecipeImage'
+import { Icon } from './Icon'
 
 interface Props {
-  days: string[]
   picks: string[]
   assignment: BreakfastAssignment
   prepProgress: { done: number; total: number }
+  open: boolean
+  onToggle: () => void
   onPlan: () => void
   onPrep: () => void
   onOpen: (r: Recipe) => void
@@ -24,51 +24,78 @@ function dayRange(ds: string[]): string {
   return `${weekdayName(ds[0], true)}–${weekdayName(ds[ds.length - 1], true)}`
 }
 
-export function BreakfastCard({ days, picks, assignment, prepProgress, onPlan, onPrep, onOpen, onReset }: Props) {
+const FILLER = new Set(['mit', 'und', '&', 'auf', 'aus', 'in', 'im', 'à', 'la', 'vom', 'zum'])
+/** die ersten zwei Wörter eines Rezepttitels, ohne hängendes „mit“/„und“ */
+export function shortTitle(title: string): string {
+  const w = title.split(' ').slice(0, 2)
+  if (w.length > 1 && FILLER.has(w[1].toLowerCase())) w.pop()
+  return w.join(' ')
+}
+
+/** Frühstückszeile der Wochenansicht: zugeklappt 56 px, aufgeklappt mit beiden Rezepten */
+export function BreakfastCard({ picks, assignment, prepProgress, open, onToggle, onPlan, onPrep, onOpen, onReset }: Props) {
   if (!picks.length) {
     return (
-      <button className="bf-empty" onClick={onPlan}>
+      <button className="bf-bar empty" onClick={onPlan}>
         <span className="bf-sun">☀️</span>
-        <span>
+        <span className="bf-mid">
           <b>Frühstück für Mo–Fr planen</b>
-          <small>Einmal sonntags vorbereiten · satt, eiweiß- & ballaststoffreich</small>
+          <small>1–2 Rezepte, sonntags vorbereiten</small>
         </span>
+        <Icon name="chevron" size={20} />
       </button>
     )
   }
 
-  const prep = prepDay(days)
+  const rows = picks
+    .map((id) => RECIPE_BY_ID[id])
+    .filter(Boolean)
+    .map((r) => ({
+      r,
+      ds: Object.entries(assignment.days).filter(([, rid]) => rid === r.id).map(([d]) => d).sort(),
+    }))
+  const summary = rows.map(({ r, ds }) => `${dayRange(ds) || '–'} ${shortTitle(r.title)}`).join(' · ')
+  const prepDone = prepProgress.total > 0 && prepProgress.done >= prepProgress.total
+
   return (
-    <section className="bf-card">
-      <div className="bf-head">
-        <b>☀️ Frühstück Mo–Fr</b>
-        <button className="link small" onClick={onReset}>Neu wählen</button>
+    <section className={`bf-card ${open ? 'open' : ''}`}>
+      <div className="bf-bar">
+        <button className="bf-toggle" onClick={onToggle} aria-expanded={open} aria-label={`Frühstück Mo–Fr: ${summary}`} />
+        <span className="bf-thumbs">
+          {rows.slice(0, 2).map(({ r }) => <RecipeImage key={r.id} recipe={r} className="thumb" />)}
+        </span>
+        <span className="bf-mid">
+          <b>Frühstück Mo–Fr</b>
+          <small>{summary}</small>
+        </span>
+        <button className="bf-prep" onClick={onPrep} aria-label={`Prep-Liste, ${prepProgress.done} von ${prepProgress.total} Schritten erledigt`}>
+          <span className={`pill ${prepDone ? 'ghost' : ''}`}>{prepDone ? 'Prep ✓' : `Prep ${prepProgress.done}/${prepProgress.total}`}</span>
+        </button>
+        <span className="bf-chev"><Icon name="chevronDown" size={20} /></span>
       </div>
-      {picks.map((id) => {
-        const r = RECIPE_BY_ID[id]
-        if (!r) return null
-        const ds = Object.entries(assignment.days).filter(([, rid]) => rid === id).map(([d]) => d).sort()
-        return (
-          <button key={id} className="bf-row" onClick={() => onOpen(r)}>
-            <RecipeImage recipe={r} className="thumb small" />
-            <span className="bf-text">
-              <span className="bf-days">{dayRange(ds) || '–'}{ds.some((d) => assignment.frozen.includes(d)) ? ' · ❄️' : ''}</span>
-              <span className="bf-title">{r.title}</span>
-              <NutritionRow n={r.nutrition} />
-            </span>
-          </button>
-        )
-      })}
-      {picks.length === 1 && Object.keys(assignment.days).length < 5 && (
-        <button className="link small" onClick={onPlan}>+ zweites Frühstück für den Rest der Woche wählen</button>
+      {open && (
+        <div className="bf-body">
+          {rows.map(({ r, ds }) => (
+            <button key={r.id} className="bf-row" onClick={() => onOpen(r)}>
+              <RecipeImage recipe={r} className="thumb" />
+              <span className="bf-text">
+                <span className="bf-days">{dayRange(ds) || '–'}{ds.some((d) => assignment.frozen.includes(d)) ? ' · ❄️' : ''}</span>
+                <span className="bf-title">{r.title}</span>
+                <span className="bf-nutri">
+                  {r.nutrition.kcal.toLocaleString('de-DE')} kcal · {Math.round(r.nutrition.protein)} g Eiweiß · {Math.round(r.nutrition.fiber)} g Ballaststoffe
+                </span>
+              </span>
+            </button>
+          ))}
+          {picks.length === 1 && Object.keys(assignment.days).length < 5 && (
+            <button className="link small" onClick={onPlan}>+ zweites Frühstück für den Rest der Woche wählen</button>
+          )}
+          {assignment.notes.map((n) => (
+            <p key={n} className="bf-note">ℹ️ {n}</p>
+          ))}
+          <button className="link small" onClick={onReset}>Neu wählen</button>
+        </div>
       )}
-      {assignment.notes.map((n) => (
-        <p key={n} className="bf-note">ℹ️ {n}</p>
-      ))}
-      <button className="btn primary wide" onClick={onPrep}>
-        🧑‍🍳 Prep-Liste für {weekdayName(prep)}, {shortDate(prep)}
-        {prepProgress.total > 0 && ` · ${prepProgress.done}/${prepProgress.total}`}
-      </button>
     </section>
   )
 }

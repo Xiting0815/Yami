@@ -3,7 +3,9 @@ import type { PlanEntry, Recipe } from './types'
 import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from './data/recipes'
 import { BREAKFAST_LABEL, type BreakfastType } from './types'
 import { assignBreakfasts, prepPlan, workdays } from './breakfast'
-import { BreakfastCard } from './components/BreakfastCard'
+import { BreakfastCard, shortTitle } from './components/BreakfastCard'
+import { DayActionsSheet } from './components/DayActionsSheet'
+import { StartCard, type StartStep } from './components/StartCard'
 import { PrepSheet } from './components/PrepSheet'
 import { ProfileSheet } from './components/ProfileSheet'
 import { ProgressSheet } from './components/ProgressSheet'
@@ -18,6 +20,7 @@ import {
   addDaysIso,
   cookDue,
   daysUntil,
+  formatEuro,
   insight,
   lastSeenMap,
   planWeek,
@@ -25,7 +28,7 @@ import {
   uncook,
   PANTRY_ONLY_MAX_EURO,
 } from './kitchen'
-import { WeekView } from './components/WeekView'
+import { type Notice, WeekView } from './components/WeekView'
 import { SwipeDeck } from './components/SwipeDeck'
 import { FilterSheet, activeFilterCount } from './components/FilterBar'
 import { RecipeSheet } from './components/RecipeSheet'
@@ -79,6 +82,11 @@ export default function App() {
   const [showPrep, setShowPrep] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showProgress, setShowProgress] = useState(false)
+  /** Tag, dessen „⋯“-Aktionen offen sind */
+  const [actionsDay, setActionsDay] = useState<string | null>(null)
+  /** Start-Checkliste gerade abgeschlossen → einmal „Alles eingerichtet“ zeigen */
+  const [justFinished, setJustFinished] = useState(false)
+  const finishShown = useRef(false)
 
   // Datum aktuell halten (App bleibt oft tagelang offen)
   useEffect(() => {
@@ -129,6 +137,7 @@ export default function App() {
   const layers: [boolean, () => void][] = [
     [tab !== 'woche', () => setTab('woche')],
     [showFilters, () => setShowFilters(false)],
+    [!!actionsDay, () => setActionsDay(null)],
     [!!sheet, () => setSheet(null)],
     [showPrep, () => setShowPrep(false)],
     [showProgress, () => setShowProgress(false)],
@@ -291,6 +300,31 @@ export default function App() {
   const pendingSuggestion = profile ? weightSuggestion(weighIns, profile, state.adjustDecidedAt) : null
   const needsWeighIn = !!profile && !weighedThisWeek(weighIns, today)
 
+  // ───── Start-Checkliste (nur beim allerersten Benutzen) ─────
+  const onboarding = !state.onboarding
+  const plannedCount = days.filter((d) => state.plan[d]).length
+  const openDay = days.find((d) => !state.plan[d] && d >= today)
+  const dinnersDone = plannedCount > 0 && !openDay
+  const somethingPlanned = plannedCount > 0 || picks.length > 0
+  const listDone = !!state.onboardingListSeen
+  const allDone = !!profile && picks.length > 0 && dinnersDone && listDone
+  useEffect(() => {
+    if (!onboarding) return
+    if (tab === 'liste' && somethingPlanned && !listDone) setState((s) => ({ ...s, onboardingListSeen: true }))
+    else if (allDone) {
+      setState((s) => ({ ...s, onboarding: 'done' }))
+      setJustFinished(true)
+    }
+  }, [onboarding, tab, somethingPlanned, listDone, allDone, setState])
+  // „Alles eingerichtet“ verschwindet, sobald man die Woche einmal damit gesehen hat und den Tab wechselt
+  useEffect(() => {
+    if (!justFinished) return
+    if (tab === 'woche') finishShown.current = true
+    else if (finishShown.current) setJustFinished(false)
+  }, [tab, justFinished])
+  // Wiegetag: nicht während der Checkliste und frühestens am Tag nach dem Anlegen des Profils
+  const weighDue = needsWeighIn && !onboarding && (!state.profileCreated || today > state.profileCreated)
+
   const urgentNames = new Set(state.pantry.filter((l) => daysUntil(l.expires, today) <= 2).map((l) => l.name))
 
   function startSwipe(day: string) {
@@ -323,7 +357,7 @@ export default function App() {
   function removeEntry(day: string) {
     const snap = snapshot()
     setEntry(day, undefined)
-    flash(`${weekdayName(day)}: Gericht entfernt`, snap)
+    flash(`${weekdayName(day)} geleert`, snap)
   }
 
   function changeWeek(delta: number) {
@@ -370,15 +404,17 @@ export default function App() {
 
   function uncookDay(day: string) {
     const snap = snapshot()
+    const wasCooked = state.plan[day]?.status === 'cooked'
     setState((s) => {
       const e = s.plan[day]
       if (!e) return s
       return { ...s, pantry: uncook(e, s.pantry), plan: { ...s.plan, [day]: { ...e, status: 'skipped', consumed: undefined } } }
     })
-    flash('Zutaten zurück im Vorrat', snap)
+    flash(wasCooked ? 'Zutaten zurück im Vorrat' : `${weekdayName(day)}: nicht gekocht`, snap)
   }
 
   function recookDay(day: string) {
+    flash(`${weekdayName(day)}: doch gekocht`, snapshot())
     setState((s) => {
       const e = s.plan[day]
       if (!e) return s
@@ -387,6 +423,67 @@ export default function App() {
       return { ...s, plan: r.plan, pantry: r.pantry }
     })
   }
+
+  const startSteps: StartStep[] = [
+    {
+      title: 'Profil anlegen',
+      sub: profile ? `Tagesziel ${targetKcal(profile).toLocaleString('de-DE')} kcal` : 'Alter, Größe, Gewicht – daraus wird dein Kalorienziel',
+      verb: 'Anlegen',
+      done: !!profile,
+      editable: true,
+      onClick: () => setShowProfile(true),
+    },
+    {
+      title: 'Frühstück für Mo–Fr wählen',
+      sub: picks.length ? picks.map((id) => shortTitle(RECIPE_BY_ID[id]?.title ?? '')).join(' + ') : '1–2 Rezepte, einmal am Sonntag vorbereiten',
+      verb: 'Wählen',
+      done: picks.length > 0,
+      editable: true,
+      onClick: () => {
+        setMeal('breakfast')
+        setTab('wischen')
+      },
+    },
+    {
+      title: 'Abendessen wischen',
+      sub: dinnersDone
+        ? `${plannedCount} von 7 Tagen geplant`
+        : plannedCount > 0 && openDay
+          ? `${plannedCount} von 7 Tagen geplant – weiter ab ${weekdayName(openDay)}`
+          : 'Für jeden Tag ein Gericht – nach Vorrat und Preis sortiert',
+      verb: plannedCount > 0 ? 'Weiter' : 'Los geht’s',
+      done: dinnersDone,
+      editable: true,
+      onClick: () => startSwipe(openDay ?? days.find((d) => d >= today) ?? days[0]),
+    },
+    {
+      title: 'Einkaufsliste ansehen',
+      sub: listDone
+        ? `≈ ${formatEuro(week.total)} · ${week.buy.length} Artikel`
+        : somethingPlanned
+          ? 'Nach Regal sortiert, mit Packungsgrößen und Preisen'
+          : 'Sobald etwas geplant ist',
+      verb: 'Zur Liste',
+      done: listDone,
+      locked: !somethingPlanned,
+      onClick: () => setTab('liste'),
+    },
+  ]
+
+  // höchstens ein Hinweis über dem Plan: Vorrat läuft ab > Vorschlag > Wiegetag
+  const notice: Notice | undefined = justFinished
+    ? { text: '✓ Alles eingerichtet – guten Appetit!', tone: 'ok' }
+    : urgentNames.size > 0
+      ? { text: `⚠ ${urgentNames.size} ${urgentNames.size === 1 ? 'Zutat läuft' : 'Zutaten laufen'} bald ab`, tone: 'warn', onClick: () => setTab('vorrat') }
+      : pendingSuggestion
+        ? { text: `Vorschlag: Tagesziel ${pendingSuggestion.title}`, onClick: () => setShowProgress(true) }
+        : weighDue
+          ? { text: 'Wiegetag – Werte eintragen', onClick: () => setShowProgress(true) }
+          : undefined
+
+  const tabTitle = tab === 'vorrat' ? 'Vorrat' : tab === 'rezepte' ? 'Rezepte' : null
+  const actionsEntry = actionsDay ? state.plan[actionsDay] : undefined
+  const actionsRecipe = actionsEntry ? RECIPE_BY_ID[actionsEntry.recipeId] : undefined
 
   const weekNav = (
     <div className="weeknav">
@@ -403,12 +500,12 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="logo">🍳</span> <span className="brand-name">Yami</span>
+          <span className="logo">🍳</span> {tabTitle ? <h1 className="top-title">{tabTitle}</h1> : <span className="brand-name">Yami</span>}
         </div>
         <div className="top-right">
-          {tab !== 'rezepte' && tab !== 'vorrat' && weekNav}
+          {!tabTitle && weekNav}
           <button
-            className={`icon-btn profile-btn ${needsWeighIn || pendingSuggestion ? 'dot-badge' : ''}`}
+            className={`icon-btn profile-btn ${weighDue || pendingSuggestion ? 'dot-badge' : ''}`}
             onClick={() => (profile ? setShowProgress(true) : setShowProfile(true))}
             aria-label="Wiegen & Fortschritt"
             title="Wiegen & Fortschritt"
@@ -422,11 +519,6 @@ export default function App() {
       </header>
 
       <main className={`content ${tab === 'wischen' ? 'swipe' : ''}`}>
-        {tab === 'woche' && profile && (needsWeighIn || pendingSuggestion) && (
-          <button className="banner info" onClick={() => setShowProgress(true)}>
-            {pendingSuggestion ? `💡 Vorschlag für dein Tagesziel: ${pendingSuggestion.title} – ansehen` : '⚖️ Wiegetag: trag deine Werte für diese Woche ein'}
-          </button>
-        )}
         {tab === 'woche' && (
           <WeekView
             days={days}
@@ -434,37 +526,47 @@ export default function App() {
             today={today}
             total={week.total}
             prices={state.prices}
-            urgentCount={urgentNames.size}
+            notice={notice}
+            startSlot={
+              onboarding ? (
+                <StartCard
+                  steps={startSteps}
+                  onDismiss={() => {
+                    setState((s) => ({ ...s, onboarding: 'dismissed' }))
+                    flash('Du findest Profil und Wiegen oben rechts.')
+                  }}
+                />
+              ) : undefined
+            }
+            hideDays={onboarding && plannedCount === 0}
             onSwipeDay={startSwipe}
             onOpen={(r, day) => setSheet({ recipe: r, day, mode: 'view' })}
-            onUpdate={(day, entry) => (entry ? setEntry(day, entry) : removeEntry(day))}
-            onUncook={uncookDay}
-            onRecook={recookDay}
+            onMore={setActionsDay}
             onShop={() => setTab('liste')}
-            onPantry={() => setTab('vorrat')}
             balances={balances}
             portions={portions}
-            hasProfile={!!profile}
-            onProfile={() => setShowProfile(true)}
             breakfastSlot={
-              <BreakfastCard
-                days={days}
-                picks={picks}
-                assignment={assignment}
-                prepProgress={{ done: prepDone, total: prepTotal }}
-                onPlan={() => {
-                  setMeal('breakfast')
-                  setTab('wischen')
-                }}
-                onPrep={() => setShowPrep(true)}
-                onOpen={(r) => setSheet({ recipe: r, mode: 'view' })}
-                onReset={() => {
-                  flash('Frühstück zurückgesetzt', snapshot())
-                  setPicks([])
-                  setMeal('breakfast')
-                  setTab('wischen')
-                }}
-              />
+              onboarding && !picks.length ? undefined : (
+                <BreakfastCard
+                  picks={picks}
+                  assignment={assignment}
+                  prepProgress={{ done: prepDone, total: prepTotal }}
+                  open={!!state.bfOpen}
+                  onToggle={() => setState((s) => ({ ...s, bfOpen: !s.bfOpen }))}
+                  onPlan={() => {
+                    setMeal('breakfast')
+                    setTab('wischen')
+                  }}
+                  onPrep={() => setShowPrep(true)}
+                  onOpen={(r) => setSheet({ recipe: r, mode: 'view' })}
+                  onReset={() => {
+                    flash('Frühstück zurückgesetzt', snapshot())
+                    setPicks([])
+                    setMeal('breakfast')
+                    setTab('wischen')
+                  }}
+                />
+              )
             }
           />
         )}
@@ -708,6 +810,40 @@ export default function App() {
         />
       )}
 
+      {actionsDay && actionsEntry && actionsRecipe && (
+        <DayActionsSheet
+          day={actionsDay}
+          entry={actionsEntry}
+          recipe={actionsRecipe}
+          today={today}
+          prices={state.prices}
+          balance={balances[actionsDay]}
+          portion={portions[actionsDay]}
+          onClose={() => setActionsDay(null)}
+          onServings={(n) => setEntry(actionsDay, { ...actionsEntry, servings: n })}
+          onView={() => {
+            setActionsDay(null)
+            setSheet({ recipe: actionsRecipe, day: actionsDay, mode: 'view' })
+          }}
+          onSwap={() => {
+            setActionsDay(null)
+            startSwipe(actionsDay)
+          }}
+          onUncook={() => {
+            setActionsDay(null)
+            uncookDay(actionsDay)
+          }}
+          onRecook={() => {
+            setActionsDay(null)
+            recookDay(actionsDay)
+          }}
+          onRemove={() => {
+            setActionsDay(null)
+            removeEntry(actionsDay)
+          }}
+        />
+      )}
+
       {showPrep && (
         <PrepSheet
           items={prepItems}
@@ -764,7 +900,7 @@ export default function App() {
           profile={profile}
           onClose={() => setShowProfile(false)}
           onSave={(p) => {
-            setState((s) => ({ ...s, profile: p }))
+            setState((s) => ({ ...s, profile: p, profileCreated: s.profile ? s.profileCreated : today }))
             setShowProfile(false)
             flash(`Tagesziel: ${targetKcal(p).toLocaleString('de-DE')} kcal ✓`)
           }}

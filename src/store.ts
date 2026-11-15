@@ -47,6 +47,14 @@ export interface AppState {
   weighIns: WeighIn[]
   /** Anzahl Messungen beim letzten Ja/Nein zu einem Anpassungsvorschlag */
   adjustDecidedAt: number
+  /** Start-Checkliste: fehlt = läuft noch, 'done' = erledigt, 'dismissed' = ausgeblendet */
+  onboarding?: 'done' | 'dismissed'
+  /** Checkliste Schritt 4: Einkaufsliste wurde angesehen, während etwas geplant war */
+  onboardingListSeen?: boolean
+  /** Tag, an dem das Profil angelegt wurde (ISO) – am selben Tag gibt es noch keinen Wiege-Hinweis */
+  profileCreated?: string
+  /** Frühstückszeile in der Wochenansicht aufgeklappt */
+  bfOpen?: boolean
 }
 
 const KEY = 'yami-state-v1'
@@ -65,14 +73,22 @@ const INITIAL: AppState = {
   prepChecked: {},
   weighIns: [],
   adjustDecidedAt: 0,
+  // immer gespeichert → daran erkennt load() einen Stand von vor der Start-Checkliste
+  onboardingListSeen: false,
 }
+
+const hasData = (s: AppState) =>
+  !!s.profile || [s.plan, s.breakfast, s.breakfastPicks].some((o) => o && Object.values(o).some((v) => (Array.isArray(v) ? v.length : v)))
 
 function load(): AppState {
   try {
     const raw = localStorage.getItem(KEY)
     if (raw) {
       const saved = JSON.parse(raw)
-      return { ...INITIAL, ...saved, filters: { ...EMPTY_FILTERS, ...saved.filters } }
+      const state: AppState = { ...INITIAL, ...saved, filters: { ...EMPTY_FILTERS, ...saved.filters } }
+      // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
+      if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'
+      return state
     }
   } catch {
     /* privates Fenster o. Ä. – mit leerem Zustand starten */

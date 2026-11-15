@@ -59,7 +59,7 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
                 </>
               ) : (
                 <div className="muted small">
-                  {CUISINE_LABEL[r.cuisine]} · {formatTime(r.time)} · ≈ {formatEuro(perPortion.get(r.id) ?? 0)}/P. · {r.nutrition.kcal} kcal
+                  {CUISINE_LABEL[r.cuisine]} · {formatTime(r.time)} · ≈ {formatEuro(perPortion.get(r.id) ?? 0)}/P. · {r.nutrition.kcal.toLocaleString('de-DE')} kcal
                   {r.vegetarian ? ' · 🌱' : ''}
                 </div>
               )}

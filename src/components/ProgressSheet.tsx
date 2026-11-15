@@ -142,7 +142,7 @@ export function ProgressSheet(props: Props) {
             </div>
             {gp ? (
               <>
-                <div className="bar big"><div style={{ width: `${gp.pct * 100}%` }} /></div>
+                <div className="bar big"><div style={{ width: `${gp.pct * 100}%`, minWidth: gp.pct > 0 ? 12 : 0 }} /></div>
                 <div className="goal-facts">
                   <span>{Math.round(gp.pct * 100)} % geschafft</span>
                   <span>

@@ -79,10 +79,10 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
           {portion && (
             <div className={`portion-box ${portion.fraction < 1 ? 'smaller' : ''}`}>
               <div>
-                🍽️ <b>Deine Portion: {portion.label}</b> · {portion.kcal} kcal
+                🍽️ <b>Deine Portion: {portion.label}</b> · {portion.kcal.toLocaleString('de-DE')} kcal
               </div>
               <div className="muted small">
-                Abendbudget heute ≈ {portion.budget} kcal (Tagesziel − Frühstück − Mittag). Eine normale Portion hat {recipe.nutrition.kcal} kcal.
+                Abendbudget heute ≈ {portion.budget.toLocaleString('de-DE')} kcal (Tagesziel − Frühstück − Mittag). Eine normale Portion hat {recipe.nutrition.kcal.toLocaleString('de-DE')} kcal.
                 {portion.rest > 0.05 &&
                   (() => {
                     const r = Math.round(portion.rest * 4) / 4
