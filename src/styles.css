@@ -360,3 +360,5 @@ li.done .item-name, li.done .item-amt { text-decoration: line-through; opacity: 
 .prep-steps input { position: absolute; opacity: 0; pointer-events: none; }
 .prep-steps .check { margin-top: 1px; }
 .prep-steps li.done span:last-child { text-decoration: line-through; opacity: .5; }
+.badge.waste { background: rgba(140, 90, 40, .85); }
+.sheet-badges .badge.waste { background: color-mix(in srgb, #8c5a28 18%, var(--surface)); }

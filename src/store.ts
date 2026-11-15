@@ -10,9 +10,11 @@ export interface Filters {
   maxTime: number
   /** nur günstige Gerichte (≤ 2,50 € pro Portion) */
   cheap: boolean
+  /** nur Gerichte, für die (fast) nichts eingekauft werden muss */
+  pantryOnly: boolean
 }
 
-export const EMPTY_FILTERS: Filters = { cuisines: [], types: [], vegetarian: false, maxTime: 0, cheap: false }
+export const EMPTY_FILTERS: Filters = { cuisines: [], types: [], vegetarian: false, maxTime: 0, cheap: false, pantryOnly: false }
 
 export interface CustomItem {
   id: string

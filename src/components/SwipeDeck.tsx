@@ -4,6 +4,7 @@ import { BREAKFAST_LABEL, CUISINE_LABEL, TYPE_LABEL } from '../types'
 import { NutritionRow } from './NutritionRow'
 import { formatTime } from '../filter'
 import { type Insight, formatEuro } from '../kitchen'
+import { formatAmount } from '../shopping'
 import { RecipeImage } from './RecipeImage'
 
 interface Props {
@@ -27,6 +28,14 @@ export function InsightBadges({ ins }: { ins?: Insight }) {
         <span className="badge eco">♻️ {others.length === 1 ? others[0] : `${others.length} Zutaten`} aus dem Vorrat</span>
       )}
       <span className="badge">🛒 {ins.buyCost < 0.01 ? 'nichts einkaufen' : `+${formatEuro(ins.buyCost)}`}</span>
+      {ins.stale.length > 0 && <span className="badge warn">⏳ {ins.stale.slice(0, 2).join(', ')} bis dahin nicht frisch</span>}
+      {ins.waste.length > 0 && (
+        <span className="badge waste">
+          🗑️ Rest: {ins.waste.slice(0, 2).map((w) => `${w.name} ${formatAmount(w.amount, w.unit)}`).join(', ')}
+          {ins.waste.length > 2 ? ' …' : ''}
+        </span>
+      )}
+      {ins.longLasting && ins.buyCost > 0.01 && ins.waste.length === 0 && <span className="badge eco">🧊 Zukauf lange haltbar</span>}
       {ins.lastSeenDays != null && ins.lastSeenDays <= 28 && <span className="badge">🔁 vor {ins.lastSeenDays} Tagen</span>}
     </div>
   )

@@ -307,8 +307,30 @@ export interface Insight {
   perPortion: number
   /** Tage seit dem letzten Mal, falls in den letzten Wochen geplant */
   lastSeenDays?: number
+  /** verderbliche Reste, die nach dem Einkauf übrig blieben (ungenutzt) */
+  waste: { name: string; amount: number; unit: string }[]
+  /** Wert dieser Reste in € */
+  wasteEuro: number
+  /** Zutaten, die bis zum Kochtag nicht mehr frisch wären */
+  stale: string[]
+  /** alles Zugekaufte hält mindestens 2 Wochen */
+  longLasting: boolean
   score: number
 }
+
+/** gilt als verderblich, wenn eine angebrochene Packung höchstens so viele Tage hält */
+const PERISHABLE_DAYS = 7
+
+/** Alltagsprodukte, deren Rest im Haushalt praktisch immer aufgebraucht wird (oder sich einfrieren lässt) */
+const WASTE_EXEMPT = new Set(['Milch', 'Vollkornbrot', 'Toastbrot', 'Weißbrot', 'Brötchen vom Vortag', 'Ciabatta', 'Zitrone', 'Limette'])
+
+export interface InsightOptions {
+  /** Tage zwischen Einkauf und Kochtag (für die Frische, nur Abendessen) */
+  freshDays?: number
+}
+
+/** „Nur mit Vorrat kochbar“: höchstens so viel muss zugekauft werden */
+export const PANTRY_ONLY_MAX_EURO = 1.5
 
 /** Ziel-Anteil vegetarischer Gerichte pro Woche (15 % ≈ 1 von 7 Tagen) */
 export const VEG_SHARE = 0.15
@@ -340,11 +362,16 @@ export function insight(
   jitter: number,
   /** schon in dieser Woche geplante Gerichte (für Abwechslung bei Art & Küche) */
   weekRecipes: Recipe[] = [],
+  opts: InsightOptions = {},
 ): Insight {
   const fromPantry: string[] = []
   const urgent: string[] = []
+  const waste: Insight['waste'] = []
+  const stale: string[] = []
   let pantryScore = 0
   let buyCost = 0
+  let wasteEuro = 0
+  let longLasting = true
   for (const n of needsOf(recipe, servings)) {
     const prod = productFor(n.name, overrides)!
     const mine = leftovers.filter((l) => l.name === n.name)
@@ -358,7 +385,20 @@ export function insight(
       if (left <= 3) urgent.push(n.name)
     }
     const missing = Math.max(0, n.amount - have)
-    if (missing > 1e-6) buyCost += Math.ceil(missing / prod.pack - 1e-6) * prod.price
+    if (missing > 1e-6) {
+      const packs = Math.ceil(missing / prod.pack - 1e-6)
+      buyCost += packs * prod.price
+      if (prod.shelf < 14) longLasting = false
+      // bis zum Kochtag noch frisch?
+      if (opts.freshDays != null && prod.shelf < opts.freshDays) stale.push(n.name)
+      // angebrochener Rest, der schnell verdirbt
+      const surplus = packs * prod.pack - missing
+      const keeps = prod.opened ?? prod.shelf
+      if (surplus > 1e-6 && keeps <= PERISHABLE_DAYS && surplus / prod.pack > 0.15 && !WASTE_EXEMPT.has(n.name)) {
+        waste.push({ name: n.name, amount: surplus, unit: prod.unit })
+        wasteEuro += (surplus / prod.pack) * prod.price
+      }
+    }
   }
   const seen = lastSeen.get(recipe.id)
   const lastSeenDays = seen ? -daysUntil(seen, today) : undefined
@@ -369,10 +409,22 @@ export function insight(
   const sameCuisine = isBreakfast ? 0 : weekRecipes.filter((w) => w.cuisine === recipe.cuisine).length
   const mixPenalty = sameType * 1.8 + Math.max(0, sameCuisine - 1) * 2.2
   // Vegetarisch nur ca. 15 %: ist das Wochen-Kontingent erreicht, rutschen Veggie-Gerichte weit nach hinten
+  // Lebensmittel sparen: verderbliche Reste deutlich abwerten, lange Haltbares bevorzugen
+  const wastePenalty = wasteEuro * 2.5 + waste.length * 0.8
+  const freshPenalty = stale.length * 4
+  const longBonus = longLasting ? 1.5 : 0
   const score =
-    pantryScore * 2 - buyCost * 0.25 + jitter * 4 - repeatPenalty - mixPenalty - (isBreakfast ? 0 : vegPenalty(recipe, weekRecipes))
+    pantryScore * 2 -
+    buyCost * 0.25 +
+    jitter * 4 -
+    repeatPenalty -
+    mixPenalty -
+    (isBreakfast ? 0 : vegPenalty(recipe, weekRecipes)) -
+    wastePenalty -
+    freshPenalty +
+    longBonus
   const cost = recipeCost(recipe, servings, overrides)
-  return { fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, score }
+  return { fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, waste, wasteEuro, stale, longLasting, score }
 }
 
 /** Wann wurde ein Rezept zuletzt geplant (vor dem angegebenen Datum)? */

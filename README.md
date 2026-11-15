@@ -25,6 +25,8 @@ Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und beko
 - **Haltbarkeit:** Das kürzer haltbare Frühstück kommt Mo–Mi, das länger haltbare Do–Fr. Was nicht so lange hält, aber einfrierbar ist, wird zum Einfrieren eingeplant (mit Hinweis, wann es in den Kühlschrank muss).
 - **Prep-Liste für Sonntag:** Zutaten hochgerechnet, Ofengerichte zuerst, Schritte zum Abhaken und was morgens/auf der Arbeit zu tun ist.
 - **Einkauf & Vorrat:** Frühstückszutaten landen auf derselben Einkaufsliste und werden wie Abendessen vom Vorrat abgezogen.
+- **Lebensmittel sparen:** Beim Wischen kommen Frühstücke zuerst, die Vorrat und Reste (auch vom Abendessen) nutzen und deren Zukauf lange hält (Haferflocken, Chiasamen, TK-Obst). Würde ein verderblicher Rest übrig bleiben (z. B. halber Becher Quark), rutscht das Rezept nach hinten und die Karte zeigt „🗑️ Rest: …“. Filter „🧺 Nur mit Vorrat“ zeigt nur Gerichte mit max. 1,50 € Zukauf.
+- **Frische nach Wochentag (Abendessen):** Für spätere Wochentage bevorzugt die App Gerichte, deren Zutaten dann noch frisch sind – Fisch und Hack eher Mo–Mi.
 - **Nährwerte für alles:** Jede Zutat hat Richtwerte pro 100 g (`src/data/nutrition.ts`), daraus werden kcal, Eiweiß, Ballaststoffe, Kohlenhydrate und Fett pro Portion berechnet – auch für alle Abendessen.
 
 Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine PWA und lässt sich auf den Homescreen legen und offline nutzen.
@@ -38,6 +40,7 @@ npm run build        # Produktions-Build nach dist/
 npm run check-data   # prüft Rezeptdatenbank, Produkte & Einheiten
 npx vite-node scripts/test-kitchen.ts   # Logiktests Vorrat/Einkauf/Empfehlungen
 npx vite-node scripts/test-breakfast.ts # Logiktests Frühstück/Meal-Prep
+npx vite-node scripts/test-leftovers.ts # Logiktests Reste/Vorrat/Frische
 ```
 
 ## Veröffentlichen (kostenlos)

@@ -18,6 +18,7 @@ import {
   planWeek,
   uid,
   uncook,
+  PANTRY_ONLY_MAX_EURO,
 } from './kitchen'
 import { WeekView } from './components/WeekView'
 import { SwipeDeck } from './components/SwipeDeck'
@@ -56,6 +57,7 @@ export default function App() {
   /** Wischen & Rezepte: Abendessen oder Frühstück */
   const [meal, setMeal] = useState<'dinner' | 'breakfast'>('dinner')
   const [bTypes, setBTypes] = useState<BreakfastType[]>([])
+  const [bPantryOnly, setBPantryOnly] = useState(false)
   const [showPrep, setShowPrep] = useState(false)
 
   // Datum aktuell halten (App bleibt oft tagelang offen)
@@ -115,15 +117,19 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [weekKey],
   )
+  // Einkauf am Wochenanfang (oder heute) → wie viele Tage bis zum gewischten Kochtag?
+  const freshDays = Math.max(0, daysUntil(swipeDay, today > days[0] ? today : days[0]))
   const insights = useMemo(
     () =>
       new Map(
         RECIPES.map((r) => [
           r.id,
-          insight(r, state.defaultServings, week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes),
+          insight(r, state.defaultServings, week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
+            freshDays: freshDays,
+          }),
         ]),
       ),
-    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes],
+    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 
@@ -131,9 +137,16 @@ export default function App() {
     () => new Set(days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => e!.recipeId)),
     [days, state.plan],
   )
-  const filteredCount = RECIPES.filter((r) => matches(r, state.filters, perPortion.get(r.id))).length
+  const filteredCount = RECIPES.filter(
+    (r) => matches(r, state.filters, perPortion.get(r.id)) && (!state.filters.pantryOnly || insights.get(r.id)!.buyCost <= PANTRY_ONLY_MAX_EURO),
+  ).length
   const deck = useMemo(() => {
-    const list = RECIPES.filter((r) => matches(r, state.filters, perPortion.get(r.id)) && !plannedIds.has(r.id))
+    const list = RECIPES.filter(
+      (r) =>
+        matches(r, state.filters, perPortion.get(r.id)) &&
+        !plannedIds.has(r.id) &&
+        (!state.filters.pantryOnly || insights.get(r.id)!.buyCost <= PANTRY_ONLY_MAX_EURO),
+    )
     const rej = new Set(rejected)
     const fresh = list.filter((r) => !rej.has(r.id)).sort((a, b) => insights.get(b.id)!.score - insights.get(a.id)!.score)
     const later = rejected.map((id) => list.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
@@ -150,12 +163,18 @@ export default function App() {
   const bInsights = useMemo(
     () =>
       new Map(
-        BREAKFASTS.map((r) => [r.id, insight(r, 3, week.leftovers, today, state.prices, bLastSeen, jitter.get(r.id) ?? Math.random(), [])]),
+        // Portionen, die dieses Frühstück abdecken würde: erstes ≈ 3 Tage, zweites ≈ 2 Tage
+        BREAKFASTS.map((r) => [r.id, insight(r, picks.length ? 2 : 3, week.leftovers, today, state.prices, bLastSeen, jitter.get(r.id) ?? 0, [])]),
       ),
-    [week.leftovers, today, state.prices, bLastSeen, jitter],
+    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length],
   )
   const bDeck = useMemo(() => {
-    const list = BREAKFASTS.filter((r) => (!bTypes.length || bTypes.includes(r.breakfast!.type)) && !picks.includes(r.id))
+    const list = BREAKFASTS.filter(
+      (r) =>
+        (!bTypes.length || bTypes.includes(r.breakfast!.type)) &&
+        !picks.includes(r.id) &&
+        (!bPantryOnly || bInsights.get(r.id)!.buyCost <= PANTRY_ONLY_MAX_EURO),
+    )
     const rej = new Set(rejected)
     // beim zweiten Frühstück: Kombinationen bevorzugen, die Mo–Fr komplett abdecken
     const fits = (r: Recipe) => picks.length !== 1 || Object.keys(assignBreakfasts([picks[0], r.id], days).days).length === 5
@@ -163,7 +182,7 @@ export default function App() {
     const fresh = list.filter((r) => !rej.has(r.id)).sort((a, b) => score(b) - score(a))
     const later = rejected.map((id) => list.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
     return [...fresh, ...later]
-  }, [bTypes, picks, rejected, bInsights, days])
+  }, [bTypes, picks, rejected, bInsights, days, bPantryOnly])
 
   /** Frühstücke für die Woche festlegen und auf Mo–Fr verteilen */
   function setPicks(ids: string[]) {
@@ -341,6 +360,9 @@ export default function App() {
                   Wähle 1–2 Frühstücke zum Vorbereiten am Sonntag. Das kürzer haltbare kommt Mo–Mi, das länger haltbare Do–Fr.
                 </p>
                 <div className="chips-row">
+                  <button className={`chip ${bPantryOnly ? 'on' : ''}`} onClick={() => setBPantryOnly((v) => !v)}>
+                    🧺 Nur mit Vorrat
+                  </button>
                   {(Object.keys(BREAKFAST_LABEL) as BreakfastType[]).map((t) => (
                     <button
                       key={t}
