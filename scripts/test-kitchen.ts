@@ -1,7 +1,7 @@
 // Logiktest für Vorrat, Einkauf & Empfehlungen:  npx vite-node scripts/test-kitchen.ts
 import { RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { formatAmount } from '../src/shopping'
-import { cookDue, insight, lastSeenMap, planWeek, uid, addDaysIso, pantryAmount, type PantryLot, type BoughtMap } from '../src/kitchen'
+import { cookDue, uncook, insight, lastSeenMap, planWeek, uid, addDaysIso, pantryAmount, type PantryLot, type BoughtMap } from '../src/kitchen'
 import type { WeekPlan } from '../src/types'
 
 let fails = 0
@@ -72,6 +72,30 @@ ok(costs[100] > 1 && costs[100] < 6, 'Median-Kosten pro Portion plausibel')
   ok(!!sp && sp.packs === 1 && sp.fromPantry === 0, 'Spaghetti fürs Wochenende reserviert → nächste Woche neu kaufen')
   const only = planWeek({ [nextDays[0]]: p[nextDays[0]] }, nextDays, lots, {}, '2026-11-20', {}, formatAmount)
   ok(only.covered.some((b) => b.name === 'Spaghetti'), 'Ohne offenes Wochenend-Gericht reicht der Vorrat')
+}
+
+// 8) „Nicht gekocht“ legt Zutaten in die ursprünglichen Posten zurück → „Haken zurücksetzen“ leert den Vorrat
+{
+  const d = Array.from({ length: 7 }, (_, i) => addDaysIso('2026-11-16', i))
+  let pl: WeekPlan = { [d[0]]: { recipeId: 'carbonara', servings: 2 }, [d[1]]: { recipeId: 'carbonara', servings: 2 } }
+  let lots: PantryLot[] = []
+  const bo: BoughtMap = {}
+  for (const b of planWeek(pl, d, lots, bo, d[0], {}, formatAmount).buy) {
+    const lot = { id: uid(), name: b.name, amount: b.packs * b.product.pack, unit: b.unit, expires: '2027-01-01' }
+    lots.push(lot)
+    bo[b.name] = { lotId: lot.id, amount: lot.amount }
+  }
+  const r = cookDue(pl, lots, d[1])
+  pl = r.plan
+  lots = uncook(pl[d[0]]!, r.pantry)
+  ok(pantryAmount(lots, 'Spaghetti') === 500, 'Nicht gekocht → Spaghetti wieder 500 g')
+  for (const b of Object.values(bo)) lots = lots.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount - b.amount } : l)).filter((l) => l.amount > 1e-6)
+  ok(lots.length === 0, 'Haken zurücksetzen danach → Vorrat leer')
+  // Portionen nach dem Einkauf erhöht → Artikel gilt nicht mehr als vollständig gekauft
+  const more: WeekPlan = { [d[0]]: { recipeId: 'carbonara', servings: 8 } }
+  const lots2: PantryLot[] = [{ id: 'x', name: 'Spaghetti', amount: 500, unit: 'g', expires: '2027-01-01' }]
+  const sp = planWeek(more, d, lots2, { Spaghetti: { lotId: 'x', amount: 500 } }, d[0], {}, formatAmount).buy.find((b) => b.name === 'Spaghetti')!
+  ok(sp.packs === 2 && sp.bought === 500, `Portionen 8: 2 Pck nötig, 1 gekauft (bought ${sp.bought})`)
 }
 
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }

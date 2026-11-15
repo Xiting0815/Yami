@@ -159,8 +159,15 @@ export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string): { p
 
 /** "Nicht gekocht": entnommene Mengen zurück in den Vorrat */
 export function uncook(entry: PlanEntry, pantry: PantryLot[]): PantryLot[] {
-  const restored = (entry.consumed ?? []).map((l) => ({ ...l, id: uid() }))
-  return [...pantry, ...restored]
+  const lots = pantry.map((l) => ({ ...l }))
+  for (const c of entry.consumed ?? []) {
+    const same = lots.find((l) => l.id === c.id)
+    if (same) {
+      same.amount += c.amount
+      if (c.expires > same.expires) same.expires = c.expires
+    } else lots.push({ ...c })
+  }
+  return lots
 }
 
 // ───────────── Wochenplanung ─────────────
@@ -180,6 +187,8 @@ export interface BuyItem {
   /** nach der Woche übrig */
   leftover: number
   recipes: string[]
+  /** in dieser Woche schon gekauft (abgehakt) – kann nach Portionsänderung kleiner sein als nötig */
+  bought: number
 }
 
 export interface StapleItem {
@@ -279,6 +288,7 @@ export function planWeek(
       product,
       cost: packs * product.price,
       leftover: available + packs * product.pack - required,
+      bought: bought[name]?.amount ?? 0,
       recipes: [...recipes],
     }
     total += item.cost

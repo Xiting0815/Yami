@@ -389,7 +389,16 @@ export default function App() {
       const checked = new Set(s.checked[weekKey] ?? [])
       let pantry = s.pantry
       const b = wk[item.name]
-      if (b) {
+      const needed = item.packs * item.product.pack
+      if (b && b.amount < needed - 1e-6) {
+        // Portionen wurden nach dem Einkauf erhöht → nur die fehlende Menge nachkaufen
+        const delta = needed - b.amount
+        const has = pantry.some((l) => l.id === b.lotId)
+        if (has) pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount + delta } : l))
+        else pantry = [...pantry, { id: b.lotId, name: item.name, amount: delta, unit: item.unit, expires: addDaysIso(today, item.product.shelf) }]
+        wk[item.name] = { lotId: b.lotId, amount: needed }
+        checked.add(item.key)
+      } else if (b) {
         pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount - b.amount } : l)).filter((l) => l.amount > 1e-6)
         delete wk[item.name]
         checked.delete(item.key)

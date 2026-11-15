@@ -19,6 +19,11 @@ interface Props {
   onGoPlan: () => void
 }
 
+/** abgehakt = genug gekauft; nach einer Portionserhöhung fehlt evtl. noch etwas */
+export const isBought = (it: BuyItem) => it.bought >= it.packs * it.product.pack - 1e-6 && it.bought > 0
+/** Packungen, die noch fehlen */
+export const missingPacks = (it: BuyItem) => Math.max(0, it.packs - Math.round(it.bought / it.product.pack))
+
 export function packText(it: BuyItem): string {
   const { packs, product: p } = it
   if (!p.packName) return formatAmount(packs * p.pack, p.unit)
@@ -44,7 +49,8 @@ export function ShoppingList(props: Props) {
   }
 
   const keys = [...result.buy.map((b) => b.key), ...custom.map((c) => `custom:${c.id}`)]
-  const done = keys.filter((k) => checkedSet.has(k)).length
+  const done =
+    result.buy.filter(isBought).length + custom.filter((c) => checkedSet.has(`custom:${c.id}`)).length
 
   return (
     <div className="shop">
@@ -69,7 +75,7 @@ export function ShoppingList(props: Props) {
         const cust = custom.filter((c) => c.cat === cat)
         if (!items.length && !cust.length) return null
         const sorted = [...items].sort(
-          (a, b) => Number(checkedSet.has(a.key)) - Number(checkedSet.has(b.key)) || a.name.localeCompare(b.name, 'de'),
+          (a, b) => Number(isBought(a)) - Number(isBought(b)) || a.name.localeCompare(b.name, 'de'),
         )
         return (
           <section key={cat} className={`shop-section cat-${cat}`}>
@@ -78,7 +84,8 @@ export function ShoppingList(props: Props) {
             </h3>
             <ul>
               {sorted.map((it) => {
-                const on = checkedSet.has(it.key)
+                const on = isBought(it)
+                const partly = !on && it.bought > 0
                 return (
                   <li key={it.key} className={on ? 'done' : ''}>
                     <label>
@@ -86,8 +93,8 @@ export function ShoppingList(props: Props) {
                       <span className="check" aria-hidden />
                       <span className="item-name">{it.name}</span>
                       <span className="item-amt">
-                        {packText(it)}
-                        <small>{formatEuro(it.cost)}</small>
+                        {partly ? `noch ${missingPacks(it)} ${it.product.packName ?? 'Stk'}` : packText(it)}
+                        <small>{partly ? 'Portionen erhöht' : formatEuro(it.cost)}</small>
                       </span>
                     </label>
                     <button className="icon-btn tiny" onClick={() => setExpanded(expanded === it.key ? null : it.key)} aria-label="Details">
