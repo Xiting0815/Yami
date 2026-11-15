@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { Cuisine, DishType } from '../types'
 import { CUISINE_LABEL, TYPE_LABEL } from '../types'
 import type { Filters } from '../store'
@@ -7,11 +8,24 @@ function toggle<T>(list: T[], v: T): T[] {
   return list.includes(v) ? list.filter((x) => x !== v) : [...list, v]
 }
 
-export function FilterBar({ filters, onChange, count }: { filters: Filters; onChange: (f: Filters) => void; count: number }) {
-  const active =
-    filters.cuisines.length + filters.types.length + (filters.vegetarian ? 1 : 0) + (filters.maxTime ? 1 : 0) + (filters.cheap ? 1 : 0) + (filters.pantryOnly ? 1 : 0) > 0
+/** Anzahl gesetzter Filter (für die Anzeige am Filter-Knopf) */
+export function activeFilterCount(f: Filters): number {
+  return f.cuisines.length + f.types.length + (f.vegetarian ? 1 : 0) + (f.maxTime ? 1 : 0) + (f.cheap ? 1 : 0) + (f.pantryOnly ? 1 : 0)
+}
+
+interface Props {
+  filters: Filters
+  onChange: (f: Filters) => void
+  count: number
+  /** im Filter-Sheet: Chips umbrechen, Zurücksetzen & Anzahl stehen im Sheet-Fuß */
+  inSheet?: boolean
+}
+
+export function FilterBar({ filters, onChange, count, inSheet }: Props) {
+  const active = activeFilterCount(filters) > 0
   return (
-    <div className="filterbar">
+    <div className={`filterbar ${inSheet ? 'wrap' : ''}`}>
+      {inSheet && <h3>Küche</h3>}
       <div className="chips">
         {(Object.keys(CUISINE_LABEL) as Cuisine[]).map((c) => (
           <button
@@ -23,6 +37,7 @@ export function FilterBar({ filters, onChange, count }: { filters: Filters; onCh
           </button>
         ))}
       </div>
+      {inSheet && <h3>Art</h3>}
       <div className="chips">
         {(Object.keys(TYPE_LABEL) as DishType[]).map((t) => (
           <button
@@ -34,6 +49,7 @@ export function FilterBar({ filters, onChange, count }: { filters: Filters; onCh
           </button>
         ))}
       </div>
+      {inSheet && <h3>Außerdem</h3>}
       <div className="chips">
         <button className={`chip ${filters.pantryOnly ? 'on' : ''}`} onClick={() => onChange({ ...filters, pantryOnly: !filters.pantryOnly })}>
           🧺 Nur mit Vorrat
@@ -56,12 +72,42 @@ export function FilterBar({ filters, onChange, count }: { filters: Filters; onCh
             ⏱ bis {m} Min.
           </button>
         ))}
-        {active && (
+        {!inSheet && active && (
           <button className="chip ghost" onClick={() => onChange(EMPTY_FILTERS)}>
             ✕ Zurücksetzen
           </button>
         )}
-        <span className="count">{count} Gerichte</span>
+        {!inSheet && <span className="count">{count} Gerichte</span>}
+      </div>
+    </div>
+  )
+}
+
+/** Filter als Sheet von unten – verdrängt beim Wischen weder Karte noch Knöpfe */
+export function FilterSheet({ filters, onChange, count, onClose }: Props & { onClose: () => void }) {
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
+  const n = activeFilterCount(filters)
+
+  return (
+    <div className="sheet-backdrop light" onClick={onClose}>
+      <div className="sheet filters" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Filter">
+        <button className="sheet-close dark" onClick={onClose} aria-label="Schließen">✕</button>
+        <div className="sheet-body">
+          <h2>⚙︎ Filter</h2>
+          <FilterBar filters={filters} onChange={onChange} count={count} inSheet />
+        </div>
+        <div className="sheet-footer row-btns">
+          <button className="btn ghost" disabled={n === 0} onClick={() => onChange(EMPTY_FILTERS)}>
+            Zurücksetzen
+          </button>
+          <button className="btn primary grow" onClick={onClose}>
+            Fertig · {count} {count === 1 ? 'Gericht' : 'Gerichte'}
+          </button>
+        </div>
       </div>
     </div>
   )

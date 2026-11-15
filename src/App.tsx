@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PlanEntry, Recipe } from './types'
 import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from './data/recipes'
 import { BREAKFAST_LABEL, type BreakfastType } from './types'
@@ -9,7 +9,8 @@ import { ProfileSheet } from './components/ProfileSheet'
 import { ProgressSheet } from './components/ProgressSheet'
 import { suggestion as weightSuggestion, upsertWeighIn, weighedThisWeek } from './progress'
 import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
-import { addDays, mondayOf, isoDate, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
+import { type AppState, addDays, mondayOf, isoDate, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
+import { useBackStack } from './useBackStack'
 import { matches } from './filter'
 import { formatAmount } from './shopping'
 import {
@@ -26,7 +27,7 @@ import {
 } from './kitchen'
 import { WeekView } from './components/WeekView'
 import { SwipeDeck } from './components/SwipeDeck'
-import { FilterBar } from './components/FilterBar'
+import { FilterSheet, activeFilterCount } from './components/FilterBar'
 import { RecipeSheet } from './components/RecipeSheet'
 import { ShoppingList } from './components/ShoppingList'
 import { RecipeBrowser } from './components/RecipeBrowser'
@@ -40,6 +41,18 @@ interface SheetState {
   day?: string
   mode: 'view' | 'take' | 'pick'
 }
+
+/** Stand vor einer Aktion – „Rückgängig“ stellt ihn komplett wieder her */
+interface Snapshot {
+  state: AppState
+  rejected: string[]
+  swipeDay: string
+  tab: Tab
+  meal: 'dinner' | 'breakfast'
+}
+
+const TOAST_MS = 2200
+const TOAST_UNDO_MS = 6000
 
 export default function App() {
   const [state, setState] = useAppState()
@@ -55,7 +68,8 @@ export default function App() {
   const weekKey = days[0]
   const [swipeDay, setSwipeDay] = useState<string>(days[0])
   const [sheet, setSheet] = useState<SheetState | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ msg: string; undo?: Snapshot } | null>(null)
+  const toastTimer = useRef<number>()
   const [showFilters, setShowFilters] = useState(false)
   const [rejected, setRejected] = useState<string[]>([])
   /** Wischen & Rezepte: Abendessen oder Frühstück */
@@ -88,10 +102,40 @@ export default function App() {
 
   useEffect(() => setRejected([]), [weekKey])
 
-  const flash = useCallback((msg: string) => {
-    setToast(msg)
-    window.setTimeout(() => setToast(null), 2200)
+  /** Toast zeigen; mit `undo` (Stand vor der Aktion) bleibt er länger und bekommt den Knopf „Rückgängig“ */
+  const flash = useCallback((msg: string, undo?: Snapshot) => {
+    window.clearTimeout(toastTimer.current)
+    setToast({ msg, undo })
+    toastTimer.current = window.setTimeout(() => setToast(null), undo ? TOAST_UNDO_MS : TOAST_MS)
   }, [])
+
+  // immer der aktuelle Stand – auch für Callbacks, die verzögert feuern (Karten-Animation)
+  const live = useRef<Snapshot>(null!)
+  live.current = { state, rejected, swipeDay, tab, meal }
+  const snapshot = () => live.current
+
+  function undo() {
+    const u = toast?.undo
+    if (!u) return
+    setState(u.state)
+    setRejected(u.rejected)
+    setSwipeDay(u.swipeDay)
+    setTab(u.tab)
+    setMeal(u.meal)
+    flash('Rückgängig gemacht ✓')
+  }
+
+  // ───── Zurück-Taste: erst Sheets schließen, dann zur Woche, erst dort die App verlassen ─────
+  const layers: [boolean, () => void][] = [
+    [tab !== 'woche', () => setTab('woche')],
+    [showFilters, () => setShowFilters(false)],
+    [!!sheet, () => setSheet(null)],
+    [showPrep, () => setShowPrep(false)],
+    [showProgress, () => setShowProgress(false)],
+    [showProfile, () => setShowProfile(false)],
+  ]
+  const open = layers.filter(([on]) => on)
+  useBackStack(open.length, (target) => open.slice(target).forEach(([, close]) => close()))
 
   const setEntry = useCallback(
     (day: string, entry: PlanEntry | undefined) => {
@@ -143,6 +187,7 @@ export default function App() {
     () => new Set(days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => e!.recipeId)),
     [days, state.plan],
   )
+  const activeFilters = activeFilterCount(state.filters)
   const filteredCount = RECIPES.filter(
     (r) => matches(r, state.filters, perPortion.get(r.id)) && (!state.filters.pantryOnly || insights.get(r.id)!.buyCost <= PANTRY_ONLY_MAX_EURO),
   ).length
@@ -207,14 +252,15 @@ export default function App() {
   }
 
   function pickBreakfast(r: Recipe) {
+    const snap = snapshot()
     const next = [...picks.filter((id) => id !== r.id), r.id].slice(-2)
     setPicks(next)
     const covered = Object.keys(assignBreakfasts(next, days).days).length
     if (next.length >= 2 || covered === 5) {
-      flash(`☀️ Frühstück steht: ${next.map((id) => RECIPE_BY_ID[id].title).join(' + ')}`)
+      flash(`☀️ Frühstück steht: ${next.map((id) => RECIPE_BY_ID[id].title).join(' + ')}`, snap)
       setTab('woche')
     } else {
-      flash(`${r.title} ✓ – wähle noch eins für den Rest der Woche`)
+      flash(`${r.title} ✓ – wähle noch eins`, snap)
     }
   }
 
@@ -254,19 +300,35 @@ export default function App() {
   }
 
   function take(recipe: Recipe, day: string, servings = state.defaultServings) {
+    const snap = snapshot()
     setEntry(day, { recipeId: recipe.id, servings })
     const idx = days.indexOf(day)
     const nextEmpty = [...days.slice(idx + 1), ...days.slice(0, idx)].find((d) => d !== day && !state.plan[d] && d >= today)
     if (nextEmpty) {
-      flash(`${weekdayName(day)}: ${recipe.title} ✓`)
+      flash(`${weekdayName(day)}: ${recipe.title} ✓`, snap)
       setSwipeDay(nextEmpty)
     } else {
-      flash('Woche komplett geplant! 🎉')
+      flash('Woche komplett geplant! 🎉', snap)
       setTab('woche')
     }
   }
 
+  /** Karte nach links: ans Ende des Stapels */
+  function reject(r: Recipe) {
+    const snap = snapshot()
+    setRejected((x) => [...x.filter((id) => id !== r.id), r.id])
+    flash(`Übersprungen: ${r.title}`, snap)
+  }
+
+  function removeEntry(day: string) {
+    const snap = snapshot()
+    setEntry(day, undefined)
+    flash(`${weekdayName(day)}: Gericht entfernt`, snap)
+  }
+
   function changeWeek(delta: number) {
+    // ein Snapshot gehört zur angezeigten Woche
+    setToast((t) => (t?.undo ? null : t))
     const m = addDays(monday, delta * 7)
     setMonday(m)
     setSwipeDay(isoDate(m))
@@ -294,6 +356,8 @@ export default function App() {
   }
 
   function resetChecks() {
+    const snap = snapshot()
+    flash('Haken zurückgesetzt', snap)
     setState((s) => {
       const wk = s.bought[weekKey] ?? {}
       let pantry = s.pantry
@@ -305,12 +369,13 @@ export default function App() {
   }
 
   function uncookDay(day: string) {
+    const snap = snapshot()
     setState((s) => {
       const e = s.plan[day]
       if (!e) return s
       return { ...s, pantry: uncook(e, s.pantry), plan: { ...s.plan, [day]: { ...e, status: 'skipped', consumed: undefined } } }
     })
-    flash('Zutaten zurück im Vorrat')
+    flash('Zutaten zurück im Vorrat', snap)
   }
 
   function recookDay(day: string) {
@@ -326,7 +391,10 @@ export default function App() {
   const weekNav = (
     <div className="weeknav">
       <button className="icon-btn" onClick={() => changeWeek(-1)} aria-label="Vorige Woche">‹</button>
-      <span>{weekLabel(monday)}</span>
+      <span className="week-label">
+        <b>{weekLabel(monday).split(' · ')[0]}</b>
+        <small>{weekLabel(monday).split(' · ')[1]}</small>
+      </span>
       <button className="icon-btn" onClick={() => changeWeek(1)} aria-label="Nächste Woche">›</button>
     </div>
   )
@@ -353,7 +421,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="content">
+      <main className={`content ${tab === 'wischen' ? 'swipe' : ''}`}>
         {tab === 'woche' && profile && (needsWeighIn || pendingSuggestion) && (
           <button className="banner info" onClick={() => setShowProgress(true)}>
             {pendingSuggestion ? `💡 Vorschlag für dein Tagesziel: ${pendingSuggestion.title} – ansehen` : '⚖️ Wiegetag: trag deine Werte für diese Woche ein'}
@@ -369,7 +437,7 @@ export default function App() {
             urgentCount={urgentNames.size}
             onSwipeDay={startSwipe}
             onOpen={(r, day) => setSheet({ recipe: r, day, mode: 'view' })}
-            onUpdate={setEntry}
+            onUpdate={(day, entry) => (entry ? setEntry(day, entry) : removeEntry(day))}
             onUncook={uncookDay}
             onRecook={recookDay}
             onShop={() => setTab('liste')}
@@ -391,6 +459,7 @@ export default function App() {
                 onPrep={() => setShowPrep(true)}
                 onOpen={(r) => setSheet({ recipe: r, mode: 'view' })}
                 onReset={() => {
+                  flash('Frühstück zurückgesetzt', snapshot())
                   setPicks([])
                   setMeal('breakfast')
                   setTab('wischen')
@@ -409,9 +478,15 @@ export default function App() {
                   <h1>
                     ☀️ Frühstück <span className="accent">Mo–Fr</span>
                   </h1>
-                  <span className="muted small">{picks.length}/2 gewählt</span>
+                  {picks.length === 1 ? (
+                    <button className="chip" onClick={() => setTab('woche')} aria-label={`Nur ${RECIPE_BY_ID[picks[0]].title} nehmen – fertig`}>
+                      1/2 · Fertig →
+                    </button>
+                  ) : (
+                    <span className="muted small">{picks.length}/2 gewählt</span>
+                  )}
                 </div>
-                <p className="muted small">
+                <p className="muted small swipe-note">
                   Wähle 1–2 Frühstücke zum Vorbereiten am Sonntag. Das kürzer haltbare kommt Mo–Mi, das länger haltbare Do–Fr.
                 </p>
                 <div className="chips-row">
@@ -432,14 +507,10 @@ export default function App() {
                   deck={bDeck}
                   insights={bInsights}
                   onTake={pickBreakfast}
-                  onReject={(r) => setRejected((x) => [...x.filter((id) => id !== r.id), r.id])}
+                  onReject={reject}
                   onInfo={(r) => setSheet({ recipe: r, mode: 'take' })}
                 />
-                {picks.length === 1 && (
-                  <button className="link center-block" onClick={() => setTab('woche')}>
-                    Nur {RECIPE_BY_ID[picks[0]].title} nehmen → fertig
-                  </button>
-                )}
+                <p className="hint toast-slot">← nächstes · wählen →</p>
               </>
             ) : (
               <>
@@ -459,17 +530,14 @@ export default function App() {
               <h1>
                 Was gibt’s <span className="accent">{weekdayName(swipeDay)}</span>?
               </h1>
-              <button className={`chip ${showFilters ? 'on' : ''}`} onClick={() => setShowFilters((v) => !v)}>
-                ⚙︎ Filter{filteredCount !== RECIPES.length ? ` (${filteredCount})` : ''}
+              <button className={`chip ${activeFilters ? 'on' : ''}`} onClick={() => setShowFilters(true)} aria-haspopup="dialog">
+                ⚙︎ Filter{activeFilters ? ` (${activeFilters})` : ''}
               </button>
             </div>
             {state.plan[swipeDay] && (
-              <p className="muted small center">
+              <p className="muted small center swipe-note">
                 Aktuell geplant: {RECIPE_BY_ID[state.plan[swipeDay]!.recipeId]?.title}. Nach rechts wischen ersetzt es.
               </p>
-            )}
-            {showFilters && (
-              <FilterBar filters={state.filters} onChange={(f) => setState((s) => ({ ...s, filters: f }))} count={filteredCount} />
             )}
             <SwipeDeck
               portionOf={(r) => {
@@ -479,10 +547,10 @@ export default function App() {
               deck={deck}
               insights={insights}
               onTake={(r) => take(r, swipeDay)}
-              onReject={(r) => setRejected((x) => [...x.filter((id) => id !== r.id), r.id])}
+              onReject={reject}
               onInfo={(r) => setSheet({ recipe: r, day: swipeDay, mode: 'take' })}
             />
-            <p className="hint">← wegwischen · nehmen → · sortiert nach Vorrat, Preis & Abwechslung</p>
+            <p className="hint toast-slot">← wegwischen · nehmen → · sortiert nach Vorrat, Preis & Abwechslung</p>
               </>
             )}
           </div>
@@ -520,7 +588,11 @@ export default function App() {
             pantry={state.pantry}
             leftovers={week.leftovers}
             today={today}
-            onChange={(pantry) => setState((s) => ({ ...s, pantry }))}
+            onChange={(pantry) => {
+              const removed = state.pantry.find((l) => !pantry.some((x) => x.id === l.id))
+              if (removed) flash(`${removed.name} entfernt`, snapshot())
+              setState((s) => ({ ...s, pantry }))
+            }}
             onCook={() => {
               const free = days.find((d) => !state.plan[d] && d >= today)
               if (free) startSwipe(free)
@@ -628,8 +700,9 @@ export default function App() {
           days={days}
           plan={state.plan}
           onPick={(day) => {
+            const snap = snapshot()
             setEntry(day, { recipeId: sheet.recipe.id, servings: state.defaultServings })
-            flash(`${sheet.recipe.title} → ${weekdayName(day)} ✓`)
+            flash(`${sheet.recipe.title} → ${weekdayName(day)} ✓`, snap)
             setSheet(null)
           }}
         />
@@ -669,7 +742,10 @@ export default function App() {
             })
             flash('Messung gespeichert ✓')
           }}
-          onDelete={(date) => setState((s) => ({ ...s, weighIns: s.weighIns.filter((x) => x.date !== date) }))}
+          onDelete={(date) => {
+            flash('Messung gelöscht', snapshot())
+            setState((s) => ({ ...s, weighIns: s.weighIns.filter((x) => x.date !== date) }))
+          }}
           onDecide={(accept) => {
             setState((s) => ({
               ...s,
@@ -695,7 +771,25 @@ export default function App() {
         />
       )}
 
-      {toast && <div className="toast">{toast}</div>}
+      {showFilters && (
+        <FilterSheet
+          filters={state.filters}
+          onChange={(f) => setState((s) => ({ ...s, filters: f }))}
+          count={filteredCount}
+          onClose={() => setShowFilters(false)}
+        />
+      )}
+
+      {toast && (
+        <div className={`toast ${toast.undo ? 'has-undo' : ''}`} role="status">
+          <span className="toast-msg">{toast.msg}</span>
+          {toast.undo && (
+            <button className="toast-undo" onClick={undo}>
+              Rückgängig
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

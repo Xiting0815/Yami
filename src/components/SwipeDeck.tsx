@@ -94,7 +94,7 @@ export function SwipeDeck({ deck, insights, onTake, onReject, onInfo, portionOf 
     return (
       <div className="deck-empty">
         <p>Keine Gerichte für diese Filter.</p>
-        <p className="muted">Lockere die Filter oben, um wieder Vorschläge zu sehen.</p>
+        <p className="muted">Lockere die Filter, um wieder Vorschläge zu sehen.</p>
       </div>
     )
   }

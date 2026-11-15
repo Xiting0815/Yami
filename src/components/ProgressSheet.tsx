@@ -90,14 +90,17 @@ export function ProgressSheet(props: Props) {
                 <span>%</span>
               </label>
               <label>
-                <span className="lbl-row">
-                  Muskelmasse
-                  <button type="button" className="unit-toggle" onClick={() => onMuscleUnit(unit === 'kg' ? '%' : 'kg')}>
-                    {unit === 'kg' ? 'kg → %' : '% → kg'}
-                  </button>
-                </span>
+                Muskelmasse
                 <input inputMode="decimal" value={muscle} placeholder="–" onChange={(e) => setMuscle(e.target.value)} />
-                <span>{unit}</span>
+                {/* Einheit im Feld ist der Umschalter (steht nach dem Input, damit das Label das Feld fokussiert) */}
+                <button
+                  type="button"
+                  className="unit-toggle"
+                  onClick={() => onMuscleUnit(unit === 'kg' ? '%' : 'kg')}
+                  aria-label={`Einheit: ${unit} – wechseln zu ${unit === 'kg' ? '%' : 'kg'}`}
+                >
+                  {unit} ⇄
+                </button>
               </label>
               <label>
                 Körperwasser
