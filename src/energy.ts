@@ -17,6 +17,14 @@ export interface Profile {
   deficit: number
   /** Pauschale fürs Mittagessen (wird nicht geplant) */
   lunchKcal: number
+  /** Körperfett in % aus der letzten Messung (→ genauere Formel) */
+  fatPct?: number
+  /** Zielgewicht in kg */
+  goalWeight?: number
+  /** bestätigte Anpassungen des Ziels in kcal (z. B. −100) */
+  adjust?: number
+  /** Einheit der Muskelmasse auf der Waage */
+  muscleUnit?: 'kg' | '%'
 }
 
 export const ACTIVITY: { value: number; label: string; hint: string }[] = [
@@ -38,7 +46,17 @@ export const DEFAULT_PROFILE: Profile = { sex: 'm', age: 40, heightCm: 180, weig
 /** angenommenes Frühstück, wenn für den Tag keins geplant ist */
 export const DEFAULT_BREAKFAST_KCAL = 400
 
+/** Formel: mit Körperfett Katch-McArdle (über die fettfreie Masse), sonst Mifflin-St Jeor */
+export function bmrFormula(p: Profile): 'katch' | 'mifflin' {
+  return p.fatPct != null && p.fatPct > 3 && p.fatPct < 60 ? 'katch' : 'mifflin'
+}
+
+export function leanMass(p: Profile): number | undefined {
+  return bmrFormula(p) === 'katch' ? p.weightKg * (1 - p.fatPct! / 100) : undefined
+}
+
 export function bmr(p: Profile): number {
+  if (bmrFormula(p) === 'katch') return 370 + 21.6 * leanMass(p)!
   return 10 * p.weightKg + 6.25 * p.heightCm - 5 * p.age + (p.sex === 'm' ? 5 : -161)
 }
 
@@ -52,7 +70,7 @@ export function floorKcal(p: Profile): number {
 }
 
 export function targetKcal(p: Profile): number {
-  return Math.round(Math.max(floorKcal(p), tdee(p) - p.deficit) / 10) * 10
+  return Math.round(Math.max(floorKcal(p), tdee(p) - p.deficit + (p.adjust ?? 0)) / 10) * 10
 }
 
 /** Tagesbilanz gilt nur Mo–Fr */

@@ -36,6 +36,14 @@ Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und beko
 - **Tagesbilanz:** Für Mo–Fr zeigt die Woche einen Balken: ☀️ Frühstück + 🥪 Mittag + 🌙 deine Abendportion im Vergleich zum Ziel. Sa/So sind ausgenommen.
 - **Deine Portion:** Abendessen bleiben für 2 Personen. Die App rechnet aus, welcher Anteil (⅓, ½, ⅔, ¾ oder voll) ins Abendbudget passt, und gibt bei gehaltvollen Gerichten einen Gemüse-/Salat-Tipp. Die Reihenfolge beim Wischen ändert sich dadurch nicht.
 
+### Wiegen & Fortschritt
+
+- **1× pro Woche wiegen** (⚖️ oben rechts): Gewicht, Körperfett %, Muskelmasse (kg oder %) und Körperwasser %. Eine zweite Messung in derselben Woche ersetzt die erste. Ab Montag erinnert die Wochenansicht, solange für die Woche nichts eingetragen ist.
+- **Genauerer Bedarf mit Körperfett:** Sobald Körperfett eingetragen ist, rechnet die App mit Katch-McArdle (370 + 21,6 × fettfreie Masse) statt Mifflin-St Jeor. Gewicht und Körperfett im Profil folgen automatisch der neuesten Messung.
+- **Verlauf:** Kennzahlen mit Veränderung zur Vorwoche und seit Start, je ein Diagramm für Gewicht (mit Ziellinie) und Körperfett, Tabelle aller Messungen.
+- **Zielgewicht:** Fortschritt in % und geschätztes Datum – ab 4 Messungen nach deinem echten Trend, vorher nach dem geplanten Tempo.
+- **Vorschläge zum Bestätigen:** frühestens nach 3 Messungen und nicht öfter als alle 2 Wochen: −100 kcal, wenn in 2 Wochen weniger als ¼ der erwarteten Abnahme erreicht wurde; +100 kcal, wenn es schneller als 1 % des Gewichts pro Woche geht. Hinweis, wenn das Gewicht sinkt, der Körperfettanteil aber steigt (Muskelabbau). Bestätigte Anpassungen stehen im Profil und lassen sich zurücksetzen.
+
 Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine PWA und lässt sich auf den Homescreen legen und offline nutzen.
 
 ## Entwickeln
@@ -49,6 +57,7 @@ npx vite-node scripts/test-kitchen.ts   # Logiktests Vorrat/Einkauf/Empfehlungen
 npx vite-node scripts/test-breakfast.ts # Logiktests Frühstück/Meal-Prep
 npx vite-node scripts/test-leftovers.ts # Logiktests Reste/Vorrat/Frische
 npx vite-node scripts/test-energy.ts    # Logiktests Kalorienbedarf/Portionen
+npx vite-node scripts/test-progress.ts  # Logiktests Wiegen/Trend/Vorschläge
 ```
 
 ## Veröffentlichen (kostenlos)

@@ -6,6 +6,8 @@ import { assignBreakfasts, prepPlan, workdays } from './breakfast'
 import { BreakfastCard } from './components/BreakfastCard'
 import { PrepSheet } from './components/PrepSheet'
 import { ProfileSheet } from './components/ProfileSheet'
+import { ProgressSheet } from './components/ProgressSheet'
+import { suggestion as weightSuggestion, upsertWeighIn, weighedThisWeek } from './progress'
 import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
 import { addDays, mondayOf, isoDate, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
 import { matches } from './filter'
@@ -62,6 +64,7 @@ export default function App() {
   const [bPantryOnly, setBPantryOnly] = useState(false)
   const [showPrep, setShowPrep] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const [showProgress, setShowProgress] = useState(false)
 
   // Datum aktuell halten (App bleibt oft tagelang offen)
   useEffect(() => {
@@ -237,6 +240,11 @@ export default function App() {
       ? Math.max(0, targetKcal(profile) - (RECIPE_BY_ID[state.breakfast[day]?.recipeId ?? '']?.nutrition.kcal ?? DEFAULT_BREAKFAST_KCAL) - profile.lunchKcal)
       : undefined
 
+  // ───── Wiegen & Anpassung ─────
+  const weighIns = state.weighIns
+  const pendingSuggestion = profile ? weightSuggestion(weighIns, profile, state.adjustDecidedAt) : null
+  const needsWeighIn = !!profile && !weighedThisWeek(weighIns, today)
+
   const urgentNames = new Set(state.pantry.filter((l) => daysUntil(l.expires, today) <= 2).map((l) => l.name))
 
   function startSwipe(day: string) {
@@ -327,10 +335,18 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="logo">🍳</span> Yami
+          <span className="logo">🍳</span> <span className="brand-name">Yami</span>
         </div>
         <div className="top-right">
           {tab !== 'rezepte' && tab !== 'vorrat' && weekNav}
+          <button
+            className={`icon-btn profile-btn ${needsWeighIn || pendingSuggestion ? 'dot-badge' : ''}`}
+            onClick={() => (profile ? setShowProgress(true) : setShowProfile(true))}
+            aria-label="Wiegen & Fortschritt"
+            title="Wiegen & Fortschritt"
+          >
+            ⚖️
+          </button>
           <button className="icon-btn profile-btn" onClick={() => setShowProfile(true)} aria-label="Profil & Kalorienziel" title="Profil & Kalorienziel">
             👤
           </button>
@@ -338,6 +354,11 @@ export default function App() {
       </header>
 
       <main className="content">
+        {tab === 'woche' && profile && (needsWeighIn || pendingSuggestion) && (
+          <button className="banner info" onClick={() => setShowProgress(true)}>
+            {pendingSuggestion ? `💡 Vorschlag für dein Tagesziel: ${pendingSuggestion.title} – ansehen` : '⚖️ Wiegetag: trag deine Werte für diese Woche ein'}
+          </button>
+        )}
         {tab === 'woche' && (
           <WeekView
             days={days}
@@ -628,6 +649,37 @@ export default function App() {
             })
           }
           onClose={() => setShowPrep(false)}
+        />
+      )}
+
+      {showProgress && profile && (
+        <ProgressSheet
+          profile={profile}
+          weighIns={weighIns}
+          today={today}
+          suggestion={pendingSuggestion}
+          onClose={() => setShowProgress(false)}
+          onSave={(w) => {
+            setState((s) => {
+              const list = upsertWeighIn(s.weighIns, w)
+              const latest = list[list.length - 1]
+              // Profil folgt der neuesten Messung (Gewicht & Körperfett → genauere Bedarfsformel)
+              const profile = s.profile ? { ...s.profile, weightKg: latest.weight, fatPct: latest.fat ?? s.profile.fatPct } : s.profile
+              return { ...s, weighIns: list, profile }
+            })
+            flash('Messung gespeichert ✓')
+          }}
+          onDelete={(date) => setState((s) => ({ ...s, weighIns: s.weighIns.filter((x) => x.date !== date) }))}
+          onDecide={(accept) => {
+            setState((s) => ({
+              ...s,
+              adjustDecidedAt: s.weighIns.length,
+              profile: accept && s.profile && pendingSuggestion ? { ...s.profile, adjust: (s.profile.adjust ?? 0) + pendingSuggestion.delta } : s.profile,
+            }))
+            flash(accept ? 'Tagesziel angepasst ✓' : 'Ziel bleibt wie es ist')
+          }}
+          onGoal={(kg) => setState((s) => (s.profile ? { ...s, profile: { ...s.profile, goalWeight: kg && kg > 30 ? kg : undefined } } : s))}
+          onMuscleUnit={(u) => setState((s) => (s.profile ? { ...s, profile: { ...s.profile, muscleUnit: u } } : s))}
         />
       )}
 

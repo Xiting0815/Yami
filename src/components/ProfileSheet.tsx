@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, floorKcal, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
+import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, bmrFormula, floorKcal, leanMass, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
 
 interface Props {
   profile?: Profile
@@ -29,7 +29,7 @@ export function ProfileSheet({ profile, onSave, onClose }: Props) {
 
   const valid = p.age >= 14 && p.heightCm >= 120 && p.weightKg >= 35
   const target = targetKcal(p)
-  const atFloor = tdee(p) - p.deficit < floorKcal(p)
+  const atFloor = tdee(p) - p.deficit + (p.adjust ?? 0) < floorKcal(p)
 
   return (
     <div className="sheet-backdrop" onClick={onClose}>
@@ -51,6 +51,18 @@ export function ProfileSheet({ profile, onSave, onClose }: Props) {
             <label>Alter<input {...num('age', 0, 110)} /><span>Jahre</span></label>
             <label>Größe<input {...num('heightCm', 0, 230)} /><span>cm</span></label>
             <label>Gewicht<input {...num('weightKg', 0, 300)} /><span>kg</span></label>
+          </div>
+
+          {p.fatPct != null && (
+            <p className="muted small">
+              Körperfett aus der letzten Messung: {String(p.fatPct).replace('.', ',')} % → genauere Berechnung über die fettfreie Masse.
+            </p>
+          )}
+          <div className="form-grid one">
+            <label>Zielgewicht<input inputMode="decimal" value={p.goalWeight != null ? String(p.goalWeight).replace('.', ',') : ''} placeholder="optional" onChange={(e) => {
+              const v = parseFloat(e.target.value.replace(',', '.'))
+              setP({ ...p, goalWeight: isNaN(v) ? undefined : v })
+            }} /><span>kg</span></label>
           </div>
 
           <h3>Aktivität</h3>
@@ -81,9 +93,25 @@ export function ProfileSheet({ profile, onSave, onClose }: Props) {
 
           {valid && (
             <div className="calc-box">
-              <div><span>Grundumsatz (Mifflin-St Jeor)</span><b>{fmt(bmr(p))} kcal</b></div>
+              <div>
+                <span>
+                  {bmrFormula(p) === 'katch'
+                    ? `Grundumsatz (Katch-McArdle, ${fmt(leanMass(p)!)} kg fettfreie Masse)`
+                    : 'Grundumsatz (Mifflin-St Jeor)'}
+                </span>
+                <b>{fmt(bmr(p))} kcal</b>
+              </div>
               <div><span>× Aktivität {String(p.activity).replace('.', ',')} = Bedarf</span><b>{fmt(tdee(p))} kcal</b></div>
               <div><span>− Defizit</span><b>−{fmt(p.deficit)} kcal</b></div>
+              {!!p.adjust && (
+                <div>
+                  <span>
+                    Bestätigte Anpassung{' '}
+                    <button className="link small" onClick={() => setP({ ...p, adjust: 0 })}>zurücksetzen</button>
+                  </span>
+                  <b>{p.adjust > 0 ? '+' : '−'}{fmt(Math.abs(p.adjust))} kcal</b>
+                </div>
+              )}
               <div className="total"><span>Dein Tagesziel</span><b>{fmt(target)} kcal</b></div>
               <div className="split">
                 ☀️ Frühstück ≈ {DEFAULT_BREAKFAST_KCAL} · 🥪 Mittag {fmt(p.lunchKcal)} · 🌙 Abendessen ≈ {fmt(Math.max(0, target - DEFAULT_BREAKFAST_KCAL - p.lunchKcal))} kcal

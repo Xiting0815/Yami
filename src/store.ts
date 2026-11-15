@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Cuisine, DishType, ShopCat, WeekPlan } from './types'
 import type { BoughtMap, PantryLot, PriceOverrides } from './kitchen'
 import type { Profile } from './energy'
+import type { WeighIn } from './progress'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -42,6 +43,10 @@ export interface AppState {
   prepChecked: Record<string, string[]>
   /** Körperdaten & Ziel (optional) */
   profile?: Profile
+  /** Messungen der Waage (1 pro Woche) */
+  weighIns: WeighIn[]
+  /** Anzahl Messungen beim letzten Ja/Nein zu einem Anpassungsvorschlag */
+  adjustDecidedAt: number
 }
 
 const KEY = 'yami-state-v1'
@@ -58,6 +63,8 @@ const INITIAL: AppState = {
   breakfast: {},
   breakfastPicks: {},
   prepChecked: {},
+  weighIns: [],
+  adjustDecidedAt: 0,
 }
 
 function load(): AppState {
