@@ -21,6 +21,7 @@ interface Props {
   onDecide: (accept: boolean) => void
   onGoal: (kg: number | undefined) => void
   onMuscleUnit: (u: 'kg' | '%') => void
+  onReview: () => void
   onClose: () => void
 }
 
@@ -38,7 +39,7 @@ function num(s: string): number | undefined {
 }
 
 export function ProgressSheet(props: Props) {
-  const { profile, weighIns, today, suggestion, onSave, onDelete, onDecide, onGoal, onMuscleUnit, onClose } = props
+  const { profile, weighIns, today, suggestion, onSave, onDelete, onDecide, onGoal, onMuscleUnit, onReview, onClose } = props
   const last = weighIns[weighIns.length - 1]
   const [date, setDate] = useState(today)
   const [weight, setWeight] = useState(last ? de(last.weight) : de(profile.weightKg))
@@ -74,6 +75,7 @@ export function ProgressSheet(props: Props) {
         <div className="sheet-body">
           <h2>⚖️ Wiegen & Fortschritt</h2>
           <p className="muted small">1× pro Woche, am besten immer am gleichen Tag morgens nüchtern. Tagesziel aktuell: {targetKcal(profile).toLocaleString('de-DE')} kcal.</p>
+          <button className="link" onClick={onReview}>📊 Wochenrückblick ansehen</button>
 
           {/* ───── Eintragen ───── */}
           <section className="card-box">

@@ -5,6 +5,7 @@
  *   geplant/gewählt  +1      weggewischt   −0,4
  *   gekocht          +0,8    nicht gekocht −1
  *   Bewertung 👍 +2 · 🔁 „bald wieder“ +2,5 · 👎 −3
+ *   Gerichte einer Woche, die eine weggeworfene Zutat brauchen −0,3 (höchstens 1× pro Tag)
  *
  * Gelernt wird pro Gericht UND pro Muster (Küche, Gerichtart, Hauptzutat, schnell/aufwendig an Werktagen
  * bzw. am Wochenende, Frühstückstyp). So bekommen auch nie gesehene Gerichte einen passenden Platz.
@@ -13,7 +14,8 @@ import { CATALOG } from './data/catalog'
 import { RECIPE_BY_ID } from './data/recipes'
 import { gramsOf } from './data/nutrition-calc'
 import { isWorkday } from './energy'
-import { daysUntil } from './kitchen'
+import { type WastedItem, canonical, daysUntil, needsOf } from './kitchen'
+import { isoDate, mondayOf, parseIso } from './store'
 import { BREAKFAST_LABEL, CUISINE_LABEL, TYPE_LABEL, type Recipe, type WeekPlan } from './types'
 
 export type Rating = 'up' | 'again' | 'down'
@@ -24,7 +26,7 @@ export interface RejectEvent {
 }
 
 const HALF_LIFE = 60
-const W = { take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3 }
+const W = { waste: -0.3, take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3 }
 /** Glättung: so viele „neutrale“ Beobachtungen werden angenommen, bevor etwas als Vorliebe gilt */
 const PRIOR_RECIPE = 2
 const PRIOR_FEATURE = 4
@@ -103,6 +105,8 @@ export interface TasteInput {
   rejects: RejectEvent[]
   ratings: Record<string, Rating>
   today: string
+  /** weggeworfene Vorräte: leichtes Minus für Gerichte derselben Woche, die die Zutat brauchen */
+  wasted?: WastedItem[]
   /** Signale vor diesem Datum ignorieren (nach „Zurücksetzen“) */
   since?: string
 }
@@ -139,6 +143,24 @@ export function buildModel(inp: TasteInput): TasteModel {
   for (const [week, ids] of Object.entries(inp.breakfastPicks)) for (const id of ids ?? []) add(id, week, W.take)
   // Weggewischt
   for (const r of inp.rejects) add(r.id, r.date, W.reject)
+  // Weggeworfen: Gerichte derselben Woche, die die Zutat brauchen, leicht abwerten
+  const hit = new Set<string>()
+  for (const w of inp.wasted ?? []) {
+    const monday = mondayOf(parseIso(w.date))
+    const name = canonical(w.name)
+    for (let i = 0; i < 7; i++) {
+      const day = isoDate(new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i))
+      for (const [kind, p] of [['d', inp.plan], ['b', inp.breakfast]] as const) {
+        const e = p[day]
+        const r = e && e.status !== 'skipped' ? RECIPE_BY_ID[e.recipeId] : undefined
+        if (!e || !r || hit.has(kind + day)) continue
+        if (needsOf(r, e.servings).some((n) => n.name === name)) {
+          hit.add(kind + day)
+          add(e.recipeId, w.date, W.waste, kind === 'd' ? day : undefined)
+        }
+      }
+    }
+  }
   return m
 }
 

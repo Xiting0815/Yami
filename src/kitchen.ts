@@ -19,6 +19,21 @@ export interface PantryLot {
   expires: string
 }
 
+/** weggeworfener Vorratsposten (für den Wochenrückblick und leichtes Lernen) */
+export interface WastedItem {
+  name: string
+  amount: number
+  unit: string
+  /** ISO-Datum, an dem es als weggeworfen erfasst wurde */
+  date: string
+  /** geschätzter Wert in € */
+  value: number
+}
+
+export const WASTED_MAX = 300
+/** so viele Tage nach Ablauf gilt ein Posten ohne Aktion als weggeworfen */
+export const WASTE_AFTER_DAYS = 7
+
 export type PriceOverrides = Record<string, { pack: number; price: number }>
 
 /** gekaufte Mengen je Woche: Zutat → angelegter Vorratsposten */
@@ -146,6 +161,38 @@ export function consume(lots: PantryLot[], name: string, amount: number, date: s
   }
   for (let i = lots.length - 1; i >= 0; i--) if (lots[i].amount <= 1e-6) lots.splice(i, 1)
   return taken
+}
+
+/** Wert einer Menge in € (anteilig an Packungsgröße × Preis), 0 ohne Produkt */
+export function amountValue(name: string, amount: number, overrides?: PriceOverrides): number {
+  const prod = productFor(name, overrides)
+  return prod && prod.pack > 0 ? (amount / prod.pack) * prod.price : 0
+}
+
+/** Vorratsposten als weggeworfen erfassen */
+export function wasteOf(lot: PantryLot, date: string, overrides?: PriceOverrides): WastedItem {
+  return { name: lot.name, amount: lot.amount, unit: lot.unit, date, value: Math.round(amountValue(lot.name, lot.amount, overrides) * 100) / 100 }
+}
+
+/** Ein entfernter Posten zählt als weggeworfen, wenn er abgelaufen war (Haltbarkeit ≤ heute) */
+export function discardWaste(lot: PantryLot, today: string, overrides?: PriceOverrides): WastedItem | null {
+  return lot.expires <= today && lot.amount > 1e-6 ? wasteOf(lot, today, overrides) : null
+}
+
+/** Posten, die vor mehr als 7 Tagen abgelaufen sind, wandern automatisch in „weggeworfen“ (idempotent) */
+export function moveExpired(
+  pantry: PantryLot[],
+  wasted: WastedItem[],
+  today: string,
+  overrides?: PriceOverrides,
+): { pantry: PantryLot[]; wasted: WastedItem[]; changed: boolean } {
+  const gone = pantry.filter((l) => daysUntil(l.expires, today) < -WASTE_AFTER_DAYS)
+  if (!gone.length) return { pantry, wasted, changed: false }
+  return {
+    pantry: pantry.filter((l) => !gone.includes(l)),
+    wasted: [...wasted, ...gone.map((l) => wasteOf(l, today, overrides))].slice(-WASTED_MAX),
+    changed: true,
+  }
 }
 
 /** Gekochte Gerichte (Tage vor heute) automatisch vom Vorrat abziehen */

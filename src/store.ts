@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { RECIPE_BY_ID } from './data/recipes'
 import type { Cuisine, DishType, ShopCat, WeekPlan } from './types'
-import type { BoughtMap, PantryLot, PriceOverrides } from './kitchen'
+import { WASTED_MAX, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
 import type { Profile } from './energy'
 import type { WeighIn } from './progress'
 import type { Rating, RejectEvent } from './learning'
@@ -67,6 +67,10 @@ export interface AppState {
   bfOpen?: boolean
   /** Datum (ISO) der letzten Sicherungsdatei */
   lastBackup?: string
+  /** weggeworfene Vorratsposten (höchstens die letzten 300) */
+  wasted: WastedItem[]
+  /** Wochen (Montag, ISO), deren Rückblick-Karte weggeklickt wurde */
+  reviewDismissed: string[]
 }
 
 const KEY = 'yami-state-v1'
@@ -90,6 +94,8 @@ const INITIAL: AppState = {
   rejects: [],
   ratings: {},
   ratingDismissed: [],
+  wasted: [],
+  reviewDismissed: [],
 }
 
 const hasData = (s: AppState) =>
@@ -117,6 +123,15 @@ export function sanitize(parsed: unknown): AppState {
   state.breakfastPicks = Object.fromEntries(
     Object.entries(state.breakfastPicks).map(([k, ids]) => [k, (Array.isArray(ids) ? ids : []).filter((id) => RECIPE_BY_ID[id])]),
   )
+  const validWaste = (w: unknown): w is WastedItem => {
+    const x = w as Partial<WastedItem> | null
+    return (
+      !!x && typeof x.name === 'string' && typeof x.unit === 'string' && typeof x.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date) &&
+      Number.isFinite(x.amount) && Number.isFinite(x.value)
+    )
+  }
+  state.wasted = state.wasted.filter(validWaste).slice(-WASTED_MAX)
+  state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)
   // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
   if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'
   return state
@@ -199,7 +214,7 @@ export function weekLabel(monday: Date): string {
   return `KW ${kw} · ${from}–${sun.getDate()}.${sun.getMonth() + 1}.`
 }
 
-function isoWeekNumber(d: Date): number {
+export function isoWeekNumber(d: Date): number {
   const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
   const day = t.getUTCDay() || 7
   t.setUTCDate(t.getUTCDate() + 4 - day)

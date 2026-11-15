@@ -24,6 +24,8 @@ interface Props {
   total: number
   prices: PriceOverrides
   notice?: Notice
+  /** Wochenrückblick-Karte (sonntags) */
+  reviewSlot?: ReactNode
   /** Start-Checkliste (ersetzt Hinweis und leere Frühstückszeile) */
   startSlot?: ReactNode
   /** Tageszeilen ausblenden (Checkliste läuft und noch kein Abendessen geplant) */
@@ -57,11 +59,13 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, notice, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions } = props
+  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions } = props
   const planned = days.filter((d) => plan[d]).length
 
   return (
     <div className="week">
+      {reviewSlot}
+
       {startSlot}
 
       {!hideDays && (

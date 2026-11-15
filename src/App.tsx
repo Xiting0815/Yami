@@ -11,6 +11,9 @@ import { type Rating, buildModel, pendingRating, preference, summarize } from '.
 import { ProfileSheet } from './components/ProfileSheet'
 import { exportBackup } from './backup'
 import { ProgressSheet } from './components/ProgressSheet'
+import { ReviewCard } from './components/ReviewCard'
+import { ReviewSheet } from './components/ReviewSheet'
+import { defaultReviewMonday, weekReview } from './review'
 import { suggestion as weightSuggestion, upsertWeighIn, weighedThisWeek } from './progress'
 import { type DayBalance, type Portion, dayBalance, isProteinLow, isWorkday, portionFor, proteinBoost, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
 import { type AppState, addDays, mondayOf, isoDate, parseIso, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
@@ -21,6 +24,8 @@ import {
   type BuyItem,
   addDaysIso,
   cookDue,
+  discardWaste,
+  moveExpired,
   daysUntil,
   formatEuro,
   insight,
@@ -29,6 +34,7 @@ import {
   uid,
   uncook,
   PANTRY_ONLY_MAX_EURO,
+  WASTED_MAX,
 } from './kitchen'
 import { type Notice, WeekView } from './components/WeekView'
 import { SwipeDeck } from './components/SwipeDeck'
@@ -104,6 +110,8 @@ export default function App() {
   const [showPrep, setShowPrep] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showProgress, setShowProgress] = useState(false)
+  /** Wochenrückblick-Sheet: Montag der gezeigten Woche (null = zu) */
+  const [reviewMonday, setReviewMonday] = useState<string | null>(null)
   /** Tag, dessen „⋯“-Aktionen offen sind */
   const [actionsDay, setActionsDay] = useState<string | null>(null)
   /** Start-Checkliste gerade abgeschlossen → einmal „Alles eingerichtet“ zeigen */
@@ -126,7 +134,9 @@ export default function App() {
     setState((s) => {
       const r = cookDue(s.plan, s.pantry, today)
       const b = cookDue(s.breakfast, r.pantry, today)
-      return r.changed || b.changed ? { ...s, plan: r.plan, breakfast: b.plan, pantry: b.pantry } : s
+      // vor mehr als 7 Tagen abgelaufen → gilt als weggeworfen
+      const x = moveExpired(b.pantry, s.wasted, today, s.prices)
+      return r.changed || b.changed || x.changed ? { ...s, plan: r.plan, breakfast: b.plan, pantry: x.pantry, wasted: x.wasted } : s
     })
   }, [today, setState])
 
@@ -165,6 +175,7 @@ export default function App() {
     [showPrep, () => setShowPrep(false)],
     [showProgress, () => setShowProgress(false)],
     [showProfile, () => setShowProfile(false)],
+    [reviewMonday !== null, () => setReviewMonday(null)],
   ]
   const open = layers.filter(([on]) => on)
   useBackStack(open.length, (target) => open.slice(target).forEach(([, close]) => close()))
@@ -211,10 +222,11 @@ export default function App() {
         breakfastPicks: state.breakfastPicks,
         rejects: state.rejects,
         ratings: state.ratings,
+        wasted: state.wasted,
         today,
         since: state.tasteSince,
       }),
-    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, today, state.tasteSince],
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince],
   )
 
   // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────
@@ -394,6 +406,20 @@ export default function App() {
     if (!dates.some((d) => d < weekAgo) && !weighIns.some((w) => w.date < weekAgo)) return false
     return !state.lastBackup || state.lastBackup < isoDate(addDays(parseIso(today), -28))
   })()
+
+  // ───── Wochenrückblick: sonntags als Karte oben in der Woche (für die Woche, die heute endet) ─────
+  const isSunday = parseIso(today).getDay() === 0
+  const cardMonday = defaultReviewMonday(today)
+  const cardReview = useMemo(
+    () => (isSunday && !onboarding ? weekReview(state, weekDays(parseIso(cardMonday)), today) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSunday, onboarding, state, cardMonday, today],
+  )
+  const showReviewCard = !!cardReview && cardReview.hasData && !state.reviewDismissed.includes(cardMonday)
+  const sheetReview = useMemo(
+    () => (reviewMonday ? weekReview(state, weekDays(parseIso(reviewMonday)), today) : null),
+    [reviewMonday, state, today],
+  )
 
   const urgentNames = new Set(state.pantry.filter((l) => daysUntil(l.expires, today) <= 2).map((l) => l.name))
 
@@ -639,6 +665,18 @@ export default function App() {
             total={week.total}
             prices={state.prices}
             notice={notice}
+            reviewSlot={
+              showReviewCard && cardReview ? (
+                <ReviewCard
+                  review={cardReview}
+                  onOpen={() => setReviewMonday(cardMonday)}
+                  onDismiss={() => {
+                    setState((s) => ({ ...s, reviewDismissed: [...s.reviewDismissed, cardMonday].slice(-60) }))
+                    flash('Rückblick ausgeblendet – du findest ihn unter ⚖️')
+                  }}
+                />
+              ) : undefined
+            }
             startSlot={
               onboarding ? (
                 <StartCard
@@ -805,7 +843,9 @@ export default function App() {
             onChange={(pantry) => {
               const removed = state.pantry.find((l) => !pantry.some((x) => x.id === l.id))
               if (removed) flash(`${removed.name} entfernt`, snapshot())
-              setState((s) => ({ ...s, pantry }))
+              // abgelaufen entfernt = weggeworfen (für den Wochenrückblick)
+              const waste = removed ? discardWaste(removed, today, state.prices) : null
+              setState((s) => ({ ...s, pantry, wasted: waste ? [...s.wasted, waste].slice(-WASTED_MAX) : s.wasted }))
             }}
             onCook={() => {
               const free = days.find((d) => !state.plan[d] && d >= today)
@@ -981,6 +1021,7 @@ export default function App() {
           weighIns={weighIns}
           today={today}
           suggestion={pendingSuggestion}
+          onReview={() => setReviewMonday(defaultReviewMonday(today))}
           onClose={() => setShowProgress(false)}
           onSave={(w) => {
             setState((s) => {
@@ -1042,7 +1083,8 @@ export default function App() {
             // wie beim Start: vergangene Gerichte gelten als gekocht
             const r = cookDue(s.plan, s.pantry, today)
             const b = cookDue(s.breakfast, r.pantry, today)
-            setState({ ...s, plan: r.plan, breakfast: b.plan, pantry: b.pantry, lastBackup: s.lastBackup ?? today })
+            const x = moveExpired(b.pantry, s.wasted, today, s.prices)
+            setState({ ...s, plan: r.plan, breakfast: b.plan, pantry: x.pantry, wasted: x.wasted, lastBackup: s.lastBackup ?? today })
             setShowProfile(false)
             flash('Sicherung geladen ✓', snap)
           }}
@@ -1061,6 +1103,15 @@ export default function App() {
           onChange={(f) => setState((s) => ({ ...s, filters: f }))}
           count={filteredCount}
           onClose={() => setShowFilters(false)}
+        />
+      )}
+
+      {sheetReview && reviewMonday && (
+        <ReviewSheet
+          review={sheetReview}
+          canNext={reviewMonday < defaultReviewMonday(today)}
+          onWeek={(delta) => setReviewMonday((m) => (m ? isoDate(addDays(parseIso(m), delta * 7)) : m))}
+          onClose={() => setReviewMonday(null)}
         />
       )}
 
