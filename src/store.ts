@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Cuisine, DishType, ShopCat, WeekPlan } from './types'
 import type { BoughtMap, PantryLot, PriceOverrides } from './kitchen'
+import type { Profile } from './energy'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -39,6 +40,8 @@ export interface AppState {
   breakfastPicks: Record<string, string[]>
   /** abgehakte Prep-Schritte je Woche */
   prepChecked: Record<string, string[]>
+  /** Körperdaten & Ziel (optional) */
+  profile?: Profile
 }
 
 const KEY = 'yami-state-v1'

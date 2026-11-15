@@ -5,6 +5,8 @@ import { BREAKFAST_LABEL, type BreakfastType } from './types'
 import { assignBreakfasts, prepPlan, workdays } from './breakfast'
 import { BreakfastCard } from './components/BreakfastCard'
 import { PrepSheet } from './components/PrepSheet'
+import { ProfileSheet } from './components/ProfileSheet'
+import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
 import { addDays, mondayOf, isoDate, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
 import { matches } from './filter'
 import { formatAmount } from './shopping'
@@ -59,6 +61,7 @@ export default function App() {
   const [bTypes, setBTypes] = useState<BreakfastType[]>([])
   const [bPantryOnly, setBPantryOnly] = useState(false)
   const [showPrep, setShowPrep] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
 
   // Datum aktuell halten (App bleibt oft tagelang offen)
   useEffect(() => {
@@ -212,6 +215,28 @@ export default function App() {
     }
   }
 
+  // ───── Kalorienbilanz (Mo–Fr) ─────
+  const profile = state.profile
+  const { balances, portions } = useMemo(() => {
+    const balances: Record<string, DayBalance | undefined> = {}
+    const portions: Record<string, Portion | undefined> = {}
+    if (profile) {
+      for (const d of days) {
+        if (!isWorkday(d)) continue
+        const b = dayBalance(profile, state.breakfast[d], state.plan[d])
+        balances[d] = b
+        const e = state.plan[d]
+        if (e && RECIPE_BY_ID[e.recipeId]) portions[d] = portionFor(RECIPE_BY_ID[e.recipeId], b.dinnerBudget, e.servings)
+      }
+    }
+    return { balances, portions }
+  }, [profile, days, state.breakfast, state.plan])
+  /** Abendbudget für einen Tag (auch wenn dort noch nichts geplant ist) */
+  const dinnerBudgetFor = (day: string) =>
+    profile && isWorkday(day)
+      ? Math.max(0, targetKcal(profile) - (RECIPE_BY_ID[state.breakfast[day]?.recipeId ?? '']?.nutrition.kcal ?? DEFAULT_BREAKFAST_KCAL) - profile.lunchKcal)
+      : undefined
+
   const urgentNames = new Set(state.pantry.filter((l) => daysUntil(l.expires, today) <= 2).map((l) => l.name))
 
   function startSwipe(day: string) {
@@ -304,7 +329,12 @@ export default function App() {
         <div className="brand">
           <span className="logo">🍳</span> Yami
         </div>
-        {tab !== 'rezepte' && tab !== 'vorrat' && weekNav}
+        <div className="top-right">
+          {tab !== 'rezepte' && tab !== 'vorrat' && weekNav}
+          <button className="icon-btn profile-btn" onClick={() => setShowProfile(true)} aria-label="Profil & Kalorienziel" title="Profil & Kalorienziel">
+            👤
+          </button>
+        </div>
       </header>
 
       <main className="content">
@@ -323,6 +353,10 @@ export default function App() {
             onRecook={recookDay}
             onShop={() => setTab('liste')}
             onPantry={() => setTab('vorrat')}
+            balances={balances}
+            portions={portions}
+            hasProfile={!!profile}
+            onProfile={() => setShowProfile(true)}
             breakfastSlot={
               <BreakfastCard
                 days={days}
@@ -417,6 +451,10 @@ export default function App() {
               <FilterBar filters={state.filters} onChange={(f) => setState((s) => ({ ...s, filters: f }))} count={filteredCount} />
             )}
             <SwipeDeck
+              portionOf={(r) => {
+                const budget = dinnerBudgetFor(swipeDay)
+                return budget != null ? portionFor(r, budget, state.defaultServings) : undefined
+              }}
               deck={deck}
               insights={insights}
               onTake={(r) => take(r, swipeDay)}
@@ -519,6 +557,12 @@ export default function App() {
           recipe={sheet.recipe}
           prices={state.prices}
           insight={insights.get(sheet.recipe.id)}
+          portion={(() => {
+            const day = sheet.day
+            if (sheet.recipe.breakfast || !day) return undefined
+            const budget = dinnerBudgetFor(day)
+            return budget != null ? { ...portionFor(sheet.recipe, budget, state.plan[day]?.servings ?? state.defaultServings), budget } : undefined
+          })()}
           servings={
             sheet.recipe.breakfast
               ? 1
@@ -584,6 +628,18 @@ export default function App() {
             })
           }
           onClose={() => setShowPrep(false)}
+        />
+      )}
+
+      {showProfile && (
+        <ProfileSheet
+          profile={profile}
+          onClose={() => setShowProfile(false)}
+          onSave={(p) => {
+            setState((s) => ({ ...s, profile: p }))
+            setShowProfile(false)
+            flash(`Tagesziel: ${targetKcal(p).toLocaleString('de-DE')} kcal ✓`)
+          }}
         />
       )}
 

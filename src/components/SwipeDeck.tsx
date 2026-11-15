@@ -5,6 +5,7 @@ import { NutritionRow } from './NutritionRow'
 import { formatTime } from '../filter'
 import { type Insight, formatEuro } from '../kitchen'
 import { formatAmount } from '../shopping'
+import type { Portion } from '../energy'
 import { RecipeImage } from './RecipeImage'
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
   onTake: (r: Recipe) => void
   onReject: (r: Recipe) => void
   onInfo: (r: Recipe) => void
+  /** deine Portion beim Abendessen (mit Profil) */
+  portionOf?: (r: Recipe) => Portion | undefined
 }
 
 const THRESHOLD = 90
@@ -41,7 +44,7 @@ export function InsightBadges({ ins }: { ins?: Insight }) {
   )
 }
 
-export function SwipeDeck({ deck, insights, onTake, onReject, onInfo }: Props) {
+export function SwipeDeck({ deck, insights, onTake, onReject, onInfo, portionOf }: Props) {
   const [drag, setDrag] = useState({ dx: 0, dy: 0, active: false })
   const [leaving, setLeaving] = useState<null | 'left' | 'right'>(null)
   const start = useRef<{ x: number; y: number; t: number } | null>(null)
@@ -166,6 +169,10 @@ export function SwipeDeck({ deck, insights, onTake, onReject, onInfo }: Props) {
               <div className="card-meta">
                 {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)} · ≈ {top.nutrition.kcal} kcal
                 {ins ? ` · ≈ ${formatEuro(ins.perPortion)}/P.` : ''}
+                {(() => {
+                  const po = portionOf?.(top)
+                  return po ? <div className="card-portion">🍽️ Deine Portion: {po.label} · {po.kcal} kcal</div> : null
+                })()}
               </div>
             )}
           </div>

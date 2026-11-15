@@ -362,3 +362,42 @@ li.done .item-name, li.done .item-amt { text-decoration: line-through; opacity: 
 .prep-steps li.done span:last-child { text-decoration: line-through; opacity: .5; }
 .badge.waste { background: rgba(140, 90, 40, .85); }
 .sheet-badges .badge.waste { background: color-mix(in srgb, #8c5a28 18%, var(--surface)); }
+
+/* ───── Profil & Kalorienbilanz ───── */
+.top-right { display: flex; align-items: center; gap: 6px; }
+.profile-btn { font-size: 17px; }
+.banner.info { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--text); font-weight: 600; font-size: 14px; }
+.day-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.portion-chip { font-size: 12px; font-weight: 700; color: var(--green); margin-top: 3px; }
+.portion-chip.smaller { color: #c97a00; }
+.card-portion { margin-top: 4px; font-weight: 700; }
+.balance { padding: 0 4px; }
+.balance-bar { position: relative; display: flex; height: 6px; border-radius: 99px; background: var(--surface-2); overflow: visible; }
+.balance-bar .seg { height: 100%; }
+.balance-bar .seg.bf { background: #ffb703; border-radius: 99px 0 0 99px; }
+.balance-bar .seg.lunch { background: #9aa5b1; }
+.balance-bar .seg.dinner { background: var(--accent); }
+.target-mark { position: absolute; top: -3px; width: 2px; height: 12px; background: var(--text); border-radius: 2px; transform: translateX(-1px); }
+.balance-text { display: flex; justify-content: space-between; gap: 6px; font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+.balance-text b { color: var(--text); white-space: nowrap; }
+.balance-text b.over { color: var(--red); }
+.portion-box { background: color-mix(in srgb, var(--green) 12%, var(--surface)); border-radius: 14px; padding: 10px 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; }
+.portion-box.smaller { background: color-mix(in srgb, #ffb703 16%, var(--surface)); }
+.seg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
+.seg2 button, .radio-list button { border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px; font-weight: 700; text-align: left; }
+.seg2 button { text-align: center; }
+.seg2 button.on, .radio-list button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.radio-list { display: flex; flex-direction: column; gap: 6px; }
+.radio-list button b { display: block; font-size: 14.5px; }
+.radio-list button span { font-size: 12.5px; color: var(--muted); font-weight: 500; }
+.form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.form-grid.one { grid-template-columns: 1fr; max-width: 200px; }
+.form-grid label { display: flex; flex-direction: column; font-size: 12.5px; color: var(--muted); font-weight: 600; gap: 3px; position: relative; }
+.form-grid input { border: 1.5px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 34px 10px 10px; font-size: 16px; font-weight: 700; color: var(--text); width: 100%; }
+.form-grid label span { position: absolute; right: 9px; bottom: 11px; font-size: 12px; }
+.calc-box { background: var(--surface); border-radius: 14px; padding: 12px 14px; margin: 16px 0 8px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.calc-box > div { display: flex; justify-content: space-between; gap: 8px; }
+.calc-box .total { border-top: 1.5px solid var(--line); padding-top: 6px; font-size: 16px; }
+.calc-box .total b { color: var(--accent); }
+.calc-box .split { display: block; font-size: 12.5px; color: var(--muted); }
+.btn:disabled { opacity: .5; }

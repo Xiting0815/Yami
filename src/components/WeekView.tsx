@@ -5,6 +5,7 @@ import { shortDate, weekdayName } from '../store'
 import { formatTime } from '../filter'
 import { type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { RecipeImage } from './RecipeImage'
+import type { DayBalance, Portion } from '../energy'
 
 interface Props {
   days: string[]
@@ -22,10 +23,15 @@ interface Props {
   onPantry: () => void
   /** Frühstückskarte (Meal-Prep) oberhalb der Tage */
   breakfastSlot?: ReactNode
+  /** Tagesbilanz Mo–Fr (nur mit Profil) */
+  balances: Record<string, DayBalance | undefined>
+  portions: Record<string, Portion | undefined>
+  hasProfile: boolean
+  onProfile: () => void
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, urgentCount, onSwipeDay, onOpen, onUpdate, onUncook, onRecook, onShop, onPantry, breakfastSlot } = props
+  const { days, plan, today, total, prices, urgentCount, onSwipeDay, onOpen, onUpdate, onUncook, onRecook, onShop, onPantry, breakfastSlot, balances, portions, hasProfile, onProfile } = props
   const planned = days.filter((d) => plan[d]).length
   const firstEmpty = days.find((d) => !plan[d] && d >= today) ?? days.find((d) => !plan[d])
 
@@ -39,6 +45,12 @@ export function WeekView(props: Props) {
       {urgentCount > 0 && (
         <button className="banner warn" onClick={onPantry}>
           ⚠️ {urgentCount} {urgentCount === 1 ? 'Zutat läuft' : 'Zutaten laufen'} bald ab – ansehen
+        </button>
+      )}
+
+      {!hasProfile && (
+        <button className="banner info" onClick={onProfile}>
+          👤 Profil anlegen – dann siehst du dein Kalorienziel und deine Portion beim Abendessen
         </button>
       )}
 
@@ -61,6 +73,7 @@ export function WeekView(props: Props) {
                 <b>{weekdayName(day, true)}</b>
                 <span>{shortDate(day)}</span>
               </div>
+              <div className="day-col">
               {recipe && entry ? (
                 <div className={`day-card ${entry.status === 'skipped' ? 'skipped' : ''}`}>
                   <button className="day-main" onClick={() => onOpen(recipe, day)}>
@@ -72,6 +85,11 @@ export function WeekView(props: Props) {
                         {entry.status === 'cooked' && <span className="tag ok"> ✓ gekocht</span>}
                         {entry.status === 'skipped' && <span className="tag"> nicht gekocht</span>}
                       </div>
+                      {portions[day] && entry.status !== 'skipped' && (
+                        <div className={`portion-chip ${portions[day]!.fraction < 1 ? 'smaller' : ''}`}>
+                          🍽️ Deine Portion: {portions[day]!.label} · {portions[day]!.kcal} kcal
+                        </div>
+                      )}
                     </div>
                   </button>
                   <div className="day-tools">
@@ -107,6 +125,8 @@ export function WeekView(props: Props) {
                   + Gericht wischen
                 </button>
               )}
+              {balances[day] && <BalanceBar b={balances[day]!} />}
+              </div>
             </li>
           )
         })}
@@ -117,6 +137,35 @@ export function WeekView(props: Props) {
           🛒 Einkaufsliste · ≈ {formatEuro(total)}
         </button>
       )}
+    </div>
+  )
+}
+
+/** Tagesbilanz: Frühstück + Mittag + Abendportion im Vergleich zum Ziel */
+function BalanceBar({ b }: { b: DayBalance }) {
+  const parts = [
+    { k: 'bf', v: b.breakfast, label: '☀️' },
+    { k: 'lunch', v: b.lunch, label: '🥪' },
+    { k: 'dinner', v: b.dinner ?? 0, label: '🌙' },
+  ]
+  const max = Math.max(b.target, b.total)
+  const left = b.target - b.total
+  return (
+    <div className="balance" title="Frühstück + Mittag (Pauschale) + deine Abendportion">
+      <div className="balance-bar">
+        {parts.map((p) => (
+          <div key={p.k} className={`seg ${p.k}`} style={{ width: `${(p.v / max) * 100}%` }} />
+        ))}
+        <div className="target-mark" style={{ left: `${(b.target / max) * 100}%` }} />
+      </div>
+      <div className="balance-text">
+        <span>
+          ☀️ {b.breakfast}{b.breakfastPlanned ? '' : '*'} · 🥪 {b.lunch} · 🌙 {b.dinner != null ? b.dinner : `bis ${b.dinnerBudget}`}
+        </span>
+        <b className={left < -50 ? 'over' : ''}>
+          {b.total.toLocaleString('de-DE')} / {b.target.toLocaleString('de-DE')} kcal
+        </b>
+      </div>
     </div>
   )
 }

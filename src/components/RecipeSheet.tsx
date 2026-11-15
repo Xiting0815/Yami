@@ -8,6 +8,7 @@ import { RecipeImage } from './RecipeImage'
 import imageMap from '../data/images.json'
 import { type Insight, type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { InsightBadges } from './SwipeDeck'
+import type { Portion } from '../energy'
 
 type Credit = { author: string; license: string; source: string } | null | undefined
 const credits = imageMap as unknown as Record<string, Credit>
@@ -20,9 +21,11 @@ interface Props {
   action?: { label: string; onClick: (servings: number) => void }
   insight?: Insight
   prices: PriceOverrides
+  /** deine Portion (Abendessen, mit Profil) */
+  portion?: Portion & { budget: number }
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
 
@@ -72,6 +75,23 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
           </div>
 
           <NutritionTable n={recipe.nutrition} servings={1} />
+
+          {portion && (
+            <div className={`portion-box ${portion.fraction < 1 ? 'smaller' : ''}`}>
+              <div>
+                🍽️ <b>Deine Portion: {portion.label}</b> · {portion.kcal} kcal
+              </div>
+              <div className="muted small">
+                Abendbudget heute ≈ {portion.budget} kcal (Tagesziel − Frühstück − Mittag). Eine normale Portion hat {recipe.nutrition.kcal} kcal.
+                {portion.rest > 0.05 &&
+                  (() => {
+                    const r = Math.round(portion.rest * 4) / 4
+                    return ` Übrig für die anderen: ca. ${String(r).replace('.', ',')} ${r === 1 ? 'Portion' : 'Portionen'}.`
+                  })()}
+              </div>
+              {portion.tip && <div className="small">🥗 {portion.tip}</div>}
+            </div>
+          )}
 
           {recipe.breakfast && (
             <div className="prep-facts">

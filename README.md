@@ -29,6 +29,13 @@ Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und beko
 - **Frische nach Wochentag (Abendessen):** Für spätere Wochentage bevorzugt die App Gerichte, deren Zutaten dann noch frisch sind – Fisch und Hack eher Mo–Mi.
 - **Nährwerte für alles:** Jede Zutat hat Richtwerte pro 100 g (`src/data/nutrition.ts`), daraus werden kcal, Eiweiß, Ballaststoffe, Kohlenhydrate und Fett pro Portion berechnet – auch für alle Abendessen.
 
+### Kalorienziel & Tagesbilanz (Mo–Fr)
+
+- **Profil** (👤 oben rechts): Geschlecht, Alter, Größe, Gewicht, Aktivität, Abnehmtempo und eine Mittags-Pauschale (Standard 600 kcal, wird nicht geplant).
+- **Berechnung:** Grundumsatz nach Mifflin-St Jeor (10 × kg + 6,25 × cm − 5 × Alter + 5 bzw. − 161) × Aktivitätsfaktor (1,2–1,725) − Defizit (250/500/750 kcal). Untergrenze 1.500 kcal (Männer) bzw. 1.200 kcal (Frauen).
+- **Tagesbilanz:** Für Mo–Fr zeigt die Woche einen Balken: ☀️ Frühstück + 🥪 Mittag + 🌙 deine Abendportion im Vergleich zum Ziel. Sa/So sind ausgenommen.
+- **Deine Portion:** Abendessen bleiben für 2 Personen. Die App rechnet aus, welcher Anteil (⅓, ½, ⅔, ¾ oder voll) ins Abendbudget passt, und gibt bei gehaltvollen Gerichten einen Gemüse-/Salat-Tipp. Die Reihenfolge beim Wischen ändert sich dadurch nicht.
+
 Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine PWA und lässt sich auf den Homescreen legen und offline nutzen.
 
 ## Entwickeln
@@ -41,6 +48,7 @@ npm run check-data   # prüft Rezeptdatenbank, Produkte & Einheiten
 npx vite-node scripts/test-kitchen.ts   # Logiktests Vorrat/Einkauf/Empfehlungen
 npx vite-node scripts/test-breakfast.ts # Logiktests Frühstück/Meal-Prep
 npx vite-node scripts/test-leftovers.ts # Logiktests Reste/Vorrat/Frische
+npx vite-node scripts/test-energy.ts    # Logiktests Kalorienbedarf/Portionen
 ```
 
 ## Veröffentlichen (kostenlos)
