@@ -45,6 +45,14 @@ export const DEFAULT_PROFILE: Profile = { sex: 'm', age: 40, heightCm: 180, weig
 
 /** angenommenes Frühstück, wenn für den Tag keins geplant ist */
 export const DEFAULT_BREAKFAST_KCAL = 400
+/** angenommenes Frühstück-Eiweiß (g), wenn für den Tag keins geplant ist */
+export const DEFAULT_BREAKFAST_PROTEIN = 20
+/** Mittag ist nicht geplant → Schätzwert Eiweiß (g) */
+export const LUNCH_PROTEIN = 25
+/** Eiweißziel: g pro kg Zielgewicht (bzw. Gewicht ohne Ziel) */
+export const PROTEIN_PER_KG = 1.6
+/** unter diesem Anteil des Eiweißziels gilt ein Tag als „zu wenig“ */
+export const PROTEIN_LOW_SHARE = 0.8
 
 /** Formel: mit Körperfett Katch-McArdle (über die fettfreie Masse), sonst Mifflin-St Jeor */
 export function bmrFormula(p: Profile): 'katch' | 'mifflin' {
@@ -73,6 +81,21 @@ export function targetKcal(p: Profile): number {
   return Math.round(Math.max(floorKcal(p), tdee(p) - p.deficit + (p.adjust ?? 0)) / 10) * 10
 }
 
+/** Eiweißziel in g pro Tag: 1,6 g × Zielgewicht (ohne Ziel: × aktuelles Gewicht) */
+export function proteinTarget(p: Profile): number {
+  return Math.round(PROTEIN_PER_KG * (p.goalWeight ?? p.weightKg))
+}
+
+/** Tag mit deutlich zu wenig Eiweiß (unter 80 % des Ziels) */
+export function isProteinLow(b: DayBalance): boolean {
+  return b.protein < PROTEIN_LOW_SHARE * b.proteinTarget
+}
+
+/** Lern-Bonus für Abendessen mit viel Eiweiß: (g − 30) / 15, höchstens 2, nie negativ */
+export function proteinBoost(proteinPerPortion: number): number {
+  return proteinPerPortion > 30 ? Math.min(2, (proteinPerPortion - 30) / 15) : 0
+}
+
 /** Tagesbilanz gilt nur Mo–Fr */
 export function isWorkday(iso: string): boolean {
   const d = parseIso(iso).getDay()
@@ -89,7 +112,16 @@ export interface DayBalance {
   /** deine Abendportion (kcal), falls ein Gericht geplant ist */
   dinner?: number
   total: number
+  /** Eiweiß gesamt (g, gerundet): Frühstück + Mittag-Schätzung + Abendportion */
   protein: number
+  /** Eiweißziel (g) */
+  proteinTarget: number
+  /** Frühstück (g): geplant oder Schätzwert */
+  breakfastProtein: number
+  /** Mittag-Schätzwert (g) */
+  lunchProtein: number
+  /** Abendportion (g), falls ein Gericht geplant ist */
+  dinnerProtein?: number
 }
 
 export interface Portion {
@@ -134,7 +166,9 @@ export function dayBalance(p: Profile, breakfast?: PlanEntry, dinner?: PlanEntry
   const dr = dinner && dinner.status !== 'skipped' ? RECIPE_BY_ID[dinner.recipeId] : undefined
   const portion = dr ? portionFor(dr, dinnerBudget, dinner!.servings) : undefined
   const dKcal = portion?.kcal
-  const protein = (bf?.nutrition.protein ?? 0) + (dr ? dr.nutrition.protein * (portion?.fraction ?? 1) : 0)
+  const breakfastProtein = bf ? bf.nutrition.protein : DEFAULT_BREAKFAST_PROTEIN
+  const dinnerProtein = dr ? dr.nutrition.protein * (portion?.fraction ?? 1) : undefined
+  const protein = breakfastProtein + LUNCH_PROTEIN + (dinnerProtein ?? 0)
   return {
     target,
     breakfast: bKcal,
@@ -144,5 +178,9 @@ export function dayBalance(p: Profile, breakfast?: PlanEntry, dinner?: PlanEntry
     dinner: dKcal,
     total: bKcal + p.lunchKcal + (dKcal ?? 0),
     protein: Math.round(protein),
+    proteinTarget: proteinTarget(p),
+    breakfastProtein,
+    lunchProtein: LUNCH_PROTEIN,
+    dinnerProtein,
   }
 }

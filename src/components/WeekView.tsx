@@ -6,7 +6,7 @@ import { formatTime } from '../filter'
 import { type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { RecipeImage } from './RecipeImage'
 import { Icon } from './Icon'
-import type { DayBalance, Portion } from '../energy'
+import { type DayBalance, type Portion, isProteinLow } from '../energy'
 
 export const kcal = (n: number) => n.toLocaleString('de-DE')
 
@@ -144,7 +144,15 @@ export function WeekView(props: Props) {
                       {l2}
                       {b && (
                         <span className={`day-l3 ${over > 50 ? 'over' : ''}`}>
-                          Tag {kcal(b.total)} / {kcal(b.target)} kcal{over > 50 ? ` · +${kcal(over)}` : ''}
+                          <span className="l3-kcal">
+                            <span className="l3-full">Tag {kcal(b.total)} / {kcal(b.target)} kcal</span>
+                            <span className="l3-compact">{kcal(b.total)}/{kcal(b.target)}</span>
+                            {over > 50 ? ` · +${kcal(over)}` : ''}
+                          </span>
+                          <span className={`day-prot ${isProteinLow(b) ? 'low' : ''}`}>
+                            · <span className="prot-long">{b.protein} / {b.proteinTarget} g Eiweiß</span>
+                            <span className="prot-short">{b.protein}/{b.proteinTarget} g E.</span>
+                          </span>
                         </span>
                       )}
                     </span>

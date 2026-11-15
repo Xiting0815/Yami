@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { LearnedSummary } from '../learning'
-import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, bmrFormula, floorKcal, leanMass, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
+import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, bmrFormula, floorKcal, leanMass, proteinTarget, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
 import { parseBackup } from '../backup'
 import { type AppState, parseIso } from '../store'
 
@@ -142,6 +142,10 @@ export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearnin
                 </div>
               )}
               <div className="total"><span>Dein Tagesziel</span><b>{fmt(target)} kcal</b></div>
+              <div>
+                <span>Eiweißziel (1,6 g × {p.goalWeight != null ? 'Zielgewicht' : 'Gewicht'})</span>
+                <b>{fmt(proteinTarget(p))} g pro Tag</b>
+              </div>
               <div className="split">
                 ☀️ Frühstück ≈ {DEFAULT_BREAKFAST_KCAL} · 🥪 Mittag {fmt(p.lunchKcal)} · 🌙 Abendessen ≈ {fmt(Math.max(0, target - DEFAULT_BREAKFAST_KCAL - p.lunchKcal))} kcal
               </div>

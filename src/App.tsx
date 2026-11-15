@@ -12,7 +12,7 @@ import { ProfileSheet } from './components/ProfileSheet'
 import { exportBackup } from './backup'
 import { ProgressSheet } from './components/ProgressSheet'
 import { suggestion as weightSuggestion, upsertWeighIn, weighedThisWeek } from './progress'
-import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
+import { type DayBalance, type Portion, dayBalance, isProteinLow, isWorkday, portionFor, proteinBoost, targetKcal, DEFAULT_BREAKFAST_KCAL } from './energy'
 import { type AppState, addDays, mondayOf, isoDate, parseIso, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
 import { useBackStack } from './useBackStack'
 import { matches } from './filter'
@@ -211,6 +211,18 @@ export default function App() {
     [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, today, state.tasteSince],
   )
 
+  // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────
+  const proteinHigh = useMemo(() => {
+    if (!state.profile) return false
+    const weekEnd = isoDate(addDays(mondayOf(parseIso(today)), 6))
+    const last = Object.keys(state.plan)
+      .filter((d) => d <= weekEnd && isWorkday(d) && state.plan[d] && state.plan[d]!.status !== 'skipped')
+      .sort()
+      .slice(-10)
+    const low = last.filter((d) => isProteinLow(dayBalance(state.profile!, state.breakfast[d], state.plan[d]))).length
+    return low >= 3
+  }, [state.profile, state.plan, state.breakfast, today])
+
   // Einkauf am Wochenanfang (oder heute) → wie viele Tage bis zum gewischten Kochtag?
   const freshDays = Math.max(0, daysUntil(swipeDay, today > days[0] ? today : days[0]))
   const insights = useMemo(
@@ -222,10 +234,11 @@ export default function App() {
             month: swipeMonth,
           })
           const pref = preference(taste, r, swipeDay)
-          return [r.id, { ...ins, score: ins.score + pref.score, taste: pref.reason }]
+          const bonus = proteinHigh ? proteinBoost(r.nutrition.protein) : 0
+          return [r.id, { ...ins, score: ins.score + pref.score + bonus, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
         }),
       ),
-    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth],
+    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 

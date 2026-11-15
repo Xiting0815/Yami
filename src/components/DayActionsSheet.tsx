@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { PlanEntry, Recipe } from '../types'
-import type { DayBalance, Portion } from '../energy'
+import { type DayBalance, type Portion, isProteinLow } from '../energy'
 import { shortDate, weekdayName } from '../store'
 import { formatTime } from '../filter'
 import { type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
@@ -59,6 +59,10 @@ export function DayActionsSheet({ day, entry, recipe, today, prices, balance: b,
           <div className="act-balance">
             <span>
               Frühstück {b.breakfastPlanned ? kcal(b.breakfast) : `≈ ${kcal(b.breakfast)} (Schätzwert)`} · Mittag {kcal(b.lunch)} · Abendessen {b.dinner != null ? kcal(b.dinner) : '–'}
+            </span>
+            <span className="act-protein">
+              Eiweiß: <b className={isProteinLow(b) ? 'low' : ''}>{b.protein} von {b.proteinTarget} g</b>{' '}
+              (Frühstück {!b.breakfastPlanned && '≈ '}{Math.round(b.breakfastProtein)} · Mittag ≈ {b.lunchProtein} · Abendessen {b.dinnerProtein != null ? Math.round(b.dinnerProtein) : '–'})
             </span>
             <b className={left < -50 ? 'over' : ''}>
               {left < 0
