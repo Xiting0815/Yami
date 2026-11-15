@@ -88,6 +88,11 @@ export default function App() {
   const weekKey = days[0]
   const [swipeDay, setSwipeDay] = useState<string>(days[0])
   const [sheet, setSheet] = useState<SheetState | null>(null)
+  /** Kochmodus über dem Rezept-Sheet */
+  const [cooking, setCooking] = useState(false)
+  useEffect(() => {
+    if (!sheet) setCooking(false)
+  }, [sheet])
   const [toast, setToast] = useState<{ msg: string; undo?: Snapshot } | null>(null)
   const toastTimer = useRef<number>()
   const [showFilters, setShowFilters] = useState(false)
@@ -156,6 +161,7 @@ export default function App() {
     [showFilters, () => setShowFilters(false)],
     [!!actionsDay, () => setActionsDay(null)],
     [!!sheet, () => setSheet(null)],
+    [cooking, () => setCooking(false)],
     [showPrep, () => setShowPrep(false)],
     [showProgress, () => setShowProgress(false)],
     [showProfile, () => setShowProfile(false)],
@@ -871,6 +877,8 @@ export default function App() {
                 state.defaultServings)
           }
           onClose={() => setSheet(null)}
+          cooking={cooking}
+          onCooking={setCooking}
           action={
             sheet.recipe.breakfast
               ? sheet.mode === 'take' || sheet.mode === 'pick'

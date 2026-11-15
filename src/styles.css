@@ -631,3 +631,45 @@ img.thumb { display: block; }
 .backup p { margin: 6px 0; font-size: 14px; line-height: 1.45; }
 .backup-actions { display: flex; gap: 8px; margin: 10px 0 4px; }
 .backup-actions .btn { flex: 1; }
+
+/* ───── Kochmodus ───── */
+.cook-start { min-height: 48px; margin: 4px 0 16px; border: 1.5px solid var(--accent); color: var(--accent-text); background: var(--surface); font-size: 16px; }
+.cook {
+  position: fixed; inset: 0; z-index: 65; background: var(--bg); color: var(--text);
+  display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+}
+.cook-head {
+  position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 12px;
+  background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--line);
+}
+.cook-title { flex: 1; min-width: 0; }
+.cook-title h2 { margin: 0; font-size: 20px; line-height: 1.25; }
+.cook-close {
+  flex: none; width: var(--tap); height: var(--tap); padding: 0; border: none; border-radius: 999px;
+  background: var(--surface-2, var(--surface)); color: var(--text); font-size: 18px;
+}
+.cook-body { padding: 12px 0 48px; display: flex; flex-direction: column; gap: 14px; }
+.cook-wake { margin: 0; font-weight: 600; color: var(--green-ink); }
+.cook-tip { margin: 0; }
+.cook-box { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 14px; }
+.cook-box h3 { margin: 0 0 8px; font-size: 16px; }
+.cook-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.cook-step {
+  width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  text-align: left; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); font: inherit; font-size: 18px; line-height: 1.5; cursor: pointer;
+}
+.cook-step.done { opacity: .45; }
+.cook-step.done .cook-text { text-decoration: line-through; }
+.cook-num {
+  display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px;
+  background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 16px;
+}
+.cook-text { display: block; }
+.cook-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cook-chip {
+  display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 15px; line-height: 1.3;
+  background: var(--surface-2, var(--bg)); border: 1px solid var(--line);
+}
+.cook-chip b { color: var(--accent-text); font-weight: 700; }
