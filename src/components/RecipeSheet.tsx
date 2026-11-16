@@ -150,7 +150,8 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               </div>
             )}
 
-            {credit && (
+            {credit && credit.license === 'KI' && <p className="credit">Bild: KI-generiert ({credit.author})</p>}
+            {credit && credit.license !== 'KI' && (
               <p className="credit">
                 Foto: {credit.author} ·{' '}
                 <a href={credit.source} target="_blank" rel="noreferrer">
