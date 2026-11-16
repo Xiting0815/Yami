@@ -1,4 +1,10 @@
 {
+ "Brot-Box": {
+  "author": "Gemini",
+  "file": "img/Brot-Box.webp",
+  "license": "KI",
+  "source": ""
+ },
  "acqua-pazza": {
   "author": "Syced",
   "commonsTitle": "File:Acqua Pazza in Ebisu.jpg",
@@ -54,6 +60,12 @@
   "file": "img/baked-oats-apfel.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Apple_Goodie_crisp.JPG"
+ },
+ "baked-oats-blaubeer": {
+  "author": "Gemini",
+  "file": "img/baked-oats-blaubeer.webp",
+  "license": "KI",
+  "source": ""
  },
  "bami-goreng": {
   "author": "Gunawan Kartapranata",
@@ -183,7 +195,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chia_pudding_with_coconut_milk_and_berries_(KETO,_LCHF,_Low_Carb,_Gluten_free,_FIT)_-_52774529156.jpg"
  },
- "chia-mango": null,
+ "chia-mango": {
+  "author": "Gemini",
+  "file": "img/chia-mango.webp",
+  "license": "KI",
+  "source": ""
+ },
  "chia-schoko": {
   "author": "Sarahchoe",
   "commonsTitle": "File:Chia Pudding.PNG",
@@ -240,6 +257,18 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Dan-dan_noodles,_Shanghai.jpg"
  },
+ "eiermuffins-schinken": {
+  "author": "Gemini",
+  "file": "img/eiermuffins-schinken.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "eiermuffins-spinat-feta": {
+  "author": "Gemini",
+  "file": "img/eiermuffins-spinat-feta.webp",
+  "license": "KI",
+  "source": ""
+ },
  "erbseneintopf": {
   "author": "Dirk Vorderstraße",
   "commonsTitle": "File:Erbsensuppe mit Bockwurst (10583434296).jpg",
@@ -288,6 +317,12 @@
   "file": "img/frittata.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Frittata_-_Bam%27s_Kitchen_2024-04-02.jpg"
+ },
+ "frittata-stuecke": {
+  "author": "Gemini",
+  "file": "img/frittata-stuecke.webp",
+  "license": "KI",
+  "source": ""
  },
  "gaisburger-marsch": {
   "author": "MarkusHagenlocher at German Wikipedia",
@@ -456,6 +491,12 @@
   "file": "img/hui-guo-rou.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Twice_cooked_pork_of_Gyoza-no-Manshu.jpg"
+ },
+ "image": {
+  "author": "Gemini",
+  "file": "img/image.webp",
+  "license": "KI",
+  "source": ""
  },
  "ingwer-huhn": {
   "author": "T.Tseng",
@@ -639,7 +680,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Linguini_al_nero,_gamberi,_pomodori_confit_e_crema_di_burrata_(23976256479).jpg"
  },
- "linsen-ei-salat": null,
+ "linsen-ei-salat": {
+  "author": "Gemini",
+  "file": "img/linsen-ei-salat.webp",
+  "license": "KI",
+  "source": ""
+ },
  "linsen-spaetzle": {
   "author": "K. Jähne, cooking by B. Gross, Merops image editing",
   "commonsTitle": "File:Linsen Spaetzle 2.jpg",
@@ -731,7 +777,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Beef_Noodles_soup_from_Jinyi_Beef_Noodle_Soup_Inn_in_Shenzhen.jpg"
  },
- "oats-apfel-zimt": null,
+ "oats-apfel-zimt": {
+  "author": "Gemini",
+  "file": "img/oats-apfel-zimt.webp",
+  "license": "KI",
+  "source": ""
+ },
  "oats-beeren": {
   "author": "USDAgov",
   "commonsTitle": "File:Child Care Recipes (Team Nutiriton) (20230123-FNS-UNK-018).jpg",
@@ -739,11 +790,36 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Child_Care_Recipes_(Team_Nutiriton)_(20230123-FNS-UNK-018).jpg"
  },
- "oats-erdnuss-apfel": null,
- "oats-himbeer-cheesecake": null,
- "oats-karottenkuchen": null,
- "oats-mango-kokos": null,
- "oats-schoko-banane": null,
+ "oats-erdnuss-apfel": {
+  "author": "Gemini",
+  "file": "img/oats-erdnuss-apfel.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "oats-himbeer-cheesecake": {
+  "author": "Gemini",
+  "file": "img/oats-himbeer-cheesecake.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "oats-karottenkuchen": {
+  "author": "Gemini",
+  "file": "img/oats-karottenkuchen.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "oats-mango-kokos": {
+  "author": "Gemini",
+  "file": "img/oats-mango-kokos.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "oats-schoko-banane": {
+  "author": "Gemini",
+  "file": "img/oats-schoko-banane.webp",
+  "license": "KI",
+  "source": ""
+ },
  "orecchiette-salsiccia": {
   "author": "Federica.tamburini.75",
   "commonsTitle": "File:Orecchiette broccoli e salsiccia.jpg",
@@ -947,6 +1023,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Polpette_Al_Sugo_-_Nanninella.jpg"
  },
+ "porridge-glas": {
+  "author": "Gemini",
+  "file": "img/porridge-glas.webp",
+  "license": "KI",
+  "source": ""
+ },
  "puttanesca": {
   "author": "Popo le Chien",
   "commonsTitle": "File:Pasta Puttanesca.jpg",
@@ -954,8 +1036,18 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pasta_Puttanesca.jpg"
  },
- "quark-bowl-apfel": null,
- "quarkauflauf": null,
+ "quark-bowl-apfel": {
+  "author": "Gemini",
+  "file": "img/quark-bowl-apfel.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "quarkauflauf": {
+  "author": "Gemini",
+  "file": "img/quarkauflauf.webp",
+  "license": "KI",
+  "source": ""
+ },
  "ragout-fin": {
   "author": "Benreis",
   "commonsTitle": "File:Würzfleisch Zur Noll Jena.JPG",
@@ -1070,7 +1162,12 @@
   "source": "https://commons.wikimedia.org/wiki/File:Sauerbraten_with_potato_dumplings.jpg"
  },
  "sauerkraut-auflauf": null,
- "savory-oats": null,
+ "savory-oats": {
+  "author": "Gemini",
+  "file": "img/savory-oats.webp",
+  "license": "KI",
+  "source": ""
+ },
  "scaloppine-limone": {
   "author": "Christian Michelides",
   "commonsTitle": "File:Scaloppine al limone, mit Spinat und Pommes frites.jpg",
@@ -1155,7 +1252,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Shoyu_Ramen.jpg"
  },
- "skyr-birne": null,
+ "skyr-birne": {
+  "author": "Gemini",
+  "file": "img/skyr-birne.webp",
+  "license": "KI",
+  "source": ""
+ },
  "soljanka": {
   "author": "Roland Geider (Ogre)",
   "commonsTitle": "File:Soljanka with olives.jpg",
@@ -1327,7 +1429,12 @@
   "source": "https://commons.wikimedia.org/wiki/File:2022-12-29_Wiener_Schnitzel_im_Hotel_Kaiserin_Elisabeth.jpg"
  },
  "wirsingeintopf": null,
- "wrap-haehnchen": null,
+ "wrap-haehnchen": {
+  "author": "Gemini",
+  "file": "img/wrap-haehnchen.webp",
+  "license": "KI",
+  "source": ""
+ },
  "yakisoba": {
   "author": "Andy Li",
   "commonsTitle": "File:Pork yakisoba and tofu yakisoba, Korpan, Brighton.jpg",
