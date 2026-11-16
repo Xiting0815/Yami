@@ -1,10 +1,4 @@
 {
- "Brot-Box": {
-  "author": "Gemini",
-  "file": "img/Brot-Box.webp",
-  "license": "KI",
-  "source": ""
- },
  "acqua-pazza": {
   "author": "Syced",
   "commonsTitle": "File:Acqua Pazza in Ebisu.jpg",
@@ -88,6 +82,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Bokkeum_Bibimbap_and_Little_Piggy_Bao_Bun_by_Bao_Bun_Brighton.jpg"
  },
+ "bircher": {
+  "author": "Gemini",
+  "file": "img/bircher.webp",
+  "license": "KI",
+  "source": ""
+ },
  "blumenkohl-auflauf": {
   "author": "Katrin Gilger",
   "commonsTitle": "File:Kartoffel-Blumenkohl-Auflauf mit Schinken (5800362613).jpg",
@@ -124,7 +124,12 @@
   "license": "CC BY-SA 3.0 de",
   "source": "https://commons.wikimedia.org/wiki/File:Nudel-Gem%C3%BCse-Auflauf01.jpg"
  },
- "brot-box": null,
+ "brot-box": {
+  "author": "Gemini",
+  "file": "img/brot-box.webp",
+  "license": "KI",
+  "source": ""
+ },
  "bulgogi": {
   "author": "Debbie Tingzon",
   "commonsTitle": "File:Bulgogi 3.jpg",
@@ -491,12 +496,6 @@
   "file": "img/hui-guo-rou.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Twice_cooked_pork_of_Gyoza-no-Manshu.jpg"
- },
- "image": {
-  "author": "Gemini",
-  "file": "img/image.webp",
-  "license": "KI",
-  "source": ""
  },
  "ingwer-huhn": {
   "author": "T.Tseng",
