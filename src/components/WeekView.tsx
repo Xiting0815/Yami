@@ -71,7 +71,7 @@ export function WeekView(props: Props) {
       {!hideDays && (
         <div className="week-status">
           <span className={planned === 7 ? 'full' : ''}>{planned} von 7 geplant{planned === 7 ? ' ✓' : ''}</span>
-          {planned > 0 && (
+          {(planned > 0 || total > 0) && (
             <button className="link status-link" onClick={onShop}>
               Einkauf ≈ {formatEuro(total)} <Icon name="chevron" size={14} />
             </button>

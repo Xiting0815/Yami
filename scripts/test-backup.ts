@@ -23,6 +23,11 @@ ok(a.weighIns.length === 1 && a.weighIns[0].weight === 91.2, 'Hülle: Messungen 
 ok(a.lastBackup === '2026-11-01', 'Hülle: lastBackup bleibt erhalten')
 ok(a.defaultServings === 2 && Array.isArray(a.rejects), 'Hülle: fehlende Felder bekommen Startwerte')
 
+// Prep-Tage: gültige bleiben, ungültige (Samstag, kaputtes Datum) fliegen raus
+const pd = parseBackup(JSON.stringify({ app: 'yami', version: 1, state: { ...state, prepDays: { '2026-11-16': '2026-11-16', '2026-11-23': '2026-11-28', '2026-11-30': 'x' } } }))
+ok(pd.prepDays['2026-11-16'] === '2026-11-16' && Object.keys(pd.prepDays).length === 1, 'Hülle: prepDays bleiben erhalten, ungültige werden verworfen')
+ok(Object.keys(a.prepDays).length === 0, 'Hülle: ohne prepDays leer')
+
 // nackter Stand
 const b = parseBackup(JSON.stringify(state))
 ok(b.plan['2026-11-16']?.recipeId === rid, 'nackter Stand: Plan wird gelesen')

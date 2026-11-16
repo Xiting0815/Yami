@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { LearnedSummary } from '../learning'
 import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, bmrFormula, floorKcal, leanMass, proteinTarget, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
+import { PREP_ADVERB } from '../breakfast'
 import { parseBackup } from '../backup'
 import { type AppState, type HaSettings, parseIso } from '../store'
 import { HaSection } from './HaSection'
@@ -11,6 +12,8 @@ interface Props {
   onClose: () => void
   /** gelernte Vorlieben */
   learned?: LearnedSummary
+  /** gelernter Prep-Wochentag (0 = Sonntag = Standard) */
+  prepWeekday?: number
   onResetLearning?: () => void
   /** Datum (ISO) der letzten Sicherung */
   lastBackup?: string
@@ -25,7 +28,7 @@ interface Props {
 
 const fmt = (n: number) => Math.round(n).toLocaleString('de-DE')
 
-export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing }: Props) {
+export function ProfileSheet({ profile, onSave, onClose, learned, prepWeekday = 0, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing }: Props) {
   const [p, setP] = useState<Profile>(profile ?? DEFAULT_PROFILE)
   const fileInput = useRef<HTMLInputElement>(null)
   const [backupError, setBackupError] = useState<string | null>(null)
@@ -180,6 +183,7 @@ export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearnin
                   <p className="muted small">Aus {learned.signals} Signalen; ältere zählen weniger, damit sich dein Geschmack ändern darf.</p>
                 </>
               )}
+              {prepWeekday > 0 && <p><b>Meal-Prep:</b> Du bereitest meist {PREP_ADVERB[prepWeekday]} vor.</p>}
               {onResetLearning && learned.signals > 0 && (
                 <button className="link small" onClick={onResetLearning}>Gelerntes zurücksetzen</button>
               )}

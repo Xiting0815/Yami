@@ -5,7 +5,7 @@ import {
   BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, TYPE_LABEL,
   type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type ShopCat, type WeekPlan,
 } from './types'
-import { WASTED_MAX, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
+import { WASTED_MAX, addDaysIso, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
 import type { Profile } from './energy'
 import type { WeighIn } from './progress'
 import type { Rating, RejectEvent } from './learning'
@@ -103,6 +103,8 @@ export interface AppState {
   breakfast: WeekPlan
   /** gewählte Frühstücke je Woche (Schlüssel = Montag) */
   breakfastPicks: Record<string, string[]>
+  /** Prep-Tag (ISO) je Woche (Schlüssel = Montag); fehlt er, gilt der gelernte Wochentag, sonst der Sonntag davor */
+  prepDays: Record<string, string>
   /** abgehakte Prep-Schritte je Woche */
   prepChecked: Record<string, string[]>
   /** Körperdaten & Ziel (optional) */
@@ -154,6 +156,7 @@ const INITIAL: AppState = {
   prices: {},
   breakfast: {},
   breakfastPicks: {},
+  prepDays: {},
   prepChecked: {},
   weighIns: [],
   adjustDecidedAt: 0,
@@ -257,6 +260,9 @@ export function sanitize(parsed: unknown): AppState {
   state.breakfast = clean(state.breakfast)
   state.breakfastPicks = Object.fromEntries(
     Object.entries(state.breakfastPicks).map(([k, ids]) => [k, (Array.isArray(ids) ? ids : []).filter((id) => RECIPE_BY_ID[id])]),
+  )
+  state.prepDays = Object.fromEntries(
+    Object.entries(state.prepDays).filter(([k, v]) => ISO.test(k) && typeof v === 'string' && ISO.test(v) && v < addDaysIso(k, 4) && v >= addDaysIso(k, -1)),
   )
   const validWaste = (w: unknown): w is WastedItem => {
     const x = w as Partial<WastedItem> | null

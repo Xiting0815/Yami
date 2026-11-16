@@ -1,13 +1,19 @@
 import { RECIPE_BY_ID } from '../data/recipes'
 import type { BreakfastAssignment } from '../breakfast'
-import { weekdayName } from '../store'
+import { shortDate, weekdayName } from '../store'
 import type { Recipe } from '../types'
 import { RecipeImage } from './RecipeImage'
 import { Icon } from './Icon'
+import { PrepDayChip } from './PrepDayChip'
 
 interface Props {
   picks: string[]
   assignment: BreakfastAssignment
+  /** Prep-Tag, wählbare Tage und die davon abgedeckten Arbeitstage */
+  prep: string
+  prepChoices: string[]
+  covered: string[]
+  onPrepDay: (iso: string) => void
   prepProgress: { done: number; total: number }
   open: boolean
   onToggle: () => void
@@ -33,14 +39,14 @@ export function shortTitle(title: string): string {
 }
 
 /** Frühstückszeile der Wochenansicht: zugeklappt 56 px, aufgeklappt mit beiden Rezepten */
-export function BreakfastCard({ picks, assignment, prepProgress, open, onToggle, onPlan, onPrep, onOpen, onReset }: Props) {
+export function BreakfastCard({ picks, assignment, prep, prepChoices, covered, onPrepDay, prepProgress, open, onToggle, onPlan, onPrep, onOpen, onReset }: Props) {
   if (!picks.length) {
     return (
       <button className="bf-bar empty" onClick={onPlan}>
         <span className="bf-sun">☀️</span>
         <span className="bf-mid">
-          <b>Frühstück für Mo–Fr planen</b>
-          <small>1–2 Rezepte, sonntags vorbereiten</small>
+          <b>Frühstück für {dayRange(covered) || 'die Woche'} planen</b>
+          <small>1–2 Rezepte, einmal vorbereiten ({weekdayName(prep, true)}, {shortDate(prep)})</small>
         </span>
         <Icon name="chevron" size={20} />
       </button>
@@ -60,12 +66,12 @@ export function BreakfastCard({ picks, assignment, prepProgress, open, onToggle,
   return (
     <section className={`bf-card ${open ? 'open' : ''}`}>
       <div className="bf-bar">
-        <button className="bf-toggle" onClick={onToggle} aria-expanded={open} aria-label={`Frühstück Mo–Fr: ${summary}`} />
+        <button className="bf-toggle" onClick={onToggle} aria-expanded={open} aria-label={`Frühstück ${dayRange(covered)}: ${summary}`} />
         <span className="bf-thumbs">
           {rows.slice(0, 2).map(({ r }) => <RecipeImage key={r.id} recipe={r} className="thumb" />)}
         </span>
         <span className="bf-mid">
-          <b>Frühstück Mo–Fr</b>
+          <b>Frühstück {dayRange(covered)}</b>
           <small>{summary}</small>
         </span>
         <button className="bf-prep" onClick={onPrep} aria-label={`Prep-Liste, ${prepProgress.done} von ${prepProgress.total} Schritten erledigt`}>
@@ -75,6 +81,10 @@ export function BreakfastCard({ picks, assignment, prepProgress, open, onToggle,
       </div>
       {open && (
         <div className="bf-body">
+          <div className="bf-prepday">
+            <PrepDayChip prep={prep} choices={prepChoices} onChange={onPrepDay} />
+            {covered.length < 5 && <span className="muted small">{covered.length === 1 ? '1 Tag' : `${covered.length} Tage`} abgedeckt</span>}
+          </div>
           {rows.map(({ r, ds }) => (
             <button key={r.id} className="bf-row" onClick={() => onOpen(r)}>
               <RecipeImage recipe={r} className="thumb" />
@@ -87,7 +97,7 @@ export function BreakfastCard({ picks, assignment, prepProgress, open, onToggle,
               </span>
             </button>
           ))}
-          {picks.length === 1 && Object.keys(assignment.days).length < 5 && (
+          {picks.length === 1 && Object.keys(assignment.days).length < covered.length && (
             <button className="link small" onClick={onPlan}>+ zweites Frühstück für den Rest der Woche wählen</button>
           )}
           {assignment.notes.map((n) => (

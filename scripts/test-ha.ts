@@ -290,6 +290,12 @@ const base = { breakfastPicks: {} as Record<string, string[]>, weighIns: [] as {
   const thaw = rt.find((x) => x.key === 'rem:thaw:2026-11-19')
   ok(!!thaw && thaw.summary === '❄️ Frühstück auftauen' && thaw.start === '2026-11-19 20:00:00', 'Auftauen: Donnerstag 20:00')
   ok(!plannedReminders({ ...base, breakfastPicks: { '2026-11-16': ['oats-apfel-zimt'] } }, at('2026-11-19 10:00:00')).some((x) => x.key.startsWith('rem:thaw')), 'Auftauen: nichts, wenn nichts eingefroren wird')
+  // Prep am Montag 16.11. (Di–Fr): Erinnerung Montag 18:00, Auftauen Donnerstag 20:00 für Freitag
+  const rpm = plannedReminders({ ...base, breakfastPicks: picks, prepDays: { '2026-11-16': '2026-11-16' } }, at('2026-11-16 09:00:00'))
+  const prepM = rpm.find((x) => x.key === 'rem:prep:2026-11-16')
+  ok(!!prepM && prepM.start === '2026-11-16 18:00:00', 'Prep Montag: Erinnerung 18:00')
+  ok(!plannedReminders({ ...base, breakfastPicks: picks, prepDays: { '2026-11-16': '2026-11-16' } }, at('2026-11-14 18:00:00')).some((x) => x.key === 'rem:prep:2026-11-15'), 'Prep Montag: keine Sonntags-Erinnerung')
+  ok(!plannedReminders({ ...base, breakfastPicks: picks, prepDays: { '2026-11-16': '2026-11-16' } }, at('2026-11-19 10:00:00')).some((x) => x.key === 'rem:thaw:2026-11-19'), 'Prep Montag: Muffins halten bis Fr (Alter 4) – kein Auftauen nötig')
   // Ablauf: Mo 16.11. ab 16:30 für Dienstag-Ablauf
   const pantry = [
     { id: 'a', name: 'Skyr', amount: 450, unit: 'g', expires: '2026-11-17' },

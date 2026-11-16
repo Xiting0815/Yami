@@ -12,7 +12,7 @@ export interface HaInput {
   setState: Dispatch<SetStateAction<AppState>>
   /** Einkaufsliste der Abgleich-Woche */
   local: LocalItem[]
-  state: Pick<AppState, 'plan' | 'breakfastPicks' | 'weighIns' | 'pantry' | 'profile'>
+  state: Pick<AppState, 'plan' | 'breakfastPicks' | 'prepDays' | 'weighIns' | 'pantry' | 'profile'>
   /** in HA abgehakt → in Yami als gekauft markieren */
   onBought: (keys: string[]) => void
 }
@@ -75,7 +75,7 @@ export function useHomeAssistant(input: HaInput) {
       const st = ref.current.state
       const todo = await syncTodo(haClient, h, ref.current.local, (keys) => ref.current.onBought(keys))
       const reminders: Desired[] = plannedReminders(
-        { breakfastPicks: st.breakfastPicks, weighIns: st.weighIns, hasProfile: !!st.profile, pantry: st.pantry },
+        { breakfastPicks: st.breakfastPicks, prepDays: st.prepDays, weighIns: st.weighIns, hasProfile: !!st.profile, pantry: st.pantry },
         now,
       )
       const cal = await syncCalendar(haClient, h, plannedDinners(st.plan, isoLocal(now)), reminders, now)
@@ -126,7 +126,7 @@ export function useHomeAssistant(input: HaInput) {
   }, [active, ha?.url, ha?.token, ha?.todo])
 
   // Änderungen an Liste, Plan, Vorrat → abgleichen
-  const sig = JSON.stringify([input.local, Object.entries(input.state.plan).map(([d, e]) => [d, e?.recipeId, e?.servings, e?.status]), input.state.breakfastPicks, input.state.weighIns.length, input.state.pantry.map((l) => [l.name, l.expires]), ha?.calendar, ha?.reminders])
+  const sig = JSON.stringify([input.local, Object.entries(input.state.plan).map(([d, e]) => [d, e?.recipeId, e?.servings, e?.status]), input.state.breakfastPicks, input.state.prepDays, input.state.weighIns.length, input.state.pantry.map((l) => [l.name, l.expires]), ha?.calendar, ha?.reminders])
   const first = useRef(true)
   useEffect(() => {
     if (first.current) {

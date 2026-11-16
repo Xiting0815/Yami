@@ -2,11 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CustomIngredient, CustomRecipe, PlanEntry, Recipe } from './types'
 import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from './data/recipes'
 import { BREAKFAST_LABEL, type BreakfastType } from './types'
-import { assignBreakfasts, prepPlan, workdays } from './breakfast'
+import { assignBreakfasts, coveredDays, learnedPrepWeekday, prepOptions, prepPlan, resolvePrepDay, workdays } from './breakfast'
 import { BreakfastCard, shortTitle } from './components/BreakfastCard'
 import { DayActionsSheet } from './components/DayActionsSheet'
 import { StartCard, type StartStep } from './components/StartCard'
 import { PrepSheet } from './components/PrepSheet'
+import { PrepDayChip } from './components/PrepDayChip'
 import { type Rating, buildModel, pendingRating, preference, summarize } from './learning'
 import { ProfileSheet } from './components/ProfileSheet'
 import { exportBackup } from './backup'
@@ -317,7 +318,10 @@ export default function App() {
 
   // ───── Frühstück ─────
   const picks = state.breakfastPicks[weekKey] ?? []
-  const assignment = useMemo(() => assignBreakfasts(picks, days), [picks, days])
+  const prep = useMemo(() => resolvePrepDay(state.prepDays, days, today), [state.prepDays, days, today])
+  const prepChoices = useMemo(() => prepOptions(days), [days])
+  const covered = useMemo(() => coveredDays(days, prep), [days, prep])
+  const assignment = useMemo(() => assignBreakfasts(picks, days, prep), [picks, days, prep])
   const prepItems = useMemo(() => prepPlan(assignment), [assignment])
   const prepTotal = prepItems.reduce((n, i) => n + i.recipe.steps.length, 0)
   const prepDone = (state.prepChecked[weekKey] ?? []).filter((k) => prepItems.some((i) => k.startsWith(i.recipe.id + ':'))).length
@@ -345,16 +349,16 @@ export default function App() {
     )
     const rej = new Set(rejected)
     // beim zweiten Frühstück: Kombinationen bevorzugen, die Mo–Fr komplett abdecken
-    const fits = (r: Recipe) => picks.length !== 1 || Object.keys(assignBreakfasts([picks[0], r.id], days).days).length === 5
+    const fits = (r: Recipe) => picks.length !== 1 || Object.keys(assignBreakfasts([picks[0], r.id], days, prep).days).length === covered.length
     const score = (r: Recipe) => bInsights.get(r.id)!.score + (fits(r) ? 0 : -30)
     const fresh = list.filter((r) => !rej.has(r.id)).sort((a, b) => score(b) - score(a))
     const later = rejected.map((id) => list.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
     return [...fresh, ...later]
-  }, [bTypes, picks, rejected, bInsights, days, bPantryOnly])
+  }, [bTypes, picks, rejected, bInsights, days, bPantryOnly, prep, covered])
 
-  /** Frühstücke für die Woche festlegen und auf Mo–Fr verteilen */
-  function setPicks(ids: string[]) {
-    const a = assignBreakfasts(ids, days)
+  /** Frühstücke für die Woche festlegen und auf die Tage nach dem Prep-Tag verteilen (Tage davor bekommen keins) */
+  function setPicks(ids: string[], prepDay: string = prep) {
+    const a = assignBreakfasts(ids, days, prepDay)
     setState((s) => {
       const breakfast = { ...s.breakfast }
       let pantry = s.pantry
@@ -364,16 +368,33 @@ export default function App() {
         delete breakfast[d]
         if (a.days[d]) breakfast[d] = { recipeId: a.days[d], servings: 1 }
       }
-      return { ...s, breakfast, pantry, breakfastPicks: { ...s.breakfastPicks, [weekKey]: ids } }
+      // Der gewählte Prep-Tag wird gemerkt – daraus lernt die App den üblichen Wochentag
+      const prepDays = ids.length || s.prepDays[weekKey] ? { ...s.prepDays, [weekKey]: prepDay } : s.prepDays
+      return { ...s, breakfast, pantry, prepDays, breakfastPicks: { ...s.breakfastPicks, [weekKey]: ids } }
     })
+  }
+
+  /** Prep-Tag ändern: Verteilung neu berechnen (rückgängig machbar) */
+  function changePrepDay(iso: string) {
+    if (iso === prep) return
+    const snap = snapshot()
+    setPicks(picks, iso)
+    if (!picks.length) setState((s) => ({ ...s, prepDays: { ...s.prepDays, [weekKey]: iso } }))
+    const n = Object.keys(assignBreakfasts(picks, days, iso).days).length
+    flash(
+      picks.length
+        ? `Vorbereitung ${weekdayName(iso, true)}, ${shortDate(iso)} – Frühstück an ${n} Tagen`
+        : `Vorbereitung: ${weekdayName(iso, true)}, ${shortDate(iso)}`,
+      snap,
+    )
   }
 
   function pickBreakfast(r: Recipe) {
     const snap = snapshot()
     const next = [...picks.filter((id) => id !== r.id), r.id].slice(-2)
     setPicks(next)
-    const covered = Object.keys(assignBreakfasts(next, days).days).length
-    if (next.length >= 2 || covered === 5) {
+    const coveredN = Object.keys(assignBreakfasts(next, days, prep).days).length
+    if (next.length >= 2 || coveredN === covered.length) {
       flash(`☀️ Frühstück steht: ${next.map((id) => RECIPE_BY_ID[id].title).join(' + ')}`, snap)
       setTab('woche')
     } else {
@@ -622,8 +643,8 @@ export default function App() {
       onClick: () => setShowProfile(true),
     },
     {
-      title: 'Frühstück für Mo–Fr wählen',
-      sub: picks.length ? picks.map((id) => shortTitle(RECIPE_BY_ID[id]?.title ?? '')).join(' + ') : '1–2 Rezepte, einmal am Sonntag vorbereiten',
+      title: `Frühstück für ${dayRangeText(covered)} wählen`,
+      sub: picks.length ? picks.map((id) => shortTitle(RECIPE_BY_ID[id]?.title ?? '')).join(' + ') : `1–2 Rezepte, einmal vorbereiten (${weekdayName(prep, true)}, ${shortDate(prep)})`,
       verb: 'Wählen',
       done: picks.length > 0,
       editable: true,
@@ -770,7 +791,7 @@ export default function App() {
                 />
               ) : undefined
             }
-            hideDays={onboarding && plannedCount === 0}
+            hideDays={onboarding && plannedCount === 0 && !picks.length}
             onSwipeDay={startSwipe}
             onOpen={(r, day) => setSheet({ recipe: r, day, mode: 'view' })}
             onMore={setActionsDay}
@@ -782,6 +803,10 @@ export default function App() {
                 <BreakfastCard
                   picks={picks}
                   assignment={assignment}
+                  prep={prep}
+                  prepChoices={prepChoices}
+                  covered={covered}
+                  onPrepDay={changePrepDay}
                   prepProgress={{ done: prepDone, total: prepTotal }}
                   open={!!state.bfOpen}
                   onToggle={() => setState((s) => ({ ...s, bfOpen: !s.bfOpen }))}
@@ -810,7 +835,7 @@ export default function App() {
               <>
                 <div className="swipe-head">
                   <h1>
-                    ☀️ Frühstück <span className="accent">Mo–Fr</span>
+                    ☀️ Frühstück <span className="accent">{dayRangeText(covered)}</span>
                   </h1>
                   {picks.length === 1 ? (
                     <button className="chip" onClick={() => setTab('woche')} aria-label={`Nur ${RECIPE_BY_ID[picks[0]]?.title ?? 'dieses Frühstück'} nehmen – fertig`}>
@@ -820,8 +845,11 @@ export default function App() {
                     <span className="muted small">{picks.length}/2 gewählt</span>
                   )}
                 </div>
+                <div className="chips-row">
+                  <PrepDayChip prep={prep} choices={prepChoices} onChange={changePrepDay} />
+                </div>
                 <p className="muted small swipe-note">
-                  Wähle 1–2 Frühstücke zum Vorbereiten am Sonntag. Das kürzer haltbare kommt Mo–Mi, das länger haltbare Do–Fr.
+                  Wähle 1–2 Frühstücke zum Vorbereiten. Das kürzer haltbare kommt an die ersten Tage, das länger haltbare ans Ende.
                 </p>
                 <div className="chips-row">
                   <button className={`chip ${bPantryOnly ? 'on' : ''}`} onClick={() => setBPantryOnly((v) => !v)}>
@@ -893,7 +921,7 @@ export default function App() {
         {tab === 'liste' && (
           <ShoppingList
             result={week}
-            planned={days.filter((d) => state.plan[d]).length}
+            planned={days.filter((d) => state.plan[d] || state.breakfast[d]).length}
             checked={state.checked[weekKey] ?? []}
             custom={state.custom[weekKey] ?? []}
             onToggleBuy={(it) => toggleBuy(it)}
@@ -1106,6 +1134,9 @@ export default function App() {
         <PrepSheet
           items={prepItems}
           notes={assignment.notes}
+          prep={prep}
+          prepChoices={prepChoices}
+          onPrepDay={changePrepDay}
           checked={state.prepChecked[weekKey] ?? []}
           onToggle={(key) =>
             setState((s) => {
@@ -1166,6 +1197,7 @@ export default function App() {
         <ProfileSheet
           profile={profile}
           learned={summarize(taste)}
+          prepWeekday={learnedPrepWeekday(state.prepDays, today)}
           onResetLearning={() => {
             const snap = snapshot()
             setState((s) => ({ ...s, tasteSince: today, rejects: [], ratings: {}, ratingDismissed: [] }))
@@ -1253,6 +1285,12 @@ function DayPicker({ days, plan, onPick }: { days: string[]; plan: Record<string
       </div>
     </div>
   )
+}
+
+/** „Di–Fr“ aus den abgedeckten Tagen */
+function dayRangeText(ds: string[]): string {
+  if (!ds.length) return '–'
+  return ds.length === 1 ? weekdayName(ds[0], true) : `${weekdayName(ds[0], true)}–${weekdayName(ds[ds.length - 1], true)}`
 }
 
 function MealToggle({ meal, onChange }: { meal: 'dinner' | 'breakfast'; onChange: (m: 'dinner' | 'breakfast') => void }) {

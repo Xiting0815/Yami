@@ -3,7 +3,7 @@
  * Die Entscheidungen stehen in reinen Funktionen (diffTodo, plannedReminders, diffDinnerEvents) – testbar ohne Netz.
  */
 import { RECIPE_BY_ID } from './data/recipes'
-import { assignBreakfasts, prepPlan } from './breakfast'
+import { assignBreakfasts, mondayIso, prepPlan, resolvePrepDay } from './breakfast'
 import { HaError } from './homeassistant'
 import { addDaysIso } from './kitchen'
 import type { PantryLot } from './kitchen'
@@ -220,6 +220,8 @@ const plusMin = (d: Date, min: number) => new Date(d.getTime() + min * 60_000)
 
 export interface ReminderInput {
   breakfastPicks: Record<string, string[]>
+  /** Prep-Tag je Woche (optional; fehlt er, gilt der gelernte Wochentag bzw. der Sonntag davor) */
+  prepDays?: Record<string, string>
   weighIns: WeighIn[]
   /** Wiege-Erinnerung nur mit Profil */
   hasProfile: boolean
@@ -255,23 +257,25 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
     const D = addDaysIso(today, i)
     const dow = parseIso(D).getDay()
 
-    if (dow === 0) {
-      const monday = addDaysIso(D, 1)
-      const a = assignBreakfasts(input.breakfastPicks[monday] ?? [], weekDays(parseIso(monday)))
-      if (Object.keys(a.days).length) {
-        const parts = prepPlan(a).map((p) => `${p.portions}× ${p.recipe.title}${p.frozenDays.length ? ` (${p.frozenDays.length} einfrieren)` : ''}`)
-        mk(`rem:prep:${D}`, '🥣 Meal-Prep heute', `Frühstück für die Woche vorbereiten: ${parts.join(', ')}`, at(D, 10, 0))
-      }
-    }
-    if (dow === 4) {
-      const monday = addDaysIso(D, -3)
+    // Prep-Tag: gehört zur Woche, in der D liegt, oder (Sonntag/Samstag davor) zur nächsten
+    const prepDays = input.prepDays ?? {}
+    const m0 = mondayIso(D)
+    for (const monday of [m0, addDaysIso(m0, 7)]) {
       const days = weekDays(parseIso(monday))
-      const a = assignBreakfasts(input.breakfastPicks[monday] ?? [], days)
-      const fri = days[4]
-      if (a.frozen.includes(fri) && a.days[fri]) {
-        const title = RECIPE_BY_ID[a.days[fri]]?.title ?? 'Frühstück'
-        mk(`rem:thaw:${D}`, '❄️ Frühstück auftauen', `${title} für morgen aus dem Gefrierfach in den Kühlschrank legen.`, at(D, 20, 0))
-      }
+      if (resolvePrepDay(prepDays, days, today) !== D) continue
+      const a = assignBreakfasts(input.breakfastPicks[monday] ?? [], days, D)
+      if (!Object.keys(a.days).length) continue
+      const parts = prepPlan(a).map((p) => `${p.portions}× ${p.recipe.title}${p.frozenDays.length ? ` (${p.frozenDays.length} einfrieren)` : ''}`)
+      mk(`rem:prep:${D}`, '🥣 Meal-Prep heute', `Frühstück für die Woche vorbereiten: ${parts.join(', ')}`, at(D, dow === 0 || dow === 6 ? 10 : 18, 0))
+    }
+    // Auftauen: am Vorabend eines eingefrorenen Frühstücks
+    const tm = addDaysIso(D, 1)
+    const tMonday = mondayIso(tm)
+    const tDays = weekDays(parseIso(tMonday))
+    const ta = assignBreakfasts(input.breakfastPicks[tMonday] ?? [], tDays, resolvePrepDay(prepDays, tDays, today))
+    if (ta.frozen.includes(tm) && ta.days[tm]) {
+      const title = RECIPE_BY_ID[ta.days[tm]]?.title ?? 'Frühstück'
+      mk(`rem:thaw:${D}`, '❄️ Frühstück auftauen', `${title} für morgen aus dem Gefrierfach in den Kühlschrank legen.`, at(D, 20, 0))
     }
     if (input.hasProfile && dow === weighDay && !weighedThisWeek(input.weighIns, D)) {
       mk(`rem:weigh:${D}`, '⚖️ Heute wiegen', 'Einmal pro Woche auf die Waage.', at(D, 7, 30))

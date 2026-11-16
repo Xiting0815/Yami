@@ -3,10 +3,14 @@ import { type PrepItem, prepMinutes } from '../breakfast'
 import { formatAmount } from '../shopping'
 import { weekdayName } from '../store'
 import { NutritionRow } from './NutritionRow'
+import { PrepDayChip } from './PrepDayChip'
 
 interface Props {
   items: PrepItem[]
   notes: string[]
+  prep: string
+  prepChoices: string[]
+  onPrepDay: (iso: string) => void
   checked: string[]
   onToggle: (key: string) => void
   onClose: () => void
@@ -15,7 +19,7 @@ interface Props {
 /** Schritt-Schlüssel für die Abhakliste */
 export const prepKey = (rid: string, i: number) => `${rid}:${i}`
 
-export function PrepSheet({ items, notes, checked, onToggle, onClose }: Props) {
+export function PrepSheet({ items, notes, prep, prepChoices, onPrepDay, checked, onToggle, onClose }: Props) {
   const done = new Set(checked)
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -35,6 +39,7 @@ export function PrepSheet({ items, notes, checked, onToggle, onClose }: Props) {
           <p className="muted">
             ca. {Math.round(prepMinutes(items))} Min. · {containers} bereitstellen
           </p>
+          <div className="bf-prepday"><PrepDayChip prep={prep} choices={prepChoices} onChange={onPrepDay} /></div>
           {notes.map((n) => (
             <p key={n} className="bf-note">ℹ️ {n}</p>
           ))}
