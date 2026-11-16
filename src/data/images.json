@@ -41,7 +41,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Penne_Arrabbiata.jpg"
  },
- "backfisch": null,
+ "backfisch": {
+  "author": "Shukanto Das",
+  "commonsTitle": "File:Fish Cutlets.JPG",
+  "file": "img/backfisch.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Fish_Cutlets.JPG"
+ },
  "bami-goreng": {
   "author": "Gunawan Kartapranata",
   "commonsTitle": "File:Mi Goreng GM.jpg",
@@ -141,7 +147,13 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cashewchickenphoto.jpg"
  },
- "champignoncremesuppe": null,
+ "champignoncremesuppe": {
+  "author": "Redeemer|Vodesnet",
+  "commonsTitle": "File:Cream Mushroom soup 2.jpg",
+  "file": "img/champignoncremesuppe.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Cream_Mushroom_soup_2.jpg"
+ },
  "char-siu": {
   "author": "Peachyeung316",
   "commonsTitle": "File:Char Siu and Siu Yuk in Tai Po.jpg",
@@ -149,7 +161,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Char_Siu_and_Siu_Yuk_in_Tai_Po.jpg"
  },
- "chicoree-gratin": null,
+ "chicoree-gratin": {
+  "author": "Jiel Beaumadier",
+  "commonsTitle": "File:Jielbeaumadier chicon au jambon maroilles 2010.jpg",
+  "file": "img/chicoree-gratin.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Jielbeaumadier_chicon_au_jambon_maroilles_2010.jpg"
+ },
  "chow-mein": {
   "author": "Gaurav Dhwaj Khadka",
   "commonsTitle": "File:Chow Mein 1.jpg",
@@ -164,7 +182,13 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chicken_Wings_in_Coca_Cola_Sauce.jpg"
  },
- "cordon-bleu": null,
+ "cordon-bleu": {
+  "author": "JIP",
+  "commonsTitle": "File:Schnitzel Cordon Bleu at restaurant West Side Story.jpg",
+  "file": "img/cordon-bleu.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Schnitzel_Cordon_Bleu_at_restaurant_West_Side_Story.jpg"
+ },
  "cotoletta": {
   "author": "Paolo Piscolla",
   "commonsTitle": "File:Cotoletta e patate al forno.jpg",
@@ -207,7 +231,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chicken_fettuccine_alfredo.JPG"
  },
- "fischauflauf": null,
+ "fischauflauf": {
+  "author": "Kimberli Mäkäräinen",
+  "commonsTitle": "File:Finnish school lunch (Wed-Thurs 6-8May2020) during the COVID-19 pandemic.jpg",
+  "file": "img/fischauflauf.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Finnish_school_lunch_(Wed-Thurs_6-8May2020)_during_the_COVID-19_pandemic.jpg"
+ },
  "flaedlesuppe": {
   "author": "Benreis",
   "commonsTitle": "File:Frittatensuppe Pumpe Klagenfurt.jpg",
@@ -376,7 +406,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Red_braised_pork_(20141106191221).JPG"
  },
- "huehnereintopf": null,
+ "huehnereintopf": {
+  "author": "Nichijyou123",
+  "commonsTitle": "File:Chicken Noodle Soup US.jpg",
+  "file": "img/huehnereintopf.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Chicken_Noodle_Soup_US.jpg"
+ },
  "huehnerfrikassee": {
   "author": "Chicken_fricassee-01.jpg: Like_the_Grand_Canyon derivative work: Hic et nunc",
   "commonsTitle": "File:Chicken fricassee-01-3.jpg",
@@ -412,7 +448,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:J%C3%A4gerschnitzel_DDR.jpg"
  },
- "jiaozi": null,
+ "jiaozi": {
+  "author": "David Pursehouse from Kawasaki, Japan",
+  "commonsTitle": "File:Chinese dumplings (Jiaozi) (2196005904).jpg",
+  "file": "img/jiaozi.webp",
+  "license": "CC BY 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Chinese_dumplings_(Jiaozi)_(2196005904).jpg"
+ },
  "kaese-lauch-suppe": {
   "author": "Katrin Gilger",
   "commonsTitle": "File:Lauch-Käse-Suppe mit Hackfleisch (5526372941).jpg",
@@ -434,8 +476,20 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kaiserschmarrn_und_Apfelmus.jpg"
  },
- "kartoffel-hack-auflauf": null,
- "kartoffel-lauch-gratin": null,
+ "kartoffel-hack-auflauf": {
+  "author": "Kotivalo",
+  "commonsTitle": "File:Jauheliha-perunasoselaatikko.jpg",
+  "file": "img/kartoffel-hack-auflauf.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Jauheliha-perunasoselaatikko.jpg"
+ },
+ "kartoffel-lauch-gratin": {
+  "author": "Andy Li",
+  "commonsTitle": "File:Leek & Dauphinoise Potato Pastry - The Flour Pot Bakery 2026-04-06.jpg",
+  "file": "img/kartoffel-lauch-gratin.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Leek_%26_Dauphinoise_Potato_Pastry_-_The_Flour_Pot_Bakery_2026-04-06.jpg"
+ },
  "kartoffeleintopf": {
   "author": "Benreis",
   "commonsTitle": "File:Kartoffelsuppe Wiener Würstchen.jpg",
@@ -492,7 +546,13 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:00101_Vorkarpatische_K%C3%BCche_Piroggen,_Kohlrouladen,_Kroketten.JPG"
  },
- "kotelett-rahmkohlrabi": null,
+ "kotelett-rahmkohlrabi": {
+  "author": "Peachyeung316",
+  "commonsTitle": "File:A Pork rib eye chops with beans and corn with garlic sauce from Diamond Restaurant.jpg",
+  "file": "img/kotelett-rahmkohlrabi.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:A_Pork_rib_eye_chops_with_beans_and_corn_with_garlic_sauce_from_Diamond_Restaurant.jpg"
+ },
  "krautschupfnudeln": {
   "author": "MarkusHagenlocher",
   "commonsTitle": "File:Schupfnudeln mit Sauerkraut-RZ.jpg",
@@ -626,7 +686,13 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Minestrone_soup.jpg"
  },
- "moehreneintopf": null,
+ "moehreneintopf": {
+  "author": "Daderot",
+  "commonsTitle": "File:Beef stew with potatoes and carrots - Massachusetts.jpg",
+  "file": "img/moehreneintopf.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Beef_stew_with_potatoes_and_carrots_-_Massachusetts.jpg"
+ },
  "nasi-goreng": {
   "author": "Wiki Farazi",
   "commonsTitle": "File:Nasi goreng pattaya 20231028 120535.jpg",
@@ -753,7 +819,13 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kartoffeln-quark.jpg"
  },
- "penne-salmone": null,
+ "penne-salmone": {
+  "author": "CK Golf from Vancouver, Canada",
+  "commonsTitle": "File:Vault Restaurant (10846956695).jpg",
+  "file": "img/penne-salmone.webp",
+  "license": "CC BY-SA 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Vault_Restaurant_(10846956695).jpg"
+ },
  "penne-vodka": {
   "author": "Joseph O'Connell - https://www.flickr.com/photos/joconnell/",
   "commonsTitle": "File:PenneAllaVodka.jpg",
@@ -838,7 +910,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cacciatore_Set_Meal_in_Matsuya_Imaike.jpg"
  },
- "pollo-romana": null,
+ "pollo-romana": {
+  "author": "DinaBenedettoFerrandina",
+  "commonsTitle": "File:Pollo con peperoni.jpg",
+  "file": "img/pollo-romana.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Pollo_con_peperoni.jpg"
+ },
  "polpette-sugo": {
   "author": "Andy Li",
   "commonsTitle": "File:Polpette Al Sugo - Nanninella.jpg",
@@ -888,7 +966,13 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Ribollita_toscana.JPG"
  },
- "rigatoni-salsiccia": null,
+ "rigatoni-salsiccia": {
+  "author": "Popo le Chien",
+  "commonsTitle": "File:Rigatoni.jpg",
+  "file": "img/rigatoni-salsiccia.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Rigatoni.jpg"
+ },
  "rind-brokkoli": {
   "author": "jeffreyw",
   "commonsTitle": "File:Broccoli beef (5457397534).jpg",
@@ -896,7 +980,13 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Broccoli_beef_(5457397534).jpg"
  },
- "rindergulasch": null,
+ "rindergulasch": {
+  "author": "John Cambrick",
+  "commonsTitle": "File:Goulash i brød i Prag.jpg",
+  "file": "img/rindergulasch.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Goulash_i_br%C3%B8d_i_Prag.jpg"
+ },
  "rinderrouladen": {
   "author": "Matt Lancashire",
   "commonsTitle": "File:Rindsroulade-01.jpg",
@@ -1252,7 +1342,13 @@
   "license": "CC BY 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Stuffed_squash_2025_JORDAN_(2).jpg"
  },
- "zucchini-hack-auflauf": null,
+ "zucchini-hack-auflauf": {
+  "author": "E4024",
+  "commonsTitle": "File:Sandal sefasi.jpg",
+  "file": "img/zucchini-hack-auflauf.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Sandal_sefasi.jpg"
+ },
  "zuercher-geschnetzeltes": {
   "author": "Jpatokal",
   "commonsTitle": "File:Zürcher Geschnetzeltes at Zur rote Buech.jpg",
