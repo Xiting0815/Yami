@@ -2,7 +2,7 @@
  * Zutatentext → Zutatenzeilen: "400 g Hackfleisch, 2 Zwiebeln, 1 EL Tomatenmark" oder eine Zutat pro Zeile.
  * Jede Zeile wird der ähnlichsten bekannten Zutat aus dem Katalog zugeordnet; was nicht passt, bleibt „unbekannt“.
  */
-import { CATALOG } from './data/catalog'
+import { CATALOG, SPICES } from './data/catalog'
 import { catalogVersion } from './data/custom-registry'
 import { UNITS } from './data/define'
 import { gramsOf } from './data/nutrition-calc'
@@ -454,7 +454,8 @@ function fold(w: string): string {
 export function unitWorks(name: string, unit: string): boolean {
   if (!unit) return true
   if (gramsOf(name, 1, unit) == null) return false
-  if (CATALOG[name] === 'vorrat') return true
+  // Gewürze zählen nur „da“/„alle“ – jede Einheit passt; Mengen-Grundzutaten (Öl, Mehl …) müssen sich umrechnen lassen
+  if (CATALOG[name] === 'vorrat' && SPICES.has(name)) return true
   const prod = PRODUCTS[name]
   return !prod || toBase(name, 1, unit, prod) != null
 }

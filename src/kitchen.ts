@@ -2,7 +2,9 @@
  * Küchenlogik: Vorrat, Einkaufsplanung nach Packungsgrößen, Kosten und Empfehlungen.
  *
  * Mengen werden je Zutat in der Basiseinheit ihres Produkts geführt (z. B. Sahne in ml,
- * Zwiebel in Stk). Gewürze & Grundzutaten (Kategorie "vorrat") werden nicht mengenmäßig geführt.
+ * Zwiebel in Stk). Grundzutaten (Kategorie "vorrat") sind zweierlei: Mengen-Grundzutaten (Öl, Brühe, Mehl …)
+ * werden wie jede Zutat geführt, aber erst, wenn du sie im Vorrat hast; Gewürze haben nur „da“ / „alle“.
+ * Siehe staples.ts.
  */
 import { CATALOG, SHOP_ALIAS } from './data/catalog'
 import { CONVERT, PRODUCTS, type Product } from './data/products'
@@ -10,6 +12,10 @@ import { inSeason, seasonOf } from './data/season'
 import { RECIPE_BY_ID } from './data/recipes'
 import { substitutesFor } from './data/substitutes'
 import type { Festive, PlanEntry, Recipe, ShopCat, WeekPlan } from './types'
+import {
+  type SpiceStatus, isSpice, type StapleMemos, STAPLE_SHOP_CAT, buyName, defaultAmount, isQtyStaple, isTrackedStaple, runningLow,
+  stapleKey, useEvents, useRate,
+} from './staples'
 
 export interface PantryLot {
   id: string
@@ -123,7 +129,32 @@ export function needsOf(recipe: Recipe, servings: number): Need[] {
   return [...out.values()]
 }
 
-/** Warenwert eines Gerichts (anteilig, ohne Gewürze) */
+/**
+ * Bedarf an Mengen-Grundzutaten (Öl, Brühe, Mehl, Saucen …). Zeilen ohne Menge ziehen eine kleine Standardmenge ab
+ * (z. B. 15 ml Öl) – nur fürs Abziehen und die Vorratsplanung, nicht für Kosten und Empfehlungen.
+ */
+export function stapleNeedsOf(recipe: Recipe, servings: number): Need[] {
+  const out = new Map<string, Need>()
+  for (const ing of recipe.ingredients) {
+    const name = canonical(ing.name)
+    if (!isQtyStaple(name)) continue
+    const prod = PRODUCTS[name]
+    if (!prod) continue
+    const v = ing.amount == null ? defaultAmount(name) : toBase(name, (ing.amount * servings) / recipe.servings, ing.unit, prod)
+    if (v == null || v <= 0) continue
+    const cur = out.get(name)
+    if (cur) cur.amount += v
+    else out.set(name, { name, amount: v, unit: prod.unit })
+  }
+  return [...out.values()]
+}
+
+/** alles, was ein Gericht aus dem Vorrat zieht: normale Zutaten und Mengen-Grundzutaten */
+export function allNeedsOf(recipe: Recipe, servings: number): Need[] {
+  return [...needsOf(recipe, servings), ...stapleNeedsOf(recipe, servings)]
+}
+
+/** Warenwert eines Gerichts (anteilig, ohne Gewürze und Grundzutaten) */
 export function recipeCost(recipe: Recipe, servings: number, overrides?: PriceOverrides): number {
   let sum = 0
   for (const n of needsOf(recipe, servings)) {
@@ -220,7 +251,7 @@ export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string): { p
     const entry = next[day]!
     const recipe = RECIPE_BY_ID[entry.recipeId]
     const consumed: PantryLot[] = []
-    if (recipe) for (const n of needsOf(recipe, entry.servings)) consumed.push(...consume(lots, n.name, n.amount, day))
+    if (recipe) for (const n of allNeedsOf(recipe, entry.servings)) consumed.push(...consume(lots, n.name, n.amount, day))
     next[day] = { ...entry, status: 'cooked', consumed }
   }
   return { plan: next, pantry: lots, changed: true }
@@ -260,6 +291,8 @@ export interface BuyItem {
   recipes: string[]
   /** in dieser Woche schon gekauft (abgehakt) – kann nach Portionsänderung kleiner sein als nötig */
   bought: number
+  /** Grundzutaten: warum sie auf der Liste stehen (wird knapp / bald leer / Gewürz ist alle) */
+  note?: 'knapp' | 'leer' | 'alle'
 }
 
 export interface StapleItem {
@@ -267,6 +300,14 @@ export interface StapleItem {
   name: string
   amount: string
   recipes: string[]
+}
+
+/** Wissen über Grundzutaten für die Wochenplanung */
+export interface StapleContext {
+  /** zuletzt geführte Brühen-Form je Grundzutat (gelernt) und welche Zutaten du schon führst */
+  memo?: StapleMemos
+  /** Gewürze: da / alle */
+  spices?: Record<string, SpiceStatus>
 }
 
 export interface WeekResult {
@@ -298,7 +339,16 @@ export function planWeek(
   breakfast: WeekPlan = {},
   /** Monat (1–12) für Saisonpreise; ohne Angabe keine Anpassung */
   month?: number,
+  /** Grundzutaten: gemerkte Formen und Gewürz-Status */
+  staple: StapleContext = {},
 ): WeekResult {
+  const memo = staple.memo ?? {}
+  // Mengen-Grundzutaten zählen erst, wenn du sie führst (Vorrat oder gemerkt) – sonst bleiben sie bei „Vorrat prüfen“
+  const trackedKey = (key: string) => isTrackedStaple(key, pantry, memo) || Object.keys(bought).some((n) => stapleKey(n) === key)
+  const needsFor = (r: Recipe, servings: number) => [
+    ...needsOf(r, servings),
+    ...stapleNeedsOf(r, servings).filter((n) => trackedKey(stapleKey(n.name))),
+  ]
   const entries = [...activeEntries(plan, days), ...activeEntries(breakfast, days)].sort((a, b) => a[0].localeCompare(b[0]))
 
   // Bedarf der Woche
@@ -306,7 +356,7 @@ export function planWeek(
   const staples = new Map<string, { parts: Map<string, number>; recipes: Set<string> }>()
   for (const [, e] of entries) {
     const r = RECIPE_BY_ID[e.recipeId]
-    for (const n of needsOf(r, e.servings)) {
+    for (const n of needsFor(r, e.servings)) {
       const cur = req.get(n.name) ?? { amount: 0, recipes: new Set<string>() }
       cur.amount += n.amount
       cur.recipes.add(r.title)
@@ -315,6 +365,9 @@ export function planWeek(
     for (const ing of r.ingredients) {
       const name = canonical(ing.name)
       if (isTracked(name)) continue
+      // geführte Mengen-Grundzutaten stehen oben im Bedarf, Gewürze mit Status über „da“/„alle“
+      if (isQtyStaple(name) && trackedKey(stapleKey(name))) continue
+      if (isSpice(name) && staple.spices?.[name]) continue
       const s = staples.get(name) ?? { parts: new Map(), recipes: new Set<string>() }
       s.recipes.add(r.title)
       if (ing.amount != null) {
@@ -353,7 +406,7 @@ export function planWeek(
     }
     return got
   }
-  const reservedNeeds = earlier.flatMap(([, e]) => needsOf(RECIPE_BY_ID[e.recipeId], e.servings))
+  const reservedNeeds = earlier.flatMap(([, e]) => needsFor(RECIPE_BY_ID[e.recipeId], e.servings))
   const reservedRest = reservedNeeds.map((n) => n.amount - take(n.name, n.amount, true).reduce((s, x) => s + x.amount, 0))
   reservedNeeds.forEach((n, i) => {
     if (reservedRest[i] > 1e-6) take(n.name, reservedRest[i], false)
@@ -375,16 +428,18 @@ export function planWeek(
   const covered: BuyItem[] = []
   let total = 0
   for (const [name, { amount: required, recipes }] of req) {
-    const product = productFor(name, overrides, month)!
+    // Brühe: gekauft wird die Form, die du zuletzt im Vorrat hattest (sonst Pulver)
+    const itemName = isQtyStaple(name) ? buyName(name, memo) : name
+    const product = productFor(itemName, overrides, month)!
     const h = have.get(name)!
     const subAmount = h.subs.reduce((s, x) => s + x.amount, 0)
     const fromPantry = h.exact + subAmount
     const missing = Math.max(0, required - fromPantry)
     const packs = missing > 1e-6 ? Math.ceil(missing / product.pack - 1e-6) : 0
     const item: BuyItem = {
-      key: name,
-      name,
-      cat: CATALOG[name] ?? 'konserven',
+      key: itemName,
+      name: itemName,
+      cat: isQtyStaple(name) ? STAPLE_SHOP_CAT : (CATALOG[name] ?? 'konserven'),
       unit: product.unit,
       required,
       fromPantry,
@@ -393,11 +448,42 @@ export function planWeek(
       product,
       cost: packs * product.price,
       leftover: h.availExact + subAmount + packs * product.pack - required,
-      bought: bought[name]?.amount ?? 0,
+      bought: bought[itemName]?.amount ?? 0,
       recipes: [...recipes],
+    }
+    if (packs > 0 && isQtyStaple(name)) item.note = 'knapp'
+    // Brühe: der Bedarf heißt „Gemüsebrühe“, die Packung „Gemüsebrühe Würfel“ – fürs „schon im Vorrat“ bleibt der Rezeptname
+    if (packs === 0 && itemName !== name) {
+      item.key = name
+      item.name = name
     }
     total += item.cost
     ;(packs > 0 ? buy : covered).push(item)
+  }
+
+  // Lernen: Grundzutaten, die bald leer sind (aus dem Verbrauch der letzten Wochen) oder fast leer, kommen auf die Liste
+  const events = useEvents(plan, breakfast)
+  const keys = new Set<string>([...Object.keys(memo), ...pantry.filter((l) => isQtyStaple(l.name)).map((l) => stapleKey(l.name))])
+  for (const key of keys) {
+    if (!trackedKey(key) || buy.some((b) => stapleKey(b.name) === key && isQtyStaple(b.name))) continue
+    const name = buyName(key, memo)
+    const product = productFor(name, overrides, month)
+    if (!product) continue
+    const inCovered = covered.find((c) => c.key === key)
+    const group = (n: string) => stapleKey(n) === key
+    const now =
+      pantry.filter((l) => group(l.name)).reduce((s, l) => s + l.amount, 0) -
+      Object.entries(bought).filter(([n]) => group(n)).reduce((s, [, b]) => s + b.amount, 0)
+    // nach dem Wochenplan: was dann noch da ist (nicht abgedeckter Bedarf kam schon oben auf die Liste)
+    const after = inCovered ? inCovered.leftover : Math.max(0, now)
+    if (!runningLow(after, product.pack, useRate(events, key, today))) continue
+    const item: BuyItem = {
+      key: name, name, cat: STAPLE_SHOP_CAT, unit: product.unit, required: inCovered?.required ?? 0, fromPantry: 0, substitutes: [], packs: 1, product,
+      cost: product.price, leftover: after + product.pack, bought: bought[name]?.amount ?? 0, recipes: inCovered?.recipes ?? [], note: 'leer',
+    }
+    if (inCovered) covered.splice(covered.indexOf(inCovered), 1)
+    total += item.cost
+    buy.push(item)
   }
 
   // Vorrat simulieren: aktueller Vorrat + noch nicht Gekauftes − offene Gerichte
@@ -409,7 +495,21 @@ export function planWeek(
   // erst die noch offenen Gerichte vor dieser Woche, dann die dieser Woche
   for (const [day, e] of [...earlier, ...entries]) {
     if (e.status === 'cooked') continue
-    for (const n of needsOf(RECIPE_BY_ID[e.recipeId], e.servings)) consume(lots, n.name, n.amount, day < today ? today : day)
+    for (const n of allNeedsOf(RECIPE_BY_ID[e.recipeId], e.servings)) consume(lots, n.name, n.amount, day < today ? today : day)
+  }
+
+  // Gewürze, die „alle“ sind: stehen als echter Artikel auf der Liste (abgehakt → wieder „da“)
+  for (const [name, st] of Object.entries(staple.spices ?? {})) {
+    const hit = bought[name] != null
+    const product = productFor(name, overrides)
+    if ((st !== 'alle' && !hit) || !product) continue
+    const used = entries.map(([, e]) => RECIPE_BY_ID[e.recipeId]).filter((r) => r.ingredients.some((i) => canonical(i.name) === name))
+    const item: BuyItem = {
+      key: name, name, cat: STAPLE_SHOP_CAT, unit: product.unit, required: 0, fromPantry: 0, substitutes: [], packs: 1, product,
+      cost: product.price, leftover: 0, bought: bought[name]?.amount ?? 0, recipes: [...new Set(used.map((r) => r.title))], note: 'alle',
+    }
+    total += item.cost
+    buy.push(item)
   }
 
   const stapleItems: StapleItem[] = [...staples].map(([name, s]) => ({

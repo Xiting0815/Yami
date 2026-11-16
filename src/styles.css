@@ -790,3 +790,15 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .sub-hint { font-size: 13px; color: var(--muted); }
 
 .search-words { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 10px; }
+
+/* Gewürze: kompakte Liste mit Status „da“ / „alle“ */
+.spice-list li { min-height: var(--tap); gap: 8px; flex-wrap: nowrap; }
+.spice-list .item-name { flex: 1; min-width: 0; }
+.spice-list li.empty .item-name { color: var(--red-ink); font-weight: 700; }
+.spice-seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.spice-seg button { min-width: 52px; min-height: 36px; border: none; background: var(--surface); color: var(--muted); font-weight: 700; font-size: 14px; padding: 0 12px; }
+.spice-seg button.on { background: color-mix(in srgb, var(--green) 20%, var(--surface)); color: var(--green-ink); }
+.spice-seg button.on.warn { background: color-mix(in srgb, var(--red) 18%, var(--surface)); color: var(--red-ink); }
+.spice-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 14px 12px; }
+.exp.low { color: var(--amber-ink); font-weight: 700; }
+.item-note { font-size: 12px; font-weight: 700; color: var(--amber-ink); display: block; }

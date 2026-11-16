@@ -42,7 +42,6 @@ export const SEASON: Record<string, number[]> = {
   'Staudensellerie': [6, 7, 8, 9, 10],
   'Steckrübe': [10, 11, 12, 1, 2, 3],
   'Tomate': [7, 8, 9],
-  'Tomaten reif': [7, 8, 9],
   'Wirsing': [9, 10, 11, 12, 1, 2, 3],
   'Zucchini': [6, 7, 8, 9],
   'Zuckerschoten': [5, 6, 7, 8],

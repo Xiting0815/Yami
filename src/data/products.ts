@@ -7,6 +7,7 @@
  * shelf   – Tage haltbar ab Einkauf
  * opened  – Tage haltbar, sobald angebrochen (Standard: wie shelf)
  * packName – Bezeichnung auf der Einkaufsliste (z. B. "Becher"); ohne = lose Ware
+ * yields – Packung „ergibt“ die Menge (Brühpulver: 1 Glas ergibt 7,5 l fertige Brühe); pack ist dann die fertige Menge
  */
 export interface Product {
   pack: number
@@ -15,10 +16,11 @@ export interface Product {
   shelf: number
   opened?: number
   packName?: string
+  yields?: boolean
 }
 
-function p(pack: number, unit: string, price: number, shelf: number, opened?: number, packName?: string): Product {
-  return { pack, unit, price, shelf, opened, packName }
+function p(pack: number, unit: string, price: number, shelf: number, opened?: number, packName?: string, yields?: boolean): Product {
+  return yields ? { pack, unit, price, shelf, opened, packName, yields } : { pack, unit, price, shelf, opened, packName }
 }
 
 const LONG = 365
@@ -61,7 +63,6 @@ export const PRODUCTS: Record<string, Product> = {
   'Kräuter für Grüne Soße': p(1, 'Bund', 2.49, 3, 3, 'Pck'),
   Kräuterseitlinge: p(200, 'g', 1.99, 5, 3, 'Schale'),
   Lauch: p(1, 'Stk', 0.79, 10),
-  'Lauchzwiebel dick': p(6, 'Stk', 0.99, 6, 6, 'Bund'),
   Limette: p(1, 'Stk', 0.35, 21),
   'Majoran frisch': p(10, 'Zweig', 1.29, 5, 5, 'Pck'),
   Möhre: p(10, 'Stk', 0.99, 21, 21, 'Beutel'),
@@ -90,7 +91,6 @@ export const PRODUCTS: Record<string, Product> = {
   'Thai-Basilikum': p(1, 'Bund', 1.49, 4),
   Thymian: p(10, 'Zweig', 1.29, 7, 7, 'Pck'),
   Tomate: p(1, 'Stk', 0.3, 6),
-  'Tomaten reif': p(500, 'g', 1.49, 5, 4, 'Pck'),
   Weißkohl: p(1500, 'g', 0.99, 30, 10, 'Kopf'),
   Wirsing: p(1000, 'g', 1.29, 14, 7, 'Kopf'),
   Zitrone: p(1, 'Stk', 0.35, 21),
@@ -299,7 +299,6 @@ export const PRODUCTS: Record<string, Product> = {
   'Gyros-Fleisch gewürzt': p(500, 'g', 4.99, 3, 1, 'Pck'),
   Kalbsbraten: p(800, 'g', 15.99, 3, 1, 'Stück'),
   Kabeljaufilet: p(400, 'g', 6.99, 2, 1, 'Pck'),
-  'Kalbfleisch Schnitzel': p(400, 'g', 9.99, 2, 1, 'Pck'),
   Kalbsbrät: p(200, 'g', 2.99, 2, 1, 'Pck'),
   'Kalbshaxe in Scheiben': p(2, 'Stk', 9.99, 2, 1, 'Pck'),
   Kalbskotelett: p(2, 'Stk', 12.99, 2, 1, 'Pck'),
@@ -339,7 +338,6 @@ export const PRODUCTS: Record<string, Product> = {
   'Schweinebauch dünn geschnitten': p(400, 'g', 3.49, 3, 2, 'Pck'),
   'Schweinebauch geräuchert': p(300, 'g', 2.99, 21, 7, 'Pck'),
   Schweinefilet: p(500, 'g', 5.99, 3, 1, 'Pck'),
-  'Schweinefleisch Schnitzel': p(400, 'g', 3.99, 3, 1, 'Pck'),
   Schweinegulasch: p(500, 'g', 3.99, 2, 1, 'Pck'),
   Schweinehackfleisch: p(500, 'g', 3.49, 1, 1, 'Pck'),
   Schweinekotelett: p(2, 'Stk', 2.99, 3, 1, 'Pck'),
@@ -367,6 +365,66 @@ export const PRODUCTS: Record<string, Product> = {
   'Pommes frites TK': p(750, 'g', 1.79, 180, 180, 'Beutel'),
   'Rahmspinat TK': p(450, 'g', 1.49, 180, 180, 'Pck'),
   'Wan-Tan-Teigblätter TK': p(40, 'Stk', 2.49, 180, 180, 'Pck'),
+
+  // ───── Grundzutaten (Mengen werden im Vorrat geführt, Preise Discounter 2026) ─────
+  Olivenöl: p(750, 'ml', 6.99, 540, 180, 'Flasche'),
+  Sonnenblumenöl: p(1000, 'ml', 2.29, 540, 180, 'Flasche'),
+  Sesamöl: p(250, 'ml', 3.49, 540, 180, 'Flasche'),
+  Kürbiskernöl: p(250, 'ml', 4.99, 365, 90, 'Flasche'),
+  Leinöl: p(250, 'ml', 3.99, 180, 42, 'Flasche'),
+  Sojasauce: p(250, 'ml', 1.99, 720, 365, 'Flasche'),
+  'Sojasauce dunkel': p(150, 'ml', 2.29, 720, 365, 'Flasche'),
+  Worcestersauce: p(150, 'ml', 1.79, 720, 365, 'Flasche'),
+  Tomatenketchup: p(500, 'ml', 1.49, 365, 90, 'Flasche'),
+  'Senf mittelscharf': p(200, 'ml', 0.79, 365, 120, 'Tube'),
+  'Senf grobkörnig': p(200, 'ml', 0.99, 365, 120, 'Glas'),
+  'Senf süß': p(200, 'ml', 1.29, 365, 120, 'Glas'),
+  Honig: p(500, 'g', 3.99, 730, 365, 'Glas'),
+  Apfelessig: p(1000, 'ml', 1.29, 730, 365, 'Flasche'),
+  Rotweinessig: p(500, 'ml', 1.19, 730, 365, 'Flasche'),
+  Weißweinessig: p(500, 'ml', 1.19, 730, 365, 'Flasche'),
+  Weizenmehl: p(1000, 'g', 0.99, 365, 180, 'Pck'),
+  Zucker: p(1000, 'g', 1.29, 730, 730, 'Pck'),
+  Puderzucker: p(500, 'g', 1.29, 730, 365, 'Pck'),
+  Vanillezucker: p(8, 'Pck', 0.79, 540, 540, 'Pck'),
+  Speisestärke: p(400, 'g', 1.19, 540, 365, 'Pck'),
+  Backpulver: p(6, 'Pck', 0.89, 540, 540, 'Pck'),
+  // Brühen: Mengen in ml fertiger Brühe (Pulver/Würfel „ergeben“ diese Menge)
+  Gemüsebrühe: p(7500, 'ml', 2.49, 540, 365, 'Glas', true),
+  'Gemüsebrühe Pulver': p(7500, 'ml', 2.49, 540, 365, 'Glas', true),
+  'Gemüsebrühe Würfel': p(4000, 'ml', 1.19, 540, 540, 'Pck', true),
+  'Gemüsebrühe flüssig': p(1000, 'ml', 1.29, 365, 5, 'Pck'),
+  Hühnerbrühe: p(7500, 'ml', 2.49, 540, 365, 'Glas', true),
+  'Hühnerbrühe Pulver': p(7500, 'ml', 2.49, 540, 365, 'Glas', true),
+  'Hühnerbrühe Würfel': p(4000, 'ml', 1.19, 540, 540, 'Pck', true),
+  'Hühnerbrühe flüssig': p(1000, 'ml', 1.29, 365, 5, 'Pck'),
+  Rinderbrühe: p(7500, 'ml', 2.49, 540, 365, 'Glas', true),
+  'Rinderbrühe Pulver': p(7500, 'ml', 2.49, 540, 365, 'Glas', true),
+  'Rinderbrühe Würfel': p(4000, 'ml', 1.19, 540, 540, 'Pck', true),
+  'Rinderbrühe flüssig': p(1000, 'ml', 1.29, 365, 5, 'Pck'),
+
+  // ───── Gewürze (nur Status „da“ / „alle“ – die Packung dient der Einkaufsliste) ─────
+  Salz: p(500, 'g', 0.39, 1460, 1460, 'Pck'),
+  Pfeffer: p(50, 'g', 1.49, 730, 730, 'Dose'),
+  'Pfeffer weiß': p(40, 'g', 1.79, 730, 730, 'Dose'),
+  Muskatnuss: p(30, 'g', 1.39, 730, 730, 'Dose'),
+  'Paprikapulver edelsüß': p(50, 'g', 1.29, 730, 730, 'Dose'),
+  'Paprikapulver rosenscharf': p(50, 'g', 1.29, 730, 730, 'Dose'),
+  Kümmel: p(40, 'g', 1.19, 730, 730, 'Dose'),
+  Kreuzkümmel: p(35, 'g', 1.49, 730, 730, 'Dose'),
+  Majoran: p(15, 'g', 0.99, 730, 730, 'Dose'),
+  'Oregano getrocknet': p(15, 'g', 0.99, 730, 730, 'Dose'),
+  Lorbeerblatt: p(10, 'g', 0.99, 730, 730, 'Dose'),
+  Nelke: p(25, 'g', 1.29, 730, 730, 'Dose'),
+  'Zimt gemahlen': p(45, 'g', 1.29, 730, 730, 'Dose'),
+  Zimtstange: p(20, 'g', 1.49, 730, 730, 'Dose'),
+  Sternanis: p(20, 'g', 1.29, 730, 730, 'Dose'),
+  Szechuanpfeffer: p(25, 'g', 1.99, 730, 730, 'Tüte'),
+  'Fünf-Gewürze-Pulver': p(30, 'g', 1.79, 730, 730, 'Dose'),
+  Currypulver: p(40, 'g', 1.29, 730, 730, 'Dose'),
+  'Chili getrocknet': p(15, 'g', 1.29, 730, 730, 'Tüte'),
+  Chiliflocken: p(25, 'g', 1.29, 730, 730, 'Dose'),
+  Wacholderbeere: p(25, 'g', 1.29, 730, 730, 'Dose'),
 }
 
 /** Zutatenspezifische Umrechnungen: Rezepteinheit → Basiseinheit des Produkts */
@@ -392,4 +450,15 @@ export const CONVERT: Record<string, Record<string, number>> = {
   Kopfsalat: { g: 1 / 300 },
   'Gehackte Tomaten': { g: 1 / 400 },
   Kichererbsen: { g: 1 / 240 },
+  // zusammengeführte Schnitzel & Tomate (Stück statt Gramm)
+  Kalbsschnitzel: { g: 1 / 150 },
+  Schweineschnitzel: { g: 1 / 150 },
+  Tomate: { g: 1 / 120 },
+  // Grundzutaten: Löffel & Prisen in die Packungseinheit
+  Honig: { EL: 20, TL: 7 },
+  Zucker: { EL: 12, TL: 4, Prise: 1 },
+  Puderzucker: { EL: 10 },
+  Weizenmehl: { EL: 10 },
+  Speisestärke: { EL: 10, TL: 3 },
+  Backpulver: { TL: 0.3 },
 }

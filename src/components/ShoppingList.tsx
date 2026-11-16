@@ -27,6 +27,9 @@ interface Props {
 
 export { isBought, missingPacks, packText }
 
+/** Warum eine Grundzutat auf der Liste steht */
+const NOTE_TEXT = { knapp: 'wird knapp', leer: 'bald leer', alle: 'ist alle' } as const
+
 export function ShoppingList(props: Props) {
   const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan, haShared, haError, haOnWeek } = props
   const [newName, setNewName] = useState('')
@@ -90,7 +93,10 @@ export function ShoppingList(props: Props) {
                     <label>
                       <input type="checkbox" checked={on} onChange={() => onToggleBuy(it)} />
                       <span className="check" aria-hidden />
-                      <span className="item-name">{it.name}</span>
+                      <span className="item-name">
+                        {it.name}
+                        {it.note && <small className="item-note">{NOTE_TEXT[it.note]}</small>}
+                      </span>
                       <span className="item-amt">
                         {partly ? `noch ${missingPacks(it)} ${it.product.packName ?? 'Stk'}` : packText(it)}
                         <small>{partly ? 'Portionen erhöht' : formatEuro(it.cost)}</small>
@@ -201,6 +207,7 @@ function ItemDetails({ it, onEditPrice }: { it: BuyItem; onEditPrice: (name: str
   const [price, setPrice] = useState(it.product.price.toFixed(2).replace('.', ','))
   return (
     <div className="item-recipes">
+      {it.note === 'alle' ? <div>Du hast „alle“ markiert – abgehakt ist es wieder „da“.</div> : it.required <= 0 ? <div>Nach deinem Verbrauch der letzten Wochen bald leer.</div> : (
       <div>
         Brauchst {formatAmount(it.required, it.unit)}
         {it.fromPantry > 0 && (
@@ -211,7 +218,8 @@ function ItemDetails({ it, onEditPrice }: { it: BuyItem; onEditPrice: (name: str
         )}
         {it.leftover > 0.01 && <> · <b className="accent">{formatAmount(it.leftover, it.unit)} bleiben übrig</b></>}
       </div>
-      <div>Für: {it.recipes.join(' · ')}</div>
+      )}
+      {it.recipes.length > 0 && <div>Für: {it.recipes.join(' · ')}</div>}
       {!editing ? (
         <button className="link small" onClick={() => setEditing(true)}>
           Packung {formatAmount(it.product.pack, it.unit)} für {formatEuro(it.product.price)} ✎ anpassen

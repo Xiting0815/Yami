@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { RECIPE_BY_ID, registerCustom } from './data/recipes'
-import { CATALOG } from './data/catalog'
+import { CATALOG, RENAMED } from './data/catalog'
+import { PRODUCTS } from './data/products'
+import { rememberStaples, sanitizeMemos, sanitizeSpices, type SpiceStatus, type StapleMemos } from './staples'
 import {
   BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, TYPE_LABEL,
   type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type ShopCat, type WeekPlan,
 } from './types'
-import { WASTED_MAX, addDaysIso, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
+import { WASTED_MAX, addDaysIso, toBase, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
 import type { Profile } from './energy'
 import type { WeighIn } from './progress'
 import type { Rating, RejectEvent } from './learning'
@@ -141,6 +143,10 @@ export interface AppState {
   customIngredients: CustomIngredient[]
   /** Zutaten, die du in den Vorrat getippt hast: Name → wie oft (lernt, wofür dir Rezepte fehlen) */
   pantryRequests: Record<string, number>
+  /** Gewürze: Name → „da“ oder „alle“ (nur Gewürze, die du führst) */
+  spices: Record<string, SpiceStatus>
+  /** Mengen-Grundzutaten (Öl, Brühe …), die du führst, mit der zuletzt gehabten Form (gelernt: was gekauft wird) */
+  staples: StapleMemos
   /** Home Assistant (optional) */
   ha?: HaSettings
 }
@@ -172,6 +178,8 @@ const INITIAL: AppState = {
   customRecipes: [],
   customIngredients: [],
   pantryRequests: {},
+  spices: {},
+  staples: {},
 }
 
 const hasData = (s: AppState) =>
@@ -231,6 +239,62 @@ function validRecipe(x: unknown): CustomRecipe | null {
   }
 }
 
+const renameKey = (n: string) => RENAMED[n] ?? n
+
+/** Umbenennungen zusammengeführter Zutaten (RENAMED) in einem gespeicherten Stand nachziehen */
+export function migrateNames(state: AppState): AppState {
+  const keys = (o: Record<string, unknown>) => Object.keys(o).some((k) => k in RENAMED)
+  const rekey = <T,>(o: Record<string, T>, merge: (a: T, b: T) => T): Record<string, T> => {
+    if (!keys(o)) return o
+    const out: Record<string, T> = {}
+    for (const [k, v] of Object.entries(o)) {
+      const nk = renameKey(k)
+      out[nk] = nk in out ? merge(out[nk], v) : v
+    }
+    return out
+  }
+  const next = { ...state }
+  // Vorrat: Menge in die Einheit des neuen Produkts umrechnen (z. B. 400 g Kalbfleisch Schnitzel → Stück)
+  if (Array.isArray(next.pantry) && next.pantry.some((l) => l && l.name in RENAMED)) {
+    next.pantry = next.pantry.map((l) => {
+      if (!l || !(l.name in RENAMED)) return l
+      const name = renameKey(l.name)
+      const prod = PRODUCTS[name]
+      const amount = prod && l.unit !== prod.unit ? toBase(name, l.amount, l.unit, prod) : l.amount
+      return amount == null ? { ...l, name } : { ...l, name, amount, unit: prod ? prod.unit : l.unit }
+    })
+  }
+  if (Array.isArray(next.wasted)) next.wasted = next.wasted.map((w) => (w && w.name in RENAMED ? { ...w, name: renameKey(w.name) } : w))
+  if (Array.isArray(next.customRecipes))
+    next.customRecipes = next.customRecipes.map((r) =>
+      r && Array.isArray(r.ingredients) && r.ingredients.some((i) => i && i.name in RENAMED)
+        ? {
+            ...r,
+            ingredients: r.ingredients.map((i) => {
+              if (!i || !(i.name in RENAMED)) return i
+              const name = renameKey(i.name)
+              const prod = PRODUCTS[name]
+              const amount = i.amount != null && prod && i.unit !== prod.unit ? toBase(name, i.amount, i.unit, prod) : i.amount
+              return amount == null && i.amount != null ? { ...i, name } : { ...i, name, amount, unit: i.amount != null && prod && amount != null ? prod.unit : i.unit }
+            }),
+          }
+        : r,
+    )
+  // selbst eingetragene Preise und Abhak-Stände gelten für die alte Packung/Einheit – bei umbenannten Zutaten verwerfen
+  if (next.prices && typeof next.prices === 'object' && keys(next.prices)) next.prices = Object.fromEntries(Object.entries(next.prices).filter(([k]) => !(k in RENAMED)))
+  if (next.pantryRequests && typeof next.pantryRequests === 'object') next.pantryRequests = rekey(next.pantryRequests, (a, b) => a + b)
+  if (next.bought && typeof next.bought === 'object')
+    next.bought = Object.fromEntries(
+      Object.entries(next.bought).map(([w, m]) => [w, m && typeof m === 'object' ? Object.fromEntries(Object.entries(m).filter(([k]) => !(k in RENAMED))) : m]),
+    )
+  if (next.checked && typeof next.checked === 'object')
+    next.checked = Object.fromEntries(
+      Object.entries(next.checked).map(([w, ks]) => [w, Array.isArray(ks) ? ks.filter((k) => !(typeof k === 'string' && k in RENAMED)) : ks]),
+    )
+  if (next.ha && typeof next.ha === 'object' && next.ha.items) next.ha = { ...next.ha, items: rekey(next.ha.items, (a) => a) }
+  return next
+}
+
 /** Stand aus beliebigen Daten (localStorage oder Sicherungsdatei) machen: falsche Typen verwerfen, Rezepte ohne Eintrag entfernen */
 export function sanitize(parsed: unknown): AppState {
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
@@ -254,6 +318,8 @@ export function sanitize(parsed: unknown): AppState {
     const cs = state.filters.cuisines
     if (cs.includes('de') && cs.includes('it') && cs.includes('as') && !cs.includes('gr')) state.filters = { ...state.filters, cuisines: [...cs, 'gr'] }
   }
+  // zusammengeführte Zutaten (z. B. „Tomaten reif“ → „Tomate“) umbenennen, bevor eigene Rezepte geprüft werden
+  Object.assign(state, migrateNames(state))
   // Eigene Zutaten und Rezepte prüfen und eintragen, bevor der Plan geprüft wird (der Plan darf auf sie zeigen)
   state.customIngredients = state.customIngredients.filter(validIngredient)
   registerCustom(state.customIngredients, [])
@@ -285,6 +351,8 @@ export function sanitize(parsed: unknown): AppState {
       .filter(([k, v]) => typeof v === 'number' && Number.isFinite(v) && v > 0 && k.length <= 60)
       .slice(-200),
   )
+  state.spices = sanitizeSpices(state.spices)
+  state.staples = rememberStaples(sanitizeMemos(state.staples), Array.isArray(state.pantry) ? state.pantry : [])
   state.ha = sanitizeHa(saved.ha)
   if (!state.ha) delete state.ha
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)
@@ -310,6 +378,13 @@ export function useAppState() {
   const [state, setState] = useState<AppState>(load)
   // eigene Zutaten/Rezepte vor dem Rendern in die Verzeichnisse eintragen (auch nach Rückgängig/Import); idempotent
   registerCustom(state.customIngredients, state.customRecipes)
+  // Lernen: welche Grundzutaten (und in welcher Form) im Vorrat geführt werden, merkt sich die App
+  useEffect(() => {
+    setState((s) => {
+      const m = rememberStaples(s.staples, s.pantry)
+      return m === s.staples ? s : { ...s, staples: m }
+    })
+  }, [state.pantry])
   useEffect(() => {
     try {
       localStorage.setItem(KEY, JSON.stringify(state))

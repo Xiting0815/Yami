@@ -1,17 +1,24 @@
 import { useMemo, useState } from 'react'
-import { CATALOG } from '../data/catalog'
+import { CATALOG, SHOP_ALIAS } from '../data/catalog'
 import { PRODUCTS } from '../data/products'
 import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER, type CustomIngredient, type ShopCat } from '../types'
 import { searchIngredients, titleCase } from '../customIngredients'
 import { CAT_DEFAULTS } from '../data/custom-registry'
 import { formatAmount } from '../shopping'
 import { type PantryLot, addDaysIso, daysUntil, uid } from '../kitchen'
+import { SPICE_NAMES, type SpiceStatus, type StapleHint, isBrothBase, isQtyStaple, roughAmount, stapleKey } from '../staples'
 
 interface Props {
   pantry: PantryLot[]
   /** voraussichtlich übrig nach den geplanten Gerichten */
   leftovers: PantryLot[]
   today: string
+  /** gelernt: wie lange reichen Öl, Brühe & Co. noch (Schlüssel = Grundzutat) */
+  hints?: Record<string, StapleHint>
+  /** Gewürze: da / alle */
+  spices?: Record<string, SpiceStatus>
+  /** Gewürz-Status setzen (null = nicht mehr führen) */
+  onSpice?: (name: string, status: SpiceStatus | null) => void
   onChange: (lots: PantryLot[]) => void
   /** Zutat aus dem Katalog hinzugefügt (zählt als „Wunsch“ fürs Lernen) */
   onAdded?: (name: string) => void
@@ -26,8 +33,15 @@ const NEW_CATS = SHOP_ORDER.filter((c) => c !== 'vorrat')
 /** alle Zutaten mit Produktdaten (auch selbst angelegte) – zur Laufzeit, weil eigene Zutaten dazukommen */
 const trackedNames = () =>
   Object.keys(PRODUCTS)
-    .filter((n) => CATALOG[n] && CATALOG[n] !== 'vorrat')
+    .filter((n) => CATALOG[n] && (CATALOG[n] !== 'vorrat' || isQtyStaple(n)) && !isBrothBase(n))
     .sort((a, b) => a.localeCompare(b, 'de'))
+
+/** Packung für die Suche: „1 Glas (ergibt 7,5 l)“, sonst Menge */
+function packHint(name: string): string {
+  const p = PRODUCTS[name]
+  if (p.yields) return `${p.packName ?? 'Pck'} (ergibt ${formatAmount(p.pack, p.unit)})`
+  return formatAmount(p.pack, p.unit)
+}
 
 function expiryText(days: number): string {
   if (days < 0) return days === -1 ? 'seit gestern abgelaufen' : `seit ${-days} Tagen abgelaufen`
@@ -38,8 +52,12 @@ function expiryText(days: number): string {
   return 'lange haltbar'
 }
 
-export function PantryView({ pantry, leftovers, today, onChange, onAdded, onCreate, onCook }: Props) {
+/** Gewürze, die fast jedes Rezept braucht – zum schnellen Antippen */
+const COMMON_SPICES = ['Salz', 'Pfeffer', 'Muskatnuss', 'Paprikapulver edelsüß', 'Majoran', 'Oregano getrocknet']
+
+export function PantryView({ pantry, leftovers, today, hints = {}, spices = {}, onSpice, onChange, onAdded, onCreate, onCook }: Props) {
   const [query, setQuery] = useState('')
+  const [spiceQuery, setSpiceQuery] = useState('')
   /** Formular „neue Zutat anlegen“ */
   const [creating, setCreating] = useState<{ name: string; cat: ShopCat; amount: string; unit: (typeof NEW_UNITS)[number] } | null>(null)
   const sorted = useMemo(() => [...pantry].sort((a, b) => a.expires.localeCompare(b.expires)), [pantry])
@@ -67,9 +85,26 @@ export function PantryView({ pantry, leftovers, today, onChange, onAdded, onCrea
   const hits = q.length >= 2 ? TRACKED.filter((n) => n.toLowerCase().includes(q)) : []
   // erst der unscharfe Abgleich („Creme fraiche“, „Pasta“, „Hack“), dann Treffer am Wortanfang und im Wort
   const fuzzy = q.length >= 3 ? searchIngredients(query, 12).filter((n) => TRACKED.includes(n)) : []
+  const spiceHits = (text: string) => {
+    const t = text.trim().toLowerCase()
+    if (t.length < 2) return []
+    return SPICE_NAMES.filter((n) => !spices[n] && n.toLowerCase().includes(t)).sort(
+      (a, b) => Number(b.toLowerCase().startsWith(t)) - Number(a.toLowerCase().startsWith(t)),
+    )
+  }
   const suggestions = [
     ...new Set([...fuzzy, ...hits.filter((n) => n.toLowerCase().startsWith(q)), ...hits.filter((n) => !n.toLowerCase().startsWith(q))]),
   ].slice(0, 6)
+  const spiceSuggestions = spiceHits(query).slice(0, 3)
+  const spiceSearch = spiceHits(spiceQuery).slice(0, 6)
+  const spiceRows = Object.entries(spices).sort((a, b) => Number(b[1] === 'alle') - Number(a[1] === 'alle') || a[0].localeCompare(b[0], 'de'))
+  const commonLeft = COMMON_SPICES.filter((n) => !spices[n])
+
+  function addSpice(name: string) {
+    onSpice?.(name, 'da')
+    setQuery('')
+    setSpiceQuery('')
+  }
 
   function add(name: string) {
     const p = PRODUCTS[name]
@@ -117,10 +152,10 @@ export function PantryView({ pantry, leftovers, today, onChange, onAdded, onCrea
           }}
           placeholder="➕ Zutat hinzufügen, z. B. Sahne"
         />
-        {suggestions.length === 0 && q.length >= 3 && !creating && CATALOG[titleCase(query)] === 'vorrat' && (
-          <div className="suggest"><p className="muted small pad">Gewürze und Grundzutaten wie „{titleCase(query)}“ musst du nicht eintragen.</p></div>
+        {suggestions.length === 0 && spiceSuggestions.length === 0 && q.length >= 3 && !creating && SHOP_ALIAS[titleCase(query)] && CATALOG[titleCase(query)] === 'vorrat' && (
+          <div className="suggest"><p className="muted small pad">„{titleCase(query)}“ zählt unter „{SHOP_ALIAS[titleCase(query)]}“.</p></div>
         )}
-        {suggestions.length === 0 && q.length >= 3 && !creating && !CATALOG[titleCase(query)] && (
+        {suggestions.length === 0 && spiceSuggestions.length === 0 && q.length >= 3 && !creating && !CATALOG[titleCase(query)] && (
           <div className="suggest">
             <button
               className="new-ing"
@@ -130,11 +165,16 @@ export function PantryView({ pantry, leftovers, today, onChange, onAdded, onCrea
             </button>
           </div>
         )}
-        {suggestions.length > 0 && (
+        {(suggestions.length > 0 || spiceSuggestions.length > 0) && (
           <div className="suggest">
             {suggestions.map((n) => (
               <button key={n} onClick={() => add(n)}>
-                {SHOP_ICON[CATALOG[n]]} {n} <span className="muted small">{formatAmount(PRODUCTS[n].pack, PRODUCTS[n].unit)}</span>
+                {SHOP_ICON[CATALOG[n]]} {n} <span className="muted small">{packHint(n)}</span>
+              </button>
+            ))}
+            {spiceSuggestions.map((n) => (
+              <button key={n} onClick={() => addSpice(n)}>
+                🧂 {n} <span className="muted small">Gewürz · da</span>
               </button>
             ))}
           </div>
@@ -196,11 +236,15 @@ export function PantryView({ pantry, leftovers, today, onChange, onAdded, onCrea
             <ul>
               {g.items.map((l) => {
                 const d = daysUntil(l.expires, today)
+                const key = stapleKey(l.name)
+                const hint = isQtyStaple(l.name) && hints[key] && pantry.find((x) => stapleKey(x.name) === key)?.id === l.id ? hints[key] : undefined
+                const yields = PRODUCTS[l.name]?.yields
                 return (
                   <li key={l.id} className={`lot ${d <= 1 ? 'urgent' : d <= 3 ? 'soon' : ''}`}>
                     <span className="item-name">
                       {l.name}
-                      <small className="exp">{expiryText(d)}</small>
+                      <small className="exp">{yields ? `${roughAmount(l.amount, l.unit)} übrig · ` : ''}{expiryText(d)}</small>
+                      {hint && <small className={`exp ${hint.low ? 'low' : ''}`}>⏳ {key === l.name ? l.name : key} {hint.text}</small>}
                     </span>
                     <span className="lot-amt">
                       <input
@@ -231,6 +275,42 @@ export function PantryView({ pantry, leftovers, today, onChange, onAdded, onCrea
           </section>
         ) : null,
       )}
+
+      <section className="shop-section spices">
+        <h3>🧂 Gewürze</h3>
+        <p className="muted small pad">Nur „da“ oder „alle“ – was „alle“ ist, kommt auf die Einkaufsliste, abgehakt ist es wieder „da“.</p>
+        <div className="pantry-add">
+          <input value={spiceQuery} onChange={(e) => setSpiceQuery(e.target.value)} placeholder="➕ Gewürz hinzufügen, z. B. Muskat" aria-label="Gewürz hinzufügen" />
+          {spiceSearch.length > 0 && (
+            <div className="suggest">
+              {spiceSearch.map((n) => (
+                <button key={n} onClick={() => addSpice(n)}>🧂 {n}</button>
+              ))}
+            </div>
+          )}
+        </div>
+        {spiceRows.length === 0 && commonLeft.length > 0 && (
+          <div className="spice-quick">
+            {commonLeft.map((n) => (
+              <button key={n} className="chip" onClick={() => addSpice(n)}>+ {n}</button>
+            ))}
+          </div>
+        )}
+        {spiceRows.length > 0 && (
+          <ul className="spice-list">
+            {spiceRows.map(([name, st]) => (
+              <li key={name} className={st === 'alle' ? 'empty' : ''}>
+                <span className="item-name">{name}</span>
+                <span className="spice-seg" role="group" aria-label={`Status ${name}`}>
+                  <button className={st === 'da' ? 'on' : ''} aria-pressed={st === 'da'} onClick={() => onSpice?.(name, 'da')}>da</button>
+                  <button className={st === 'alle' ? 'on warn' : ''} aria-pressed={st === 'alle'} onClick={() => onSpice?.(name, 'alle')}>alle</button>
+                </span>
+                <button className="icon-btn tiny" onClick={() => onSpice?.(name, null)} aria-label={`${name} nicht mehr führen`}>✕</button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {rest.length > 0 && (
         <section className="shop-section covered">

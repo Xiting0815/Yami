@@ -23,6 +23,7 @@ import { type AppState, addDays, mondayOf, isoDate, parseIso, shortDate, useAppS
 import { useBackStack } from './useBackStack'
 import { matches } from './filter'
 import { formatAmount, isBought } from './shopping'
+import { isSpice, stapleHints, toggleSpiceBought, useEvents, type SpiceStatus } from './staples'
 import {
   type BuyItem,
   addDaysIso,
@@ -214,17 +215,19 @@ export default function App() {
   const todayMonth = new Date(today + 'T12:00:00').getMonth() + 1
   const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
   const week = useMemo(
-    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth),
-    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients],
+    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices }),
+    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
   )
+  // Lernen: wie lange reichen Öl, Brühe & Co. noch (aus dem Verbrauch der gekochten Gerichte)
+  const hints = useMemo(() => stapleHints(useEvents(state.plan, state.breakfast), state.pantry, today), [state.plan, state.breakfast, state.pantry, today])
   // Einkaufsliste für Home Assistant: immer die „aktuelle“ Woche (ab Samstag die nächste), unabhängig von der angezeigten
   const haKey = defaultMonday(today)
   const haWeek = useMemo(
     () =>
       haKey === weekKey
         ? week
-        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth),
-    [haKey, weekKey, week, state.plan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients],
+        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices }),
+    [haKey, weekKey, week, state.plan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
   )
   const haLocal = useMemo(() => localItems(haWeek.buy), [haWeek])
   const haRef = useRef({ buy: haWeek.buy, key: haKey })
@@ -606,6 +609,17 @@ export default function App() {
   }
 
   function toggleBuy(item: BuyItem, forWeek = weekKey) {
+    // Gewürz: abhaken heißt „wieder da“ (kein Vorratsposten), Abwählen wieder „alle“
+    if (isSpice(item.name)) {
+      setState((s) => {
+        const r = toggleSpiceBought(s.spices, s.bought[forWeek] ?? {}, item.name, item.product.pack)
+        const checked = new Set(s.checked[forWeek] ?? [])
+        if (r.on) checked.add(item.key)
+        else checked.delete(item.key)
+        return { ...s, spices: r.spices, bought: { ...s.bought, [forWeek]: r.bought }, checked: { ...s.checked, [forWeek]: [...checked] } }
+      })
+      return
+    }
     setState((s) => {
       const wk = { ...(s.bought[forWeek] ?? {}) }
       const checked = new Set(s.checked[forWeek] ?? [])
@@ -641,10 +655,15 @@ export default function App() {
     setState((s) => {
       const wk = s.bought[weekKey] ?? {}
       let pantry = s.pantry
-      for (const b of Object.values(wk)) {
+      const spices = { ...s.spices }
+      for (const [name, b] of Object.entries(wk)) {
+        if (b.lotId.startsWith('spice:')) {
+          spices[name] = 'alle'
+          continue
+        }
         pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount - b.amount } : l)).filter((l) => l.amount > 1e-6)
       }
-      return { ...s, pantry, bought: { ...s.bought, [weekKey]: {} }, checked: { ...s.checked, [weekKey]: [] } }
+      return { ...s, spices, pantry, bought: { ...s.bought, [weekKey]: {} }, checked: { ...s.checked, [weekKey]: [] } }
     })
   }
 
@@ -999,6 +1018,16 @@ export default function App() {
           <PantryView
             pantry={state.pantry}
             leftovers={week.leftovers}
+            hints={hints}
+            spices={state.spices}
+            onSpice={(name: string, status: SpiceStatus | null) =>
+              setState((s) => {
+                const spices = { ...s.spices }
+                if (status) spices[name] = status
+                else delete spices[name]
+                return { ...s, spices }
+              })
+            }
             today={today}
             onChange={(pantry) => {
               const removed = state.pantry.find((l) => !pantry.some((x) => x.id === l.id))

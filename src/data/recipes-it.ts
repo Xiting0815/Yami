@@ -601,7 +601,7 @@ export const recipesIt = [
     ], 'Stracciatella soup'),
 
   r('pappa-pomodoro', 'Pappa al Pomodoro', 'it', 'suppe', 40,
-    '500 g Tomaten reif | 1 Dose Geschälte Tomaten | 250 g Toskanisches Brot | 3 Zehe Knoblauch | 1 Bund Basilikum | 500 ml Gemüsebrühe | 5 EL Olivenöl | Salz | Pfeffer',
+    '500 g Tomate | 1 Dose Geschälte Tomaten | 250 g Toskanisches Brot | 3 Zehe Knoblauch | 1 Bund Basilikum | 500 ml Gemüsebrühe | 5 EL Olivenöl | Salz | Pfeffer',
     [
       'Knoblauch im Olivenöl anschwitzen. Frische und geschälte Tomaten zugeben und 15 Minuten köcheln lassen.',
       'Brühe zugeben. Altbackenes Brot in Stücken einlegen und 15 Minuten ziehen lassen.',

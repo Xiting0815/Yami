@@ -12,6 +12,10 @@ export const SUBSTITUTE_GROUPS: Record<string, string[]> = {
   ],
   /** Saure Milchprodukte zum Verfeinern (Sahne gehört nicht dazu) */
   sauerrahm: ['Crème fraîche', 'Schmand', 'Saure Sahne'],
+  /** Brühen: das Rezept nennt die fertige Brühe, im Vorrat liegt Pulver, Würfel oder flüssige Brühe (alles in ml fertiger Brühe) */
+  'brühe-gemüse': ['Gemüsebrühe', 'Gemüsebrühe Pulver', 'Gemüsebrühe Würfel', 'Gemüsebrühe flüssig'],
+  'brühe-huhn': ['Hühnerbrühe', 'Hühnerbrühe Pulver', 'Hühnerbrühe Würfel', 'Hühnerbrühe flüssig'],
+  'brühe-rind': ['Rinderbrühe', 'Rinderbrühe Pulver', 'Rinderbrühe Würfel', 'Rinderbrühe flüssig'],
 }
 
 const GROUP_OF = new Map<string, string>()

@@ -242,7 +242,7 @@ export const recipesDe = [
     ], 'chicken mushroom cream sauce tagliatelle'),
 
   r('zuercher-geschnetzeltes', 'Zürcher Geschnetzeltes mit Rösti', 'de', 'haupt', 45,
-    '400 g Kalbfleisch Schnitzel | 200 g Champignons | 1 Stk Schalotte | 100 ml Weißwein | 200 ml Sahne | 100 ml Kalbsfond | 1 EL Weizenmehl | 2 EL Butterschmalz | 600 g Kartoffeln festkochend | 0.5 Bund Petersilie | Salz | Pfeffer',
+    '400 g Kalbsschnitzel | 200 g Champignons | 1 Stk Schalotte | 100 ml Weißwein | 200 ml Sahne | 100 ml Kalbsfond | 1 EL Weizenmehl | 2 EL Butterschmalz | 600 g Kartoffeln festkochend | 0.5 Bund Petersilie | Salz | Pfeffer',
     [
       'Kartoffeln vorab als Pellkartoffeln kochen, auskühlen lassen und grob raspeln. Salzen, in Butterschmalz zu 2 Rösti formen und von jeder Seite 8 Minuten knusprig braten.',
       'Fleisch in feine Streifen schneiden, leicht mehlieren und portionsweise scharf anbraten. Herausnehmen.',

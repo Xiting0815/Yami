@@ -58,7 +58,7 @@ export const recipesAs = [
     ], 'Beef and broccoli'),
 
   r('hui-guo-rou', 'Twice Cooked Pork (Hui Guo Rou)', 'as', 'haupt', 50,
-    '400 g Schweinebauch | 1 Stk Spitzpaprika grün | 4 Stk Lauchzwiebel dick | 2 EL Doubanjiang | 1 EL Fermentierte schwarze Bohnen | 1 EL Shaoxing-Reiswein | 1 TL Zucker | 15 g Ingwer | 1 EL Sonnenblumenöl | 150 g Jasminreis',
+    '400 g Schweinebauch | 1 Stk Spitzpaprika grün | 8 Stk Frühlingszwiebel | 2 EL Doubanjiang | 1 EL Fermentierte schwarze Bohnen | 1 EL Shaoxing-Reiswein | 1 TL Zucker | 15 g Ingwer | 1 EL Sonnenblumenöl | 150 g Jasminreis',
     [
       'Schweinebauch mit Ingwer in Wasser 20 Minuten köcheln lassen, abkühlen lassen und in hauchdünne Scheiben schneiden.',
       'Im Wok mit wenig Öl braten, bis sich die Scheiben wölben und das Fett austritt.',
@@ -212,7 +212,7 @@ export const recipesAs = [
 
   // ───────────── China – Suppen ─────────────
   r('suan-la-tang', 'Scharf-saure Suppe (Suan La Tang)', 'as', 'suppe', 30,
-    '800 ml Hühnerbrühe | 100 g Schweinefleisch Schnitzel | 150 g Tofu natur | 30 g Mu-Err-Pilze getrocknet | 50 g Bambussprossen | 1 Stk Ei | 3 EL Chinkiang-Essig | 2 EL Sojasauce | 1 TL Pfeffer weiß | 1 TL Chiliöl | 2 EL Speisestärke | 2 Stk Frühlingszwiebel',
+    '800 ml Hühnerbrühe | 100 g Schweineschnitzel | 150 g Tofu natur | 30 g Mu-Err-Pilze getrocknet | 50 g Bambussprossen | 1 Stk Ei | 3 EL Chinkiang-Essig | 2 EL Sojasauce | 1 TL Pfeffer weiß | 1 TL Chiliöl | 2 EL Speisestärke | 2 Stk Frühlingszwiebel',
     [
       'Pilze einweichen und in Streifen schneiden. Fleisch, Tofu und Bambus in feine Streifen schneiden.',
       'Brühe aufkochen, Fleisch, Pilze und Bambus 5 Minuten garen, dann den Tofu zugeben.',

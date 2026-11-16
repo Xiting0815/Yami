@@ -11,10 +11,10 @@ const groups: Record<ShopCat, string[]> = {
     'Feldsalat', 'Frühlingszwiebel', 'Galgant', 'Grüne Bohnen', 'Grünkohl', 'Hokkaido-Kürbis', 'Ingwer',
     'Kaffirlimettenblätter', 'Kartoffeln festkochend', 'Kartoffeln mehligkochend', 'Kirschtomaten', 'Knoblauch',
     'Knollensellerie', 'Kohlrabi', 'Kopfsalat', 'Koriander', 'Kräuter für Grüne Soße', 'Kräuterseitlinge', 'Lauch',
-    'Lauchzwiebel dick', 'Limette', 'Majoran frisch', 'Möhre', 'Pak Choi', 'Paprika gelb', 'Paprika grün',
+    'Limette', 'Majoran frisch', 'Möhre', 'Pak Choi', 'Paprika gelb', 'Paprika grün',
     'Paprika rot', 'Petersilie', 'Rosenkohl', 'Rosmarin', 'Rote Bete gekocht', 'Rotkohl', 'Rucola', 'Salatgurke',
     'Salbei', 'Schalotte', 'Schnittlauch', 'Schwarzkohl', 'Shiitake', 'Sojasprossen', 'Spargel weiß',
-    'Spitzpaprika grün', 'Staudensellerie', 'Steckrübe', 'Thai-Basilikum', 'Thymian', 'Tomate', 'Tomaten reif',
+    'Spitzpaprika grün', 'Staudensellerie', 'Steckrübe', 'Thai-Basilikum', 'Thymian', 'Tomate',
     'Weißkohl', 'Wirsing', 'Orange', 'Zitrone', 'Zitrone unbehandelt', 'Zitronengras', 'Zucchini', 'Zuckerschoten', 'Zwiebel',
     'Zwiebel rot',
   ],
@@ -51,14 +51,14 @@ const groups: Record<ShopCat, string[]> = {
     'Bacon', 'Blutwurst', 'Bockwurst', 'Bratwurst', 'Cabanossi', 'Doradenfilet', 'Fleischwurst', 'Guanciale',
     'Gänsekeule', 'Entenbrust', 'Entenkeule', 'Gyros-Fleisch gewürzt', 'Kalbsbraten',
     'Hackfleisch gemischt', 'Hähnchenbrustfilet', 'Hähnchenflügel', 'Hähnchenschenkel', 'Hähnchenschenkelfilet',
-    'Kabeljaufilet', 'Kalbfleisch Schnitzel', 'Kalbsbrät', 'Kalbshaxe in Scheiben', 'Kalbskotelett', 'Kalbsleber',
+    'Kabeljaufilet', 'Kalbsbrät', 'Kalbshaxe in Scheiben', 'Kalbskotelett', 'Kalbsleber',
     'Kalbsschnitzel', 'Kalbsschnitzel klein', 'Kasseler Kotelett', 'Kasseler Nacken', 'Katenschinken', 'Kochschinken',
     'Lachsfilet', 'Lammschulter', 'Leberkäse', 'Markknochen', 'Matjesfilet', 'Mettenden', 'Miesmuscheln',
     'Nordseekrabben', 'Nürnberger Rostbratwürstchen', 'Pancetta', 'Parmaschinken', 'Pinkelwurst', 'Rinderbeinscheibe',
     'Rinderbraten aus der Keule', 'Rindergulasch', 'Rinderhackfleisch', 'Rinderhüfte', 'Rinderleber', 'Rinderroulade',
     'Rinderroulade dünn', 'Rollmops', 'Rumpsteak', 'Salami', 'Salami piccante', 'Salsiccia', 'Scholle küchenfertig',
     'Schweinebauch', 'Schweinebauch dünn geschnitten', 'Schweinebauch geräuchert', 'Schweinefilet',
-    'Schweinefleisch Schnitzel', 'Schweinegulasch', 'Schweinehackfleisch', 'Schweinekotelett', 'Schweinenacken',
+    'Schweinegulasch', 'Schweinehackfleisch', 'Schweinekotelett', 'Schweinenacken',
     'Schweineschnitzel', 'Schweineschnitzel klein', 'Schweineschulter mit Schwarte', 'Schweinshaxe hinten',
     'Seelachsfilet', 'Speckwürfel', 'Suppenfleisch Rind', 'Tafelspitz', 'Venusmuscheln', 'Wiener Würstchen',
   ],
@@ -77,7 +77,29 @@ const groups: Record<ShopCat, string[]> = {
     'Sojasauce', 'Sojasauce dunkel', 'Sonnenblumenöl', 'Speisestärke', 'Sternanis', 'Szechuanpfeffer',
     'Tomatenketchup', 'Vanillezucker', 'Wacholderbeere', 'Weißweinessig', 'Weizenmehl', 'Worcestersauce', 'Zimtstange',
     'Zucker',
+    'Gemüsebrühe Pulver', 'Gemüsebrühe Würfel', 'Gemüsebrühe flüssig',
+    'Hühnerbrühe Pulver', 'Hühnerbrühe Würfel', 'Hühnerbrühe flüssig',
+    'Rinderbrühe Pulver', 'Rinderbrühe Würfel', 'Rinderbrühe flüssig',
   ],
+}
+
+/**
+ * Grundzutaten (Kategorie "vorrat") gibt es in zwei Arten:
+ * – Mengen-Grundzutaten (Öl, Brühe, Mehl, Zucker, Saucen …): wie normale Zutaten im Vorrat mit Menge geführt
+ * – Gewürze: nur Status „da“ / „alle“, ohne Mengen
+ */
+export const SPICES = new Set([
+  'Salz', 'Pfeffer', 'Pfeffer schwarz grob', 'Pfeffer weiß', 'Pfefferkörner', 'Muskatnuss', 'Paprikapulver edelsüß',
+  'Paprikapulver rosenscharf', 'Kümmel', 'Kümmel gemahlen', 'Kreuzkümmel', 'Majoran', 'Oregano getrocknet', 'Lorbeerblatt',
+  'Nelke', 'Zimt gemahlen', 'Zimtstange', 'Sternanis', 'Szechuanpfeffer', 'Fünf-Gewürze-Pulver', 'Currypulver',
+  'Chili getrocknet', 'Chiliflocken', 'Wacholderbeere',
+])
+
+/** Brühen: Rezeptname → Formen im Vorrat (Pulver, Würfel, flüssig – alles in ml fertiger Brühe) */
+export const BROTH_FORMS: Record<string, string[]> = {
+  Gemüsebrühe: ['Gemüsebrühe Pulver', 'Gemüsebrühe Würfel', 'Gemüsebrühe flüssig'],
+  Hühnerbrühe: ['Hühnerbrühe Pulver', 'Hühnerbrühe Würfel', 'Hühnerbrühe flüssig'],
+  Rinderbrühe: ['Rinderbrühe Pulver', 'Rinderbrühe Würfel', 'Rinderbrühe flüssig'],
 }
 
 export const CATALOG: Record<string, ShopCat> = {}
@@ -93,6 +115,23 @@ export const SHOP_ALIAS: Record<string, string> = {
   'Kalbsschnitzel klein': 'Kalbsschnitzel',
   'Schweineschnitzel klein': 'Schweineschnitzel',
   'Zitrone unbehandelt': 'Zitrone',
+  // Gewürz-Varianten teilen sich einen Status / eine Packung
+  'Pfeffer schwarz grob': 'Pfeffer',
+  Pfefferkörner: 'Pfeffer',
+  'Kümmel gemahlen': 'Kümmel',
+  // Frittieröl ist Sonnenblumenöl
+  Frittieröl: 'Sonnenblumenöl',
+}
+
+/**
+ * Zusammengeführte Doppelungen (alter Name → neuer Name). Gespeicherte Stände (Vorrat, eigene Rezepte,
+ * Preise …) werden beim Laden umbenannt; Mengen rechnet die App in die Einheit des neuen Produkts um.
+ */
+export const RENAMED: Record<string, string> = {
+  'Kalbfleisch Schnitzel': 'Kalbsschnitzel',
+  'Schweinefleisch Schnitzel': 'Schweineschnitzel',
+  'Tomaten reif': 'Tomate',
+  'Lauchzwiebel dick': 'Frühlingszwiebel',
 }
 
 /** Nicht-vegetarische Zutaten außerhalb der Fleisch/Fisch-Kategorie */
@@ -100,4 +139,6 @@ export const NON_VEG = new Set([
   'Corned Beef', 'Sardellenfilet', 'Thunfisch in Olivenöl', 'Fischsauce', 'Austernsauce', 'Garnelenpaste',
   'Rinderfond', 'Kalbsfond', 'Fischfond', 'Hühnerbrühe', 'Rinderbrühe', 'Garnelen roh TK', 'Jiaozi-Teigblätter TK',
   'Schweineschmalz',
+  'Hühnerbrühe Pulver', 'Hühnerbrühe Würfel', 'Hühnerbrühe flüssig',
+  'Rinderbrühe Pulver', 'Rinderbrühe Würfel', 'Rinderbrühe flüssig',
 ])

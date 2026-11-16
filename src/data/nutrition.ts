@@ -45,7 +45,6 @@ export const NUTRI: Record<string, N> = {
   'Kräuter für Grüne Soße': [35, 3, 0.6, 3, 3],
   Kräuterseitlinge: [35, 2.5, 0.4, 4, 2.3],
   Lauch: [31, 1.5, 0.3, 6, 2.2],
-  'Lauchzwiebel dick': [32, 1.8, 0.2, 5, 2.6],
   Limette: [30, 0.7, 0.2, 8, 2.8],
   'Majoran frisch': [40, 3, 1, 4, 4],
   Möhre: [41, 0.9, 0.2, 7, 2.8],
@@ -73,7 +72,6 @@ export const NUTRI: Record<string, N> = {
   'Thai-Basilikum': [23, 3.2, 0.6, 1, 1.6],
   Thymian: [100, 5, 2, 10, 14],
   Tomate: [18, 0.9, 0.2, 3, 1.2],
-  'Tomaten reif': [18, 0.9, 0.2, 3, 1.2],
   Weißkohl: [25, 1.3, 0.1, 4, 2.5],
   Wirsing: [31, 3, 0.4, 3, 2.6],
   Zitrone: [29, 1.1, 0.3, 3, 2.8],
@@ -286,7 +284,6 @@ export const NUTRI: Record<string, N> = {
   'Gyros-Fleisch gewürzt': [190, 19, 12, 1, 0],
   Kalbsbraten: [110, 20, 3, 0, 0],
   Kabeljaufilet: [80, 18, 0.7, 0, 0],
-  'Kalbfleisch Schnitzel': [110, 21, 2, 0, 0],
   Kalbsbrät: [230, 13, 20, 1, 0],
   'Kalbshaxe in Scheiben': [110, 15, 5, 0, 0],
   Kalbskotelett: [130, 18, 6, 0, 0],
@@ -327,7 +324,6 @@ export const NUTRI: Record<string, N> = {
   'Schweinebauch dünn geschnitten': [330, 15, 30, 0, 0],
   'Schweinebauch geräuchert': [330, 15, 30, 0, 0],
   Schweinefilet: [110, 21, 2, 0, 0],
-  'Schweinefleisch Schnitzel': [110, 22, 2, 0, 0],
   Schweinegulasch: [150, 20, 8, 0, 0],
   Schweinehackfleisch: [260, 17, 21, 0, 0],
   Schweinekotelett: [180, 18, 12, 0, 0],
@@ -410,11 +406,14 @@ export const NUTRI: Record<string, N> = {
   Zucker: [400, 0, 0, 100, 0],
 }
 
+// Brühen als Pulver, Würfel oder flüssig: Nährwerte je ml fertiger Brühe wie die Rezept-Brühe
+for (const b of ['Gemüsebrühe', 'Hühnerbrühe', 'Rinderbrühe']) for (const f of ['Pulver', 'Würfel', 'flüssig']) NUTRI[`${b} ${f}`] = NUTRI[b]
+
 /** Gramm pro Einheit, zutatenspezifisch (sonst gelten die Standardwerte unten) */
 export const GRAMS: Record<string, Record<string, number>> = {
   Ananas: {}, Apfel: { Stk: 180 }, 'Apfel säuerlich': { Stk: 180 }, Aubergine: { Stk: 300 }, Banane: { Stk: 120 },
   Birne: { Stk: 180 }, Blumenkohl: { Stk: 800 }, Chicorée: { Stk: 120 }, 'Chili rot': { Stk: 15 },
-  Frühlingszwiebel: { Stk: 20 }, 'Lauchzwiebel dick': { Stk: 40 }, Kohlrabi: { Stk: 250 }, Kopfsalat: { Stk: 300 },
+  Frühlingszwiebel: { Stk: 20 }, Kohlrabi: { Stk: 250 }, Kopfsalat: { Stk: 300 },
   Lauch: { Stk: 200 }, Limette: { Stk: 60 }, Möhre: { Stk: 100 }, 'Paprika gelb': { Stk: 160 }, 'Paprika grün': { Stk: 160 },
   'Paprika rot': { Stk: 160 }, Salatgurke: { Stk: 400 }, Schalotte: { Stk: 30 }, 'Spitzpaprika grün': { Stk: 80 },
   Staudensellerie: { Stk: 40 }, Tomate: { Stk: 120 }, Weißkohl: { Stk: 1500 }, Zitrone: { Stk: 60 },

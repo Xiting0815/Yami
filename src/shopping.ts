@@ -53,6 +53,8 @@ export const missingPacks = (it: BuyItem) => Math.max(0, it.packs - Math.round(i
 
 export function packText(it: BuyItem): string {
   const { packs, product: p } = it
+  // Brühpulver & -würfel: die Packung „ergibt“ eine Menge fertiger Brühe
+  if (p.yields) return packs === 1 ? `1 ${p.packName ?? 'Pck'} (ergibt ${formatAmount(p.pack, p.unit)})` : `${packs} ${p.packName ?? 'Pck'} (je ${formatAmount(p.pack, p.unit)})`
   if (!p.packName) return formatAmount(packs * p.pack, p.unit)
   return p.pack === 1 ? `${packs} ${p.packName}` : `${packs} ${p.packName} (${formatAmount(p.pack, p.unit)})`
 }
