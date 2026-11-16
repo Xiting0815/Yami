@@ -36,10 +36,11 @@ const PRIOR_FEATURE = 4
 const PROTEIN_RULES: [RegExp, string][] = [
   [/hack/i, 'Hackfleisch'],
   [/lachs|kabeljau|seelachs|dorade|scholle|matjes|rollmops|garnel|krabben|muschel|thunfisch|sardell/i, 'Fisch'],
-  [/hähnchen|huhn|ente/i, 'Geflügel'],
+  [/hähnchen|huhn|ente|gans|gänse/i, 'Geflügel'],
   [/rind|tafelspitz|rumpsteak|suppenfleisch|corned/i, 'Rind'],
   [/kalb/i, 'Kalb'],
   [/lamm/i, 'Lamm'],
+  [/gyros/i, 'Schwein'],
   [/wurst|würstchen|mettend|cabanossi|salami|salsiccia|leberkäse|pinkel|bockwurst/i, 'Wurst'],
   [/schwein|kasseler|speck|bacon|schinken|guanciale|pancetta|bauch|haxe/i, 'Schwein'],
 ]

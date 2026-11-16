@@ -1,4 +1,4 @@
-import type { BreakfastType, Cuisine, DishType, Ingredient } from '../types'
+import type { BreakfastType, Cuisine, DishType, Festive, Ingredient } from '../types'
 
 /** Erlaubte Einheiten. Die Reihenfolge ist egal, Schreibweise zählt. */
 export const UNITS = [
@@ -17,6 +17,8 @@ export interface RawRecipe {
   img?: string
   /** Basis-Portionen der Mengenangaben (Abendessen 2, Frühstück 1) */
   servings?: number
+  /** Festtagsgericht (Zeitfenster) */
+  festive?: Festive[]
   breakfast?: { type: BreakfastType; fridgeDays: number; freezer: boolean; container: string; morning: string }
 }
 
@@ -86,4 +88,9 @@ export function b(
     servings: 1,
     breakfast: { type, fridgeDays, freezer, container, morning },
   }
+}
+
+/** Rezept als Festtagsgericht markieren */
+export function fest(rec: RawRecipe, ...windows: Festive[]): RawRecipe {
+  return { ...rec, festive: windows }
 }

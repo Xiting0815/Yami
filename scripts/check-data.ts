@@ -33,7 +33,7 @@ for (const n of Object.keys(CATALOG)) if (!used.has(n)) console.warn('Unbenutzt 
 const by = (k: string) => RAW_RECIPES.filter((r) => r.cuisine === k).length
 const byType: Record<string, number> = {}
 for (const r of RAW_RECIPES) byType[r.type] = (byType[r.type] ?? 0) + 1
-console.log(`${RAW_RECIPES.length} Rezepte – DE ${by('de')}, IT ${by('it')}, AS ${by('as')}`, byType)
+console.log(`${RAW_RECIPES.length} Rezepte – DE ${by('de')}, IT ${by('it')}, AS ${by('as')}, GR ${by('gr')}`, byType)
 // Frühstücksziele: satt & leicht
 for (const r of BREAKFASTS) {
   const n = r.nutrition

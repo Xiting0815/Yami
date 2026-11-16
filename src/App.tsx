@@ -285,6 +285,7 @@ export default function App() {
           const ins = insight(r, state.defaultServings, week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
             freshDays: freshDays,
             month: swipeMonth,
+            day: swipeDay,
           })
           const pref = preference(taste, r, swipeDay)
           const bonus = proteinHigh ? proteinBoost(r.nutrition.protein) : 0

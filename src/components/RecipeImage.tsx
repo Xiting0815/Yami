@@ -8,7 +8,7 @@ const EMOJI: Record<Recipe['type'], string> = {
   auflauf: '🧀',
 }
 
-const HUE: Record<Recipe['cuisine'], number> = { de: 28, it: 4, as: 340 }
+const HUE: Record<Recipe['cuisine'], number> = { de: 28, it: 4, as: 340, gr: 205 }
 
 export function RecipeImage({ recipe, className }: { recipe: Recipe; className?: string }) {
   if (recipe.image) {

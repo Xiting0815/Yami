@@ -4,6 +4,7 @@ import type { RawRecipe } from './define'
 import { recipesDe } from './recipes-de'
 import { recipesIt } from './recipes-it'
 import { recipesAs } from './recipes-as'
+import { recipesGr } from './recipes-gr'
 import { breakfasts } from './breakfasts'
 import { nutritionOf } from './nutrition-calc'
 import { registerCustomIngredients } from './custom-registry'
@@ -12,7 +13,7 @@ import imageMap from './images.json'
 const images = imageMap as unknown as Record<string, { file: string } | null | undefined>
 
 /** Abendessen (Rohdaten) */
-export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs]
+export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs, ...recipesGr]
 /** Frühstücke (Rohdaten) */
 export const RAW_BREAKFASTS = breakfasts
 
@@ -31,6 +32,7 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
     steps: r.steps,
     vegetarian: !r.ingredients.some((i) => CATALOG[i.name] === 'fleisch' || NON_VEG.has(i.name)),
     image: images[r.id]?.file,
+    festive: r.festive,
     nutrition: nutritionOf(r.ingredients, servings),
   }
 }

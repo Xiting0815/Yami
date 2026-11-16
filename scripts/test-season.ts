@@ -38,5 +38,22 @@ console.log(`  Spargel weiß 500 g: November ${pNov} €, Mai ${pMay} €, ohne 
 ok(pNov > pMay, 'Spargel weiß im November teurer als im Mai')
 ok(productFor('Kartoffeln festkochend', {}, 11)!.price === productFor('Kartoffeln festkochend')!.price, 'Kartoffeln: Preis unverändert')
 
+// Festtage (Fenster: Martini 1.–15. Nov., Weihnachten 15. Nov.–31. Dez.)
+{
+  const goose = RECIPE_BY_ID['gaensekeulen-rotkohl']
+  const duck = RECIPE_BY_ID['entenbrust-orangensauce']
+  const plain = RECIPE_BY_ID['gruenkohl']
+  const sc = (r: typeof goose, d: string) => insight(r, 2, [], d, {}, new Map(), 0, [], { month: Number(d.slice(5, 7)), day: d })
+  ok(!!goose && !!duck, 'Festtags-Rezepte vorhanden')
+  ok(sc(goose, '2026-11-05').festive?.label?.includes('Martinsgans') === true, 'Gans am 5.11.: Martinsgans-Badge')
+  ok(sc(goose, '2026-12-20').festive?.label?.includes('Weihnachtszeit') === true, 'Gans am 20.12.: Weihnachts-Badge')
+  ok(sc(duck, '2026-12-20').festive?.active === true, 'Ente am 20.12. im Fenster')
+  ok(sc(duck, '2026-11-05').festive?.active === false, 'Ente am 5.11. außerhalb des Fensters')
+  ok(sc(goose, '2026-03-10').festive?.active === false, 'Gans im März außerhalb')
+  const dIn = sc(duck, '2026-12-20').score, dOut = sc(duck, '2026-03-10').score
+  ok(dIn - dOut >= 10, `Ente: Score im Fenster (${dIn.toFixed(1)}) mindestens 10 über außerhalb (${dOut.toFixed(1)})`)
+  ok(sc(plain, '2026-12-20').festive === undefined, 'Normales Gericht ohne Festtagsbezug')
+}
+
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')
 if (fails) process.exit(1)

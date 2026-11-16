@@ -32,6 +32,7 @@ export function InsightBadges({ ins }: { ins?: Insight }) {
         <span className="badge eco">♻️ {others.length === 1 ? others[0] : `${others.length} Zutaten`} aus dem Vorrat</span>
       )}
       <span className="badge">🛒 {ins.buyCost < 0.01 ? 'nichts einkaufen' : `+${formatEuro(ins.buyCost)}`}</span>
+      {ins.festive?.active && ins.festive.label && <span className="badge eco">{ins.festive.label}</span>}
       {ins.season?.out.length ? (
         <span className="badge warn">❄️ keine Saison: {ins.season.out.slice(0, 2).join(', ')}{ins.season.out.length > 2 ? ' …' : ''}</span>
       ) : ins.season?.peak.length ? (

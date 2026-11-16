@@ -383,4 +383,15 @@ export const recipesAs = [
       'Schnitzel salzen, mehlieren und durch Ei und Panko ziehen. In 2 cm Öl je Seite 3 Minuten goldbraun ausbacken.',
       'Schnitzel in Streifen schneiden und mit Curry und Reis anrichten.',
     ], 'Katsu curry'),
+
+  // ───────────── Festtag ─────────────
+  r('knusprige-ente-suess-sauer', 'Knusprige Ente süß-sauer mit Ananas und Reis', 'as', 'haupt', 100,
+    '2 Stk Entenkeule | 20 g Ingwer | 1 TL Fünf-Gewürze-Pulver | 2 EL Shaoxing-Reiswein | 2 EL Sojasauce | 2 EL Speisestärke | 500 ml Frittieröl | 1 Stk Paprika rot | 1 Stk Paprika grün | 200 g Ananas | 1 Stk Zwiebel | 3 EL Tomatenketchup | 3 EL Reisessig | 2 EL Zucker | 1 TL Sojasauce | 200 g Jasminreis | Salz',
+    [
+      'Entenkeulen mit Salz, Fünf-Gewürze-Pulver, Reiswein, Sojasauce und Ingwerscheiben einreiben und 30 Minuten marinieren. Anschließend im Dampf oder zugedeckt im Ofen bei 160 °C 75 Minuten garen, bis das Fleisch sehr zart ist.',
+      'Keulen abkühlen lassen, trocken tupfen, mit Stärke bestäuben und im heißen Öl (170 °C) 5 bis 6 Minuten knusprig ausbacken. Dann in Stücke schneiden. Reis kochen.',
+      'Paprika, Ananas und Zwiebel in Stücke schneiden. Ketchup, Essig, Zucker, Sojasauce und 100 ml Wasser verrühren.',
+      'Gemüse im Wok in wenig Öl 2 Minuten anbraten, Soße zugeben und aufkochen. Mit etwas angerührter Stärke leicht binden.',
+      'Entenstücke auf Reis anrichten und die Soße darübergeben.',
+    ], 'crispy duck sweet and sour'),
 ]

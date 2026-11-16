@@ -8,7 +8,7 @@ import { CATALOG, SHOP_ALIAS } from './data/catalog'
 import { CONVERT, PRODUCTS, type Product } from './data/products'
 import { inSeason, seasonOf } from './data/season'
 import { RECIPE_BY_ID } from './data/recipes'
-import type { PlanEntry, Recipe, ShopCat, WeekPlan } from './types'
+import type { Festive, PlanEntry, Recipe, ShopCat, WeekPlan } from './types'
 
 export interface PantryLot {
   id: string
@@ -378,6 +378,8 @@ export function planWeek(
 // ───────────── Empfehlungen ─────────────
 
 export interface Insight {
+  /** Festtagsgericht: im Fenster (mit Badge-Text) oder außerhalb */
+  festive?: { active: boolean; label?: string }
   /** Saisonbezug (nur mit Monat): Zutaten außerhalb / innerhalb der Saison */
   season?: { out: string[]; peak: string[] }
   /** Zutaten, die (teilweise) aus dem Vorrat kommen */
@@ -410,7 +412,27 @@ const PERISHABLE_DAYS = 7
 /** Alltagsprodukte, deren Rest im Haushalt praktisch immer aufgebraucht wird (oder sich einfrieren lässt) */
 const WASTE_EXEMPT = new Set(['Milch', 'Vollkornbrot', 'Toastbrot', 'Weißbrot', 'Brötchen vom Vortag', 'Ciabatta', 'Zitrone', 'Limette'])
 
+/** Festtags-Fenster als [Monat-Tag von, bis] (inklusive) */
+const FESTIVE_WINDOW: Record<Festive, [string, string]> = {
+  martini: ['11-01', '11-30'],
+  weihnachten: ['12-01', '12-26'],
+}
+const FESTIVE_BADGE: Record<Festive, string> = { martini: '🪿 Martinsgans-Zeit', weihnachten: '🎄 Passt zur Weihnachtszeit' }
+/** Bonus im Festtags-Fenster / Abzug außerhalb */
+export const FESTIVE_BOOST = 11
+export const FESTIVE_PENALTY = 4
+
+/** Festtagsbezug eines Gerichts am Kochtag (ISO-Datum): im Fenster (Badge-Text) oder außerhalb */
+export function festiveOf(recipe: Recipe, iso: string): { active: boolean; label?: string } | undefined {
+  if (!recipe.festive?.length) return undefined
+  const md = iso.slice(5, 10)
+  const hit = recipe.festive.find((w) => md >= FESTIVE_WINDOW[w][0] && md <= FESTIVE_WINDOW[w][1])
+  return hit ? { active: true, label: FESTIVE_BADGE[hit] } : { active: false }
+}
+
 export interface InsightOptions {
+  /** Kochtag (ISO-Datum) für Festtags-Fenster; Standard: heute */
+  day?: string
   /** Tage zwischen Einkauf und Kochtag (für die Frische, nur Abendessen) */
   freshDays?: number
   /** Monat (1–12) des Kochtags: Saisonbezug und Saisonpreise */
@@ -504,8 +526,12 @@ export function insight(
   // Saison: Gerichte mit Zutaten außerhalb der Saison nach hinten, saisonale leicht nach vorne
   const season = opts.month != null ? seasonOf(recipe, opts.month) : undefined
   const seasonScore = season ? (season.out.length > 0 ? -3 : season.peak.length > 0 ? 1 : 0) : 0
+  const festive = festiveOf(recipe, opts.day ?? today)
+  // im Fenster: der Preis des Festessens zählt nur noch halb – es kommt nach vorn, ohne den Stapel zu dominieren
+  const festiveScore = festive ? (festive.active ? FESTIVE_BOOST + buyCost * 0.18 : -FESTIVE_PENALTY) : 0
   const score =
     seasonScore +
+    festiveScore +
     pantryScore * 2 -
     buyCost * 0.25 +
     jitter * 4 -
@@ -516,7 +542,7 @@ export function insight(
     freshPenalty +
     longBonus
   const cost = recipeCost(recipe, servings, overrides)
-  return { season, fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, waste, wasteEuro, stale, longLasting, score }
+  return { season, festive, fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, waste, wasteEuro, stale, longLasting, score }
 }
 
 /** Wann wurde ein Rezept zuletzt geplant (vor dem angegebenen Datum)? */

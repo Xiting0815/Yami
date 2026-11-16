@@ -1,4 +1,4 @@
-import { r } from './define'
+import { fest, r } from './define'
 
 // Deutsche Küche – alle Mengen für 2 Portionen
 export const recipesDe = [
@@ -818,4 +818,117 @@ export const recipesDe = [
       'Kartoffeln und Lauch-Wurst-Mischung in eine Form schichten. Sahne und Brühe würzen und darüber gießen.',
       'Mit Käse bestreuen und bei 190 °C 45 Minuten backen.',
     ], 'Kartoffel-Lauch-Auflauf'),
+
+  // ───────────── Festtage & Klassiker ─────────────
+  fest(r('gaensekeulen-rotkohl', 'Gänsekeulen mit Rotkohl und Kartoffelklößen', 'de', 'haupt', 190,
+    '2 Stk Gänsekeule | 2 Stk Zwiebel | 1 Stk Apfel | 1 Stk Orange | 2 TL Majoran | 200 ml Rotwein | 300 ml Rinderfond | 800 g Rotkohl | 1 Stk Apfel säuerlich | 2 EL Rotweinessig | 1 EL Zucker | 1 Blatt Lorbeerblatt | 2 Stk Nelke | 1 Pck Kartoffelknödel halb und halb | 1 EL Speisestärke | 1 EL Butterschmalz | Salz | Pfeffer',
+    [
+      'Gänsekeulen waschen, trocken tupfen, mit Salz, Pfeffer und Majoran einreiben. Die Haut mit einer Gabel mehrfach einstechen, damit das Fett austreten kann.',
+      'Keulen mit der Hautseite nach unten in einem Bräter in Butterschmalz anbraten, wenden und herausnehmen. Zwiebeln, Apfel und Orange in Stücken im Fett leicht anrösten und mit Rotwein ablöschen.',
+      'Fond angießen, Keulen mit der Haut nach oben einlegen und im Ofen bei 160 °C zugedeckt 2 Stunden schmoren. Anschließend ohne Deckel bei 200 °C 20 bis 25 Minuten kross braten.',
+      'Rotkohl fein hobeln, mit gewürfeltem Apfel, Essig, Zucker, Lorbeer, Nelken und 100 ml Wasser ca. 45 Minuten weich schmoren und abschmecken.',
+      'Klöße nach Packungsanweisung in siedendem Wasser garen. Bratensatz durch ein Sieb passieren, entfetten und mit angerührter Stärke zur Soße binden. Alles zusammen servieren.',
+    ], 'roast goose leg red cabbage dumplings'), 'martini', 'weihnachten'),
+
+  fest(r('entenbrust-orangensauce', 'Entenbrust mit Orangensauce, Rotkohl und Kartoffelgratin', 'de', 'haupt', 90,
+    '350 g Entenbrust | 2 Stk Orange | 1 EL Honig | 100 ml Kalbsfond | 2 EL Butter | 400 g Rotkohl | 1 Stk Apfel säuerlich | 1 EL Rotweinessig | 1 TL Zucker | 500 g Kartoffeln festkochend | 150 ml Sahne | 1 Zehe Knoblauch | 50 g Gruyère | Muskatnuss | Salz | Pfeffer',
+    [
+      'Kartoffeln in dünne Scheiben hobeln, in eine gebutterte Form schichten, mit Sahne, Knoblauch, Salz, Pfeffer und Muskat übergießen, mit Gruyère bestreuen und bei 180 °C 45 Minuten backen.',
+      'Rotkohl fein hobeln, mit gewürfeltem Apfel, Essig, Zucker, Salz und 80 ml Wasser 35 Minuten weich schmoren.',
+      'Die Haut der Entenbrust rautenförmig einritzen, salzen und pfeffern. Mit der Hautseite nach unten in eine kalte Pfanne legen, langsam erhitzen und 8 bis 10 Minuten knusprig auslassen. Wenden, 4 Minuten braten und dann 5 Minuten im 160 °C warmen Ofen fertig garen. Ruhen lassen.',
+      'Für die Soße den Saft von 1 Orange mit Honig und Fond einkochen, mit kalter Butter aufschlagen. Die zweite Orange filetieren und kurz in der Soße erwärmen.',
+      'Entenbrust aufschneiden und mit Soße, Rotkohl und Gratin servieren.',
+    ], 'duck breast orange sauce'), 'weihnachten'),
+
+  fest(r('entenkeulen-rotkohl', 'Knusprige Entenkeulen mit Rotkohl und Klößen', 'de', 'haupt', 140,
+    '2 Stk Entenkeule | 2 Stk Zwiebel | 1 Stk Apfel | 1 TL Majoran | 150 ml Rotwein | 200 ml Rinderfond | 600 g Rotkohl | 1 Stk Apfel säuerlich | 2 EL Rotweinessig | 1 EL Zucker | 1 Blatt Lorbeerblatt | 1 Pck Kartoffelknödel halb und halb | 1 EL Speisestärke | Salz | Pfeffer',
+    [
+      'Entenkeulen salzen, pfeffern und mit Majoran einreiben. Haut mehrfach einstechen.',
+      'Keulen mit Zwiebelspalten und Apfelstücken in einen Bräter legen, Rotwein und Fond angießen und zugedeckt bei 170 °C 75 Minuten schmoren.',
+      'Deckel abnehmen, die Hitze auf 210 °C erhöhen und weitere 25 Minuten braten, bis die Haut knusprig ist.',
+      'Rotkohl fein hobeln und mit Apfel, Essig, Zucker, Lorbeer und 100 ml Wasser ca. 45 Minuten schmoren. Klöße nach Packungsanweisung garen.',
+      'Bratensud passieren, entfetten, mit angerührter Stärke binden und abschmecken. Alles zusammen anrichten.',
+    ], 'roast duck legs red cabbage'), 'weihnachten'),
+
+  r('kalbsbraten-rahmsauce', 'Kalbsbraten mit Rahmsauce und Spätzle', 'de', 'haupt', 120,
+    '800 g Kalbsbraten | 1 Stk Zwiebel | 1 Stk Möhre | 2 EL Butterschmalz | 150 ml Weißwein | 200 ml Kalbsfond | 150 ml Sahne | 200 g Champignons | 400 g Spätzle frisch | 1 EL Butter | 1 TL Speisestärke | Salz | Pfeffer',
+    [
+      'Kalbsbraten salzen und pfeffern und in Butterschmalz im Bräter rundum anbraten. Zwiebel und Möhre würfeln, kurz mitrösten und mit Weißwein ablöschen.',
+      'Fond angießen und den Braten zugedeckt bei 160 °C ca. 75 Minuten garen, bis die Kerntemperatur 68 °C erreicht. Herausnehmen und in Folie ruhen lassen.',
+      'Bratensud durch ein Sieb gießen, mit Sahne aufkochen und sämig einkochen. Champignons in Butter anbraten und zugeben, nach Bedarf mit Stärke binden.',
+      'Spätzle in Butter schwenken oder nach Packung erhitzen. Braten aufschneiden und mit Rahmsauce und Spätzle servieren.',
+    ], 'veal roast cream sauce spaetzle'),
+
+  // ───────────── Eintöpfe ─────────────
+  r('bud-spencer-eintopf', 'Bud-Spencer-Eintopf mit Hack, Bohnen und Mais', 'de', 'eintopf', 45,
+    '400 g Hackfleisch gemischt | 1 Stk Zwiebel | 2 Zehe Knoblauch | 1 Stk Paprika rot | 1 Dose Kidneybohnen | 1 Dose Weiße Bohnen | 1 Dose Mais | 400 g Passierte Tomaten | 2 EL Tomatenmark | 400 ml Rinderbrühe | 2 TL Paprikapulver edelsüß | 1 TL Kreuzkümmel | 1 TL Chiliflocken | 2 EL Sonnenblumenöl | Salz | Pfeffer',
+    [
+      'Zwiebel, Knoblauch und Paprika würfeln. Hack in Öl im großen Topf krümelig und kräftig anbraten.',
+      'Zwiebel, Knoblauch und Paprika zugeben, Tomatenmark und Gewürze 2 Minuten mitrösten.',
+      'Passierte Tomaten und Brühe angießen. Abgetropfte Bohnen und Mais zugeben und 25 Minuten köcheln lassen.',
+      'Kräftig mit Salz, Pfeffer und Chili abschmecken. Dazu passt Brot.',
+    ], 'bean mince stew pot'),
+
+  r('schnippelbohneneintopf', 'Schnippelbohneneintopf mit Mettwurst', 'de', 'eintopf', 60,
+    '500 g Grüne Bohnen | 500 g Kartoffeln festkochend | 1 Stk Zwiebel | 2 Stk Mettenden | 1 EL Butterschmalz | 700 ml Gemüsebrühe | 1 Bund Bohnenkraut | 1 Stk Möhre | 1 Bund Petersilie | Salz | Pfeffer | Weißweinessig',
+    [
+      'Bohnen putzen und in kleine Stücke schneiden (schnippeln). Kartoffeln und Möhre würfeln, Zwiebel hacken.',
+      'Zwiebel in Butterschmalz andünsten, Bohnen, Möhre und Kartoffeln zugeben, mit Brühe auffüllen und Bohnenkraut zugeben.',
+      'Zugedeckt 25 Minuten köcheln. Mettenden in Scheiben schneiden und die letzten 10 Minuten mitgaren.',
+      'Mit Salz, Pfeffer und einem Schuss Essig abschmecken und mit Petersilie bestreuen.',
+    ], 'green bean stew sausage'),
+
+  r('sauerkrauteintopf-kasseler', 'Sauerkrauteintopf mit Kasseler', 'de', 'eintopf', 55,
+    '400 g Kasseler Nacken | 500 g Sauerkraut | 500 g Kartoffeln mehligkochend | 1 Stk Zwiebel | 1 EL Butterschmalz | 800 ml Rinderbrühe | 5 Stk Wacholderbeere | 1 Blatt Lorbeerblatt | 1 TL Paprikapulver edelsüß | 100 g Schmand | Salz | Pfeffer',
+    [
+      'Zwiebel würfeln und in Butterschmalz glasig dünsten, Paprikapulver kurz mitrösten.',
+      'Sauerkraut zugeben und kurz anschwitzen. Kartoffeln würfeln und mit Brühe, Wacholder und Lorbeer dazugeben.',
+      'Kasseler in Würfel schneiden, zufügen und 30 Minuten bei kleiner Hitze köcheln.',
+      'Mit Salz und Pfeffer abschmecken und mit einem Klecks Schmand servieren.',
+    ], 'sauerkraut stew smoked pork'),
+
+  r('kuerbis-hack-eintopf', 'Kürbis-Hack-Eintopf mit Kartoffeln', 'de', 'eintopf', 45,
+    '400 g Hackfleisch gemischt | 600 g Hokkaido-Kürbis | 300 g Kartoffeln festkochend | 1 Stk Zwiebel | 1 Stk Paprika rot | 2 EL Tomatenmark | 700 ml Rinderbrühe | 1 TL Paprikapulver edelsüß | 1 TL Majoran | 100 g Schmand | 1 EL Sonnenblumenöl | Salz | Pfeffer',
+    [
+      'Kürbis entkernen und mit Schale (Hokkaido) würfeln. Kartoffeln, Zwiebel und Paprika würfeln.',
+      'Hack in Öl krümelig anbraten, Zwiebel zugeben und Tomatenmark mitrösten. Mit Paprika und Majoran würzen.',
+      'Kürbis, Kartoffeln und Paprika zugeben, Brühe angießen und 20 Minuten köcheln, bis alles weich ist.',
+      'Einen Teil des Kürbisses zerdrücken, damit der Eintopf sämig wird. Mit Schmand, Salz und Pfeffer abschmecken.',
+    ], 'pumpkin minced meat stew'),
+
+  r('paprika-hack-topf', 'Paprika-Hack-Topf mit Sahne', 'de', 'eintopf', 40,
+    '400 g Hackfleisch gemischt | 3 Stk Paprika rot | 1 Stk Paprika gelb | 1 Stk Zwiebel | 2 Zehe Knoblauch | 400 g Kartoffeln festkochend | 2 EL Tomatenmark | 500 ml Rinderbrühe | 150 ml Sahne | 2 TL Paprikapulver edelsüß | 1 EL Sonnenblumenöl | Salz | Pfeffer',
+    [
+      'Paprika in Streifen, Kartoffeln in kleine Würfel schneiden, Zwiebel und Knoblauch hacken.',
+      'Hack in Öl scharf anbraten, Zwiebel und Knoblauch zugeben. Tomatenmark und Paprikapulver kurz mitrösten.',
+      'Paprika und Kartoffeln zugeben, mit Brühe auffüllen und 20 Minuten köcheln.',
+      'Sahne einrühren, kurz aufkochen und mit Salz und Pfeffer abschmecken.',
+    ], 'paprika minced meat stew cream'),
+
+  r('westfaelisches-blindhuhn', 'Westfälisches Blindhuhn mit Bohnen, Birnen und Speck', 'de', 'eintopf', 70,
+    '300 g Grüne Bohnen | 400 g Kartoffeln festkochend | 2 Stk Birne | 1 Stk Apfel | 150 g Schweinebauch geräuchert | 100 g Speckwürfel | 1 Stk Zwiebel | 800 ml Gemüsebrühe | 1 Bund Bohnenkraut | 1 Stk Möhre | Salz | Pfeffer',
+    [
+      'Räucherbauch im Ganzen in der Brühe 30 Minuten vorgaren. Speckwürfel in einem Topf auslassen, Zwiebel darin andünsten.',
+      'Kartoffeln und Möhre würfeln, Bohnen in Stücke brechen. Mit der Brühe samt Bauch und Bohnenkraut zu den Zwiebeln geben und 20 Minuten garen.',
+      'Birne und Apfel schälen, in Spalten schneiden und die letzten 10 Minuten mitgaren.',
+      'Fleisch herausnehmen, würfeln und zurück in den Eintopf geben. Mit Salz und Pfeffer abschmecken.',
+    ], 'Westfälisches Blindhuhn'),
+
+  r('schnuesch', 'Schnüsch – norddeutscher Gemüseeintopf mit Schinken', 'de', 'eintopf', 50,
+    '300 g Möhre | 200 g Grüne Bohnen | 300 g Kartoffeln mehligkochend | 150 g Katenschinken | 200 ml Milch | 500 ml Gemüsebrühe | 1 Stk Zwiebel | 1 EL Butter | 1 EL Weizenmehl | 0.5 Bund Petersilie | Muskatnuss | Salz | Pfeffer',
+    [
+      'Möhren und Kartoffeln würfeln, Bohnen in Stücke schneiden, Schinken in kleine Würfel schneiden. Zwiebel würfeln.',
+      'Zwiebel in Butter andünsten, Mehl darüberstäuben, Brühe und Milch einrühren.',
+      'Gemüse zugeben und 20 Minuten köcheln, bis es weich ist.',
+      'Schinken zugeben, mit Muskat, Salz und Pfeffer abschmecken und mit Petersilie servieren.',
+    ], 'vegetable stew ham milk'),
+
+  r('chili-con-carne', 'Chili con Carne mit Kidneybohnen und Mais', 'de', 'eintopf', 60,
+    '450 g Rinderhackfleisch | 1 Stk Zwiebel | 2 Zehe Knoblauch | 1 Stk Paprika rot | 1 Dose Kidneybohnen | 1 Dose Mais | 400 g Gehackte Tomaten | 2 EL Tomatenmark | 200 ml Rinderbrühe | 2 TL Paprikapulver edelsüß | 1 TL Kreuzkümmel | 1 Stk Chili rot | 1 EL Sonnenblumenöl | 100 g Schmand | Salz | Pfeffer',
+    [
+      'Zwiebel, Knoblauch, Paprika und Chili würfeln. Hack in Öl kräftig und krümelig anbraten.',
+      'Zwiebel, Knoblauch und Gewürze zugeben, Tomatenmark kurz mitrösten.',
+      'Tomaten, Brühe und Paprika zugeben und 30 Minuten bei kleiner Hitze köcheln. Bohnen und Mais zufügen und 10 Minuten mitkochen.',
+      'Abschmecken und mit Schmand servieren, dazu passt Brot oder Reis.',
+    ], 'chili con carne bowl'),
 ]

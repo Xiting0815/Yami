@@ -15,7 +15,7 @@ const groups: Record<ShopCat, string[]> = {
     'Paprika rot', 'Petersilie', 'Rosenkohl', 'Rosmarin', 'Rote Bete gekocht', 'Rotkohl', 'Rucola', 'Salatgurke',
     'Salbei', 'Schalotte', 'Schnittlauch', 'Schwarzkohl', 'Shiitake', 'Sojasprossen', 'Spargel weiß',
     'Spitzpaprika grün', 'Staudensellerie', 'Steckrübe', 'Thai-Basilikum', 'Thymian', 'Tomate', 'Tomaten reif',
-    'Weißkohl', 'Wirsing', 'Zitrone', 'Zitrone unbehandelt', 'Zitronengras', 'Zucchini', 'Zuckerschoten', 'Zwiebel',
+    'Weißkohl', 'Wirsing', 'Orange', 'Zitrone', 'Zitrone unbehandelt', 'Zitronengras', 'Zucchini', 'Zuckerschoten', 'Zwiebel',
     'Zwiebel rot',
   ],
   konserven: [
@@ -32,13 +32,13 @@ const groups: Record<ShopCat, string[]> = {
     'Rinderfond', 'Risottoreis', 'Rosinen', 'Röstzwiebeln', 'Rotwein', 'Safranfäden', 'Sake', 'Sardellenfilet',
     'Sauerkraut', 'Schälerbsen gelb', 'Sesam', 'Sesampaste', 'Shaoxing-Reiswein', 'Sojabohnenpaste gelb',
     'Steinpilze getrocknet', 'Sushireis', 'Tamarindenpaste', 'Tellerlinsen', 'Thunfisch in Olivenöl', 'Tomatenmark',
-    'Walnusskerne', 'Weinbrand', 'Weiße Bohnen', 'Weißwein', 'Weizenmehl Tipo 00', 'Wodka', 'Yakisoba-Sauce',
+    'Walnusskerne', 'Metaxa', 'Weinbrand', 'Weiße Bohnen', 'Weißwein', 'Weizenmehl Tipo 00', 'Wodka', 'Yakisoba-Sauce',
     'Zuckerrübensirup',
   ],
-  backwaren: ['Vollkornbrot', 'Vollkorn-Knäckebrot', 'Vollkorn-Tortilla','Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
+  backwaren: ['Pitabrot', 'Vollkornbrot', 'Vollkorn-Knäckebrot', 'Vollkorn-Tortilla','Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
   molkerei: [
     'Skyr', 'Magerquark', 'Hüttenkäse', 'Eiklar', 'Hummus',
-    'Bandnudeln', 'Bergkäse', 'Bucatini', 'Butter', 'Butterschmalz', 'Cannelloni', 'Ditalini', 'Ei', 'Eigelb',
+    'Bandnudeln', 'Bergkäse', 'Bucatini', 'Butter', 'Butterschmalz', 'Cannelloni', 'Ditalini', 'Ei', 'Kritharaki', 'Tzatziki', 'Eigelb',
     'Ei hart gekocht', 'Emmentaler', 'Emmentaler gerieben', 'Feta', 'Fettuccine', 'Flammkuchenteig', 'Fusilli',
     'Gnocchi', 'Gorgonzola dolce', 'Gouda gerieben', 'Gruyère', 'Hefe frisch', 'Joghurt natur', 'Kartoffelsalat',
     'Lasagneplatten', 'Linguine', 'Maultaschen', 'Mie-Nudeln', 'Milch', 'Mozzarella', 'Orecchiette',
@@ -49,6 +49,7 @@ const groups: Record<ShopCat, string[]> = {
   ],
   fleisch: [
     'Bacon', 'Blutwurst', 'Bockwurst', 'Bratwurst', 'Cabanossi', 'Doradenfilet', 'Fleischwurst', 'Guanciale',
+    'Gänsekeule', 'Entenbrust', 'Entenkeule', 'Gyros-Fleisch gewürzt', 'Kalbsbraten',
     'Hackfleisch gemischt', 'Hähnchenbrustfilet', 'Hähnchenflügel', 'Hähnchenschenkel', 'Hähnchenschenkelfilet',
     'Kabeljaufilet', 'Kalbfleisch Schnitzel', 'Kalbsbrät', 'Kalbshaxe in Scheiben', 'Kalbskotelett', 'Kalbsleber',
     'Kalbsschnitzel', 'Kalbsschnitzel klein', 'Kasseler Kotelett', 'Kasseler Nacken', 'Katenschinken', 'Kochschinken',

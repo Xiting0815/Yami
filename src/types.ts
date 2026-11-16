@@ -1,4 +1,6 @@
-export type Cuisine = 'de' | 'it' | 'as'
+export type Cuisine = 'de' | 'it' | 'as' | 'gr'
+/** Festtags-Fenster: Martinsgans-Zeit (1.–15. Nov.) und Weihnachtszeit (15. Nov.–31. Dez.) */
+export type Festive = 'martini' | 'weihnachten'
 export type DishType = 'haupt' | 'pasta' | 'eintopf' | 'suppe' | 'auflauf'
 
 /** Einkaufslisten-Abschnitte – Reihenfolge = Reihenfolge im Laden */
@@ -26,7 +28,7 @@ export const SHOP_ICON: Record<ShopCat, string> = {
   vorrat: '🧂',
 }
 
-export const CUISINE_LABEL: Record<Cuisine, string> = { de: 'Deutsch', it: 'Italienisch', as: 'Asiatisch' }
+export const CUISINE_LABEL: Record<Cuisine, string> = { de: 'Deutsch', it: 'Italienisch', as: 'Asiatisch', gr: 'Griechisch' }
 export const TYPE_LABEL: Record<DishType, string> = {
   haupt: 'Hauptgericht',
   pasta: 'Pasta',
@@ -83,6 +85,8 @@ export interface Recipe {
   steps: string[]
   vegetarian: boolean
   image?: string
+  /** Festtagsgericht: kommt in diesen Zeitfenstern nach vorn, sonst weiter hinten */
+  festive?: Festive[]
   /** selbst angelegtes Rezept (Id beginnt mit "my-") */
   custom?: boolean
 }

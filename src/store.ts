@@ -246,6 +246,11 @@ export function sanitize(parsed: unknown): AppState {
   }
   if (typeof saved.lastBackup !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(saved.lastBackup)) delete saved.lastBackup
   const state: AppState = { ...INITIAL, ...(saved as Partial<AppState>), filters: { ...EMPTY_FILTERS, ...(saved.filters as object) } }
+  // Neue Küche „Griechisch“: wer alle bisherigen Küchen gewählt hatte, soll sie ebenfalls sehen
+  if (Array.isArray(state.filters.cuisines)) {
+    const cs = state.filters.cuisines
+    if (cs.includes('de') && cs.includes('it') && cs.includes('as') && !cs.includes('gr')) state.filters = { ...state.filters, cuisines: [...cs, 'gr'] }
+  }
   // Eigene Zutaten und Rezepte prüfen und eintragen, bevor der Plan geprüft wird (der Plan darf auf sie zeigen)
   state.customIngredients = state.customIngredients.filter(validIngredient)
   registerCustom(state.customIngredients, [])
