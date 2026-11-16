@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { LearnedSummary } from '../learning'
 import { ACTIVITY, DEFAULT_PROFILE, PACE, type Profile, bmr, bmrFormula, floorKcal, leanMass, proteinTarget, targetKcal, tdee, DEFAULT_BREAKFAST_KCAL } from '../energy'
 import { parseBackup } from '../backup'
-import { type AppState, parseIso } from '../store'
+import { type AppState, type HaSettings, parseIso } from '../store'
+import { HaSection } from './HaSection'
 
 interface Props {
   profile?: Profile
@@ -15,11 +16,16 @@ interface Props {
   lastBackup?: string
   onExport: () => void
   onImport: (s: AppState) => void
+  /** Home Assistant */
+  ha?: HaSettings
+  onHaChange: (ha: HaSettings | undefined) => void
+  onHaSyncNow: () => void
+  haSyncing: boolean
 }
 
 const fmt = (n: number) => Math.round(n).toLocaleString('de-DE')
 
-export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearning, lastBackup, onExport, onImport }: Props) {
+export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing }: Props) {
   const [p, setP] = useState<Profile>(profile ?? DEFAULT_PROFILE)
   const fileInput = useRef<HTMLInputElement>(null)
   const [backupError, setBackupError] = useState<string | null>(null)
@@ -201,6 +207,8 @@ export function ProfileSheet({ profile, onSave, onClose, learned, onResetLearnin
             />
             {backupError && <p className="bf-note" role="alert">⚠ {backupError}</p>}
           </section>
+
+          <HaSection ha={ha} onChange={onHaChange} onSyncNow={onHaSyncNow} syncing={haSyncing} />
 
           <p className="muted small">
             Richtwerte, keine ärztliche Beratung. Bei Vorerkrankungen das Ziel bitte mit dem Hausarzt abstimmen.

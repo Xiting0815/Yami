@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { ShopCat } from '../types'
 import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER } from '../types'
-import { formatAmount } from '../shopping'
+import { formatAmount, isBought, missingPacks, packText } from '../shopping'
 import type { CustomItem } from '../store'
 import { type BuyItem, type WeekResult, formatEuro } from '../kitchen'
 
@@ -17,21 +17,18 @@ interface Props {
   onRemoveCustom: (id: string) => void
   onEditPrice: (name: string, pack: number, price: number) => void
   onGoPlan: () => void
+  /** Liste ist mit Home Assistant verbunden */
+  haShared?: boolean
+  /** Meldung, wenn der Abgleich nicht klappt (blockiert nichts) */
+  haError?: string
+  /** angezeigt wird die Woche, die mit HA abgeglichen wird */
+  haOnWeek?: boolean
 }
 
-/** abgehakt = genug gekauft; nach einer Portionserhöhung fehlt evtl. noch etwas */
-export const isBought = (it: BuyItem) => it.bought >= it.packs * it.product.pack - 1e-6 && it.bought > 0
-/** Packungen, die noch fehlen */
-export const missingPacks = (it: BuyItem) => Math.max(0, it.packs - Math.round(it.bought / it.product.pack))
-
-export function packText(it: BuyItem): string {
-  const { packs, product: p } = it
-  if (!p.packName) return formatAmount(packs * p.pack, p.unit)
-  return p.pack === 1 ? `${packs} ${p.packName}` : `${packs} ${p.packName} (${formatAmount(p.pack, p.unit)})`
-}
+export { isBought, missingPacks, packText }
 
 export function ShoppingList(props: Props) {
-  const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan } = props
+  const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan, haShared, haError, haOnWeek } = props
   const [newName, setNewName] = useState('')
   const [newCat, setNewCat] = useState<ShopCat>('gemuese')
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -69,6 +66,8 @@ export function ShoppingList(props: Props) {
         {done > 0 && <button className="link" onClick={onResetChecks}>Haken zurücksetzen</button>}
       </div>
       <p className="muted small">Abgehakte Artikel wandern automatisch in deinen Vorrat.</p>
+      {haShared && haOnWeek && <p className="muted small">🏠 Mit Home Assistant geteilt</p>}
+      {haError && haOnWeek && <p className="muted small" role="status">🏠 Home Assistant: {haError} – die Liste hier funktioniert trotzdem.</p>}
 
       {SHOP_ORDER.filter((c) => c !== 'vorrat').map((cat) => {
         const items = result.buy.filter((b) => b.cat === cat)

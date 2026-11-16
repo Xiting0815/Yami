@@ -1,3 +1,4 @@
+import type { BuyItem } from './kitchen'
 import type { Ingredient } from './types'
 
 /** Mengen auf die gewünschte Portionenzahl umrechnen */
@@ -43,4 +44,15 @@ export function formatAmount(amount: number | null, unit: string): string {
   // Einkaufsliste: Kleinstmengen in g (z. B. Safran) lesbar halten
   if (unit === 'g' && amount < 1) return `${String(Math.round(amount * 10) / 10).replace('.', ',')} g`
   return niceNumber(amount, unit)
+}
+
+/** abgehakt = genug gekauft; nach einer Portionserhöhung fehlt evtl. noch etwas */
+export const isBought = (it: BuyItem) => it.bought >= it.packs * it.product.pack - 1e-6 && it.bought > 0
+/** Packungen, die noch fehlen */
+export const missingPacks = (it: BuyItem) => Math.max(0, it.packs - Math.round(it.bought / it.product.pack))
+
+export function packText(it: BuyItem): string {
+  const { packs, product: p } = it
+  if (!p.packName) return formatAmount(packs * p.pack, p.unit)
+  return p.pack === 1 ? `${packs} ${p.packName}` : `${packs} ${p.packName} (${formatAmount(p.pack, p.unit)})`
 }

@@ -30,6 +30,64 @@ export interface CustomItem {
   cat: ShopCat
 }
 
+/** Home-Assistant-Verbindung (Token bleibt nur auf diesem Gerät, kommt nie in die Sicherung) */
+export interface HaSettings {
+  url: string
+  token: string
+  enabled: boolean
+  /** Einkaufsliste (todo-Entität) */
+  todo: string
+  /** Kalender für den Plan */
+  calendar: string
+  /** Kalender für Erinnerungen (HA schickt zum Beginn eine Mitteilung) */
+  reminders: string
+  /** Yami-Schlüssel (Zutat) → HA-Todo-uid */
+  items: Record<string, string>
+  /** Schlüssel, die beim letzten Abgleich in HA als erledigt standen (erkennt „in Yami wieder abgewählt“) */
+  done?: string[]
+  /** Kalendereinträge: Schlüssel → uid (falls bekannt) und Signatur */
+  events: Record<string, { uid?: string; sig: string }>
+  lastSync?: string
+  error?: string
+}
+
+export const HA_DEFAULTS = { todo: 'todo.einkaufsliste', calendar: 'calendar.yami', reminders: 'calendar.yami_erinnerungen' }
+
+export function newHa(url = '', token = ''): HaSettings {
+  return { url, token, enabled: false, ...HA_DEFAULTS, items: {}, events: {} }
+}
+
+const ENTITY = /^[a-z_]+\.[a-z0-9_]+$/
+
+function sanitizeHa(x: unknown): HaSettings | undefined {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return undefined
+  const h = x as Record<string, unknown>
+  const str = (v: unknown, d: string) => (typeof v === 'string' ? v.trim().slice(0, 500) : d)
+  const ent = (v: unknown, d: string) => (typeof v === 'string' && ENTITY.test(v.trim()) ? v.trim() : d)
+  const items: Record<string, string> = {}
+  if (h.items && typeof h.items === 'object' && !Array.isArray(h.items))
+    for (const [k, v] of Object.entries(h.items)) if (typeof v === 'string' && v) items[k] = v
+  const events: HaSettings['events'] = {}
+  if (h.events && typeof h.events === 'object' && !Array.isArray(h.events))
+    for (const [k, v] of Object.entries(h.events)) {
+      const e = v as { uid?: unknown; sig?: unknown } | null
+      if (e && typeof e.sig === 'string') events[k] = { sig: e.sig, ...(typeof e.uid === 'string' && e.uid ? { uid: e.uid } : {}) }
+    }
+  return {
+    url: str(h.url, ''),
+    token: str(h.token, ''),
+    enabled: h.enabled === true,
+    todo: ent(h.todo, HA_DEFAULTS.todo),
+    calendar: ent(h.calendar, HA_DEFAULTS.calendar),
+    reminders: ent(h.reminders, HA_DEFAULTS.reminders),
+    items,
+    done: Array.isArray(h.done) ? h.done.filter((k): k is string => typeof k === 'string') : undefined,
+    events,
+    lastSync: typeof h.lastSync === 'string' ? h.lastSync : undefined,
+    error: typeof h.error === 'string' ? h.error : undefined,
+  }
+}
+
 export interface AppState {
   plan: WeekPlan
   /** abgehakte Einträge je Woche (Schlüssel = Montag der Woche) */
@@ -79,6 +137,8 @@ export interface AppState {
   customRecipes: CustomRecipe[]
   /** selbst angelegte Zutaten, die nicht im Katalog stehen */
   customIngredients: CustomIngredient[]
+  /** Home Assistant (optional) */
+  ha?: HaSettings
 }
 
 const KEY = 'yami-state-v1'
@@ -206,6 +266,8 @@ export function sanitize(parsed: unknown): AppState {
     )
   }
   state.wasted = state.wasted.filter(validWaste).slice(-WASTED_MAX)
+  state.ha = sanitizeHa(saved.ha)
+  if (!state.ha) delete state.ha
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)
   // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
   if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'

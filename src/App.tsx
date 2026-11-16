@@ -19,7 +19,7 @@ import { type DayBalance, type Portion, dayBalance, isProteinLow, isWorkday, por
 import { type AppState, addDays, mondayOf, isoDate, parseIso, shortDate, useAppState, weekDays, weekdayName, weekLabel } from './store'
 import { useBackStack } from './useBackStack'
 import { matches } from './filter'
-import { formatAmount } from './shopping'
+import { formatAmount, isBought } from './shopping'
 import {
   type BuyItem,
   addDaysIso,
@@ -41,6 +41,8 @@ import { SwipeDeck } from './components/SwipeDeck'
 import { FilterSheet, activeFilterCount } from './components/FilterBar'
 import { RecipeSheet } from './components/RecipeSheet'
 import { ShoppingList } from './components/ShoppingList'
+import { localItems } from './haSync'
+import { useHomeAssistant } from './useHa'
 import { RecipeBrowser } from './components/RecipeBrowser'
 import { RecipeEditor } from './components/RecipeEditor'
 import { PantryView } from './components/PantryView'
@@ -160,7 +162,8 @@ export default function App() {
   function undo() {
     const u = toast?.undo
     if (!u) return
-    setState(u.state)
+    // Home-Assistant-Zuordnung bleibt, wie sie ist (sie beschreibt, was dort schon liegt)
+    setState((cur) => ({ ...u.state, ha: cur.ha }))
     setRejected(u.rejected)
     setSwipeDay(u.swipeDay)
     setTab(u.tab)
@@ -207,6 +210,32 @@ export default function App() {
     () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth),
     [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients],
   )
+  // Einkaufsliste für Home Assistant: immer die „aktuelle“ Woche (ab Samstag die nächste), unabhängig von der angezeigten
+  const haKey = defaultMonday(today)
+  const haWeek = useMemo(
+    () =>
+      haKey === weekKey
+        ? week
+        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth),
+    [haKey, weekKey, week, state.plan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients],
+  )
+  const haLocal = useMemo(() => localItems(haWeek.buy), [haWeek])
+  const haRef = useRef({ buy: haWeek.buy, key: haKey })
+  haRef.current = { buy: haWeek.buy, key: haKey }
+  const ha = useHomeAssistant({
+    ha: state.ha,
+    setState,
+    local: haLocal,
+    state,
+    // in HA abgehakt → wie Abhaken in der Liste (Vorrat füllt sich)
+    onBought: (keys) => {
+      const { buy, key } = haRef.current
+      for (const k of keys) {
+        const it = buy.find((b) => b.key === k)
+        if (it && !isBought(it)) toggleBuy(it, key)
+      }
+    },
+  })
   const weekRecipes = useMemo(
     () => days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => RECIPE_BY_ID[e!.recipeId]).filter(Boolean),
     [days, state.plan, state.customRecipes],
@@ -518,10 +547,10 @@ export default function App() {
     setSwipeDay(isoDate(m))
   }
 
-  function toggleBuy(item: BuyItem) {
+  function toggleBuy(item: BuyItem, forWeek = weekKey) {
     setState((s) => {
-      const wk = { ...(s.bought[weekKey] ?? {}) }
-      const checked = new Set(s.checked[weekKey] ?? [])
+      const wk = { ...(s.bought[forWeek] ?? {}) }
+      const checked = new Set(s.checked[forWeek] ?? [])
       let pantry = s.pantry
       const b = wk[item.name]
       const needed = item.packs * item.product.pack
@@ -544,7 +573,7 @@ export default function App() {
         wk[item.name] = { lotId: lot.id, amount }
         checked.add(item.key)
       }
-      return { ...s, pantry, bought: { ...s.bought, [weekKey]: wk }, checked: { ...s.checked, [weekKey]: [...checked] } }
+      return { ...s, pantry, bought: { ...s.bought, [forWeek]: wk }, checked: { ...s.checked, [forWeek]: [...checked] } }
     })
   }
 
@@ -867,7 +896,10 @@ export default function App() {
             planned={days.filter((d) => state.plan[d]).length}
             checked={state.checked[weekKey] ?? []}
             custom={state.custom[weekKey] ?? []}
-            onToggleBuy={toggleBuy}
+            onToggleBuy={(it) => toggleBuy(it)}
+            haShared={ha.live === 'ok' || ha.live === 'connecting'}
+            haError={ha.live === 'error' ? state.ha?.error ?? 'Abgleich mit Home Assistant fehlgeschlagen' : undefined}
+            haOnWeek={weekKey === haKey}
             onToggleKey={(key) =>
               setState((s) => {
                 const cur = new Set(s.checked[weekKey] ?? [])
@@ -1140,6 +1172,10 @@ export default function App() {
             flash('Gelerntes zurückgesetzt', snap)
           }}
           lastBackup={state.lastBackup}
+          ha={state.ha}
+          onHaChange={(h) => setState((s) => ({ ...s, ha: h }))}
+          onHaSyncNow={() => void ha.syncNow()}
+          haSyncing={ha.syncing}
           onExport={() => {
             // Stand mit heutigem Datum speichern, damit die Datei selbst die letzte Sicherung kennt
             exportBackup({ ...state, lastBackup: today })
@@ -1156,7 +1192,9 @@ export default function App() {
             const r = cookDue(s.plan, s.pantry, today)
             const b = cookDue(s.breakfast, r.pantry, today)
             const x = moveExpired(b.pantry, s.wasted, today, s.prices)
-            setState({ ...s, plan: r.plan, breakfast: b.plan, pantry: x.pantry, wasted: x.wasted, lastBackup: s.lastBackup ?? today })
+            // der Token steht nie in der Sicherung: bei gleicher Adresse den vorhandenen behalten
+            const keepHa = s.ha && state.ha && s.ha.url === state.ha.url && !s.ha.token ? { ...s.ha, token: state.ha.token } : s.ha
+            setState({ ...s, ha: keepHa, plan: r.plan, breakfast: b.plan, pantry: x.pantry, wasted: x.wasted, lastBackup: s.lastBackup ?? today })
             setShowProfile(false)
             flash('Sicherung geladen ✓', snap)
           }}

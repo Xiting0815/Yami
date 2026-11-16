@@ -8,13 +8,19 @@ const VERSION = 1
  * Ergibt `true`, wenn gesichert wurde – `false`, wenn der Nutzer das Teilen abgebrochen hat.
  * Aufruf direkt aus dem Klick (vor dem ersten await), sonst erlaubt der Browser das Teilen nicht.
  */
-export async function exportBackup(state: AppState): Promise<boolean> {
-  const body = {
+/** Inhalt der Sicherungsdatei – der Home-Assistant-Token bleibt draußen, die Adresse nicht */
+export function backupBody(state: AppState) {
+  const { ha, ...rest } = state
+  return {
     app: APP,
     version: VERSION,
     exportedAt: new Date().toISOString(),
-    state,
+    state: ha ? { ...rest, ha: { ...ha, token: '', error: undefined } } : rest,
   }
+}
+
+export async function exportBackup(state: AppState): Promise<boolean> {
+  const body = backupBody(state)
   const name = `yami-sicherung-${isoDate(new Date())}.json`
   const blob = new Blob([JSON.stringify(body, null, 2)], { type: 'application/json' })
   const file = new File([blob], name, { type: 'application/json' })
