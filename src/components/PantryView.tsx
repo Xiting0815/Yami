@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { CATALOG } from '../data/catalog'
 import { PRODUCTS } from '../data/products'
-import { SHOP_ICON } from '../types'
+import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER, type CustomIngredient, type ShopCat } from '../types'
+import { searchIngredients, titleCase } from '../customIngredients'
+import { CAT_DEFAULTS } from '../data/custom-registry'
 import { formatAmount } from '../shopping'
 import { type PantryLot, addDaysIso, daysUntil, uid } from '../kitchen'
 
@@ -11,12 +13,21 @@ interface Props {
   leftovers: PantryLot[]
   today: string
   onChange: (lots: PantryLot[]) => void
+  /** Zutat aus dem Katalog hinzugefügt (zählt als „Wunsch“ fürs Lernen) */
+  onAdded?: (name: string) => void
+  /** ganz neue Zutat anlegen und gleich in den Vorrat legen */
+  onCreate: (c: CustomIngredient, lot: PantryLot) => void
   onCook: () => void
 }
 
-const TRACKED = Object.keys(PRODUCTS)
-  .filter((n) => CATALOG[n] && CATALOG[n] !== 'vorrat')
-  .sort((a, b) => a.localeCompare(b, 'de'))
+const NEW_UNITS = ['g', 'ml', 'Stk'] as const
+const NEW_CATS = SHOP_ORDER.filter((c) => c !== 'vorrat')
+
+/** alle Zutaten mit Produktdaten (auch selbst angelegte) – zur Laufzeit, weil eigene Zutaten dazukommen */
+const trackedNames = () =>
+  Object.keys(PRODUCTS)
+    .filter((n) => CATALOG[n] && CATALOG[n] !== 'vorrat')
+    .sort((a, b) => a.localeCompare(b, 'de'))
 
 function expiryText(days: number): string {
   if (days < 0) return days === -1 ? 'seit gestern abgelaufen' : `seit ${-days} Tagen abgelaufen`
@@ -27,8 +38,10 @@ function expiryText(days: number): string {
   return 'lange haltbar'
 }
 
-export function PantryView({ pantry, leftovers, today, onChange, onCook }: Props) {
+export function PantryView({ pantry, leftovers, today, onChange, onAdded, onCreate, onCook }: Props) {
   const [query, setQuery] = useState('')
+  /** Formular „neue Zutat anlegen“ */
+  const [creating, setCreating] = useState<{ name: string; cat: ShopCat; amount: string; unit: (typeof NEW_UNITS)[number] } | null>(null)
   const sorted = useMemo(() => [...pantry].sort((a, b) => a.expires.localeCompare(b.expires)), [pantry])
   const groups = [
     { title: '⚠️ Bald verbrauchen', items: sorted.filter((l) => daysUntil(l.expires, today) <= 3) },
@@ -49,13 +62,38 @@ export function PantryView({ pantry, leftovers, today, onChange, onCook }: Props
   }, [leftovers, today])
 
   // Treffer am Wortanfang zuerst („Sa“ → Sahne, Salz … vor Austernsauce)
+  const TRACKED = trackedNames()
   const q = query.trim().toLowerCase()
   const hits = q.length >= 2 ? TRACKED.filter((n) => n.toLowerCase().includes(q)) : []
-  const suggestions = [...hits.filter((n) => n.toLowerCase().startsWith(q)), ...hits.filter((n) => !n.toLowerCase().startsWith(q))].slice(0, 6)
+  // erst der unscharfe Abgleich („Creme fraiche“, „Pasta“, „Hack“), dann Treffer am Wortanfang und im Wort
+  const fuzzy = q.length >= 3 ? searchIngredients(query, 12).filter((n) => TRACKED.includes(n)) : []
+  const suggestions = [
+    ...new Set([...fuzzy, ...hits.filter((n) => n.toLowerCase().startsWith(q)), ...hits.filter((n) => !n.toLowerCase().startsWith(q))]),
+  ].slice(0, 6)
 
   function add(name: string) {
     const p = PRODUCTS[name]
     onChange([...pantry, { id: uid(), name, amount: p.pack, unit: p.unit, expires: addDaysIso(today, p.shelf) }])
+    onAdded?.(name)
+    setQuery('')
+  }
+
+  function create() {
+    if (!creating) return
+    const name = creating.name.trim()
+    const amount = parseFloat(creating.amount.replace(',', '.'))
+    if (!name || !(amount > 0)) return
+    const d = CAT_DEFAULTS[creating.cat]
+    const ci: CustomIngredient = {
+      name,
+      cat: creating.cat,
+      kcal: d.kcal,
+      protein: d.protein,
+      unit: creating.unit,
+      gramsPerPiece: creating.unit === 'Stk' ? 100 : undefined,
+    }
+    onCreate(ci, { id: uid(), name, amount, unit: creating.unit, expires: addDaysIso(today, d.shelf) })
+    setCreating(null)
     setQuery('')
   }
 
@@ -71,7 +109,27 @@ export function PantryView({ pantry, leftovers, today, onChange, onCook }: Props
       </p>
 
       <div className="pantry-add">
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="➕ Zutat hinzufügen, z. B. Sahne" />
+        <input
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            setCreating(null)
+          }}
+          placeholder="➕ Zutat hinzufügen, z. B. Sahne"
+        />
+        {suggestions.length === 0 && q.length >= 3 && !creating && CATALOG[titleCase(query)] === 'vorrat' && (
+          <div className="suggest"><p className="muted small pad">Gewürze und Grundzutaten wie „{titleCase(query)}“ musst du nicht eintragen.</p></div>
+        )}
+        {suggestions.length === 0 && q.length >= 3 && !creating && !CATALOG[titleCase(query)] && (
+          <div className="suggest">
+            <button
+              className="new-ing"
+              onClick={() => setCreating({ name: titleCase(query), cat: 'gemuese', amount: '1', unit: 'Stk' })}
+            >
+              ➕ „{titleCase(query)}“ als neue Zutat anlegen
+            </button>
+          </div>
+        )}
         {suggestions.length > 0 && (
           <div className="suggest">
             {suggestions.map((n) => (
@@ -82,6 +140,46 @@ export function PantryView({ pantry, leftovers, today, onChange, onCook }: Props
           </div>
         )}
       </div>
+
+      {creating && (
+        <div className="pantry-new">
+          <label>
+            Name
+            <input value={creating.name} onChange={(e) => setCreating({ ...creating, name: e.target.value })} />
+          </label>
+          <label>
+            Einkaufsliste – Abschnitt
+            <select value={creating.cat} onChange={(e) => setCreating({ ...creating, cat: e.target.value as ShopCat })}>
+              {NEW_CATS.map((c) => (
+                <option key={c} value={c}>
+                  {SHOP_ICON[c]} {SHOP_LABEL[c]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="amt-row">
+            <label>
+              Menge
+              <input inputMode="decimal" value={creating.amount} onChange={(e) => setCreating({ ...creating, amount: e.target.value })} />
+            </label>
+            <label>
+              Einheit
+              <select value={creating.unit} onChange={(e) => setCreating({ ...creating, unit: e.target.value as (typeof NEW_UNITS)[number] })}>
+                {NEW_UNITS.map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="row-btns">
+            <button className="btn ghost" onClick={() => setCreating(null)}>Abbrechen</button>
+            <button className="btn primary grow" disabled={!creating.name.trim() || !(parseFloat(creating.amount.replace(',', '.')) > 0)} onClick={create}>
+              In den Vorrat legen
+            </button>
+          </div>
+          <p className="muted small">Die App kennt „{creating.name.trim() || 'die Zutat'}“ dann auch beim Wischen und Einkaufen.</p>
+        </div>
+      )}
 
       {pantry.length === 0 && (
         <div className="empty-state small-pad">

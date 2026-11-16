@@ -231,6 +231,16 @@ export const recipesDe = [
       'Den Reis nach Packungsanweisung kochen und dazu servieren.',
     ], 'Hühnerfrikassee'),
 
+  r('haehnchen-rahm-bandnudeln', 'Hähnchen-Champignon-Rahmgeschnetzeltes mit Bandnudeln', 'de', 'haupt', 30,
+    '400 g Hähnchenbrustfilet | 250 g Champignons | 1 Stk Zwiebel | 200 ml Sahne | 100 ml Hühnerbrühe | 1 TL Senf mittelscharf | 1 TL Paprikapulver edelsüß | 1 TL Speisestärke | 2 EL Sonnenblumenöl | 250 g Bandnudeln | 0.5 Bund Petersilie | Salz | Pfeffer',
+    [
+      'Bandnudeln in reichlich Salzwasser nach Packungsangabe bissfest kochen.',
+      'Hähnchenbrust in schmale Streifen schneiden, mit Salz, Pfeffer und Paprikapulver würzen und in Öl in einer großen Pfanne 4 bis 5 Minuten rundum goldbraun braten. Herausnehmen.',
+      'Zwiebel würfeln, Champignons in Scheiben schneiden und im Bratfett 5 Minuten anbraten, bis sie Farbe haben.',
+      'Mit Brühe ablöschen, Sahne und Senf einrühren und 3 Minuten köcheln. Stärke in wenig kaltem Wasser anrühren und die Soße damit leicht binden.',
+      'Hähnchen zurück in die Soße geben und nur noch erwärmen. Abschmecken, mit Petersilie bestreuen und mit den Bandnudeln servieren.',
+    ], 'chicken mushroom cream sauce tagliatelle'),
+
   r('zuercher-geschnetzeltes', 'Zürcher Geschnetzeltes mit Rösti', 'de', 'haupt', 45,
     '400 g Kalbfleisch Schnitzel | 200 g Champignons | 1 Stk Schalotte | 100 ml Weißwein | 200 ml Sahne | 100 ml Kalbsfond | 1 EL Weizenmehl | 2 EL Butterschmalz | 600 g Kartoffeln festkochend | 0.5 Bund Petersilie | Salz | Pfeffer',
     [

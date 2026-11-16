@@ -30,3 +30,4 @@ Datei-Name (ohne Endung, Rezept-ID) und Beschreibung für das Bild. Stil wie die
 | westfaelisches-blindhuhn | Westfälisches Blindhuhn mit Bohnen, Birnen und Speck: Rustikaler Eintopf mit grünen Bohnen, Birnenspalten, Kartoffeln, Räucherbauch und Speck. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
 | schnuesch | Schnüsch – norddeutscher Gemüseeintopf mit Schinken: Heller Gemüseeintopf aus Möhren, Bohnen und Kartoffeln mit Schinkenwürfeln und Petersilie. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
 | chili-con-carne | Chili con Carne mit Kidneybohnen und Mais: Dunkelrotes Chili con Carne mit Kidneybohnen und Mais, mit Klecks Schmand. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| haehnchen-rahm-bandnudeln | Hähnchen-Champignon-Rahmgeschnetzeltes: Hähnchenstreifen und Champignons in heller Rahmsoße auf Bandnudeln, mit Petersilie. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |

@@ -12,6 +12,7 @@
  */
 import { CATALOG } from './data/catalog'
 import { RECIPE_BY_ID } from './data/recipes'
+import { interchangeable } from './data/substitutes'
 import { gramsOf } from './data/nutrition-calc'
 import { isWorkday } from './energy'
 import { type WastedItem, canonical, daysUntil, needsOf } from './kitchen'
@@ -159,7 +160,7 @@ export function buildModel(inp: TasteInput): TasteModel {
         const e = p[day]
         const r = e && e.status !== 'skipped' ? RECIPE_BY_ID[e.recipeId] : undefined
         if (!e || !r || hit.has(kind + day)) continue
-        if (needsOf(r, e.servings).some((n) => n.name === name)) {
+        if (needsOf(r, e.servings).some((n) => interchangeable(n.name, name))) {
           hit.add(kind + day)
           add(e.recipeId, w.date, W.waste, kind === 'd' ? day : undefined)
         }
@@ -193,6 +194,16 @@ export function preference(m: TasteModel, r: Recipe, day?: string): Preference {
     if (best) reason = `👍 ${featureLabel(best.f)} magst du`
   }
   return { score, reason }
+}
+
+/** Zutaten, die du oft in den Vorrat legst, für die es aber kaum Rezepte gibt (Name → Zahl der Rezepte) */
+export function pantryWishes(requests: Record<string, number> | undefined, minCount = 2): { name: string; count: number; recipes: number }[] {
+  return Object.entries(requests ?? {})
+    .filter(([, count]) => count >= minCount)
+    .map(([name, count]) => ({ name, count, recipes: Object.values(RECIPE_BY_ID).filter((r) => r.ingredients.some((i) => canonical(i.name) === name)).length }))
+    .filter((x) => x.recipes < 2)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3)
 }
 
 export interface LearnedSummary {

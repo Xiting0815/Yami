@@ -139,6 +139,8 @@ export interface AppState {
   customRecipes: CustomRecipe[]
   /** selbst angelegte Zutaten, die nicht im Katalog stehen */
   customIngredients: CustomIngredient[]
+  /** Zutaten, die du in den Vorrat getippt hast: Name → wie oft (lernt, wofür dir Rezepte fehlen) */
+  pantryRequests: Record<string, number>
   /** Home Assistant (optional) */
   ha?: HaSettings
 }
@@ -169,6 +171,7 @@ const INITIAL: AppState = {
   reviewDismissed: [],
   customRecipes: [],
   customIngredients: [],
+  pantryRequests: {},
 }
 
 const hasData = (s: AppState) =>
@@ -277,6 +280,11 @@ export function sanitize(parsed: unknown): AppState {
     )
   }
   state.wasted = state.wasted.filter(validWaste).slice(-WASTED_MAX)
+  state.pantryRequests = Object.fromEntries(
+    Object.entries(state.pantryRequests)
+      .filter(([k, v]) => typeof v === 'number' && Number.isFinite(v) && v > 0 && k.length <= 60)
+      .slice(-200),
+  )
   state.ha = sanitizeHa(saved.ha)
   if (!state.ha) delete state.ha
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)

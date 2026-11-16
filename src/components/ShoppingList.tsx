@@ -159,7 +159,10 @@ export function ShoppingList(props: Props) {
             <ul>
               {result.covered.map((it) => (
                 <li key={it.key}>
-                  <span className="item-name">{it.name}</span>
+                  <span className="item-name">
+                    {it.name}
+                    {it.substitutes.length > 0 && <small className="exp">aus Vorrat: {it.substitutes.map((x) => x.name).join(', ')} statt {it.name}</small>}
+                  </span>
                   <span className="item-amt">{formatAmount(it.required, it.unit)}</span>
                 </li>
               ))}
@@ -200,7 +203,12 @@ function ItemDetails({ it, onEditPrice }: { it: BuyItem; onEditPrice: (name: str
     <div className="item-recipes">
       <div>
         Brauchst {formatAmount(it.required, it.unit)}
-        {it.fromPantry > 0 && <> · {formatAmount(it.fromPantry, it.unit)} aus dem Vorrat</>}
+        {it.fromPantry > 0 && (
+          <>
+            {' '}· {formatAmount(it.fromPantry, it.unit)} aus dem Vorrat
+            {it.substitutes.length > 0 && <> ({it.substitutes.map((x) => x.name).join(', ')} statt {it.name})</>}
+          </>
+        )}
         {it.leftover > 0.01 && <> · <b className="accent">{formatAmount(it.leftover, it.unit)} bleiben übrig</b></>}
       </div>
       <div>Für: {it.recipes.join(' · ')}</div>

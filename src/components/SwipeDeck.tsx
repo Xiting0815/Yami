@@ -12,6 +12,8 @@ interface Props {
   /** bereits sortiert: beste Empfehlung zuerst */
   deck: Recipe[]
   insights: Map<string, Insight>
+  /** Vorrats-Modus: Karte zeigt „x von y Zutaten da“ */
+  pantryMode?: boolean
   onTake: (r: Recipe) => void
   onReject: (r: Recipe) => void
   onInfo: (r: Recipe) => void
@@ -21,11 +23,19 @@ interface Props {
 
 const THRESHOLD = 90
 
-export function InsightBadges({ ins }: { ins?: Insight }) {
+export function InsightBadges({ ins, pantryMode }: { ins?: Insight; pantryMode?: boolean }) {
   if (!ins) return null
   const others = ins.fromPantry.filter((n) => !ins.urgent.includes(n))
   return (
     <div className="badges">
+      {pantryMode && ins.needCount > 0 && (
+        <span className="badge pantry-fit">
+          🧺 {ins.haveCount} von {ins.needCount} Zutaten da · Zukauf ≈ {formatEuro(ins.buyCost)}
+        </span>
+      )}
+      {ins.substitutes.map((s) => (
+        <span key={s.need} className="badge eco">🔄 {s.with.join(', ')} aus dem Vorrat statt {s.need}</span>
+      ))}
       {ins.taste && <span className="badge love">{ins.taste}</span>}
       {ins.urgent.length > 0 && <span className="badge warn">⚠️ verbraucht {ins.urgent.slice(0, 2).join(', ')}{ins.urgent.length > 2 ? ' …' : ''}</span>}
       {others.length > 0 && (
@@ -51,7 +61,7 @@ export function InsightBadges({ ins }: { ins?: Insight }) {
   )
 }
 
-export function SwipeDeck({ deck, insights, onTake, onReject, onInfo, portionOf }: Props) {
+export function SwipeDeck({ deck, insights, pantryMode, onTake, onReject, onInfo, portionOf }: Props) {
   const [drag, setDrag] = useState({ dx: 0, dy: 0, active: false })
   const [leaving, setLeaving] = useState<null | 'left' | 'right'>(null)
   const start = useRef<{ x: number; y: number; t: number } | null>(null)
@@ -100,8 +110,17 @@ export function SwipeDeck({ deck, insights, onTake, onReject, onInfo, portionOf 
   if (!top) {
     return (
       <div className="deck-empty">
-        <p>Keine Gerichte für diese Filter.</p>
-        <p className="muted">Lockere die Filter, um wieder Vorschläge zu sehen.</p>
+        {pantryMode ? (
+          <>
+            <p>Mit deinem Vorrat passt kein Gericht.</p>
+            <p className="muted">Beende „Vorrat zuerst“ oder lockere die Filter.</p>
+          </>
+        ) : (
+          <>
+            <p>Keine Gerichte für diese Filter.</p>
+            <p className="muted">Lockere die Filter, um wieder Vorschläge zu sehen.</p>
+          </>
+        )}
       </div>
     )
   }
@@ -162,7 +181,7 @@ export function SwipeDeck({ deck, insights, onTake, onReject, onInfo, portionOf 
           <div className="stamp like" style={{ opacity: likeOpacity }}>LECKER</div>
           <div className="stamp nope" style={{ opacity: nopeOpacity }}>NÄCHSTES</div>
           <div className="card-info">
-            <InsightBadges ins={ins} />
+            <InsightBadges ins={ins} pantryMode={pantryMode} />
             <h2>{top.title}</h2>
             {top.breakfast ? (
               <>

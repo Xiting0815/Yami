@@ -5,9 +5,11 @@ import { BREAKFAST_LABEL, type BreakfastType } from './types'
 import { assignBreakfasts, coveredDays, learnedPrepWeekday, prepOptions, prepPlan, resolvePrepDay, workdays } from './breakfast'
 import { BreakfastCard, shortTitle } from './components/BreakfastCard'
 import { DayActionsSheet } from './components/DayActionsSheet'
+import { PantryDaySheet } from './components/PantryDaySheet'
 import { StartCard, type StartStep } from './components/StartCard'
 import { PrepSheet } from './components/PrepSheet'
 import { PrepDayChip } from './components/PrepDayChip'
+import { pantryWishes } from './learning'
 import { type Rating, buildModel, pendingRating, preference, summarize } from './learning'
 import { ProfileSheet } from './components/ProfileSheet'
 import { exportBackup } from './backup'
@@ -122,6 +124,9 @@ export default function App() {
   const [actionsDay, setActionsDay] = useState<string | null>(null)
   /** Start-Checkliste gerade abgeschlossen → einmal „Alles eingerichtet“ zeigen */
   const [justFinished, setJustFinished] = useState(false)
+  /** „Was koche ich damit?“: Tag wählen (Sheet) und Wischen nach Vorrat sortieren */
+  const [pantryChooser, setPantryChooser] = useState(false)
+  const [pantryMode, setPantryMode] = useState(false)
   const finishShown = useRef(false)
 
   // Datum aktuell halten (App bleibt oft tagelang offen)
@@ -184,6 +189,7 @@ export default function App() {
     [showProgress, () => setShowProgress(false)],
     [showProfile, () => setShowProfile(false)],
     [reviewMonday !== null, () => setReviewMonday(null)],
+    [pantryChooser, () => setPantryChooser(false)],
   ]
   const open = layers.filter(([on]) => on)
   useBackStack(open.length, (target) => open.slice(target).forEach(([, close]) => close()))
@@ -289,7 +295,8 @@ export default function App() {
           })
           const pref = preference(taste, r, swipeDay)
           const bonus = proteinHigh ? proteinBoost(r.nutrition.protein) : 0
-          return [r.id, { ...ins, score: ins.score + pref.score + bonus, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
+          // Vorrats-Modus: Vorrat zuerst, gelernte Vorliebe nur als Tie-Breaker (×0,3)
+          return [r.id, { ...ins, score: ins.score + pref.score + bonus, modeScore: ins.modeScore + pref.score * 0.3, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
         }),
       ),
     [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
@@ -312,10 +319,17 @@ export default function App() {
         (!state.filters.pantryOnly || insights.get(r.id)!.buyCost <= PANTRY_ONLY_MAX_EURO),
     )
     const rej = new Set(rejected)
-    const fresh = list.filter((r) => !rej.has(r.id)).sort((a, b) => insights.get(b.id)!.score - insights.get(a.id)!.score)
-    const later = rejected.map((id) => list.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
+    // Vorrats-Modus: nur Gerichte, die etwas aus dem Vorrat brauchen, nach Vorratsnutzung sortiert
+    const pool = pantryMode ? list.filter((r) => insights.get(r.id)!.fromPantry.length > 0) : list
+    const key = (id: string) => (pantryMode ? insights.get(id)!.modeScore : insights.get(id)!.score)
+    const fresh = pool.filter((r) => !rej.has(r.id)).sort((a, b) => key(b.id) - key(a.id))
+    const later = rejected.map((id) => pool.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
     return [...fresh, ...later]
-  }, [state.filters, perPortion, plannedIds, rejected, insights])
+  }, [state.filters, perPortion, plannedIds, rejected, insights, pantryMode])
+  // Vorrats-Modus endet mit dem Tab-Wechsel
+  useEffect(() => {
+    if (tab !== 'wischen' || meal !== 'dinner') setPantryMode(false)
+  }, [tab, meal])
 
   // ───── Frühstück ─────
   const picks = state.breakfastPicks[weekKey] ?? []
@@ -485,9 +499,26 @@ export default function App() {
     setTab('wischen')
   }
 
+  /** „Was koche ich damit?“ → Tag gewählt: Woche des Tages zeigen und nach Vorrat wischen */
+  function startPantrySwipe(day: string) {
+    setPantryChooser(false)
+    setMeal('dinner')
+    setMonday(mondayOf(parseIso(day)))
+    setSwipeDay(day)
+    setRejected([])
+    setPantryMode(true)
+    setTab('wischen')
+  }
+
   function take(recipe: Recipe, day: string, servings = state.defaultServings) {
     const snap = snapshot()
     setEntry(day, { recipeId: recipe.id, servings })
+    if (pantryMode) {
+      flash(`${weekdayName(day)}: ${recipe.title} ✓`, snap)
+      setPantryMode(false)
+      setTab('woche')
+      return
+    }
     const idx = days.indexOf(day)
     const nextEmpty = [...days.slice(idx + 1), ...days.slice(0, idx)].find((d) => d !== day && !state.plan[d] && d >= today)
     if (nextEmpty) {
@@ -519,6 +550,11 @@ export default function App() {
     setEditor(null)
     setMeal(rec.meal)
     flash(old ? `${rec.title} gespeichert ✓` : `${rec.title} angelegt ✓`, snap)
+  }
+
+  /** Zutat in den Vorrat getippt – merken, wofür es (noch) kaum Rezepte gibt */
+  function noteRequest(name: string) {
+    setState((s) => ({ ...s, pantryRequests: { ...s.pantryRequests, [name]: (s.pantryRequests[name] ?? 0) + 1 } }))
   }
 
   function createIngredient(c: CustomIngredient) {
@@ -897,6 +933,13 @@ export default function App() {
                 ⚙︎ Filter{activeFilters ? ` (${activeFilters})` : ''}
               </button>
             </div>
+            {pantryMode && (
+              <div className="chips-row">
+                <button className="chip pantry-mode" onClick={() => setPantryMode(false)} aria-label="Vorrat zuerst beenden">
+                  🧺 Vorrat zuerst ✕
+                </button>
+              </div>
+            )}
             {state.plan[swipeDay] && (
               <p className="muted small center swipe-note">
                 Aktuell geplant: {RECIPE_BY_ID[state.plan[swipeDay]!.recipeId]?.title}. Nach rechts wischen ersetzt es.
@@ -909,11 +952,14 @@ export default function App() {
               }}
               deck={deck}
               insights={insights}
+              pantryMode={pantryMode}
               onTake={(r) => take(r, swipeDay)}
               onReject={reject}
               onInfo={(r) => setSheet({ recipe: r, day: swipeDay, mode: 'take' })}
             />
-            <p className="hint toast-slot">← wegwischen · nehmen → · sortiert nach Vorrat, Preis & Abwechslung</p>
+            <p className="hint toast-slot">
+              {pantryMode ? '← wegwischen · nehmen → · sortiert nach dem, was du im Vorrat hast' : '← wegwischen · nehmen → · sortiert nach Vorrat, Preis & Abwechslung'}
+            </p>
               </>
             )}
           </div>
@@ -961,15 +1007,17 @@ export default function App() {
               const waste = removed ? discardWaste(removed, today, state.prices) : null
               setState((s) => ({ ...s, pantry, wasted: waste ? [...s.wasted, waste].slice(-WASTED_MAX) : s.wasted }))
             }}
-            onCook={() => {
-              const free = days.find((d) => !state.plan[d] && d >= today)
-              if (free) startSwipe(free)
-              else {
-                // Woche voll → nächste Woche planen
-                changeWeek(1)
-                setTab('wischen')
-              }
+            onAdded={noteRequest}
+            onCreate={(c, lot) => {
+              setState((s) => ({
+                ...s,
+                customIngredients: s.customIngredients.some((x) => x.name === c.name) ? s.customIngredients : [...s.customIngredients, c],
+                pantry: [...s.pantry, lot],
+                pantryRequests: { ...s.pantryRequests, [c.name]: (s.pantryRequests[c.name] ?? 0) + 1 },
+              }))
+              flash(`${c.name} angelegt und im Vorrat ✓`)
             }}
+            onCook={() => setPantryChooser(true)}
           />
         )}
 
@@ -1097,6 +1145,10 @@ export default function App() {
         />
       )}
 
+      {pantryChooser && (
+        <PantryDaySheet today={today} plan={state.plan} onClose={() => setPantryChooser(false)} onPick={startPantrySwipe} />
+      )}
+
       {actionsDay && actionsEntry && actionsRecipe && (
         <DayActionsSheet
           day={actionsDay}
@@ -1198,6 +1250,7 @@ export default function App() {
         <ProfileSheet
           profile={profile}
           learned={summarize(taste)}
+          wishes={pantryWishes(state.pantryRequests)}
           prepWeekday={learnedPrepWeekday(state.prepDays, today)}
           onResetLearning={() => {
             const snap = snapshot()

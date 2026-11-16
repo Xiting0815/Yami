@@ -43,7 +43,7 @@ const groups: Record<ShopCat, string[]> = {
     'Gnocchi', 'Gorgonzola dolce', 'Gouda gerieben', 'Gruyère', 'Hefe frisch', 'Joghurt natur', 'Kartoffelsalat',
     'Lasagneplatten', 'Linguine', 'Maultaschen', 'Mie-Nudeln', 'Milch', 'Mozzarella', 'Orecchiette',
     'Parmigiano Reggiano', 'Pecorino Romano', 'Penne', 'Provolone', 'Ramen-Nudeln', 'Ravioli Ricotta-Spinat frisch',
-    'Reisbandnudeln', 'Ricotta', 'Ricotta salata', 'Rigatoni', 'Sahne', 'Saure Sahne', 'Schmand', 'Schmelzkäse',
+    'Reisbandnudeln', 'Crème fraîche', 'Sauce Hollandaise', 'Nudeln', 'Frischkäse', 'Mascarpone', 'Ricotta', 'Ricotta salata', 'Rigatoni', 'Sahne', 'Saure Sahne', 'Schmand', 'Schmelzkäse',
     'Schupfnudeln', 'Schweineschmalz', 'Spaghetti', 'Spätzle frisch', 'Speisequark', 'Suppennudeln', 'Tagliatelle',
     'Tofu natur', 'Tofu seiden', 'Tortellini frisch', 'Trofie', 'Weizennudeln asiatisch', 'Yakisoba-Nudeln', 'Ziti',
   ],

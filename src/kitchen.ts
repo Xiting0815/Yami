@@ -8,6 +8,7 @@ import { CATALOG, SHOP_ALIAS } from './data/catalog'
 import { CONVERT, PRODUCTS, type Product } from './data/products'
 import { inSeason, seasonOf } from './data/season'
 import { RECIPE_BY_ID } from './data/recipes'
+import { substitutesFor } from './data/substitutes'
 import type { Festive, PlanEntry, Recipe, ShopCat, WeekPlan } from './types'
 
 export interface PantryLot {
@@ -142,16 +143,28 @@ export function pantryAmount(lots: PantryLot[], name: string): number {
   return lots.filter((l) => l.name === name).reduce((s, l) => s + l.amount, 0)
 }
 
+/** Menge im Vorrat, die den Bedarf an `name` deckt: die Zutat selbst plus austauschbare (Penne für Spaghetti) */
+export function pantryCovering(lots: PantryLot[], name: string): number {
+  const subs = new Set(substitutesFor(name))
+  return lots.filter((l) => l.name === name || subs.has(l.name)).reduce((s, l) => s + l.amount, 0)
+}
+
 /**
  * Menge nach FIFO (frühestes Ablaufdatum zuerst) entnehmen. Angebrochene Posten bekommen
  * die kürzere "angebrochen"-Haltbarkeit. Gibt die entnommenen Teilmengen zurück.
  */
 export function consume(lots: PantryLot[], name: string, amount: number, date: string): PantryLot[] {
-  const prod = PRODUCTS[name]
   const taken: PantryLot[] = []
   let rest = amount
-  const mine = lots.filter((l) => l.name === name).sort((a, b) => a.expires.localeCompare(b.expires))
+  // erst die Zutat selbst, dann austauschbare (z. B. Penne statt Spaghetti), jeweils das früheste Ablaufdatum zuerst
+  const byExpiry = (a: PantryLot, b: PantryLot) => a.expires.localeCompare(b.expires)
+  const subs = new Set(substitutesFor(name))
+  const mine = [
+    ...lots.filter((l) => l.name === name).sort(byExpiry),
+    ...lots.filter((l) => subs.has(l.name)).sort(byExpiry),
+  ]
   for (const lot of mine) {
+    const prod = PRODUCTS[lot.name]
     if (rest <= 1e-9) break
     const t = Math.min(lot.amount, rest)
     lot.amount -= t
@@ -237,6 +250,8 @@ export interface BuyItem {
   required: number
   /** davon aus dem Vorrat */
   fromPantry: number
+  /** Teil davon aus austauschbaren Zutaten (z. B. Penne statt Spaghetti) */
+  substitutes: { name: string; amount: number }[]
   packs: number
   product: Product
   cost: number
@@ -310,9 +325,13 @@ export function planWeek(
     }
   }
 
-  // Vorrat vor dem Einkauf rekonstruieren: jetzt − Gekauftes + diese Woche schon Verbrauchtes
-  const consumedWeek = new Map<string, number>()
-  for (const [, e] of entries) for (const c of e.consumed ?? []) consumedWeek.set(c.name, (consumedWeek.get(c.name) ?? 0) + c.amount)
+  // Vorrat vor dem Einkauf rekonstruieren: jetzt − Gekauftes + diese Woche schon Verbrauchtes (je Zutat zusammengefasst)
+  const pool = new Map<string, number>()
+  const bump = (name: string, d: number) => pool.set(name, (pool.get(name) ?? 0) + d)
+  for (const l of pantry) bump(l.name, l.amount)
+  for (const [name, b] of Object.entries(bought)) bump(name, -b.amount)
+  for (const [, e] of entries) for (const c of e.consumed ?? []) bump(c.name, c.amount)
+  for (const [k, v] of pool) if (v < 0) pool.set(k, 0)
 
   // Noch offene Gerichte VOR dieser Woche (z. B. Sa/So, wenn schon die nächste Woche geplant wird)
   // brauchen ihre Zutaten noch – die dürfen für diese Woche nicht als vorhanden zählen.
@@ -320,20 +339,47 @@ export function planWeek(
     .flatMap((p) => Object.entries(p))
     .filter((x): x is [string, PlanEntry] => !!x[1] && x[0] < days[0] && !x[1].status && !!RECIPE_BY_ID[x[1].recipeId])
     .sort((a, b) => a[0].localeCompare(b[0]))
-  const reserved = new Map<string, number>()
-  for (const [, e] of earlier)
-    for (const n of needsOf(RECIPE_BY_ID[e.recipeId], e.servings)) reserved.set(n.name, (reserved.get(n.name) ?? 0) + n.amount)
+  /** Menge aus dem Pool nehmen: erst die Zutat selbst, dann austauschbare; gibt die Teilmengen zurück */
+  const take = (name: string, amount: number, exactOnly: boolean) => {
+    const got: { name: string; amount: number }[] = []
+    let rest = amount
+    for (const n of exactOnly ? [name] : substitutesFor(name)) {
+      const t = Math.min(pool.get(n) ?? 0, rest)
+      if (t > 1e-9) {
+        pool.set(n, (pool.get(n) ?? 0) - t)
+        rest -= t
+        got.push({ name: n, amount: t })
+      }
+    }
+    return got
+  }
+  const reservedNeeds = earlier.flatMap(([, e]) => needsOf(RECIPE_BY_ID[e.recipeId], e.servings))
+  const reservedRest = reservedNeeds.map((n) => n.amount - take(n.name, n.amount, true).reduce((s, x) => s + x.amount, 0))
+  reservedNeeds.forEach((n, i) => {
+    if (reservedRest[i] > 1e-6) take(n.name, reservedRest[i], false)
+  })
+
+  // 1. Durchgang: Zutat selbst – 2. Durchgang: austauschbare Posten für den Rest
+  const have = new Map<string, { exact: number; availExact: number; subs: { name: string; amount: number }[] }>()
+  for (const [name, { amount: required }] of req) {
+    const availExact = pool.get(name) ?? 0
+    const exact = take(name, required, true).reduce((s, x) => s + x.amount, 0)
+    have.set(name, { exact, availExact, subs: [] })
+  }
+  for (const [name, { amount: required }] of req) {
+    const h = have.get(name)!
+    if (required - h.exact > 1e-6) h.subs = take(name, required - h.exact, false)
+  }
 
   const buy: BuyItem[] = []
   const covered: BuyItem[] = []
   let total = 0
   for (const [name, { amount: required, recipes }] of req) {
     const product = productFor(name, overrides, month)!
-    const available = Math.max(
-      0,
-      pantryAmount(pantry, name) - (bought[name]?.amount ?? 0) + (consumedWeek.get(name) ?? 0) - (reserved.get(name) ?? 0),
-    )
-    const missing = Math.max(0, required - available)
+    const h = have.get(name)!
+    const subAmount = h.subs.reduce((s, x) => s + x.amount, 0)
+    const fromPantry = h.exact + subAmount
+    const missing = Math.max(0, required - fromPantry)
     const packs = missing > 1e-6 ? Math.ceil(missing / product.pack - 1e-6) : 0
     const item: BuyItem = {
       key: name,
@@ -341,11 +387,12 @@ export function planWeek(
       cat: CATALOG[name] ?? 'konserven',
       unit: product.unit,
       required,
-      fromPantry: Math.min(available, required),
+      fromPantry,
+      substitutes: h.subs,
       packs,
       product,
       cost: packs * product.price,
-      leftover: available + packs * product.pack - required,
+      leftover: h.availExact + subAmount + packs * product.pack - required,
       bought: bought[name]?.amount ?? 0,
       recipes: [...recipes],
     }
@@ -386,6 +433,16 @@ export interface Insight {
   fromPantry: string[]
   /** davon bald ablaufend (≤ 3 Tage) */
   urgent: string[]
+  /** Zutaten, die ein austauschbarer Vorratsposten deckt (z. B. Spaghetti ← Penne) */
+  substitutes: { need: string; with: string[] }[]
+  /** Anzahl mengenmäßig geführter Zutaten des Gerichts (ohne Gewürze/Grundzutaten) */
+  needCount: number
+  /** davon mindestens zur Hälfte aus dem Vorrat gedeckt */
+  haveCount: number
+  /** Anteil des Warenwerts, der aus dem Vorrat kommt (0–1) */
+  pantryShare: number
+  /** Vorrats-Modus („Was koche ich damit?“): Sortierwert ohne gelernte Vorliebe */
+  modeScore: number
   /** zusätzliche Einkaufskosten (ganze Packungen) */
   buyCost: number
   /** anteiliger Warenwert */
@@ -405,6 +462,9 @@ export interface Insight {
   longLasting: boolean
   score: number
 }
+
+/** Gewicht des Vorrats in der normalen Sortierung (Aufbrauchen vor Zukaufen) */
+export const PANTRY_WEIGHT = 4
 
 /** gilt als verderblich, wenn eine angebrochene Packung höchstens so viele Tage hält */
 const PERISHABLE_DAYS = 7
@@ -479,20 +539,55 @@ export function insight(
   const waste: Insight['waste'] = []
   const stale: string[] = []
   let pantryScore = 0
+  let coveredValue = 0
+  let totalValue = 0
+  let urgentValue = 0
+  let haveCount = 0
+  const substitutes: Insight['substitutes'] = []
+  const needs = needsOf(recipe, servings)
+  // jeder Vorratsposten wird nur einmal angerechnet (Spaghetti und Penne im selben Gericht teilen sich ihn)
+  const poolLeft = new Map<string, number>()
+  const left0 = (l: PantryLot) => poolLeft.get(l.id) ?? l.amount
   let buyCost = 0
   let wasteEuro = 0
   let longLasting = true
-  for (const n of needsOf(recipe, servings)) {
+  for (const n of needs) {
     const prod = productFor(n.name, overrides, opts.month)!
-    const mine = leftovers.filter((l) => l.name === n.name)
-    const have = mine.reduce((s, l) => s + l.amount, 0)
+    const byExpiry = (x: PantryLot, y: PantryLot) => x.expires.localeCompare(y.expires)
+    const subNames = new Set(substitutesFor(n.name))
+    const cand = [
+      ...leftovers.filter((l) => l.name === n.name).sort(byExpiry),
+      ...leftovers.filter((l) => subNames.has(l.name) && l.unit === prod.unit).sort(byExpiry),
+    ]
+    let rest = n.amount
+    let have = 0
+    const used: PantryLot[] = []
+    for (const l of cand) {
+      const a = left0(l)
+      if (a <= 1e-6 || rest <= 1e-9) continue
+      const t = Math.min(a, rest)
+      poolLeft.set(l.id, a - t)
+      rest -= t
+      have += t
+      used.push(l)
+    }
+    const value = (n.amount / prod.pack) * prod.price
+    totalValue += value
     if (have > 1e-6) {
       const coverage = Math.min(1, have / n.amount)
-      const soonest = mine.reduce((m, l) => minIso(m, l.expires), mine[0].expires)
+      const soonest = used.reduce((m, l) => minIso(m, l.expires), used[0].expires)
       const left = daysUntil(soonest, today)
       pantryScore += coverage * urgencyWeight(left)
-      fromPantry.push(n.name)
-      if (left <= 3) urgent.push(n.name)
+      coveredValue += coverage * value
+      if (coverage >= 0.5) haveCount++
+      const names = [...new Set(used.map((l) => l.name))]
+      for (const nm of names) if (!fromPantry.includes(nm)) fromPantry.push(nm)
+      const other = names.filter((nm) => nm !== n.name)
+      if (other.length) substitutes.push({ need: n.name, with: other })
+      if (left <= 3) {
+        urgentValue += coverage * value
+        for (const nm of names) if (!urgent.includes(nm)) urgent.push(nm)
+      }
     }
     const missing = Math.max(0, n.amount - have)
     if (missing > 1e-6) {
@@ -529,10 +624,17 @@ export function insight(
   const festive = festiveOf(recipe, opts.day ?? today)
   // im Fenster: der Preis des Festessens zählt nur noch halb – es kommt nach vorn, ohne den Stapel zu dominieren
   const festiveScore = festive ? (festive.active ? FESTIVE_BOOST + buyCost * 0.18 : -FESTIVE_PENALTY) : 0
+  // Vorrat aufbrauchen: Zahl der gedeckten Zutaten (Dringlichkeit) plus Anteil am Warenwert
+  const pantryShare = totalValue > 1e-6 ? coveredValue / totalValue : 0
+  const urgentShare = totalValue > 1e-6 ? urgentValue / totalValue : 0
+  const countShare = needs.length ? haveCount / needs.length : 0
+  const modeScore =
+    (fromPantry.length ? 6 : -50) + 12 * pantryShare + 16 * countShare + 8 * urgentShare + pantryScore * 1.5 - buyCost * 0.6 - repeatPenalty * 0.5 + jitter
   const score =
     seasonScore +
     festiveScore +
-    pantryScore * 2 -
+    pantryScore * PANTRY_WEIGHT +
+    pantryShare * 4 -
     buyCost * 0.25 +
     jitter * 4 -
     repeatPenalty -
@@ -542,7 +644,7 @@ export function insight(
     freshPenalty +
     longBonus
   const cost = recipeCost(recipe, servings, overrides)
-  return { season, festive, fromPantry, urgent, buyCost, cost, perPortion: cost / servings, lastSeenDays, waste, wasteEuro, stale, longLasting, score }
+  return { season, festive, fromPantry, urgent, substitutes, needCount: needs.length, haveCount, pantryShare, modeScore, buyCost, cost, perPortion: cost / servings, lastSeenDays, waste, wasteEuro, stale, longLasting, score }
 }
 
 /** Wann wurde ein Rezept zuletzt geplant (vor dem angegebenen Datum)? */
