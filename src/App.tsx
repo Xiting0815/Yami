@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { PlanEntry, Recipe } from './types'
+import type { CustomIngredient, CustomRecipe, PlanEntry, Recipe } from './types'
 import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from './data/recipes'
 import { BREAKFAST_LABEL, type BreakfastType } from './types'
 import { assignBreakfasts, prepPlan, workdays } from './breakfast'
@@ -42,6 +42,7 @@ import { FilterSheet, activeFilterCount } from './components/FilterBar'
 import { RecipeSheet } from './components/RecipeSheet'
 import { ShoppingList } from './components/ShoppingList'
 import { RecipeBrowser } from './components/RecipeBrowser'
+import { RecipeEditor } from './components/RecipeEditor'
 import { PantryView } from './components/PantryView'
 
 type Tab = 'woche' | 'wischen' | 'liste' | 'vorrat' | 'rezepte'
@@ -107,6 +108,8 @@ export default function App() {
   const [meal, setMeal] = useState<'dinner' | 'breakfast'>('dinner')
   const [bTypes, setBTypes] = useState<BreakfastType[]>([])
   const [bPantryOnly, setBPantryOnly] = useState(false)
+  /** Rezept-Editor: leer = neues Rezept */
+  const [editor, setEditor] = useState<{ recipe?: CustomRecipe } | null>(null)
   const [showPrep, setShowPrep] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showProgress, setShowProgress] = useState(false)
@@ -171,6 +174,7 @@ export default function App() {
     [showFilters, () => setShowFilters(false)],
     [!!actionsDay, () => setActionsDay(null)],
     [!!sheet, () => setSheet(null)],
+    [!!editor, () => setEditor(null)],
     [cooking, () => setCooking(false)],
     [showPrep, () => setShowPrep(false)],
     [showProgress, () => setShowProgress(false)],
@@ -201,11 +205,11 @@ export default function App() {
   const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
   const week = useMemo(
     () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth),
-    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth],
+    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients],
   )
   const weekRecipes = useMemo(
     () => days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => RECIPE_BY_ID[e!.recipeId]).filter(Boolean),
-    [days, state.plan],
+    [days, state.plan, state.customRecipes],
   )
   const lastSeen = useMemo(() => lastSeenMap(state.plan, days[0]), [state.plan, days])
   const jitter = useMemo(
@@ -225,8 +229,9 @@ export default function App() {
         wasted: state.wasted,
         today,
         since: state.tasteSince,
+        customRecipes: state.customRecipes,
       }),
-    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince],
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes],
   )
 
   // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────
@@ -256,7 +261,7 @@ export default function App() {
           return [r.id, { ...ins, score: ins.score + pref.score + bonus, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
         }),
       ),
-    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh],
+    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 
@@ -300,7 +305,7 @@ export default function App() {
           return [r.id, { ...ins, score: ins.score + pref.score, taste: pref.reason }]
         }),
       ),
-    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length, taste, todayMonth],
+    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length, taste, todayMonth, state.customRecipes, state.customIngredients],
   )
   const bDeck = useMemo(() => {
     const list = BREAKFASTS.filter(
@@ -362,7 +367,7 @@ export default function App() {
       }
     }
     return { balances, portions }
-  }, [profile, days, state.breakfast, state.plan])
+  }, [profile, days, state.breakfast, state.plan, state.customRecipes])
   /** Abendbudget für einen Tag (auch wenn dort noch nichts geplant ist) */
   const dinnerBudgetFor = (day: string) =>
     profile && isWorkday(day)
@@ -449,6 +454,54 @@ export default function App() {
     setRejected((x) => [...x.filter((id) => id !== r.id), r.id])
     setState((s) => ({ ...s, rejects: [...s.rejects, { id: r.id, date: today }].slice(-400) }))
     flash(`Übersprungen: ${r.title}`, snap)
+  }
+
+  /** Eigenes Rezept anlegen oder ändern */
+  function saveCustom(r: Omit<CustomRecipe, 'id' | 'created'> & { id?: string }) {
+    const snap = snapshot()
+    const old = state.customRecipes.find((c) => c.id === r.id)
+    const rec: CustomRecipe = { ...r, id: old?.id ?? `my-${uid()}`, created: old?.created ?? today }
+    setState((s) => ({
+      ...s,
+      customRecipes: old ? s.customRecipes.map((c) => (c.id === rec.id ? rec : c)) : [...s.customRecipes, rec],
+    }))
+    setEditor(null)
+    setMeal(rec.meal)
+    flash(old ? `${rec.title} gespeichert ✓` : `${rec.title} angelegt ✓`, snap)
+  }
+
+  function createIngredient(c: CustomIngredient) {
+    setState((s) => (s.customIngredients.some((x) => x.name === c.name) ? s : { ...s, customIngredients: [...s.customIngredients, c] }))
+  }
+
+  /** Eigenes Rezept löschen – inklusive aller Plan-Einträge (Rückgängig stellt alles wieder her) */
+  function deleteCustom(id: string) {
+    const snap = snapshot()
+    const title = RECIPE_BY_ID[id]?.title ?? 'Rezept'
+    setState((s) => {
+      let pantry = s.pantry
+      const strip = (p: typeof s.plan) => {
+        const next = { ...p }
+        for (const [d, e] of Object.entries(p)) {
+          if (e?.recipeId !== id) continue
+          if (e.status === 'cooked') pantry = uncook(e, pantry)
+          delete next[d]
+        }
+        return next
+      }
+      const plan = strip(s.plan)
+      const breakfast = strip(s.breakfast)
+      return {
+        ...s,
+        plan,
+        breakfast,
+        pantry,
+        customRecipes: s.customRecipes.filter((c) => c.id !== id),
+        breakfastPicks: Object.fromEntries(Object.entries(s.breakfastPicks).map(([k, ids]) => [k, ids.filter((x) => x !== id)])),
+      }
+    })
+    setSheet(null)
+    flash(`${title} gelöscht`, snap)
   }
 
   function removeEntry(day: string) {
@@ -867,6 +920,8 @@ export default function App() {
             perPortion={perPortion}
             meal={meal}
             onMeal={setMeal}
+            custom={state.customRecipes}
+            onNew={() => setEditor({})}
           />
         )}
       </main>
@@ -919,6 +974,12 @@ export default function App() {
           onClose={() => setSheet(null)}
           cooking={cooking}
           onCooking={setCooking}
+          onEdit={() => {
+            const c = state.customRecipes.find((x) => x.id === sheet.recipe.id)
+            setSheet(null)
+            if (c) setEditor({ recipe: c })
+          }}
+          onDelete={() => deleteCustom(sheet.recipe.id)}
           action={
             sheet.recipe.breakfast
               ? sheet.mode === 'take' || sheet.mode === 'pick'
@@ -948,6 +1009,17 @@ export default function App() {
                   }
                 : undefined
           }
+        />
+      )}
+
+      {editor && (
+        <RecipeEditor
+          key={editor.recipe?.id ?? 'new'}
+          initial={editor.recipe}
+          defaultMeal={meal}
+          onSave={saveCustom}
+          onCreateIngredient={createIngredient}
+          onClose={() => setEditor(null)}
         />
       )}
 

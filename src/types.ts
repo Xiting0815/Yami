@@ -83,6 +83,41 @@ export interface Recipe {
   steps: string[]
   vegetarian: boolean
   image?: string
+  /** selbst angelegtes Rezept (Id beginnt mit "my-") */
+  custom?: boolean
+}
+
+/** Selbst angelegtes Rezept – wird gespeichert und zur Laufzeit zu einem `Recipe` gebaut */
+export interface CustomRecipe {
+  id: string
+  title: string
+  meal: 'dinner' | 'breakfast'
+  cuisine: Cuisine
+  type: DishType
+  time: number
+  /** Basis-Portionen der Mengenangaben */
+  servings: number
+  ingredients: Ingredient[]
+  steps: string[]
+  /** kleines Foto als Data-URL */
+  image?: string
+  /** nur Frühstück */
+  breakfast?: NonNullable<Recipe['breakfast']>
+  /** Anlegedatum (ISO) – zählt einmal als „genommen“ fürs Lernen */
+  created: string
+}
+
+/** Selbst angelegte Zutat (nicht im Katalog) */
+export interface CustomIngredient {
+  name: string
+  cat: ShopCat
+  /** pro 100 g bzw. 100 ml */
+  kcal: number
+  protein: number
+  /** Basiseinheit der Packung: g, ml, Stk, Bund … */
+  unit: string
+  /** Gewicht eines Stücks in g (nur bei Stk) */
+  gramsPerPiece?: number
 }
 
 export interface PlanEntry {

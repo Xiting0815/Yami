@@ -27,9 +27,12 @@ interface Props {
   /** Kochmodus offen – App zählt ihn als Zurück-Ebene */
   cooking: boolean
   onCooking: (on: boolean) => void
+  /** nur bei eigenen Rezepten */
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onCooking }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onCooking, onEdit, onDelete }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
 
@@ -67,6 +70,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                 </>
               )}
               <span>⏱ {formatTime(recipe.time)}</span>
+              {recipe.custom && <span>✏️ Eigenes</span>}
             </div>
             <h2>{recipe.title}</h2>
             {insight && <div className="sheet-badges"><InsightBadges ins={insight} /></div>}
@@ -137,6 +141,13 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                 <h3>Morgens / auf der Arbeit</h3>
                 <p className="morning">☀️ {recipe.breakfast.morning}</p>
               </>
+            )}
+
+            {recipe.custom && (
+              <div className="own-actions">
+                <button className="btn ghost" onClick={onEdit}>✏️ Bearbeiten</button>
+                <button className="btn ghost danger" onClick={onDelete}>🗑️ Löschen</button>
+              </div>
             )}
 
             {credit && (

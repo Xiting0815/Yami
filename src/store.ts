@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
-import { RECIPE_BY_ID } from './data/recipes'
-import type { Cuisine, DishType, ShopCat, WeekPlan } from './types'
+import { RECIPE_BY_ID, registerCustom } from './data/recipes'
+import { CATALOG } from './data/catalog'
+import {
+  BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, TYPE_LABEL,
+  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type ShopCat, type WeekPlan,
+} from './types'
 import { WASTED_MAX, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
 import type { Profile } from './energy'
 import type { WeighIn } from './progress'
@@ -71,6 +75,10 @@ export interface AppState {
   wasted: WastedItem[]
   /** Wochen (Montag, ISO), deren Rückblick-Karte weggeklickt wurde */
   reviewDismissed: string[]
+  /** selbst angelegte Rezepte (Id beginnt mit "my-") */
+  customRecipes: CustomRecipe[]
+  /** selbst angelegte Zutaten, die nicht im Katalog stehen */
+  customIngredients: CustomIngredient[]
 }
 
 const KEY = 'yami-state-v1'
@@ -96,14 +104,73 @@ const INITIAL: AppState = {
   ratingDismissed: [],
   wasted: [],
   reviewDismissed: [],
+  customRecipes: [],
+  customIngredients: [],
 }
 
 const hasData = (s: AppState) =>
   !!s.profile || [s.plan, s.breakfast, s.breakfastPicks].some((o) => o && Object.values(o).some((v) => (Array.isArray(v) ? v.length : v)))
 
+const ISO = /^\d{4}-\d{2}-\d{2}$/
+const MAX_IMAGE = 300_000
+
+function validIngredient(x: unknown): x is CustomIngredient {
+  const c = x as Partial<CustomIngredient> | null
+  return (
+    !!c && typeof c.name === 'string' && c.name.trim() !== '' && c.name.length <= 60 && typeof c.cat === 'string' && c.cat in SHOP_LABEL &&
+    Number.isFinite(c.kcal) && Number.isFinite(c.protein) && typeof c.unit === 'string' && c.unit !== '' &&
+    (c.gramsPerPiece == null || (Number.isFinite(c.gramsPerPiece) && c.gramsPerPiece > 0))
+  )
+}
+
+/** Eigenes Rezept prüfen; Zutaten, die es nicht (mehr) gibt, entfallen */
+function validRecipe(x: unknown): CustomRecipe | null {
+  const c = x as Partial<CustomRecipe> | null
+  if (!c || typeof c.id !== 'string' || !c.id.startsWith('my-') || typeof c.title !== 'string' || !c.title.trim()) return null
+  if (c.meal !== 'dinner' && c.meal !== 'breakfast') return null
+  if (!c.cuisine || !(c.cuisine in CUISINE_LABEL) || !c.type || !(c.type in TYPE_LABEL)) return null
+  if (!Array.isArray(c.ingredients) || !Array.isArray(c.steps)) return null
+  const ingredients: Ingredient[] = c.ingredients
+    .filter(
+      (i): i is Ingredient =>
+        !!i && typeof i.name === 'string' && !!CATALOG[i.name] && typeof i.unit === 'string' && (i.amount === null || Number.isFinite(i.amount)),
+    )
+    .map((i) => ({ name: i.name, amount: i.amount, unit: i.unit }))
+  if (!ingredients.length) return null
+  const b = c.breakfast
+  const breakfast =
+    c.meal === 'breakfast'
+      ? {
+          type: b && b.type in BREAKFAST_LABEL ? (b.type as BreakfastType) : ('herzhaft' as BreakfastType),
+          fridgeDays: b && Number.isFinite(b.fridgeDays) && b.fridgeDays > 0 ? b.fridgeDays : 3,
+          freezer: !!b?.freezer,
+          container: b && typeof b.container === 'string' && b.container ? b.container : 'Glas',
+          morning: b && typeof b.morning === 'string' ? b.morning : '',
+        }
+      : undefined
+  const image = typeof c.image === 'string' && c.image.startsWith('data:image/') && c.image.length <= MAX_IMAGE ? c.image : undefined
+  return {
+    id: c.id,
+    title: c.title.trim().slice(0, 120),
+    meal: c.meal,
+    cuisine: c.cuisine as Cuisine,
+    type: c.type as DishType,
+    time: Number.isFinite(c.time) && c.time! > 0 ? Math.round(c.time!) : 30,
+    servings: Number.isFinite(c.servings) && c.servings! >= 1 ? Math.round(c.servings!) : c.meal === 'breakfast' ? 1 : 2,
+    ingredients,
+    steps: c.steps.filter((s): s is string => typeof s === 'string' && s.trim() !== '').map((s) => s.trim()),
+    image,
+    breakfast,
+    created: typeof c.created === 'string' && ISO.test(c.created) ? c.created : '1970-01-01',
+  }
+}
+
 /** Stand aus beliebigen Daten (localStorage oder Sicherungsdatei) machen: falsche Typen verwerfen, Rezepte ohne Eintrag entfernen */
 export function sanitize(parsed: unknown): AppState {
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return INITIAL
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    registerCustom([], [])
+    return INITIAL
+  }
   // Felder mit falschem Typ (z. B. "plan": null) verwerfen statt die App abstürzen zu lassen
   const saved: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(parsed)) {
@@ -116,6 +183,14 @@ export function sanitize(parsed: unknown): AppState {
   }
   if (typeof saved.lastBackup !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(saved.lastBackup)) delete saved.lastBackup
   const state: AppState = { ...INITIAL, ...(saved as Partial<AppState>), filters: { ...EMPTY_FILTERS, ...(saved.filters as object) } }
+  // Eigene Zutaten und Rezepte prüfen und eintragen, bevor der Plan geprüft wird (der Plan darf auf sie zeigen)
+  state.customIngredients = state.customIngredients.filter(validIngredient)
+  registerCustom(state.customIngredients, [])
+  const seen = new Set<string>()
+  state.customRecipes = state.customRecipes
+    .map(validRecipe)
+    .filter((r): r is CustomRecipe => !!r && !seen.has(r.id) && !!seen.add(r.id))
+  registerCustom(state.customIngredients, state.customRecipes)
   // Einträge zu Rezepten, die es nicht mehr gibt, entfernen
   const clean = (p: WeekPlan) => Object.fromEntries(Object.entries(p).filter(([, e]) => e && RECIPE_BY_ID[e.recipeId]))
   state.plan = clean(state.plan)
@@ -152,6 +227,8 @@ function load(): AppState {
 
 export function useAppState() {
   const [state, setState] = useState<AppState>(load)
+  // eigene Zutaten/Rezepte vor dem Rendern in die Verzeichnisse eintragen (auch nach Rückgängig/Import); idempotent
+  registerCustom(state.customIngredients, state.customRecipes)
   useEffect(() => {
     try {
       localStorage.setItem(KEY, JSON.stringify(state))

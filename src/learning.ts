@@ -2,7 +2,7 @@
  * Lernende Vorlieben.
  *
  * Signale (mit Zeitverfall, Halbwertszeit 60 Tage):
- *   geplant/gewählt  +1      weggewischt   −0,4
+ *   geplant/gewählt  +1      weggewischt   −0,4      selbst angelegtes Rezept +1
  *   gekocht          +0,8    nicht gekocht −1
  *   Bewertung 👍 +2 · 🔁 „bald wieder“ +2,5 · 👎 −3
  *   Gerichte einer Woche, die eine weggeworfene Zutat brauchen −0,3 (höchstens 1× pro Tag)
@@ -109,6 +109,8 @@ export interface TasteInput {
   wasted?: WastedItem[]
   /** Signale vor diesem Datum ignorieren (nach „Zurücksetzen“) */
   since?: string
+  /** selbst angelegte Rezepte: Anlegen zählt einmal wie „genommen“ (+1) */
+  customRecipes?: { id: string; created: string }[]
 }
 
 export function buildModel(inp: TasteInput): TasteModel {
@@ -141,6 +143,8 @@ export function buildModel(inp: TasteInput): TasteModel {
   }
   // Frühstück: pro Woche gewählt (nicht 5× pro Tag zählen)
   for (const [week, ids] of Object.entries(inp.breakfastPicks)) for (const id of ids ?? []) add(id, week, W.take)
+  // Selbst angelegt: ein eigenes Rezept zeigt, was man gern isst
+  for (const c of inp.customRecipes ?? []) add(c.id, c.created, W.take)
   // Weggewischt
   for (const r of inp.rejects) add(r.id, r.date, W.reject)
   // Weggeworfen: Gerichte derselben Woche, die die Zutat brauchen, leicht abwerten

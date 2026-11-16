@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { Recipe } from '../types'
+import type { CustomRecipe, Recipe } from '../types'
 import { CUISINE_LABEL } from '../types'
 import { BREAKFASTS, RECIPES } from '../data/recipes'
 import { BREAKFAST_LABEL } from '../types'
@@ -18,21 +18,25 @@ interface Props {
   perPortion: Map<string, number>
   meal: 'dinner' | 'breakfast'
   onMeal: (m: 'dinner' | 'breakfast') => void
+  /** eigene Rezepte (ändert sich beim Anlegen/Löschen → Liste neu aufbauen) */
+  custom: CustomRecipe[]
+  onNew: () => void
 }
 
 function norm(s: string) {
   return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 }
 
-export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, onMeal }: Props) {
+export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, onMeal, custom, onNew }: Props) {
   const [q, setQ] = useState('')
+  const [mine, setMine] = useState(false)
   const list = useMemo(() => {
     const nq = norm(q.trim())
     const base = meal === 'breakfast' ? BREAKFASTS : RECIPES.filter((r) => matches(r, filters, perPortion.get(r.id)))
-    return base.filter(
+    return base.filter((r) => !mine || r.custom).filter(
       (r) => !nq || norm(r.title).includes(nq) || r.ingredients.some((i) => norm(i.name).includes(nq)),
     ).sort((a, b) => a.title.localeCompare(b.title, 'de'))
-  }, [q, filters, perPortion, meal])
+  }, [q, filters, perPortion, meal, mine, custom])
 
   return (
     <div className="browser">
@@ -41,17 +45,31 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
         <button className={meal === 'breakfast' ? 'on' : ''} onClick={() => onMeal('breakfast')}>☀️ Frühstück</button>
         <button className={meal === 'dinner' ? 'on' : ''} onClick={() => onMeal('dinner')}>🌙 Abendessen</button>
       </div>
+      <div className="chips-row own-row">
+        <button className="chip own-new" onClick={onNew}>
+          + Eigenes Rezept
+        </button>
+        <button className={`chip ${mine ? 'on' : ''}`} onClick={() => setMine(!mine)} aria-pressed={mine}>
+          Meine Rezepte{custom.length ? ` (${custom.length})` : ''}
+        </button>
+      </div>
       {meal === 'dinner' ? (
         <FilterBar filters={filters} onChange={onFilters} count={list.length} />
       ) : (
         <p className="muted small">{list.length} Meal-Prep-Frühstücke · je ca. 370–470 kcal, ≥ 25 g Eiweiß, ≥ 8 g Ballaststoffe</p>
+      )}
+      {mine && list.length === 0 && (
+        <p className="muted small">Noch kein eigenes Rezept{meal === 'breakfast' ? ' fürs Frühstück' : ' fürs Abendessen'}. Tipp auf „+ Eigenes Rezept“.</p>
       )}
       <div className="grid">
         {list.map((r) => (
           <button key={r.id} className="tile" onClick={() => onOpen(r)}>
             <RecipeImage recipe={r} className="tile-img" />
             <div className="tile-text">
-              <div className="tile-title">{r.title}</div>
+              <div className="tile-title">
+                {r.custom && <span className="own-badge">Eigenes</span>}
+                {r.title}
+              </div>
               {r.breakfast ? (
                 <>
                   <div className="muted small">{BREAKFAST_LABEL[r.breakfast.type]} · hält {r.breakfast.fridgeDays} T.</div>
