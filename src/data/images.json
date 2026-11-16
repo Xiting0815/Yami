@@ -102,7 +102,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Ghormeh_Sabzi.JPG"
  },
- "boscaiola": null,
+ "boscaiola": {
+  "author": "Gemini",
+  "file": "img/boscaiola.webp",
+  "license": "KI",
+  "source": ""
+ },
  "bratwurst-sauerkraut": {
   "author": "Schlurcher",
   "commonsTitle": "File:Nürnberger Rostbratwürste.JPG",
@@ -294,6 +299,12 @@
   "file": "img/fettuccine-alfredo.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chicken_fettuccine_alfredo.JPG"
+ },
+ "fischauflauf": {
+  "author": "Gemini",
+  "file": "img/fischauflauf.webp",
+  "license": "KI",
+  "source": ""
  },
  "flaedlesuppe": {
   "author": "Benreis",
@@ -553,6 +564,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Jauheliha-perunasoselaatikko.jpg"
  },
+ "kartoffel-lauch-gratin": {
+  "author": "Gemini",
+  "file": "img/kartoffel-lauch-gratin.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kartoffeleintopf": {
   "author": "Benreis",
   "commonsTitle": "File:Kartoffelsuppe Wiener Würstchen.jpg",
@@ -608,6 +625,12 @@
   "file": "img/kohlrouladen.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:00101_Vorkarpatische_K%C3%BCche_Piroggen,_Kohlrouladen,_Kroketten.JPG"
+ },
+ "kotelett-rahmkohlrabi": {
+  "author": "Gemini",
+  "file": "img/kotelett-rahmkohlrabi.webp",
+  "license": "KI",
+  "source": ""
  },
  "krautschupfnudeln": {
   "author": "MarkusHagenlocher",
@@ -924,6 +947,12 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kartoffeln-quark.jpg"
  },
+ "penne-salmone": {
+  "author": "Gemini",
+  "file": "img/penne-salmone.webp",
+  "license": "KI",
+  "source": ""
+ },
  "penne-vodka": {
   "author": "Joseph O'Connell - https://www.flickr.com/photos/joconnell/",
   "commonsTitle": "File:PenneAllaVodka.jpg",
@@ -1082,6 +1111,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Ribollita_toscana.JPG"
  },
+ "rigatoni-salsiccia": {
+  "author": "Gemini",
+  "file": "img/rigatoni-salsiccia.webp",
+  "license": "KI",
+  "source": ""
+ },
  "rind-brokkoli": {
   "author": "jeffreyw",
   "commonsTitle": "File:Broccoli beef (5457397534).jpg",
@@ -1131,7 +1166,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Risotto-alla-zucca.jpg"
  },
- "rosenkohl-gratin": null,
+ "rosenkohl-gratin": {
+  "author": "Gemini",
+  "file": "img/rosenkohl-gratin.webp",
+  "license": "KI",
+  "source": ""
+ },
  "rotes-curry": {
   "author": "goanfishcurryrice3",
   "commonsTitle": "File:Prawns and Ladyfinger curry (16263691317).jpg",
@@ -1160,7 +1200,12 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Sauerbraten_with_potato_dumplings.jpg"
  },
- "sauerkraut-auflauf": null,
+ "sauerkraut-auflauf": {
+  "author": "Gemini",
+  "file": "img/sauerkraut-auflauf.webp",
+  "license": "KI",
+  "source": ""
+ },
  "savory-oats": {
   "author": "Gemini",
   "file": "img/savory-oats.webp",
@@ -1264,7 +1309,12 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Soljanka_with_olives.jpg"
  },
- "spaetzle-auflauf": null,
+ "spaetzle-auflauf": {
+  "author": "Gemini",
+  "file": "img/spaetzle-auflauf.webp",
+  "license": "KI",
+  "source": ""
+ },
  "spaghetti-cozze": {
   "author": "Daniele Pugliesi",
   "commonsTitle": "File:Spaghetti con le cozze nella padella.jpg",
@@ -1419,7 +1469,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Bohnensuppe_serbisch.jpg"
  },
- "weisskohleintopf": null,
+ "weisskohleintopf": {
+  "author": "Gemini",
+  "file": "img/weisskohleintopf.webp",
+  "license": "KI",
+  "source": ""
+ },
  "wiener-schnitzel": {
   "author": "Burkhard Mücke",
   "commonsTitle": "File:2022-12-29 Wiener Schnitzel im Hotel Kaiserin Elisabeth.jpg",
@@ -1427,7 +1482,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:2022-12-29_Wiener_Schnitzel_im_Hotel_Kaiserin_Elisabeth.jpg"
  },
- "wirsingeintopf": null,
+ "wirsingeintopf": {
+  "author": "Gemini",
+  "file": "img/wirsingeintopf.webp",
+  "license": "KI",
+  "source": ""
+ },
  "wrap-haehnchen": {
   "author": "Gemini",
   "file": "img/wrap-haehnchen.webp",
