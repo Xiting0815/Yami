@@ -788,3 +788,5 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .badge.pantry-fit { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); font-weight: 700; }
 .chip.pantry-mode { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .sub-hint { font-size: 13px; color: var(--muted); }
+
+.search-words { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 10px; }

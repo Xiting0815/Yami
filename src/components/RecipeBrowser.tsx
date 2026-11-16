@@ -9,6 +9,7 @@ import { matches, formatTime } from '../filter'
 import { formatEuro } from '../kitchen'
 import { FilterBar } from './FilterBar'
 import { RecipeImage } from './RecipeImage'
+import { searchIngredients } from '../customIngredients'
 
 interface Props {
   filters: Filters
@@ -33,14 +34,34 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
   const list = useMemo(() => {
     const nq = norm(q.trim())
     const base = meal === 'breakfast' ? BREAKFASTS : RECIPES.filter((r) => matches(r, filters, perPortion.get(r.id)))
-    return base.filter((r) => !mine || r.custom).filter(
-      (r) => !nq || norm(r.title).includes(nq) || r.ingredients.some((i) => norm(i.name).includes(nq)),
-    ).sort((a, b) => a.title.localeCompare(b.title, 'de'))
+    const pool = base.filter((r) => !mine || r.custom)
+    const exact = pool.filter((r) => !nq || norm(r.title).includes(nq) || r.ingredients.some((i) => norm(i.name).includes(nq)))
+    // nichts gefunden (z. B. Tippfehler „Tunfisch“) → über ähnlich geschriebene Zutaten suchen
+    const fuzzy = exact.length || nq.length < 3 ? [] : (() => {
+      const names = new Set(searchIngredients(q, 6))
+      return pool.filter((r) => r.ingredients.some((i) => names.has(i.name)))
+    })()
+    return (exact.length ? exact : fuzzy).sort((a, b) => a.title.localeCompare(b.title, 'de'))
   }, [q, filters, perPortion, meal, mine, custom])
+  // Wortvorschläge beim Tippen (Zutaten, auch bei Tippfehlern)
+  const words = useMemo(() => {
+    const t = q.trim()
+    if (t.length < 3) return []
+    return searchIngredients(t, 5).filter((n) => norm(n) !== norm(t))
+  }, [q])
 
   return (
     <div className="browser">
       <input className="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="🔍 Gericht oder Zutat suchen …" />
+      {words.length > 0 && (
+        <div className="search-words" aria-label="Vorschläge">
+          {words.map((w) => (
+            <button key={w} className="chip" onClick={() => setQ(w)}>
+              {w}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="segmented">
         <button className={meal === 'breakfast' ? 'on' : ''} onClick={() => onMeal('breakfast')}>☀️ Frühstück</button>
         <button className={meal === 'dinner' ? 'on' : ''} onClick={() => onMeal('dinner')}>🌙 Abendessen</button>

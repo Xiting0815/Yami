@@ -412,7 +412,40 @@ export function searchIngredients(query: string, limit = 8): string[] {
   for (const c of getIndex()) {
     if (normalize(c.name).includes(nq) || (qt.length && qt.every((t) => c.stems.some((s) => s.startsWith(t) || t.startsWith(s))))) hits.add(c.name)
   }
+  // Tippfehler und Schreibvarianten („Tunfisch“, „Zuchini“, „Broccoli“): lautähnlich + kleine Abweichungen
+  if (hits.size < limit) {
+    const ft = tokens(query).map(fold).filter((t) => t.length >= 3)
+    if (ft.length) {
+      const scored: { name: string; d: number }[] = []
+      for (const c of getIndex()) {
+        if (hits.has(c.name)) continue
+        const words = tokens(c.name).map(fold)
+        let total = 0
+        const ok = ft.every((t) => {
+          const best = Math.min(...words.map((w) => (w.includes(t) ? 0 : lev(t, w.slice(0, t.length)))))
+          total += best
+          return best <= (t.length >= 7 ? 2 : t.length >= 4 ? 1 : 0)
+        })
+        if (ok) scored.push({ name: c.name, d: total })
+      }
+      scored.sort((a, b) => a.d - b.d || a.name.length - b.name.length)
+      for (const s of scored) hits.add(s.name)
+    }
+  }
   return [...hits].slice(0, limit)
+}
+
+/** Lautähnliche Schreibweise: th→t, ph→f, ck/c→k, y→i, ie→i, doppelte Buchstaben einfach */
+function fold(w: string): string {
+  return w
+    .replace(/th/g, 't')
+    .replace(/ph/g, 'f')
+    .replace(/ck/g, 'k')
+    .replace(/c(?=[aou]|$)/g, 'k')
+    .replace(/qu/g, 'kw')
+    .replace(/y/g, 'i')
+    .replace(/ie/g, 'i')
+    .replace(/(.)\1+/g, '$1')
 }
 
 // ───────────── Einheit prüfen ─────────────
