@@ -154,6 +154,8 @@ export interface AppState {
   profileCreated?: string
   /** Frühstückszeile in der Wochenansicht aufgeklappt */
   bfOpen?: boolean
+  /** Rezeptansicht: klassische Schritte statt der Geräte-Schritte (pro Gerät/Nutzer gemerkt) */
+  showClassicSteps?: boolean
   /** Datum (ISO) der letzten Sicherungsdatei */
   lastBackup?: string
   /** weggeworfene Vorratsposten (höchstens die letzten 300) */
@@ -440,6 +442,7 @@ export function sanitize(parsed: unknown): AppState {
   state.prices = Object.fromEntries(Object.entries(state.prices).filter(([, p]) => !!p && isNum(p.pack) && p.pack > 0 && isNum(p.price) && p.price >= 0))
   if (state.profile) state.profile = validProfile(state.profile)
   if (!state.profile) delete state.profile
+  if (typeof state.showClassicSteps !== 'boolean') delete state.showClassicSteps
   state.ha = sanitizeHa(saved.ha)
   if (!state.ha) delete state.ha
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)

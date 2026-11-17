@@ -856,3 +856,16 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .spice-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 14px 12px; }
 .exp.low { color: var(--amber-ink); font-weight: 700; }
 .item-note { font-size: 12px; font-weight: 700; color: var(--amber-ink); display: block; }
+
+/* ───── Geräte-Einstellungen ───── */
+.dev-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.dev-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 999px;
+  font-size: 13px; line-height: 1.3; font-weight: 600; color: var(--text);
+  background: var(--accent-soft); border: 1px solid var(--line);
+}
+.dev-chip .icon { flex: none; color: var(--accent-text); }
+.dev-note { font-weight: 400; color: var(--muted); }
+.cook-step .dev-chip { font-size: 15px; padding: 6px 12px 6px 10px; }
+.dev-toggle { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 10px; }
+.dev-toggle button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 13px; color: var(--accent-text); text-decoration: underline; cursor: pointer; }

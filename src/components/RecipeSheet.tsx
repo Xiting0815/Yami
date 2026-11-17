@@ -10,6 +10,7 @@ import { type Insight, type PriceOverrides, formatEuro, recipeCost } from '../ki
 import { InsightBadges } from './SwipeDeck'
 import type { Portion } from '../energy'
 import { CookMode } from './CookMode'
+import { DeviceChips } from './DeviceChip'
 
 type Credit = { author: string; license: string; source: string } | null | undefined
 const credits = imageMap as unknown as Record<string, Credit>
@@ -30,11 +31,16 @@ interface Props {
   /** nur bei eigenen Rezepten */
   onEdit?: () => void
   onDelete?: () => void
+  /** klassische Schritte statt Geräte-Schritte zeigen (gemerkt) */
+  showClassic?: boolean
+  onShowClassic?: (v: boolean) => void
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onCooking, onEdit, onDelete }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onCooking, onEdit, onDelete, showClassic, onShowClassic }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
+  const hasDevice = !!recipe.deviceSteps && !!recipe.classicSteps
+  const classic = hasDevice && !!showClassic
 
   useEffect(() => {
     // Escape schließt zuerst den Kochmodus (dort), nicht das Sheet
@@ -130,10 +136,21 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             </ul>
 
             <h3>{recipe.breakfast ? 'Vorbereitung (am Prep-Tag)' : 'Zubereitung'}</h3>
+            {hasDevice && (
+              <p className="dev-toggle muted small">
+                <span>{classic ? 'Klassische Schritte' : 'Für deine Geräte angepasst'}</span>
+                <button onClick={() => onShowClassic?.(!classic)}>{classic ? 'Für meine Geräte anzeigen' : 'Klassisch anzeigen'}</button>
+              </p>
+            )}
             <ol className="steps">
-              {recipe.steps.map((s, i) => (
-                <li key={i}>{s}</li>
-              ))}
+              {classic
+                ? recipe.classicSteps!.map((s, i) => <li key={i}>{s}</li>)
+                : recipe.steps.map((s, i) => (
+                    <li key={i}>
+                      {s}
+                      <DeviceChips settings={recipe.deviceSteps?.[i]?.settings} />
+                    </li>
+                  ))}
             </ol>
 
             {recipe.breakfast && (

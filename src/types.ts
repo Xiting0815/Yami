@@ -82,13 +82,44 @@ export interface Recipe {
   /** Basis-Portionen der Mengenangaben */
   servings: number
   ingredients: Ingredient[]
+  /** Schritttexte (bei angepassten Rezepten: die Texte aus `deviceSteps`) */
   steps: string[]
+  /** Schritte mit Geräte-Einstellungen (CombiSteamer, Combair, BORA, Airfryer); gleiche Länge wie `steps` */
+  deviceSteps?: DeviceStep[]
+  /** ursprüngliche Schritte (ohne Geräte), nur wenn `deviceSteps` gesetzt ist */
+  classicSteps?: string[]
   vegetarian: boolean
   image?: string
   /** Festtagsgericht: kommt in diesen Zeitfenstern nach vorn, sonst weiter hinten */
   festive?: Festive[]
   /** selbst angelegtes Rezept (Id beginnt mit "my-") */
   custom?: boolean
+}
+
+/** Küchengeräte im Haushalt */
+export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer'
+
+/** Eine Geräte-Einstellung zu einem Rezeptschritt */
+export interface DeviceSetting {
+  device: Device
+  /** Betriebsart bzw. Kochzone, deutsch wie im Gerät (z. B. „Dämpfen“, „Heissluft“, „Pfanne“) */
+  mode: string
+  /** °C */
+  temp?: number
+  /** nur BORA: „1“–„9“, „Power“, „Schmelzen“, „Warmhalten“, „Simmern“ */
+  level?: string
+  minutes?: number
+  /** Feuchte in % (nur wo das Gerät sie einstellen lässt) */
+  humidity?: number
+  /** Kerntemperatur °C (Fühler) */
+  core?: number
+  note?: string
+}
+
+/** Rezeptschritt mit Text und optionalen Geräte-Einstellungen */
+export interface DeviceStep {
+  text: string
+  settings?: DeviceSetting[]
 }
 
 /** Selbst angelegtes Rezept – wird gespeichert und zur Laufzeit zu einem `Recipe` gebaut */

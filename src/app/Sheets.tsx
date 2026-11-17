@@ -51,6 +51,8 @@ export function Sheets({ m }: { m: AppModel }) {
           onClose={() => ui.setSheet(null)}
           cooking={ui.cooking}
           onCooking={ui.setCooking}
+          showClassic={state.showClassicSteps}
+          onShowClassic={(v) => m.setState((s) => ({ ...s, showClassicSteps: v }))}
           onEdit={() => {
             const c = state.customRecipes.find((x) => x.id === sheet.recipe.id)
             ui.setSheet(null)

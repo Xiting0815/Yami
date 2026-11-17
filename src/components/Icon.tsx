@@ -21,6 +21,10 @@ const PATHS = {
   info: <><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.2M12 7.9v.1" /></>,
   sun: <><circle cx="12" cy="12" r="3.8" /><path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5L7 7M17 17l1.5 1.5M5.5 18.5L7 17M17 7l1.5-1.5" /></>,
   save: <path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14" />,
+  steamer: <><rect x="3.5" y="9" width="17" height="11" rx="2.5" /><path d="M7 12.5h10M8 16.5h8M8 6.5c-1-1 1-2 0-3M12 6.5c-1-1 1-2 0-3M16 6.5c-1-1 1-2 0-3" /></>,
+  combair: <><rect x="3.5" y="4" width="17" height="16" rx="2.5" /><path d="M3.5 8.5h17M7 6.3h.1M10 6.3h.1M7 12.5h10v5H7z" /></>,
+  bora: <><rect x="3.5" y="6" width="17" height="12" rx="2.5" /><circle cx="8.5" cy="12" r="2.2" /><circle cx="15.5" cy="12" r="2.2" /><path d="M12 9.5v5" /></>,
+  airfryer: <><path d="M6 4.5h12l1.5 9h-15zM4.5 13.5h15v4a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2zM9 8.5h6" /></>,
   trend: <path d="M4 16.5l5-5 4 4 7-7M15 8.5h5v5" />,
 } as const
 

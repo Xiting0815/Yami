@@ -8,6 +8,7 @@ import { recipesGr } from './recipes-gr'
 import { breakfasts } from './breakfasts'
 import { nutritionOf } from './nutrition-calc'
 import { registerCustomIngredients } from './custom-registry'
+import { DEVICE_STEPS } from './device-steps'
 import imageMap from './images.json'
 
 const images = imageMap as unknown as Record<string, { file: string } | null | undefined>
@@ -19,6 +20,9 @@ export const RAW_BREAKFASTS = breakfasts
 
 function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
   const servings = r.servings ?? 2
+  // Geräte-Schritte (nur eingebaute Rezepte; eigene Rezepte haben keine)
+  const dev = DEVICE_STEPS[r.id]
+  const device = dev && dev.length ? dev : undefined
   return {
     id: r.id,
     title: r.title,
@@ -29,7 +33,9 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
     time: r.time,
     servings,
     ingredients: r.ingredients,
-    steps: r.steps,
+    steps: device ? device.map((d) => d.text) : r.steps,
+    deviceSteps: device,
+    classicSteps: device ? r.steps : undefined,
     vegetarian: !r.ingredients.some((i) => CATALOG[i.name] === 'fleisch' || NON_VEG.has(i.name)),
     image: images[r.id]?.file,
     festive: r.festive,

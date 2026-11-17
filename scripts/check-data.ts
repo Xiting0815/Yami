@@ -6,6 +6,8 @@ import { BROTH_FORMS, CATALOG, SPICES } from '../src/data/catalog'
 import { PRODUCTS } from '../src/data/products'
 import { canonical, toBase } from '../src/kitchen'
 import { isSpice } from '../src/staples'
+import { DEVICE_STEPS } from '../src/data/device-steps'
+import { validateSetting } from '../src/deviceText'
 
 let errors = 0
 const ids = new Set<string>()
@@ -61,5 +63,18 @@ for (const r of BREAKFASTS) {
   }
 }
 console.log(`${BREAKFASTS.length} Frühstücke`)
+// Geräte-Schritte: bekannte Rezepte, Texte, Einstellungen im gültigen Bereich
+for (const [id, steps] of Object.entries(DEVICE_STEPS)) {
+  if (!ids.has(id)) { console.error(`Geräte-Schritte für unbekanntes Rezept: ${id}`); errors++; continue }
+  if (!steps.length) { console.error(`Geräte-Schritte leer: ${id}`); errors++ }
+  steps.forEach((st, i) => {
+    if (!st.text || !st.text.trim()) { console.error(`Geräte-Schritt ${i + 1} ohne Text: ${id}`); errors++ }
+    for (const se of st.settings ?? []) for (const e of validateSetting(se)) { console.error(`Gerät in ${id}, Schritt ${i + 1}: ${e}`); errors++ }
+  })
+}
+const withDev = [...ids].filter((id) => DEVICE_STEPS[id]?.length).length
+const cov = Math.round((withDev / ids.size) * 100)
+console.log(`Geräte-Schritte: ${withDev} von ${ids.size} Rezepten (${cov} %)`)
+if (cov < 100) console.warn(`Warnung: Geräte-Abdeckung ${cov} % – noch ${ids.size - withDev} Rezepte ohne Geräte-Schritte`)
 if (errors) { console.error(`${errors} Fehler`); process.exit(1) }
 console.log('OK')

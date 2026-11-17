@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Ingredient, Recipe } from '../types'
 import { formatAmount, scale } from '../shopping'
 import { ingredientsForStep, unmatched } from '../cookSteps'
+import { DeviceChips } from './DeviceChip'
 
 interface Props {
   recipe: Recipe
@@ -122,6 +123,7 @@ export function CookMode({ recipe, servings, onClose }: Props) {
                 <button className={`cook-step ${isDone ? 'done' : ''}`} onClick={() => toggle(i)} aria-pressed={isDone}>
                   <span className="cook-num">{i + 1}</span>
                   <span className="cook-text">{text}</span>
+                  <DeviceChips settings={recipe.deviceSteps?.[i]?.settings} />
                   {needs.length > 0 && (
                     <span className="cook-chips">
                       {needs.map((ing, j) => (
