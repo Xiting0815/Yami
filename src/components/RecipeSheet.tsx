@@ -12,6 +12,12 @@ import type { Portion } from '../energy'
 import { CookMode, type CookFinish } from './CookMode'
 import { DeviceChips } from './DeviceChip'
 
+/** kurze Erklärung für Zutaten, die man leicht verwechselt */
+const INGREDIENT_HINT: Record<string, string> = {
+  Eiklar: 'flüssiges Eiweiß aus der Flasche (Kühlregal) – 100 g ≈ das Weiße von 3 Eiern',
+  Eigelb: 'nur das Gelbe vom Ei',
+}
+
 type Credit = { author: string; license: string; source: string } | null | undefined
 const credits = imageMap as unknown as Record<string, Credit>
 
@@ -92,6 +98,12 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               </div>
             </div>
 
+            {recipe.breakfast && (
+              <p className="muted small bf-portion-hint">
+                1 Portion = 1 Frühstück. Für die ganze Woche rechnet Yami die Mengen in der Prep-Liste auf deine Tage hoch.
+              </p>
+            )}
+
             <NutritionTable n={recipe.nutrition} servings={1} />
 
             {portion && (
@@ -133,7 +145,10 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               {recipe.ingredients.map((ing, i) => (
                 <li key={i}>
                   <span className="amt">{formatAmount(scale(ing, recipe.servings, servings), ing.unit) || 'n. B.'}</span>
-                  <span>{ing.name}</span>
+                  <span>
+                    {ing.name}
+                    {INGREDIENT_HINT[ing.name] && <small className="ing-hint">{INGREDIENT_HINT[ing.name]}</small>}
+                  </span>
                 </li>
               ))}
             </ul>
