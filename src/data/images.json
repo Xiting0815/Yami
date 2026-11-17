@@ -634,12 +634,22 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kaiserschmarrn_und_Apfelmus.jpg"
  },
+ "kalbsbaeckchen-weissweinrahm": null,
  "kalbsbraten-rahmsauce": {
   "author": "Gemini",
   "file": "img/kalbsbraten-rahmsauce.webp",
   "license": "KI",
   "source": ""
  },
+ "kalbsbrust-gefuellt": {
+  "author": "--Xocolatl 12:55, 10 February 2008 (UTC)",
+  "commonsTitle": "File:GefüllteKalbsbrust.jpg",
+  "file": "img/kalbsbrust-gefuellt.webp",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Gef%C3%BCllteKalbsbrust.jpg"
+ },
+ "kalbsfond-hell": null,
+ "kalbshuefte-morchelrahm": null,
  "kartoffel-hack-auflauf": {
   "author": "Kotivalo",
   "commonsTitle": "File:Jauheliha-perunasoselaatikko.jpg",
@@ -742,6 +752,7 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schupfnudeln_mit_Sauerkraut-RZ.jpg"
  },
+ "krustenbraten-dunkelbier": null,
  "kuerbis-hack-eintopf": {
   "author": "Gemini",
   "file": "img/kuerbis-hack-eintopf.webp",
@@ -769,6 +780,15 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Grilled_plated_salmon_fillet_(cropped).jpg"
  },
+ "lammfond-dunkel": null,
+ "lammhaxen-polenta": {
+  "author": "Ewan Munro from London, UK",
+  "commonsTitle": "File:Kopapa, Covent Garden, London (5890455766).jpg",
+  "file": "img/lammhaxen-polenta.webp",
+  "license": "CC BY-SA 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Kopapa,_Covent_Garden,_London_(5890455766).jpg"
+ },
+ "lammkeule-rosmarinjus": null,
  "lasagne": {
   "author": "Breville USA",
   "commonsTitle": "File:Meaty Lasagna 8of8 (8736299782).jpg",
@@ -957,6 +977,7 @@
   "license": "KI",
   "source": ""
  },
+ "ochsenbaeckchen-spaetburgunder": null,
  "orecchiette-salsiccia": {
   "author": "Federica.tamburini.75",
   "commonsTitle": "File:Orecchiette broccoli e salsiccia.jpg",
@@ -1251,6 +1272,14 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Broccoli_beef_(5457397534).jpg"
  },
+ "rinderfilet-rotweinjus": {
+  "author": "Pp1809a",
+  "commonsTitle": "File:Rinderfilet, rosa gebraten.jpg",
+  "file": "img/rinderfilet-rotweinjus.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Rinderfilet,_rosa_gebraten.jpg"
+ },
+ "rinderfond-braun": null,
  "rindergulasch": {
   "author": "John Cambrick",
   "commonsTitle": "File:Goulash i brød i Prag.jpg",
@@ -1265,6 +1294,7 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Rindsroulade-01.jpg"
  },
+ "rinderschmorbraten-rotwein": null,
  "risi-bisi": {
   "author": "Ilaria22",
   "commonsTitle": "File:Risi e bisi.JPG",
@@ -1292,6 +1322,13 @@
   "file": "img/risotto-zucca.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Risotto-alla-zucca.jpg"
+ },
+ "roastbeef-remoulade": {
+  "author": "Pp1809a",
+  "commonsTitle": "File:Roastbeef, rosa gebraten.jpg",
+  "file": "img/roastbeef-remoulade.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Roastbeef,_rosa_gebraten.jpg"
  },
  "rosenkohl-gratin": {
   "author": "Gemini",
@@ -1352,6 +1389,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Scaloppine_al_limone,_mit_Spinat_und_Pommes_frites.jpg"
  },
+ "schaeufele-kloesse": {
+  "author": "Burkhard Mücke",
+  "commonsTitle": "File:Schäufele with crispy crust.jpg",
+  "file": "img/schaeufele-kloesse.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Sch%C3%A4ufele_with_crispy_crust.jpg"
+ },
  "schaschlik-pfanne": {
   "author": "Alandislands",
   "commonsTitle": "File:Grilled shashlik.jpg",
@@ -1391,6 +1435,13 @@
   "file": "img/schweinebraten.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schweinebraten_Goldener_Adler_M%C3%BCrsbach.jpg"
+ },
+ "schweinefilet-speckmantel": {
+  "author": "PattayaPatrol",
+  "commonsTitle": "File:DSCF0414 Four bite-sized bacon-wrapped pork medallions served with a side of creamy pasta coleslaw greens and a jug of savory gravy.jpg",
+  "file": "img/schweinefilet-speckmantel.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:DSCF0414_Four_bite-sized_bacon-wrapped_pork_medallions_served_with_a_side_of_creamy_pasta_coleslaw_greens_and_a_jug_of_savory_gravy.jpg"
  },
  "schweinemedaillons-pfefferrahm": {
   "author": "Manfred&amp;Barbara Aulbach",
