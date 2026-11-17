@@ -634,7 +634,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kaiserschmarrn_und_Apfelmus.jpg"
  },
- "kalbsbaeckchen-weissweinrahm": null,
+ "kalbsbaeckchen-weissweinrahm": {
+  "author": "Gemini",
+  "file": "img/kalbsbaeckchen-weissweinrahm.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kalbsbraten-rahmsauce": {
   "author": "Gemini",
   "file": "img/kalbsbraten-rahmsauce.webp",
@@ -648,8 +653,18 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Gef%C3%BCllteKalbsbrust.jpg"
  },
- "kalbsfond-hell": null,
- "kalbshuefte-morchelrahm": null,
+ "kalbsfond-hell": {
+  "author": "Gemini",
+  "file": "img/kalbsfond-hell.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "kalbshuefte-morchelrahm": {
+  "author": "Gemini",
+  "file": "img/kalbshuefte-morchelrahm.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kartoffel-hack-auflauf": {
   "author": "Kotivalo",
   "commonsTitle": "File:Jauheliha-perunasoselaatikko.jpg",
@@ -752,7 +767,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schupfnudeln_mit_Sauerkraut-RZ.jpg"
  },
- "krustenbraten-dunkelbier": null,
+ "krustenbraten-dunkelbier": {
+  "author": "Gemini",
+  "file": "img/krustenbraten-dunkelbier.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kuerbis-hack-eintopf": {
   "author": "Gemini",
   "file": "img/kuerbis-hack-eintopf.webp",
@@ -780,7 +800,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Grilled_plated_salmon_fillet_(cropped).jpg"
  },
- "lammfond-dunkel": null,
+ "lammfond-dunkel": {
+  "author": "Gemini",
+  "file": "img/lammfond-dunkel.webp",
+  "license": "KI",
+  "source": ""
+ },
  "lammhaxen-polenta": {
   "author": "Ewan Munro from London, UK",
   "commonsTitle": "File:Kopapa, Covent Garden, London (5890455766).jpg",
@@ -788,7 +813,12 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kopapa,_Covent_Garden,_London_(5890455766).jpg"
  },
- "lammkeule-rosmarinjus": null,
+ "lammkeule-rosmarinjus": {
+  "author": "Gemini",
+  "file": "img/lammkeule-rosmarinjus.webp",
+  "license": "KI",
+  "source": ""
+ },
  "lasagne": {
   "author": "Breville USA",
   "commonsTitle": "File:Meaty Lasagna 8of8 (8736299782).jpg",
@@ -977,7 +1007,12 @@
   "license": "KI",
   "source": ""
  },
- "ochsenbaeckchen-spaetburgunder": null,
+ "ochsenbaeckchen-spaetburgunder": {
+  "author": "Gemini",
+  "file": "img/ochsenbaeckchen-spaetburgunder.webp",
+  "license": "KI",
+  "source": ""
+ },
  "orecchiette-salsiccia": {
   "author": "Federica.tamburini.75",
   "commonsTitle": "File:Orecchiette broccoli e salsiccia.jpg",
@@ -1272,7 +1307,18 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Broccoli_beef_(5457397534).jpg"
  },
- "rinderfond-braun": null,
+ "rinderfilet-rotweinjus": {
+  "author": "Gemini",
+  "file": "img/rinderfilet-rotweinjus.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "rinderfond-braun": {
+  "author": "Gemini",
+  "file": "img/rinderfond-braun.webp",
+  "license": "KI",
+  "source": ""
+ },
  "rindergulasch": {
   "author": "John Cambrick",
   "commonsTitle": "File:Goulash i brød i Prag.jpg",
@@ -1287,7 +1333,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Rindsroulade-01.jpg"
  },
- "rinderschmorbraten-rotwein": null,
+ "rinderschmorbraten-rotwein": {
+  "author": "Gemini",
+  "file": "img/rinderschmorbraten-rotwein.webp",
+  "license": "KI",
+  "source": ""
+ },
  "risi-bisi": {
   "author": "Ilaria22",
   "commonsTitle": "File:Risi e bisi.JPG",
