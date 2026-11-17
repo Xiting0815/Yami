@@ -6,7 +6,7 @@ import {
   diffDinnerEvents, diffTodo, plannedDinners, plannedReminders, syncCalendar, syncTodo, usualWeighDay,
 } from '../src/haSync'
 import { backupBody, parseBackup } from '../src/backup'
-import { newHa, sanitize } from '../src/store'
+import { newHa, sanitize, withHaTargets, HA_DEFAULTS } from '../src/store'
 import { RECIPES } from '../src/data/recipes'
 
 let fails = 0
@@ -330,7 +330,7 @@ const plan = (o: Record<string, [string, number]>) => Object.fromEntries(Object.
 {
   const ds = plannedDinners(plan({ '2026-11-16': [dinnerRecipe.id, 2], '2026-11-18': [dinnerRecipe2.id, 3], '2026-11-30': [dinnerRecipe.id, 2] }), '2026-11-16')
   ok(ds.length === 2, 'Plan: nur die nächsten 7 Tage (heute bis +7)')
-  ok(ds[0].start === '2026-11-16 18:00:00' && ds[0].end === '2026-11-16 19:00:00' && ds[0].summary === `🍽️ ${dinnerRecipe.title}` && ds[0].sig === `${dinnerRecipe.id}×2`, 'Plan: 18–19 Uhr, Titel, Signatur')
+  ok(ds[0].start === '2026-11-16 18:30:00' && ds[0].end === '2026-11-16 19:30:00' && ds[0].summary === `🍽️ ${dinnerRecipe.title}` && ds[0].sig === `${dinnerRecipe.id}×2`, 'Plan: 18:30–19:30 Uhr, Titel, Signatur')
   ok(ds[1].description.startsWith('3 Portionen\n• ') && ds[0].description.startsWith('2 Portionen'), 'Plan: Beschreibung mit Portionen und Zutaten')
   ok(plannedDinners({ '2026-11-16': { recipeId: dinnerRecipe.id, servings: 2, status: 'skipped' } }, '2026-11-16').length === 0, 'Plan: nicht gekochte Tage ausgelassen')
 }
@@ -401,12 +401,28 @@ const plan = (o: Record<string, [string, number]>) => Object.fromEntries(Object.
   ok(!text.includes('geheim'), 'Sicherung: Token steht nicht in der Datei')
   ok(body.state.ha?.url === 'https://abc.ui.nabu.casa', 'Sicherung: Adresse bleibt')
   const back = parseBackup(text)
-  ok(back.ha?.url === 'https://abc.ui.nabu.casa' && back.ha.token === '' && back.ha.todo === 'todo.einkaufsliste', 'Sicherung: beim Laden Adresse da, Token leer, Standard-Entitäten')
+  ok(back.ha?.url === 'https://abc.ui.nabu.casa' && back.ha.token === '' && back.ha.todo === HA_DEFAULTS.todo, 'Sicherung: beim Laden Adresse da, Token leer, Standard-Entitäten')
   const bad = sanitize({ ha: { url: 5, token: null, enabled: 'ja', todo: 'kaputt!', items: { a: 3, b: 'x' }, events: { k: { sig: 1 }, z: { sig: 's' } } } })
-  ok(bad.ha?.url === '' && bad.ha.enabled === false && bad.ha.todo === 'todo.einkaufsliste' && Object.keys(bad.ha.items).join() === 'b' && Object.keys(bad.ha.events).join() === 'z', 'sanitize: falsche Typen im Feld "ha" werden verworfen')
+  ok(bad.ha?.url === '' && bad.ha.enabled === false && bad.ha.todo === HA_DEFAULTS.todo && Object.keys(bad.ha.items).join() === 'b' && Object.keys(bad.ha.events).join() === 'z', 'sanitize: falsche Typen im Feld "ha" werden verworfen')
   ok(!('ha' in sanitize({ ha: 'x' })), 'sanitize: ha ohne Objekt entfällt')
-  ok(sanitize({ ha: { entity: 1 } }).ha?.calendar === 'calendar.yami', 'sanitize: Standardwerte für Entitäten')
+  ok(sanitize({ ha: { entity: 1 } }).ha?.calendar === HA_DEFAULTS.calendar, 'sanitize: Standardwerte für Entitäten')
 }
 
+
+// ── Ziele: Google Tasks „Einkaufen“ + Kalender „Familie“ ──
+{
+  ok(HA_DEFAULTS.todo === 'todo.einkaufen' && HA_DEFAULTS.calendar === 'calendar.familie' && HA_DEFAULTS.reminders === 'calendar.yami_erinnerungen', 'Standardziele: Einkaufen, Familie, Yami Erinnerungen')
+  const old = { ...newHa('https://x.ui.nabu.casa', 't'), todo: 'todo.einkaufsliste', calendar: 'calendar.yami', items: { k1: 'u1' }, done: ['k1'], events: { 'dinner:2026-11-16': { uid: 'e1', sig: 'a×2' }, 'rem:prep:2026-11-15': { uid: 'r1', sig: 'p' } } }
+  const st = sanitize({ ha: old })
+  ok(st.ha?.todo === 'todo.einkaufen' && st.ha?.calendar === 'calendar.familie', 'Alte Standardziele werden umgestellt')
+  ok(!!st.ha && Object.keys(st.ha.items).length === 0 && !st.ha.done, 'Umstellung Liste: alte Zuordnungen verworfen')
+  ok(!!st.ha && !st.ha.events['dinner:2026-11-16'] && !!st.ha.events['rem:prep:2026-11-15'], 'Umstellung Kalender: nur Abendessen-Termine verworfen, Erinnerungen bleiben')
+  const own = sanitize({ ha: { ...old, todo: 'todo.meine_aufgaben', calendar: 'calendar.projekte' } })
+  ok(own.ha?.todo === 'todo.meine_aufgaben' && own.ha?.calendar === 'calendar.projekte' && own.ha?.items.k1 === 'u1', 'Selbst gewählte Ziele bleiben unverändert')
+  const same = withHaTargets(old, { todo: 'todo.einkaufsliste' })
+  ok(same.items.k1 === 'u1', 'Gleiches Ziel: Zuordnungen bleiben')
+  const rem = withHaTargets(old, { reminders: 'calendar.familie' })
+  ok(!rem.events['rem:prep:2026-11-15'] && !!rem.events['dinner:2026-11-16'], 'Erinnerungs-Kalender gewechselt: nur Erinnerungen verworfen')
+}
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')
 process.exit(fails ? 1 : 0)

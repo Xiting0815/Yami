@@ -305,8 +305,8 @@ export function plannedDinners(plan: WeekPlan, today: string): Desired[] {
       key: `dinner:${D}`,
       summary: `🍽️ ${r.title}`,
       description: `${e.servings} ${e.servings === 1 ? 'Portion' : 'Portionen'}\n${lines.join('\n')}`,
-      start: stamp(at(D, 18, 0)),
-      end: stamp(at(D, 19, 0)),
+      start: stamp(at(D, 18, 30)),
+      end: stamp(at(D, 19, 30)),
       sig: `${e.recipeId}×${e.servings}`,
     })
   }

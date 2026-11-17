@@ -53,7 +53,25 @@ export interface HaSettings {
   error?: string
 }
 
-export const HA_DEFAULTS = { todo: 'todo.einkaufsliste', calendar: 'calendar.yami', reminders: 'calendar.yami_erinnerungen' }
+export const HA_DEFAULTS = { todo: 'todo.einkaufen', calendar: 'calendar.familie', reminders: 'calendar.yami_erinnerungen' }
+/** frühere Standardziele – werden beim Laden auf die neuen umgestellt (Google Tasks „Einkaufen“, Google-Kalender „Familie“) */
+const HA_OLD_DEFAULTS = { todo: 'todo.einkaufsliste', calendar: 'calendar.yami' }
+
+/**
+ * Ziele ändern: die gemerkten Zuordnungen (Einträge/Termine) gehören zur alten Liste bzw. zum alten Kalender
+ * und werden für das geänderte Ziel verworfen, sonst würde Yami fremde Einträge ändern oder löschen.
+ */
+export function withHaTargets(h: HaSettings, next: Partial<Pick<HaSettings, 'todo' | 'calendar' | 'reminders'>>): HaSettings {
+  const out: HaSettings = { ...h, ...next }
+  if (next.todo && next.todo !== h.todo) {
+    out.items = {}
+    out.done = undefined
+  }
+  const drop = (prefix: string) => Object.fromEntries(Object.entries(out.events).filter(([k]) => !k.startsWith(prefix)))
+  if (next.calendar && next.calendar !== h.calendar) out.events = drop('dinner:')
+  if (next.reminders && next.reminders !== h.reminders) out.events = drop('rem:')
+  return out
+}
 
 export function newHa(url = '', token = ''): HaSettings {
   return { url, token, enabled: false, ...HA_DEFAULTS, items: {}, events: {} }
@@ -75,7 +93,7 @@ function sanitizeHa(x: unknown): HaSettings | undefined {
       const e = v as { uid?: unknown; sig?: unknown } | null
       if (e && typeof e.sig === 'string') events[k] = { sig: e.sig, ...(typeof e.uid === 'string' && e.uid ? { uid: e.uid } : {}) }
     }
-  return {
+  const base: HaSettings = {
     url: str(h.url, ''),
     token: str(h.token, ''),
     enabled: h.enabled === true,
@@ -88,6 +106,11 @@ function sanitizeHa(x: unknown): HaSettings | undefined {
     lastSync: typeof h.lastSync === 'string' ? h.lastSync : undefined,
     error: typeof h.error === 'string' ? h.error : undefined,
   }
+  // alte Standardziele auf die neuen umstellen (selbst gewählte Ziele bleiben)
+  const move: Partial<Pick<HaSettings, 'todo' | 'calendar'>> = {}
+  if (base.todo === HA_OLD_DEFAULTS.todo) move.todo = HA_DEFAULTS.todo
+  if (base.calendar === HA_OLD_DEFAULTS.calendar) move.calendar = HA_DEFAULTS.calendar
+  return Object.keys(move).length ? withHaTargets(base, move) : base
 }
 
 export interface AppState {

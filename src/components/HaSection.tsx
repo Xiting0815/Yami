@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { HaClient, haErrorText } from '../homeassistant'
-import { type HaSettings, HA_DEFAULTS, newHa } from '../store'
+import { type HaSettings, HA_DEFAULTS, newHa, withHaTargets } from '../store'
 
 interface Props {
   ha?: HaSettings
@@ -54,7 +54,7 @@ export function HaSection({ ha, onChange, onSyncNow, syncing }: Props) {
     const ok = /^[a-z_]+\.[a-z0-9_]+$/.test(val)
     const next = { ...entities, [k]: ok ? val : HA_DEFAULTS[k] }
     setEntities(next)
-    if (ha) onChange({ ...ha, ...next })
+    if (ha) onChange(withHaTargets(ha, next))
   }
 
   return (
