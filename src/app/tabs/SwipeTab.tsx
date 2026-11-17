@@ -1,0 +1,116 @@
+import { RECIPE_BY_ID } from '../../data/recipes'
+import { BREAKFAST_LABEL, type BreakfastType } from '../../types'
+import { portionFor } from '../../energy'
+import { shortDate, weekdayName } from '../../store'
+import { MealToggle } from '../../components/MealToggle'
+import { PrepDayChip } from '../../components/PrepDayChip'
+import { SwipeDeck } from '../../components/SwipeDeck'
+import { dayRangeText } from '../dates'
+import type { AppModel } from '../useAppModel'
+
+/** Tab „Wischen“: Frühstück (1–2 fürs Prep) oder Abendessen für den gewählten Tag */
+export function SwipeTab({ m }: { m: AppModel }) {
+  const { state, cal, ui, plan, bf, energy, act } = m
+  const { days } = cal
+  const { meal, swipeDay, pantryMode } = ui
+  const { picks } = bf
+  return (
+    <div className="swipe-screen">
+      <MealToggle meal={meal} onChange={ui.setMeal} />
+      {meal === 'breakfast' ? (
+        <>
+          <div className="swipe-head">
+            <h1>
+              ☀️ Frühstück <span className="accent">{dayRangeText(bf.covered)}</span>
+            </h1>
+            {picks.length === 1 ? (
+              <button className="chip" onClick={() => ui.setTab('woche')} aria-label={`Nur ${RECIPE_BY_ID[picks[0]]?.title ?? 'dieses Frühstück'} nehmen – fertig`}>
+                1/2 · Fertig →
+              </button>
+            ) : (
+              <span className="muted small">{picks.length}/2 gewählt</span>
+            )}
+          </div>
+          <div className="chips-row">
+            <PrepDayChip prep={bf.prep} choices={bf.prepChoices} onChange={act.changePrepDay} />
+          </div>
+          <p className="muted small swipe-note">
+            Wähle 1–2 Frühstücke zum Vorbereiten. Das kürzer haltbare kommt an die ersten Tage, das länger haltbare ans Ende.
+          </p>
+          <div className="chips-row">
+            <button className={`chip ${ui.bPantryOnly ? 'on' : ''}`} onClick={() => ui.setBPantryOnly((v) => !v)}>
+              🧺 Nur mit Vorrat
+            </button>
+            {(Object.keys(BREAKFAST_LABEL) as BreakfastType[]).map((t) => (
+              <button
+                key={t}
+                className={`chip ${ui.bTypes.includes(t) ? 'on' : ''}`}
+                onClick={() => ui.setBTypes((x) => (x.includes(t) ? x.filter((y) => y !== t) : [...x, t]))}
+              >
+                {BREAKFAST_LABEL[t]}
+              </button>
+            ))}
+          </div>
+          <SwipeDeck
+            deck={bf.bDeck}
+            insights={bf.bInsights}
+            onTake={act.pickBreakfast}
+            onReject={act.reject}
+            onInfo={(r) => ui.setSheet({ recipe: r, mode: 'take' })}
+          />
+          <p className="hint toast-slot">← nächstes · wählen →</p>
+        </>
+      ) : (
+        <>
+          <div className="day-dots">
+            {days.map((d) => (
+              <button
+                key={d}
+                className={`dot ${d === swipeDay ? 'current' : ''} ${state.plan[d] ? 'filled' : ''}`}
+                onClick={() => ui.setSwipeDay(d)}
+              >
+                <b>{weekdayName(d, true)}</b>
+                <span>{state.plan[d] ? '✓' : shortDate(d)}</span>
+              </button>
+            ))}
+          </div>
+          <div className="swipe-head">
+            <h1>
+              Was gibt’s <span className="accent">{weekdayName(swipeDay)}</span>?
+            </h1>
+            <button className={`chip ${plan.activeFilters ? 'on' : ''}`} onClick={() => ui.setShowFilters(true)} aria-haspopup="dialog">
+              ⚙︎ Filter{plan.activeFilters ? ` (${plan.activeFilters})` : ''}
+            </button>
+          </div>
+          {pantryMode && (
+            <div className="chips-row">
+              <button className="chip pantry-mode" onClick={() => ui.setPantryMode(false)} aria-label="Vorrat zuerst beenden">
+                🧺 Vorrat zuerst ✕
+              </button>
+            </div>
+          )}
+          {state.plan[swipeDay] && (
+            <p className="muted small center swipe-note">
+              Aktuell geplant: {RECIPE_BY_ID[state.plan[swipeDay]!.recipeId]?.title}. Nach rechts wischen ersetzt es.
+            </p>
+          )}
+          <SwipeDeck
+            portionOf={(r) => {
+              const budget = energy.dinnerBudgetFor(swipeDay)
+              return budget != null ? portionFor(r, budget, state.defaultServings) : undefined
+            }}
+            deck={plan.deck}
+            insights={plan.insights}
+            pantryMode={pantryMode}
+            onTake={(r) => act.take(r, swipeDay)}
+            onReject={act.reject}
+            onInfo={(r) => ui.setSheet({ recipe: r, day: swipeDay, mode: 'take' })}
+          />
+          <p className="hint toast-slot">
+            {pantryMode ? '← wegwischen · nehmen → · sortiert nach dem, was du im Vorrat hast' : '← wegwischen · nehmen → · sortiert nach Vorrat, Preis & Abwechslung'}
+          </p>
+        </>
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,130 @@
+import { useMemo } from 'react'
+import type { Recipe } from '../types'
+import { RECIPES, RECIPE_BY_ID } from '../data/recipes'
+import { buildModel, preference } from '../learning'
+import { dayBalance, isProteinLow, isWorkday, proteinBoost } from '../energy'
+import { type AppState, addDays, isoDate, mondayOf, parseIso, weekDays } from '../store'
+import { matches } from '../filter'
+import { formatAmount } from '../shopping'
+import { stapleHints, useEvents } from '../staples'
+import { daysUntil, insight, lastSeenMap, planWeek, PANTRY_ONLY_MAX_EURO } from '../kitchen'
+import { activeFilterCount } from '../components/FilterBar'
+import { localItems } from '../haSync'
+import type { Calendar } from './useCalendar'
+import type { Ui } from './useUi'
+import { defaultMonday } from './dates'
+
+/** Planung, Vorrat & Empfehlungen fürs Abendessen: Wocheneinkauf, gelernte Vorlieben, Wisch-Stapel */
+export function usePlanning(state: AppState, { today, days, weekKey }: Calendar, { swipeDay, pantryMode, rejected }: Pick<Ui, 'swipeDay' | 'pantryMode' | 'rejected'>) {
+  // Saison: Monat des gewischten Kochtags (Abendessen) bzw. heute (Frühstück & Wocheneinkauf)
+  const todayMonth = new Date(today + 'T12:00:00').getMonth() + 1
+  const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
+  // ab Samstag ist die Liste die der nächsten Woche: was für Sa/So der laufenden Woche noch fehlt, kommt mit drauf
+  const carryFor = (key: string) => today < key && key === defaultMonday(today)
+  const week = useMemo(
+    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(weekKey) }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
+  )
+  // Lernen: wie lange reichen Öl, Brühe & Co. noch (aus dem Verbrauch der gekochten Gerichte)
+  const hints = useMemo(() => stapleHints(useEvents(state.plan, state.breakfast), state.pantry, today), [state.plan, state.breakfast, state.pantry, today])
+  // Einkaufsliste für Home Assistant: immer die „aktuelle“ Woche (ab Samstag die nächste), unabhängig von der angezeigten
+  const haKey = defaultMonday(today)
+  const haWeek = useMemo(
+    () =>
+      haKey === weekKey
+        ? week
+        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(haKey) }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [haKey, weekKey, week, state.plan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
+  )
+  const haLocal = useMemo(() => localItems(haWeek.buy), [haWeek])
+  const weekRecipes = useMemo(
+    () => days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => RECIPE_BY_ID[e!.recipeId]).filter(Boolean),
+    [days, state.plan, state.customRecipes],
+  )
+  const lastSeen = useMemo(() => lastSeenMap(state.plan, days[0]), [state.plan, days])
+  const jitter = useMemo(
+    () => new Map(RECIPES.map((r) => [r.id, Math.random()])),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [weekKey],
+  )
+  // ───── Gelernte Vorlieben ─────
+  const taste = useMemo(
+    () =>
+      buildModel({
+        plan: state.plan,
+        breakfast: state.breakfast,
+        breakfastPicks: state.breakfastPicks,
+        rejects: state.rejects,
+        ratings: state.ratings,
+        wasted: state.wasted,
+        today,
+        since: state.tasteSince,
+        customRecipes: state.customRecipes,
+      }),
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes],
+  )
+
+  // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────
+  const proteinHigh = useMemo(() => {
+    if (!state.profile) return false
+    const weekEnd = isoDate(addDays(mondayOf(parseIso(today)), 6))
+    const last = Object.keys(state.plan)
+      .filter((d) => d <= weekEnd && isWorkday(d) && state.plan[d] && state.plan[d]!.status !== 'skipped')
+      .sort()
+      .slice(-10)
+    const low = last.filter((d) => isProteinLow(dayBalance(state.profile!, state.breakfast[d], state.plan[d]))).length
+    return low >= 3
+  }, [state.profile, state.plan, state.breakfast, today])
+
+  // Einkauf am Wochenanfang (oder heute) → wie viele Tage bis zum gewischten Kochtag?
+  const freshDays = Math.max(0, daysUntil(swipeDay, today > days[0] ? today : days[0]))
+  const insights = useMemo(
+    () =>
+      new Map(
+        RECIPES.map((r) => {
+          // „Was koche ich damit?“: nur der echte Vorrat (ohne geplante Einkäufe) zählt für „x von y da“ und die Reihenfolge
+          const ins = insight(r, state.defaultServings, pantryMode ? week.pantryLeft : week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
+            freshDays: freshDays,
+            month: swipeMonth,
+            day: swipeDay,
+          })
+          const pref = preference(taste, r, swipeDay)
+          const bonus = proteinHigh ? proteinBoost(r.nutrition.protein) : 0
+          // Vorrats-Modus: Vorrat zuerst, gelernte Vorliebe nur als Tie-Breaker (×0,3)
+          return [r.id, { ...ins, score: ins.score + pref.score + bonus, modeScore: ins.modeScore + pref.score * 0.3, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
+        }),
+      ),
+    [week.leftovers, week.pantryLeft, pantryMode, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
+  )
+  const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
+
+  const plannedIds = useMemo(
+    () => new Set(days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => e!.recipeId)),
+    [days, state.plan],
+  )
+  const activeFilters = activeFilterCount(state.filters)
+  const filteredCount = RECIPES.filter(
+    (r) => matches(r, state.filters, perPortion.get(r.id)) && (!state.filters.pantryOnly || insights.get(r.id)!.buyCost <= PANTRY_ONLY_MAX_EURO),
+  ).length
+  const deck = useMemo(() => {
+    const list = RECIPES.filter(
+      (r) =>
+        matches(r, state.filters, perPortion.get(r.id)) &&
+        !plannedIds.has(r.id) &&
+        (!state.filters.pantryOnly || insights.get(r.id)!.buyCost <= PANTRY_ONLY_MAX_EURO),
+    )
+    const rej = new Set(rejected)
+    // Vorrats-Modus: nur Gerichte, die etwas aus dem Vorrat brauchen, nach Vorratsnutzung sortiert
+    const pool = pantryMode ? list.filter((r) => insights.get(r.id)!.fromPantry.length > 0) : list
+    const key = (id: string) => (pantryMode ? insights.get(id)!.modeScore : insights.get(id)!.score)
+    const fresh = pool.filter((r) => !rej.has(r.id)).sort((a, b) => key(b.id) - key(a.id))
+    const later = rejected.map((id) => pool.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
+    return [...fresh, ...later]
+  }, [state.filters, perPortion, plannedIds, rejected, insights, pantryMode])
+
+  return { todayMonth, week, hints, haKey, haWeek, haLocal, jitter, taste, insights, perPortion, activeFilters, filteredCount, deck }
+}
+
+export type Planning = ReturnType<typeof usePlanning>

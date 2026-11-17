@@ -29,8 +29,6 @@ for (const [base, forms] of Object.entries(BROTH_FORMS)) for (const f of forms) 
 export const stapleKey = (name: string) => BASE_OF.get(name) ?? name
 export const isBrothBase = (name: string) => name in BROTH_FORMS
 export const brothForms = (base: string) => BROTH_FORMS[base] ?? []
-/** Rezept-Brühe ohne Form (die man nicht direkt in den Vorrat legt) */
-export const isFormless = (name: string) => isBrothBase(name)
 
 /** alle Gewürze mit eigener Packung (Varianten wie „Pfeffer schwarz grob“ stehen unter „Pfeffer“) */
 export const SPICE_NAMES: string[] = [...SPICES].filter((n) => canon(n) === n && PRODUCTS[n]).sort((a, b) => a.localeCompare(b, 'de'))

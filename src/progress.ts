@@ -2,7 +2,7 @@
  * Wiegen 1× pro Woche: Messwerte, Trend, Zielgewicht und Vorschläge zur Anpassung des Kalorienziels.
  */
 import type { Profile } from './energy'
-import { floorKcal, targetKcal, tdee } from './energy'
+import { floorKcal, targetKcal } from './energy'
 import { addDaysIso, daysUntil } from './kitchen'
 import { isoDate, mondayOf, parseIso } from './store'
 
@@ -145,9 +145,4 @@ export function goalProgress(list: WeighIn[], p: Profile, today: string): GoalPr
   }
   const eta = lossPerWeek > 0 ? addDaysIso(today, Math.round((remaining / lossPerWeek) * 7)) : undefined
   return { start, current, goal, pct, remaining, eta, basis }
-}
-
-/** Erhaltungsbedarf zum Vergleich (für die Anzeige) */
-export function maintenance(p: Profile): number {
-  return Math.round(tdee(p) / 10) * 10
 }

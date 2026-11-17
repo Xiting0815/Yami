@@ -4,7 +4,7 @@
  */
 import { RECIPE_BY_ID } from './data/recipes'
 import { PROTEIN_LOW_SHARE, dayBalance, isWorkday } from './energy'
-import { amountValue, formatEuro } from './kitchen'
+import { amountValue } from './kitchen'
 import { type Rating, buildModel, summarize } from './learning'
 import { type WeighIn, weekOf } from './progress'
 import { type AppState, addDays, isoWeekNumber, mondayOf, parseIso } from './store'
@@ -189,6 +189,3 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
     tip,
   }
 }
-
-/** „≈ 12,50 €“ */
-export const approx = (v: number) => `≈ ${formatEuro(v)}`
