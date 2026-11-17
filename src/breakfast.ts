@@ -142,7 +142,7 @@ export function prepPlan(assignment: BreakfastAssignment): PrepItem[] {
   })
   // Ofen = Combair oder CombiSteamer mit Backen (nicht nur Dämpfen); klassische Schritte: Wort „Ofen“
   const usesOven = (r: Recipe) =>
-    r.deviceSteps?.some((s) => s.settings?.some((x) => x.device === 'combair' || (x.device === 'steamer' && x.mode !== 'Dämpfen'))) ??
+    r.deviceSteps?.some((s) => s.settings?.some((x) => x.device === 'combair' || (x.device === 'steamer' && x.mode !== 'Dämpfen' && x.mode !== 'Regenerieren'))) ??
     (r.classicSteps ?? r.steps).some((s) => /Ofen/.test(s))
   return items.sort((a, b) => Number(usesOven(b.recipe)) - Number(usesOven(a.recipe)))
 }

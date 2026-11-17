@@ -31,17 +31,17 @@ const airfryer = (temp: number, minutes: number, note?: string): DeviceSetting =
   minutes,
   ...(note ? { note } : {}),
 })
-/** Langkornreis im CombiSteamer (ungelochtes Blech, Wasser 1:1,5) */
+/** Langkornreis im CombiSteamer (flache Form, Wasser 1:1,5) */
 const rice = (gramm: number): DeviceStep => ({
-  text: `Den CombiSteamer vorheizen. Den Langkornreis (${gramm} g) gründlich waschen, mit ${Math.round(gramm * 1.5)} ml Wasser und etwas Salz in ein ungelochtes Blech geben, auf Ebene 2 schieben und dämpfen.`,
-  settings: [steamer('Dämpfen', 100, 22, 'vorheizen, Ebene 2')],
+  text: `Den Wasserbehälter des CombiSteamers füllen. Den Langkornreis (${gramm} g) gründlich waschen, mit ${Math.round(gramm * 1.5)} ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.`,
+  settings: [steamer('Dämpfen', 100, 22, 'Ebene 2')],
 })
 
 export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'bifteki-feta': [
     {
       text: 'Den Combair vorheizen. Die Kartoffeln schälen, in Spalten schneiden, mit Olivenöl, Salz, Oregano und Zitronensaft mischen, auf ein Blech legen und auf Ebene 2 schieben. Dabei einmal wenden.',
-      settings: [combair('Heissluft', 180, 40, 'vorheizen, Ebene 2')],
+      settings: [combair('Heißluft', 180, 40, 'vorheizen, Ebene 2')],
     },
     {
       text: 'Das Brötchen in Wasser einweichen und gut ausdrücken. Zwiebel und Knoblauch fein hacken. Das Hackfleisch mit Brötchen, Ei, Zwiebel, Knoblauch, gehackter Petersilie, Salz und Pfeffer kräftig verkneten.',
@@ -76,8 +76,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Den Reis in eine Auflaufform geben, das Gyros mit der Soße darüber verteilen und mit Gouda bestreuen.',
     },
     {
-      text: 'Den Combair vorheizen. Die Form auf Ebene 3 schieben und goldbraun überbacken.',
-      settings: [combair('Grill mit Umluft', 200, 10, 'vorheizen, Ebene 3')],
+      text: 'Den Combair vorheizen. Die Form auf Ebene 2 schieben und goldbraun überbacken.',
+      settings: [combair('Grill-Umluft', 200, 10, 'vorheizen, Ebene 2')],
     },
   ],
 
@@ -107,8 +107,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Die Auberginen in 1 cm dicke Scheiben schneiden, salzen und 20 Minuten Wasser ziehen lassen, dann trocken tupfen. Die Kartoffeln in dünne Scheiben schneiden.',
     },
     {
-      text: 'Den Combair vorheizen. Auberginen und Kartoffeln mit Olivenöl bestreichen, auf zwei Blechen auf Ebene 2 und 3 verteilen und goldbraun backen. Beiseitestellen.',
-      settings: [combair('Heissluft', 200, 25, 'vorheizen, Ebene 2+3')],
+      text: 'Den Combair vorheizen. Auberginen und Kartoffeln mit Olivenöl bestreichen, auf zwei Blechen auf Ebene 1 und 3 verteilen und goldbraun backen. Beiseitestellen.',
+      settings: [combair('Heißluft', 200, 25, 'vorheizen, Ebene 1+3')],
     },
     {
       text: 'Das Hackfleisch mit Zwiebel und Knoblauch krümelig braten, das Tomatenmark kurz mitrösten und mit Rotwein ablöschen. Gehackte Tomaten, Zimtstange und Oregano zugeben und 20 Minuten köcheln lassen. Die Zimtstange entfernen.',
@@ -123,7 +123,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Die Form auf Ebene 2 in den Combair schieben und goldbraun backen. Anschließend 10 Minuten ruhen lassen.',
-      settings: [combair('Heissluft', 180, 35, 'Ebene 2')],
+      settings: [combair('Heißluft', 180, 35, 'Ebene 2')],
     },
   ],
 
@@ -145,7 +145,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Combair vorheizen. Die Form auf Ebene 2 schieben und backen, bis die Oberfläche goldbraun ist. Vor dem Servieren 10 Minuten ruhen lassen.',
-      settings: [combair('Heissluft', 180, 35, 'vorheizen, Ebene 2')],
+      settings: [combair('Heißluft', 180, 35, 'vorheizen, Ebene 2')],
     },
   ],
 
@@ -175,15 +175,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Combair vorheizen. Passierte Tomaten, Zimtstange, Oregano, Lorbeerblatt und 250 ml Rinderbrühe zugeben, den Bräter zudecken, auf Ebene 2 schieben und schmoren, bis das Fleisch zart ist.',
-      settings: [combair('Heissluft', 170, 90, 'vorheizen, Ebene 2')],
+      settings: [combair('Heißluft', 170, 90, 'vorheizen, Ebene 2')],
     },
     {
       text: 'Zimtstange und Lorbeer entfernen. Das Kritharaki und die restliche heiße Rinderbrühe unterrühren und abgedeckt weitergaren, bis die Nudeln weich sind und die Soße aufgesogen ist.',
-      settings: [combair('Heissluft', 170, 25, 'abgedeckt')],
+      settings: [combair('Heißluft', 170, 25, 'abgedeckt')],
     },
     {
       text: 'Mit zerbröseltem Feta bestreuen und kurz offen überbacken oder direkt servieren.',
-      settings: [combair('Heissluft', 200, 5, 'offen')],
+      settings: [combair('Heißluft', 200, 5, 'offen')],
     },
   ],
 
@@ -204,8 +204,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Das Gyros wieder zugeben, mit Salz und Pfeffer abschmecken und den Feta darüber bröseln.',
     },
     {
-      text: 'Den Combair vorheizen. Den Topf auf Ebene 3 schieben und überbacken, bis der Käse leicht Farbe hat.',
-      settings: [combair('Grill mit Umluft', 200, 9, 'vorheizen, Ebene 3')],
+      text: 'Den Combair vorheizen. Den Topf auf Ebene 2 schieben und überbacken, bis der Käse leicht Farbe hat.',
+      settings: [combair('Grill-Umluft', 200, 9, 'vorheizen, Ebene 2')],
     },
   ],
 
@@ -221,7 +221,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Combair vorheizen. Die Form auf Ebene 2 schieben und backen. Dabei zwei- bis dreimal wenden und mit dem Sud begießen, bis die Haut knusprig und die Kartoffeln weich sind. Den Kerntemperaturfühler in einen Schenkel stecken.',
-      settings: [combair('Heissluft', 190, 60, 'vorheizen, Ebene 2', 85)],
+      settings: [combair('Heißluft', 190, 60, 'vorheizen, Ebene 2', 85)],
     },
   ],
 
@@ -275,7 +275,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Combair vorheizen. Die Form auf Ebene 2 schieben und backen, bis Reis und Kartoffeln weich sind. Zwischendurch eine Garprobe machen.',
-      settings: [combair('Heissluft', 170, 70, 'vorheizen, Ebene 2')],
+      settings: [combair('Heißluft', 170, 70, 'vorheizen, Ebene 2')],
     },
   ],
 
@@ -290,7 +290,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Combair vorheizen. Die Bohnen in eine Auflaufform füllen, mit zerbröseltem Feta belegen, auf Ebene 2 schieben und backen, bis die Soße eingedickt ist.',
-      settings: [combair('Heissluft', 180, 25, 'vorheizen, Ebene 2')],
+      settings: [combair('Heißluft', 180, 25, 'vorheizen, Ebene 2')],
     },
     {
       text: 'Mit Dill bestreuen und mit Brot servieren.',

@@ -33,10 +33,10 @@ const airfryer = (temp: number, minutes: number, note?: string): DeviceSetting =
   minutes,
   ...(note ? { note } : {}),
 })
-/** Reis im CombiSteamer (ungelochtes Blech, Wasser 1:1,5; Sushireis etwas weniger) */
+/** Reis im CombiSteamer (flache Form, Wasser 1:1,5; Sushireis etwas weniger) */
 const rice = (sorte: string, wasser: number): DeviceStep => ({
-  text: `Den CombiSteamer vorheizen. Den ${sorte} gründlich waschen, mit ${wasser} ml Wasser und etwas Salz in ein ungelochtes Blech geben, auf Ebene 2 schieben und dämpfen.`,
-  settings: [steamer('Dämpfen', 100, 22, 'vorheizen, Ebene 2')],
+  text: `Den Wasserbehälter des CombiSteamers füllen. Den ${sorte} gründlich waschen, mit ${wasser} ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.`,
+  settings: [steamer('Dämpfen', 100, 22, 'Ebene 2')],
 })
 
 export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
@@ -142,7 +142,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     rice('Jasminreis', 225),
     {
-      text: 'Den Brokkoli in Röschen teilen, auf ein gelochtes Blech legen und auf Ebene 3 zum Reis in den CombiSteamer schieben. Bissfest dämpfen.',
+      text: 'Den Brokkoli in Röschen teilen, auf ein gelochten Garbehälter legen und auf Ebene 3 zum Reis in den CombiSteamer schieben. Bissfest dämpfen.',
       settings: [steamer('Dämpfen', 100, 6, 'Ebene 3, gelocht')],
     },
     {
@@ -258,16 +258,16 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Combair vorheizen. Das Fleisch auf einem Gitter über einem Blech mit etwas Wasser auf Ebene 2 schieben, rösten und zwischendurch mehrmals mit Marinade bestreichen. Den Kerntemperaturfühler in die dickste Stelle stecken.',
-      settings: [combair('Heissluft', 180, 35, 'vorheizen, Ebene 2', 75)],
+      settings: [combair('Heißluft', 180, 35, 'vorheizen, Ebene 2', 75)],
     },
     rice('Jasminreis', 225),
     {
       text: 'Das Fleisch mit dem restlichen Honig bestreichen und unter dem Grill 3 Minuten karamellisieren. Dabei nicht aus den Augen lassen.',
-      settings: [combair('Grill mit Umluft', 230, 3, 'Ebene 3')],
+      settings: [{ device: 'combair', mode: 'Grill', minutes: 3, note: 'Stufe 3 (stark), Ebene 3' }],
     },
     {
-      text: 'Den Pak Choi auf einem gelochten Blech 4 Minuten im CombiSteamer dämpfen, solange das Fleisch ruht.',
-      settings: [steamer('Dämpfen', 100, 4, 'gelochtes Blech')],
+      text: 'Den Pak Choi auf einem gelochten Garbehälter 4 Minuten im CombiSteamer dämpfen, solange das Fleisch ruht.',
+      settings: [steamer('Dämpfen', 100, 4, 'gelochten Garbehälter')],
     },
     {
       text: 'Das Fleisch in Scheiben schneiden und mit dem Reis und dem Pak Choi mit Austernsauce servieren.',
@@ -305,8 +305,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Je 1 TL Füllung auf ein Jiaozi-Teigblatt geben, den Rand befeuchten, zu einem Halbmond falten und die Ränder in Falten andrücken.',
     },
     {
-      text: 'Den CombiSteamer vorheizen. Die Jiaozi mit etwas Abstand auf ein gelochtes, geöltes oder mit Backpapier belegtes Blech setzen, auf Ebene 2 schieben und dämpfen.',
-      settings: [steamer('Dämpfen', 100, 12, 'vorheizen, Ebene 2')],
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Die Jiaozi mit etwas Abstand auf ein gelochtes, geöltes oder mit Backpapier belegtes Blech setzen, auf Ebene 2 schieben und dämpfen.',
+      settings: [steamer('Dämpfen', 100, 12, 'Ebene 2')],
     },
     {
       text: 'Chinkiang-Essig und Chiliöl zu einem Dip verrühren und die Jiaozi damit servieren.',
@@ -374,7 +374,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     rice('Jasminreis', 225),
     {
-      text: 'Die Doradenfilets auf einen Teller legen und mit der Hälfte des Ingwers belegen. Den Teller auf Ebene 3 zum Reis in den CombiSteamer stellen und dämpfen. Den Pak Choi daneben auf ein gelochtes Blech legen und mitdämpfen.',
+      text: 'Die Doradenfilets auf einen Teller legen und mit der Hälfte des Ingwers belegen. Den Teller auf Ebene 3 zum Reis in den CombiSteamer stellen und dämpfen. Den Pak Choi daneben auf ein gelochten Garbehälter legen und mitdämpfen.',
       settings: [steamer('Dämpfen', 90, 10, 'Ebene 3, Fisch')],
     },
     {
@@ -477,8 +477,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('2', 60, 'Deckel drauf')],
     },
     {
-      text: 'Etwa 25 Minuten vor Ende der Schmorzeit den CombiSteamer vorheizen. Den Jasminreis mit 225 ml Wasser in ein ungelochtes Blech geben und mit den Eiern in einem zweiten Blech auf Ebene 3 dämpfen. Die Eier nach 11 Minuten abschrecken und pellen, den Reis ausdämpfen lassen.',
-      settings: [steamer('Dämpfen', 100, 22, 'vorheizen, Reis + Eier')],
+      text: 'Etwa 25 Minuten vor Ende der Schmorzeit den Wasserbehälter des CombiSteamers füllen. Den Jasminreis mit 225 ml Wasser in eine flache Schale geben, auf den gelochten Garbehälter stellen und mit den Eiern auf Ebene 3 dämpfen. Die Eier nach 11 Minuten abschrecken und pellen, den Reis ausdämpfen lassen.',
+      settings: [steamer('Dämpfen', 100, 22, 'Reis + Eier')],
     },
     {
       text: 'Die gepellten Eier in den letzten 15 Minuten zum Fleisch geben. Den Pak Choi kurz blanchieren.',
@@ -515,8 +515,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Je 1 TL Füllung auf ein Wan-Tan-Teigblatt setzen, den Rand befeuchten und zu kleinen Säckchen zusammendrücken.',
     },
     {
-      text: 'Den CombiSteamer vorheizen. Die Wan Tans mit Abstand auf ein gelochtes, geöltes Blech setzen, auf Ebene 2 schieben und dämpfen.',
-      settings: [steamer('Dämpfen', 100, 8, 'vorheizen, Ebene 2')],
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Die Wan Tans mit Abstand auf ein gelochtes, geöltes Blech setzen, auf Ebene 2 schieben und dämpfen.',
+      settings: [steamer('Dämpfen', 100, 8, 'Ebene 2')],
     },
     {
       text: 'Die Hühnerbrühe mit restlicher Sojasauce und weißem Pfeffer aufkochen. Den Pak Choi darin 2 Minuten garen.',
@@ -685,7 +685,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     rice('Sushireis', 180),
     {
-      text: 'Den Brokkoli in Röschen teilen, auf ein gelochtes Blech legen und auf Ebene 3 zum Reis in den CombiSteamer schieben.',
+      text: 'Den Brokkoli in Röschen teilen, auf ein gelochten Garbehälter legen und auf Ebene 3 zum Reis in den CombiSteamer schieben.',
       settings: [steamer('Dämpfen', 100, 8, 'Ebene 3, gelocht')],
     },
     {
@@ -707,8 +707,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('2', 60, 'Deckel drauf')],
     },
     {
-      text: 'Die Eier im vorgeheizten CombiSteamer dämpfen, abschrecken, pellen und 30 Minuten in etwas Schmorsud marinieren.',
-      settings: [steamer('Dämpfen', 100, 7, 'vorheizen, wachsweich')],
+      text: 'Die Eier im CombiSteamer dämpfen, abschrecken, pellen und 30 Minuten in etwas Schmorsud marinieren.',
+      settings: [steamer('Dämpfen', 100, 7, 'wachsweich')],
     },
     {
       text: 'Die Hühnerbrühe mit Knoblauch, 2 EL Sojasauce und einem Schuss Schmorsud aufkochen.',
@@ -748,7 +748,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     rice('Sushireis', 180),
     {
-      text: 'Spinat und Sojasprossen auf ein gelochtes Blech legen, auf Ebene 3 zum Reis schieben und kurz dämpfen. Mit Sesamöl und Salz würzen.',
+      text: 'Spinat und Sojasprossen auf ein gelochten Garbehälter legen, auf Ebene 3 zum Reis schieben und kurz dämpfen. Mit Sesamöl und Salz würzen.',
       settings: [steamer('Dämpfen', 100, 3, 'Ebene 3, gelocht')],
     },
     {
@@ -873,11 +873,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Combair vorheizen. Die Keulen in einer Form auf Ebene 2 schieben und weich garen, bis das Fleisch sehr zart ist. Den Kerntemperaturfühler in die dickste Stelle der Keule stecken.',
-      settings: [combair('Heissluft feucht', 150, 75, 'vorheizen, Ebene 2', 88)],
+      settings: [combair('Heißluft feucht', 150, 75, 'vorheizen, Ebene 2', 88)],
     },
     {
-      text: 'Den CombiSteamer vorheizen. Den Jasminreis mit 300 ml Wasser und etwas Salz in ein ungelochtes Blech geben, auf Ebene 2 schieben und dämpfen.',
-      settings: [steamer('Dämpfen', 100, 22, 'vorheizen, Ebene 2')],
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Den Jasminreis mit 300 ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.',
+      settings: [steamer('Dämpfen', 100, 22, 'Ebene 2')],
     },
     {
       text: 'Die Keulen abkühlen lassen, trocken tupfen und mit Speisestärke bestäuben.',

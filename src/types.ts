@@ -102,7 +102,7 @@ export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer'
 /** Eine Geräte-Einstellung zu einem Rezeptschritt */
 export interface DeviceSetting {
   device: Device
-  /** Betriebsart bzw. Kochzone, deutsch wie im Gerät (z. B. „Dämpfen“, „Heissluft“, „Pfanne“) */
+  /** Betriebsart bzw. Kochzone, deutsch wie im Gerät (z. B. „Dämpfen“, „Heißluft“, „Pfanne“) */
   mode: string
   /** °C */
   temp?: number

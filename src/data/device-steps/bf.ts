@@ -96,28 +96,28 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   // ───────────── Herzhaft ─────────────
   'eiermuffins-spinat-feta': [
     {
-      text: 'Den Combair auf 170 °C Heissluft vorheizen, Muffinform fetten oder Silikonförmchen nehmen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, note: 'vorheizen' }],
+      text: 'Den Combair auf 170 °C Heißluft vorheizen, Muffinform fetten oder Silikonförmchen nehmen.',
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, note: 'vorheizen' }],
     },
     { text: 'Spinat auftauen und gut ausdrücken. Paprika klein würfeln.' },
     { text: 'Ei, Eiklar und Hüttenkäse verquirlen, salzen und pfeffern. Spinat, Paprika und zerbröselten Feta unterrühren.' },
     {
       text: 'In 3 Mulden pro Portion füllen und im Combair 20 Minuten backen, bis sie gestockt sind.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, minutes: 20 }],
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, minutes: 20 }],
     },
     { text: 'Abkühlen lassen. Möhre in Sticks schneiden, Muffins, Möhrensticks und Vollkornbrot zusammen in eine Dose packen.' },
   ],
 
   'eiermuffins-schinken': [
     {
-      text: 'Den Combair auf 170 °C Heissluft vorheizen, Muffinform vorbereiten.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, note: 'vorheizen' }],
+      text: 'Den Combair auf 170 °C Heißluft vorheizen, Muffinform vorbereiten.',
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, note: 'vorheizen' }],
     },
     { text: 'Schinken, Paprika und Frühlingszwiebel klein schneiden.' },
     { text: 'Ei und Eiklar verquirlen, mit Salz und Pfeffer würzen und mit Schinken und Gemüse mischen. In 3 Mulden pro Portion füllen und mit Gouda bestreuen.' },
     {
       text: 'Im Combair 20 Minuten backen und abkühlen lassen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, minutes: 20 }],
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, minutes: 20 }],
     },
     { text: 'Möhre in Sticks schneiden und mit Muffins und Vollkornbrot in eine Dose packen.' },
   ],
@@ -159,8 +159,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   // Eier im CombiSteamer vorheizen und dämpfen, Rest kalt
   'brot-box': [
     {
-      text: 'Den CombiSteamer vorheizen. Möhre, Paprika und Gurke in Sticks schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, note: 'vorheizen' }],
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Möhre, Paprika und Gurke in Sticks schneiden.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, note: 'Wasserbehälter füllen' }],
     },
     {
       text: 'Eier 10 Minuten im Dampf hart garen, abschrecken und ungeschält kühl lagern.',
@@ -171,14 +171,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'frittata-stuecke': [
     {
-      text: 'Den Combair auf 170 °C Heissluft vorheizen. Eine kleine Auflaufform mit Backpapier auslegen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, note: 'vorheizen' }],
+      text: 'Den Combair auf 170 °C Heißluft vorheizen. Eine kleine Auflaufform mit Backpapier auslegen.',
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, note: 'vorheizen' }],
     },
     { text: 'Zucchini, Paprika und Zwiebel würfeln und auf dem Blech verteilen.' },
     { text: 'Ei und Eiklar verquirlen, mit Salz und Pfeffer würzen und darüber gießen. Feta darüber bröseln.' },
     {
       text: 'In den Combair schieben und 25 Minuten backen. Abkühlen lassen, in Portionsstücke schneiden und mit dem Vollkornbrot in die Dose packen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, minutes: 25 }],
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, minutes: 25 }],
     },
   ],
 
@@ -192,8 +192,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Den CombiSteamer vorheizen. Ei 10 Minuten hart dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 10, note: 'vorheizen' }],
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Ei 10 Minuten hart dämpfen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 10, note: 'Wasserbehälter füllen' }],
     },
     { text: 'Öl, Essig und Senf verrühren, mit Linsen, Tomaten, Gurke und Petersilie mischen und mit Salz und Pfeffer würzen.' },
     { text: 'Ins Glas füllen und Feta darüber bröseln. Ei ungeschält dazulegen.' },
@@ -202,27 +202,27 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   // ───────────── Warm (Mikrowelle auf der Arbeit) ─────────────
   'baked-oats-blaubeer': [
     {
-      text: 'Den Combair auf 170 °C Heissluft vorheizen. Banane zerdrücken und mit Ei, Skyr, Milch, Haferflocken, Chiasamen und Backpulver verrühren.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, note: 'vorheizen' }],
+      text: 'Den Combair auf 170 °C Heißluft vorheizen. Banane zerdrücken und mit Ei, Skyr, Milch, Haferflocken, Chiasamen und Backpulver verrühren.',
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, note: 'vorheizen' }],
     },
     { text: 'In ofenfeste Gläser oder Förmchen füllen und Heidelbeeren hineindrücken.' },
     {
       text: 'In den Combair stellen und 25 Minuten backen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, minutes: 25 }],
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, minutes: 25 }],
     },
     { text: 'Abkühlen lassen und verschließen. Portionen für Do/Fr einfrieren.' },
   ],
 
   'baked-oats-apfel': [
     {
-      text: 'Den Combair auf 170 °C Heissluft vorheizen. Den halben Apfel reiben, die andere Hälfte würfeln.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, note: 'vorheizen' }],
+      text: 'Den Combair auf 170 °C Heißluft vorheizen. Den halben Apfel reiben, die andere Hälfte würfeln.',
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, note: 'vorheizen' }],
     },
     { text: 'Geriebenen Apfel mit Ei, Skyr, Milch, Haferflocken, Leinsamen, Zimt und Backpulver verrühren.' },
     { text: 'In ofenfeste Gläser füllen und die Apfelwürfel obenauf verteilen.' },
     {
       text: 'In den Combair stellen, 25 Minuten backen und abkühlen lassen. Verschließen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, minutes: 25 }],
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, minutes: 25 }],
     },
   ],
 
@@ -236,8 +236,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   // Ei im CombiSteamer, Haferbrei auf dem BORA
   'savory-oats': [
     {
-      text: 'Den CombiSteamer vorheizen. Ei 10 Minuten hart dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 10, note: 'vorheizen' }],
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Ei 10 Minuten hart dämpfen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 10, note: 'Wasserbehälter füllen' }],
     },
     {
       text: 'Haferflocken in der Gemüsebrühe mit Spinat und Leinsamen aufkochen, dann 3 Minuten köcheln lassen. Hüttenkäse unterrühren und pfeffern.',
@@ -268,13 +268,13 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'quarkauflauf': [
     {
-      text: 'Den Combair auf 170 °C Heissluft vorheizen. Quark, Ei, Haferflocken, Leinsamen, Zimt und Backpulver verrühren.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, note: 'vorheizen' }],
+      text: 'Den Combair auf 170 °C Heißluft vorheizen. Quark, Ei, Haferflocken, Leinsamen, Zimt und Backpulver verrühren.',
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, note: 'vorheizen' }],
     },
     { text: 'In eine kleine Form füllen, Apfelscheiben obenauf legen.' },
     {
       text: 'In den Combair schieben und 30 Minuten backen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 170, minutes: 30 }],
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 170, minutes: 30 }],
     },
     { text: 'Abkühlen lassen und in Portionsstücke schneiden.' },
   ],

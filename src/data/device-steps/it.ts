@@ -136,7 +136,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'In der Sauce schwenken und mit Walnüssen, Parmigiano Reggiano und Pfeffer servieren.' },
   ],
   'gnocchi-salbei': [
-    { text: 'Kartoffeln mit Schale im CombiSteamer dämpfen, pellen und noch heiß durch die Presse drücken. Ausdampfen lassen. Den CombiSteamer vorheizen.', settings: [dev('steamer', 'Dämpfen', 100, { minutes: 35, note: 'vorheizen, ganze Kartoffeln' })] },
+    { text: 'Kartoffeln mit Schale im CombiSteamer dämpfen, pellen und noch heiß durch die Presse drücken. Ausdampfen lassen. Den CombiSteamer vorheizen.', settings: [dev('steamer', 'Dämpfen', 100, { minutes: 35, note: 'ganze Kartoffeln' })] },
     { text: 'Mit Weizenmehl, Eigelb, Salz und Muskat rasch zu einem Teig verkneten. Rollen formen, in Stücke schneiden und über eine Gabel abrollen.' },
     { text: 'In siedendem Salzwasser garen, bis sie aufsteigen, und abschöpfen.', settings: [boil(), bora('4', { minutes: 3, note: 'bis sie aufsteigen' })] },
     { text: 'Butter mit Salbeiblättern aufschäumen, bis sie nussig duftet. Gnocchi darin schwenken und mit Parmigiano Reggiano servieren.', settings: [bora('5', { minutes: 4, note: 'Salbeibutter' })] },
@@ -228,7 +228,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Mit Butter, Parmigiano Reggiano und Muskat cremig rühren. Salbei in Butter knusprig braten und darüber geben.', settings: [bora('5', { minutes: 2, note: 'Salbei braten' })] },
   ],
   saltimbocca: [
-    { text: 'Kartoffeln würfeln, mit Olivenöl, Rosmarin und Salz mischen und auf einem Blech auf Ebene 2 in den vorgeheizten Combair schieben.', settings: [dev('combair', 'Heissluft', 190, { minutes: 35, note: 'vorheizen, Ebene 2' })] },
+    { text: 'Kartoffeln würfeln, mit Olivenöl, Rosmarin und Salz mischen und auf einem Blech auf Ebene 2 in den vorgeheizten Combair schieben.', settings: [dev('combair', 'Heißluft', 190, { minutes: 35, note: 'vorheizen, Ebene 2' })] },
     { text: 'Kalbsschnitzel dünn klopfen, pfeffern, mit je einer Scheibe Parmaschinken und einem Salbeiblatt belegen und mit einem Zahnstocher feststecken.' },
     { text: 'Die Unterseite leicht mit Mehl bestäuben. In Butter erst auf der Schinkenseite, dann auf der anderen Seite je 1 bis 2 Minuten braten.', settings: [bora('6', { minutes: 4, note: 'Pfanne vorheizen' })] },
     { text: 'Mit Weißwein ablöschen, etwas einkochen und die Sauce über das Fleisch geben.', settings: [bora('5', { minutes: 2 })] },
@@ -236,13 +236,13 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ossobuco: [
     { text: 'Kalbshaxenscheiben am Rand einschneiden, damit sie sich nicht wölben, salzen, pfeffern und mit Mehl bestäuben. In Butter rundum anbraten.', settings: [bora('7', { minutes: 8, note: 'Brücke' })] },
     { text: 'Zwiebel, Möhre und Sellerie fein würfeln und mitdünsten. Tomatenmark kurz mitrösten und mit Weißwein ablöschen.', settings: [bora('5', { minutes: 6 })] },
-    { text: 'Kalbsfond angießen und die Haxen im geschlossenen Bräter im CombiSteamer 1,5 bis 2 Stunden sanft schmoren. Den CombiSteamer vorheizen.', settings: [dev('steamer', 'Heissluft feucht', 150, { minutes: 105, note: 'vorheizen, Ebene 2' })] },
+    { text: 'Kalbsfond angießen und die Haxen im geschlossenen Bräter im CombiSteamer 1,5 bis 2 Stunden sanft schmoren. Den CombiSteamer vorheizen.', settings: [dev('steamer', 'Heißluft feucht', 150, { minutes: 105, note: 'vorheizen, Ebene 2' })] },
     { text: 'Für die Gremolata Zitronenschale, Knoblauch und Petersilie fein hacken und darüber streuen. Dazu Risottoreis kochen: Reis in wenig Butter glasig rösten und mit heißem Wasser unter Rühren garen.', settings: [bora('5', { minutes: 18, note: 'Reis, rühren' })] },
   ],
   'pollo-cacciatora': [
     { text: 'Hähnchenschenkel salzen und pfeffern und im Olivenöl rundum goldbraun anbraten.', settings: [bora('7', { minutes: 10, note: 'Brücke' })] },
     { text: 'Zwiebel und Knoblauch zugeben und mit Rotwein ablöschen.', settings: [bora('5', { minutes: 4 })] },
-    { text: 'Geschälte Tomaten, schwarze Oliven, Rosmarin und Thymian zugeben, den Bräter in den vorgeheizten Combair schieben und 45 Minuten schmoren.', settings: [dev('combair', 'Heissluft feucht', 180, { minutes: 45, core: 85, note: 'vorheizen, Ebene 2' })] },
+    { text: 'Geschälte Tomaten, schwarze Oliven, Rosmarin und Thymian zugeben, den Bräter in den vorgeheizten Combair schieben und 45 Minuten schmoren.', settings: [dev('combair', 'Heißluft feucht', 180, { minutes: 45, core: 85, note: 'vorheizen, Ebene 2' })] },
     { text: 'Mit Ciabatta servieren.' },
   ],
   'scaloppine-limone': [
@@ -259,13 +259,13 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
   'pizza-margherita': [
     { text: 'Mehl, 190 ml lauwarmes Wasser, Hefe und 7 g Salz 10 Minuten zu einem glatten Teig kneten. Zugedeckt 2 Stunden gehen lassen.' },
-    { text: 'Den Combair mit dem Blech auf Ebene 1 vorheizen.', settings: [dev('combair', 'PizzaPlus', 280, { note: 'vorheizen, Ebene 1' })] },
+    { text: 'Den Combair mit dem Blech auf Ebene 2 vorheizen.', settings: [dev('combair', 'PizzaPlus', 280, { note: 'vorheizen, Ebene 2' })] },
     { text: 'Teig in 2 Kugeln teilen und von innen nach außen dünn ausziehen. Mit gesalzenen Passierten Tomaten bestreichen und mit zerzupftem, abgetropftem Mozzarella belegen.' },
     { text: 'Die Pizzen nacheinander auf dem heißen Blech 7 bis 9 Minuten backen. Mit Basilikum und Olivenöl servieren.', settings: [dev('combair', 'PizzaPlus', 280, { minutes: 8, note: 'je Pizza' })] },
   ],
   'pizza-diavola': [
     { text: 'Teig wie für Pizza Margherita zubereiten und 2 Stunden gehen lassen.' },
-    { text: 'Den Combair mit dem Blech auf Ebene 1 vorheizen.', settings: [dev('combair', 'PizzaPlus', 280, { note: 'vorheizen, Ebene 1' })] },
+    { text: 'Den Combair mit dem Blech auf Ebene 2 vorheizen.', settings: [dev('combair', 'PizzaPlus', 280, { note: 'vorheizen, Ebene 2' })] },
     { text: 'Teig dünn ausziehen, mit gewürzten Passierten Tomaten bestreichen und mit Mozzarella, Salami piccante, Chiliringen und Oregano belegen.' },
     { text: 'Die Pizzen nacheinander 7 bis 9 Minuten backen und mit Olivenöl beträufeln.', settings: [dev('combair', 'PizzaPlus', 280, { minutes: 8, note: 'je Pizza' })] },
   ],
@@ -307,8 +307,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
   'salsiccia-patate': [
     { text: 'Kartoffeln in Spalten schneiden und mit roter Zwiebel, Knoblauch, Rosmarin, Olivenöl, Salz und Pfeffer auf einem Blech mischen.' },
-    { text: 'Das Blech auf Ebene 2 in den vorgeheizten Combair schieben und 20 Minuten backen.', settings: [dev('combair', 'Heissluft', 190, { minutes: 20, note: 'vorheizen, Ebene 2' })] },
-    { text: 'Salsicce dazulegen, mit Weißwein beträufeln und weitere 25 Minuten backen, bis alles goldbraun ist.', settings: [dev('combair', 'Heissluft', 190, { minutes: 25 })] },
+    { text: 'Das Blech auf Ebene 2 in den vorgeheizten Combair schieben und 20 Minuten backen.', settings: [dev('combair', 'Heißluft', 190, { minutes: 20, note: 'vorheizen, Ebene 2' })] },
+    { text: 'Salsicce dazulegen, mit Weißwein beträufeln und weitere 25 Minuten backen, bis alles goldbraun ist.', settings: [dev('combair', 'Heißluft', 190, { minutes: 25 })] },
     { text: 'Direkt vom Blech servieren.' },
   ],
   involtini: [
@@ -319,7 +319,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
   calzone: [
     { text: 'Pizzateig aus Mehl, Hefe, Wasser und Salz zubereiten und 2 Stunden gehen lassen.' },
-    { text: 'Den Combair mit dem Blech auf Ebene 1 vorheizen.', settings: [dev('combair', 'PizzaPlus', 250, { note: 'vorheizen, Ebene 1' })] },
+    { text: 'Den Combair mit dem Blech auf Ebene 2 vorheizen.', settings: [dev('combair', 'PizzaPlus', 250, { note: 'vorheizen, Ebene 2' })] },
     { text: 'Ricotta mit Parmigiano Reggiano, Pfeffer und gewürfeltem Kochschinken und Mozzarella mischen.' },
     { text: 'Teig in 2 Kreise ausziehen, eine Hälfte mit Passierten Tomaten und der Füllung belegen, zuklappen und die Ränder fest andrücken. Mit Olivenöl bestreichen.' },
     { text: 'Die Calzone auf dem heißen Blech 12 bis 15 Minuten backen.', settings: [dev('combair', 'PizzaPlus', 250, { minutes: 13 })] },
@@ -385,7 +385,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Zucchini längs halbieren und aushöhlen. Das Fruchtfleisch hacken.' },
     { text: 'Fruchtfleisch mit Hackfleisch, eingeweichtem Weißbrot, Ei, Parmigiano Reggiano, Knoblauch, Salz und Pfeffer mischen und in die Zucchini füllen.' },
     { text: 'Passierte Tomaten in eine Form geben, Zucchini daraufsetzen und mit Olivenöl beträufeln.' },
-    { text: 'Die Form auf Ebene 2 in den vorgeheizten Combair schieben und 35 Minuten backen. Mit Basilikum und Ciabatta servieren.', settings: [dev('combair', 'Heissluft', 180, { minutes: 35, note: 'vorheizen, Ebene 2' })] },
+    { text: 'Die Form auf Ebene 2 in den vorgeheizten Combair schieben und 35 Minuten backen. Mit Basilikum und Ciabatta servieren.', settings: [dev('combair', 'Heißluft', 180, { minutes: 35, note: 'vorheizen, Ebene 2' })] },
   ],
 
   // ───────────── Suppen & Eintöpfe ─────────────
@@ -411,7 +411,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Soffritto aus Zwiebel, Möhren und Sellerie im Olivenöl anschwitzen.', settings: [bora('4', { minutes: 8 })] },
     { text: 'Schwarzkohl und Wirsing in Streifen schneiden, zugeben, dann Geschälte Tomaten, Gemüsebrühe, Thymian und die Hälfte der Cannellini-Bohnen zugeben. 40 Minuten köcheln lassen.', settings: [bora('Power', { note: 'aufkochen' }), bora('3', { minutes: 40, note: 'Deckel drauf' })] },
     { text: 'Restliche Bohnen pürieren und unterrühren. Das Toskanische Brot in Stücken einlegen und 10 Minuten ziehen lassen, bis es zerfällt.', settings: [bora('Simmern', { minutes: 10 })] },
-    { text: 'Mit reichlich Olivenöl servieren. Am nächsten Tag die Reste im CombiSteamer regenerieren, das schmeckt noch besser.', settings: [dev('steamer', 'Regenerieren', 120, { minutes: 15, note: 'vorheizen, Deckel' })] },
+    { text: 'Mit reichlich Olivenöl servieren. Am nächsten Tag die Reste im CombiSteamer regenerieren, das schmeckt noch besser.', settings: [dev('steamer', 'Regenerieren', 120, { minutes: 15, note: 'Deckel' })] },
   ],
   stracciatella: [
     { text: 'Eier mit Parmigiano Reggiano, Paniermehl, Petersilie und Muskat verquirlen.' },
@@ -434,7 +434,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   spezzatino: [
     { text: 'Rindergulasch portionsweise im Olivenöl anbraten.', settings: [bora('8', { minutes: 10, note: 'Abzug höher' })] },
     { text: 'Soffritto aus Zwiebel, Möhre und Sellerie zugeben, Tomatenmark mitrösten und mit Rotwein ablöschen.', settings: [bora('5', { minutes: 6 })] },
-    { text: 'Rinderfond, Rosmarin und Lorbeerblatt zugeben und im geschlossenen Bräter im CombiSteamer 90 Minuten schmoren. Den CombiSteamer vorheizen.', settings: [dev('steamer', 'Heissluft feucht', 150, { minutes: 90, note: 'vorheizen, Ebene 2' })] },
-    { text: 'Kartoffelwürfel zugeben und weitere 30 Minuten garen.', settings: [dev('steamer', 'Heissluft feucht', 150, { minutes: 30 })] },
+    { text: 'Rinderfond, Rosmarin und Lorbeerblatt zugeben und im geschlossenen Bräter im CombiSteamer 90 Minuten schmoren. Den CombiSteamer vorheizen.', settings: [dev('steamer', 'Heißluft feucht', 150, { minutes: 90, note: 'vorheizen, Ebene 2' })] },
+    { text: 'Kartoffelwürfel zugeben und weitere 30 Minuten garen.', settings: [dev('steamer', 'Heißluft feucht', 150, { minutes: 30 })] },
   ],
 }

@@ -1,6 +1,6 @@
 # Umschreibe-Regeln: Rezepte für die Geräte im Haushalt
 
-Für alle Schreib-Agenten. Datengrundlage: `vzug.md` und `bora-airfryer.md` (alle Werte dort sind **Richtwerte**, keine Herstellerangaben). Nichts erfinden, was nicht in diesen Dokumenten steht (keine Zwischenstufen bei BORA, kein Mikrowellenmodus im CombiSteamer, keine Feuchte in % beim V-ZUG).
+Für alle Schreib-Agenten. Datengrundlage: `vzug.md` (Betriebsarten, Bereiche und Zubehör **aus den offiziellen V-ZUG-Anleitungen**, Garzeiten nur Richtwerte) und `bora-airfryer.md` (Richtwerte). Änderungsprotokoll der Anleitungs-Korrektur: `korrekturen-anleitung.md`. Nichts erfinden, was nicht in diesen Dokumenten steht (keine Zwischenstufen bei BORA, kein Mikrowellenmodus im CombiSteamer, keine Feuchte in % beim V-ZUG, kein „Auftauen“, kein ungelochter Garbehälter).
 
 ## 1. Format
 
@@ -10,18 +10,18 @@ Ziel: `src/data/device-steps/<gruppe>.ts` (de, it, as, gr = Abendessen, bf = Fr�
 { text: 'Satz im Stil des Rezepts.', settings: [{ device, mode, temp?, level?, minutes?, humidity?, core?, note? }] }
 ```
 
-- `device`: `steamer` (CombiSteamer), `combair`, `bora`, `airfryer`. `mode` immer deutsch wie im Gerät: CombiSteamer: Dämpfen, Heissluft, Heissluft feucht, Heissluft mit Beschwaden, Regenerieren, Lebensmittel vorbereiten; Combair: Heissluft, Ober-/Unterhitze, Heissluft feucht, PizzaPlus, Zartgaren, Grill, Grill mit Umluft; BORA: `Kochzone` + `level` (`'1'`–`'9'`, `'Power'`, `'Schmelzen'`, `'Warmhalten'`, `'Simmern'`); Airfryer: `Heissluft` + `temp`.
+- `device`: `steamer` (CombiSteamer), `combair`, `bora`, `airfryer`. `mode` immer deutsch **wie in der Anleitung** (Schreibweise „Heißluft“ mit ß): CombiSteamer: Dämpfen, Heißluft, Heißluft feucht, Heißluft mit Beschwaden, Regenerieren, Vacuisine; Combair: Heißluft, Ober-/Unterhitze, Heißluft feucht, PizzaPlus, Grill, Grill-Umluft (vollständige Liste unten bei „Erlaubte Betriebsarten“); BORA: `Kochzone` + `level` (`'1'`–`'9'`, `'Power'`, `'Schmelzen'`, `'Warmhalten'`, `'Simmern'`); Airfryer: `Heissluft` + `temp`.
 - `minutes` nur setzen, wenn die Dauer am Gerät eingestellt wird oder man sie abwartet. `core` (40–95 °C) nur mit Kerntemperaturfühler. `note` kurz („vorheizen“, „Ebene 2“, „aufkochen“).
 - Mehrere Einstellungen pro Schritt sind erlaubt (z. B. Power zum Aufkochen, dann Stufe 6).
-- Wertebereiche (werden von `npm run check-data` geprüft): CombiSteamer 30–230 °C, Dämpfen höchstens 100 °C; Combair 30–280 °C; Airfryer 80–200 °C; Minuten 1–600; Kern 40–95 °C.
+- Wertebereiche (werden von `npm run check-data` über `validateSetting` geprüft, Quelle Anleitungen): CombiSteamer Dämpfen 30–100 °C, Heißluft/Heißluft feucht/eco 30–230, Heißluft mit Beschwaden 80–230, Regenerieren 80–200, Vacuisine 30–95, Dörren 40–85. Combair Heißluft/Ober-/Unterhitze/PizzaPlus/Grill-Umluft 30–280, die „feucht“- und eco-Varianten 30–250. **Ohne Temperaturwert:** Warmhalten (5–90 Min.), Tellerwärmen, Zartgaren, Grill und Unterhitze (4 Stufen, als `note: 'Stufe 3 (stark)'`). Airfryer 80–200 °C; Minuten 1–600; Kern 40–95 °C, **nur bei Garraumtemperatur ≤ 230 °C**; bei Vacuisine ist Kern nicht einstellbar; keine `humidity` bei V-ZUG.
 
 ## 2. Allgemeine Regeln
 
 1. **Mengen, Zutaten und Portionenzahl unverändert** lassen. Nur `steps` werden umgeschrieben, die Zutatenliste bleibt tabu.
 2. **Schrittzahl ähnlich** halten: sinnvoll zusammenfassen oder teilen (Ofenphasen = eigene Schritte). Jede Zutat soll weiterhin im Schritt genannt sein, in dem sie gebraucht wird (der Kochmodus ordnet Zutaten über die Schritttexte zu).
 3. **Stil wie die bestehenden Rezepte:** ein Satz pro Handlung, Imperativ, deutsch, konkret („in den vorgeheizten Combair schieben“). Keine Marketingsprache, keine Emojis.
-4. **Vorheizen erwähnen**, wo nötig (Backofen, Airfryer bei Fleisch/Paniertem, Pfanne vor dem Öl). Dämpfen braucht kurzes Aufheizen, der Text sagt „Den CombiSteamer vorheizen“.
-5. Temperaturen und Zeiten aus den Tabellen unten bzw. `vzug.md` 4.2 / `bora-airfryer.md` ableiten. Ofen-Rezept → Heissluft meist 20 °C niedriger. Bei Unsicherheit eher kurze Zeit + Prüfhinweis im Text („Garprobe machen“).
+4. **Vorheizen erwähnen**, wo nötig (Combair, CombiSteamer bei Heißluft/Heißluft feucht/Heißluft mit Beschwaden, Airfryer bei Fleisch/Paniertem, Pfanne vor dem Öl). **Dämpfen und Regenerieren haben kein Vorheizen** (Anleitung S. 22): der Text sagt stattdessen „Den Wasserbehälter des CombiSteamers füllen“, kein `vorheizen` in der `note`. Eco-Anwendungen nie vorheizen. Combair Grill: 3 Minuten vorheizen.
+5. Temperaturen und Zeiten aus den Tabellen unten bzw. `vzug.md` 6.2 / `bora-airfryer.md` ableiten. Ofen-Rezept → Heißluft meist 20 °C niedriger. Bei Unsicherheit eher kurze Zeit + Prüfhinweis im Text („Garprobe machen“).
 6. Gerät nur nehmen, wenn es echten Vorteil bringt. Kein Gerät nötig (Schneiden, Mischen, Pürieren, Marinieren) → Schritt ohne `settings`.
 7. Frühstück (bf): Vorbereitung am Prep-Tag darf CombiSteamer/Combair nutzen (Baked Oats, Eiermuffins). **Aufwärmen auf der Arbeit bleibt Mikrowelle** (dort gibt es keine V-ZUG-Geräte) und steht im Feld `morning`, nicht in `deviceSteps`.
 
@@ -29,8 +29,8 @@ Ziel: `src/data/device-steps/<gruppe>.ts` (de, it, as, gr = Abendessen, bf = Fr�
 
 - Kartoffeln, Klöße, Gemüse, Reis, Eier, Fisch garen: **CombiSteamer, Dämpfen**.
 - Reste und Meal-Prep aufwärmen, ohne auszutrocknen: **CombiSteamer, Regenerieren**.
-- Braten mit Kruste (Schwein, Ente, Gans): CombiSteamer Heissluft mit Beschwaden (saftig), letzte Phase trocken im Combair mit 210–220 °C.
-- Niedertemperatur (Rind, Kalb): CombiSteamer „Lebensmittel vorbereiten“ 80–90 °C mit Kerntemperaturfühler, danach Combair Grill kurz.
+- Braten mit Kruste (Schwein, Ente, Gans): CombiSteamer Heißluft mit Beschwaden (saftig), letzte Phase trocken im selben Gerät (Heißluft 210–230 °C, Fühler nur bis 230 °C).
+- Niedertemperatur (Rind, Kalb): CombiSteamer **Zartgaren** (Fühler, Zielwerte aus `vzug.md` 4.3) oder bei vakuumierten Stücken **Vacuisine** (30–95 °C); danach Combair Grill kurz. Den Namen „Lebensmittel vorbereiten“ gibt es nicht.
 - Pizza, Flammkuchen, Brötchen, Gratin, Lasagne, Aufläufe: **Combair**.
 - Schnitzel, Panieres: BORA-Pfanne oder Airfryer. Frittiertes, Pommes, Ofengemüse knusprig: **Airfryer**. Alles, was Wasser verlieren soll, nicht dämpfen.
 - Nudeln: **bleiben auf dem BORA** (Powerstufe zum Aufkochen, dann Stufe 7). Anbraten, Soßen, Suppen, Wok: BORA.
@@ -63,27 +63,27 @@ Nur ganze Stufen. Induktion reagiert sofort: eher eine Stufe niedriger starten.
 |---|---|---|---|---|
 | Salz-/Pellkartoffeln (halbiert) | CombiSteamer · Dämpfen | 100 | 20–30 | ganze mittelgroße 30–40 |
 | Klöße/Knödel (Beutel/Folie) | CombiSteamer · Dämpfen | 95–100 | 20–30 | Semmelknödel im Wasser: BORA `Simmern` |
-| Reis (1:1,5 Wasser, ungelochtes Blech) | CombiSteamer · Dämpfen | 100 | 20–25 | |
+| Reis (1:1,5 Wasser, flache Schale) | CombiSteamer · Dämpfen | 100 | 20–25 | Schale auf den gelochten Garbehälter, ohne Vorheizen; es gibt keinen ungelochten Garbehälter |
 | Nudeln | BORA | | | `Power`, dann `7` |
-| Gemüse (Brokkoli, Möhre, Bohnen) | CombiSteamer · Dämpfen | 100 | 6–20 | gelochtes Blech, bissfest |
-| Schweinebraten (1–1,5 kg) | CombiSteamer · Heissluft mit Beschwaden, dann Combair · Heissluft | 165–170 / 220 | 90–120 + 15–20 | Kern 75–80 |
-| Rinderbraten (Niedertemperatur) | CombiSteamer · Lebensmittel vorbereiten, dann Combair · Grill | 80–90 | 90–150 | Kern 55–58 (rosa), Schmorbraten 85 |
-| Kalbsbraten | CombiSteamer · Heissluft feucht | 140–160 | 90–120 | Kern 68–72 |
-| Ente ganz | CombiSteamer · Heissluft mit Beschwaden, dann Combair · Heissluft | 150 / 200–220 | 90 + 20 | Kern Brust 78, Keule 85–90 |
-| Gänsekeule | CombiSteamer · Heissluft feucht, dann Combair · Heissluft | 130 / 210 | 90–120 + 15 | Kern 90 |
+| Gemüse (Brokkoli, Möhre, Bohnen) | CombiSteamer · Dämpfen | 100 | 6–20 | gelochter Garbehälter, bissfest |
+| Schweinebraten (1–1,5 kg) | CombiSteamer · Heißluft mit Beschwaden, dann Heißluft (im selben Gerät) | 165–170 / 220 | 90–120 + 15–20 | Kern 75–80 |
+| Rinderbraten (Niedertemperatur) | CombiSteamer · Zartgaren (Fühler) oder Heißluft feucht 130–150 | Kern 57 | 90–270 | Zielwerte Tabelle `vzug.md` 4.3; Schmorbraten Kern 85 (Heißluft feucht) |
+| Kalbsbraten | CombiSteamer · Heißluft feucht | 140–160 | 90–120 | Kern 68–72 |
+| Ente ganz | CombiSteamer · Heißluft mit Beschwaden, dann Heißluft (im selben Gerät) | 150 / 200–220 | 90 + 20 | Kern Brust 78, Keule 85–90 |
+| Gänsekeule | Combair · Heißluft feucht, dann Heißluft (im selben Gerät) | 130 / 210 | 90–120 + 15 | Kern 90 |
 | Hähnchenbrust | CombiSteamer · Dämpfen | 85–100 | 12–20 | Kern 68–72 |
-| Hähnchen ganz/Keulen | Combair · Heissluft (feucht = saftiger) | 190 | 45–60 / 35–45 | Kern 80–85; Keulen alternativ Airfryer 180–200 °C, 18–25 Min. |
+| Hähnchen ganz/Keulen | Combair · Heißluft (feucht = saftiger) | 190 | 45–60 / 35–45 | Kern 80–85; Keulen alternativ Airfryer 180–200 °C, 18–25 Min. |
 | Fisch (Filet / ganz) | CombiSteamer · Dämpfen | 80–90 / 90–100 | 8–14 / 15–20 | Kern 55–62 |
-| Aufläufe, Gratin, Lasagne | Combair · Heissluft oder Ober-/Unterhitze | 180–200 | 30–45 | saftiger: CombiSteamer Heissluft mit Beschwaden 170 |
-| Pizza, Flammkuchen | Combair · PizzaPlus | 240–280 | 8–15 | Einschub 1–2, vorheizen |
-| Brötchen aufbacken | CombiSteamer · Heissluft mit Beschwaden (oder Combair) | 180–200 | 8–12 | Airfryer 160–180 °C, 3–6 Min. |
+| Aufläufe, Gratin, Lasagne | Combair · Heißluft oder Ober-/Unterhitze | 180–200 | 30–45 | saftiger: CombiSteamer Heißluft mit Beschwaden 170 |
+| Pizza, Flammkuchen | Combair · PizzaPlus | 240–280 | 8–15 | Ebene 2 (Anleitung), dunkles Blech ohne Backpapier, vorheizen |
+| Brötchen aufbacken | CombiSteamer · Heißluft mit Beschwaden (oder Combair) | 180–200 | 8–12 | Airfryer 160–180 °C, 3–6 Min. |
 | Schnitzel/Paniertes | BORA-Pfanne `5`–`6` oder Airfryer | – / 180 | – / 10–14 | Airfryer: andrücken, einsprühen, wenden |
 | Frittiertes, Pommes, Spalten | Airfryer | 180–200 | 15–25 | Korb halb voll, 1–2× schütteln |
 | Frühlingsrollen, Jiaozi TK | Airfryer | 180–190 | 8–12 | einölen |
 | Eier (wachsweich / hart) | CombiSteamer · Dämpfen | 100 | 6–7 / 10–12 | |
-| Baked Oats, Eiermuffins (Prep) | Combair · Heissluft (oder CombiSteamer · Heissluft mit Beschwaden 160–170) | 170–180 | 15–25 | Förmchen auf Rost |
-| Reste regenerieren (Reis, Nudeln, Klöße, Gemüse, Braten) | CombiSteamer · Regenerieren | 110–130 | 8–20 | Gefäß mit Deckel, Soße/Wasser zugeben, vorheizen |
-| Panierte Reste knusprig | Airfryer | 150–160 | 3–6 | oder nach Regenerieren kurz Heissluft |
+| Baked Oats, Eiermuffins (Prep) | Combair · Heißluft (oder CombiSteamer · Heißluft mit Beschwaden 160–170) | 170–180 | 15–25 | Förmchen auf Rost |
+| Reste regenerieren (Reis, Nudeln, Klöße, Gemüse, Braten) | CombiSteamer · Regenerieren | 110–130 | 8–20 | Gefäß mit Deckel, Soße/Wasser zugeben, ohne Vorheizen; ab 150 °C Kuchenblech, darunter Edelstahlblech |
+| Panierte Reste knusprig | Airfryer | 150–160 | 3–6 | oder nach Regenerieren kurz Heißluft |
 
 ## 6. Abzug (BORA)
 
@@ -95,8 +95,10 @@ Automatik „A“ an lassen, der Lüfter folgt dem Kochfeld. Beim scharfen Anbra
 
 ## Feste Regeln (vom Koordinator ergänzt)
 
-- **Ein Gericht bleibt in einem Gerät.** Nicht zwischen CombiSteamer und Combair umziehen (z. B. für die Kruste): der CombiSteamer kann selbst trocken bis 230 °C. Der zweite Ofen ist für **parallele** Komponenten da (Beilage, Gemüse, Knödel, Pizza 2. Blech).
-- **Erlaubte Betriebsarten** (exakt so schreiben, wird geprüft): CombiSteamer: Dämpfen, Heissluft, Heissluft feucht, Heissluft mit Beschwaden, Regenerieren, Lebensmittel vorbereiten, Warmhalten, Auftauen · Combair: Heissluft, Ober-/Unterhitze, Heissluft feucht, PizzaPlus, Zartgaren, Grill, Grill mit Umluft, Warmhalten, Auftauen, Tellerwärmen · BORA: mode 'Kochzone' + level ('1'–'9', 'Power', 'Schmelzen', 'Warmhalten', 'Simmern') · Airfryer: 'Heissluft' + temp.
+- **Ein Gericht bleibt in einem Gerät.** Nicht zwischen CombiSteamer und Combair umziehen (z. B. für die Kruste): der CombiSteamer kann selbst trocken bis 230 °C.
+- **Einschubebenen:** CombiSteamer Heißluft-Anwendungen Ebene 2 oder 1+3, Dämpfen/Regenerieren/Vacuisine Ebene 1–4; Combair Heißluft 2 oder 1+3, Ober-/Unterhitze und PizzaPlus Ebene 2 (hohes Gargut 1), Grill Ebene 3, Grill-Umluft Ebene 2, Unterhitze Ebene 1.
+- **Zubehör:** kein Kuchenblech beim Dämpfen/Vacuisine; kein Backpapier unter Pizza bei PizzaPlus; keine Alufolie auf den Combair-Boden; Warmhalten und Tellerwärmen ohne Temperatur, aber mit Dauer (Warmhalten 5–90 Min.). Der zweite Ofen ist für **parallele** Komponenten da (Beilage, Gemüse, Knödel, Pizza 2. Blech).
+- **Erlaubte Betriebsarten** (exakt so schreiben, wird geprüft; Quelle Anleitungen): CombiSteamer: Dämpfen, Heißluft, Heißluft feucht, Heißluft mit Beschwaden, Heißluft eco, Regenerieren, RegenerierAutomatik feucht, RegenerierAutomatik knusprig, Dörren, Vacuisine, Profi-Backen klassisch/bemehlt/bestrichen/Aufgehen lassen, Zartgaren, Warmhalten, Tellerwärmen · Combair: Ober-/Unterhitze, Ober-/Unterhitze feucht, Ober-/Unterhitze eco, Unterhitze, PizzaPlus, Grill, Grill-Umluft, Heißluft, Heißluft feucht, Heißluft eco, Dörren, Zartgaren, Warmhalten, Tellerwärmen (kein „Auftauen“ bei beiden Geräten; der CombiSteamer hat **kein** Ober-/Unterhitze, Grill oder PizzaPlus) · BORA: mode 'Kochzone' + level ('1'–'9', 'Power', 'Schmelzen', 'Warmhalten', 'Simmern') · Airfryer: 'Heissluft' + temp.
 - BORA X Pure: Pfannen/Töpfe frei auf der Fläche platzieren; für große Bräter/Pfannen die Brückenfunktion erwähnen (note: 'Brücke'). Abzug: Automatik „A“ – nur bei sehr starkem Anbraten note: 'Abzug Power'.
 - Nicht jedes Gericht braucht einen Ofen: Pfannen-, Wok- und Nudelgerichte bleiben auf dem BORA. Den CombiSteamer nur nehmen, wo er klar besser ist (Dämpfen, Braten saftig, Aufläufe, Regenerieren, Klöße/Kartoffeln/Reis/Gemüse ohne Topf).
 - Meal-Prep-Frühstück: Zubereitung zu Hause mit den Geräten; das Aufwärmen auf der Arbeit bleibt Mikrowelle (dort steht kein V-ZUG).

@@ -9,15 +9,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den CombiSteamer vorheizen. Den Braten mit der Schwarte nach unten in einen Bräter mit 2 cm Wasser legen, auf Ebene 2 schieben und 30 Minuten garen.',
-      settings: [{ device: 'steamer', mode: 'Heissluft mit Beschwaden', temp: 170, minutes: 30, note: 'vorheizen, Ebene 2' }],
+      settings: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 170, minutes: 30, note: 'vorheizen, Ebene 2' }],
     },
     {
       text: 'Den Braten umdrehen, grob geschnittene Zwiebeln und Möhre zugeben und den Kerntemperaturfühler in die dickste Stelle stecken. Weitere 90 Minuten garen und dabei immer wieder mit Bier übergießen.',
-      settings: [{ device: 'steamer', mode: 'Heissluft mit Beschwaden', temp: 170, minutes: 90, core: 78, note: 'Fühler nicht am Knochen' }],
+      settings: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 170, minutes: 90, core: 78, note: 'Fühler nicht am Knochen' }],
     },
     {
       text: 'Für die Kruste auf trockene Hitze umstellen und weitergaren, bis die Schwarte aufpoppt.',
-      settings: [{ device: 'steamer', mode: 'Heissluft', temp: 220, minutes: 15, note: 'ohne Dampf' }],
+      settings: [{ device: 'steamer', mode: 'Heißluft', temp: 220, minutes: 15, note: 'ohne Dampf' }],
     },
     {
       text: 'Für die Semmelknödel die Brötchen würfeln, mit warmer Milch übergießen und 15 Minuten ziehen lassen. Eier, Petersilie und Salz untermischen und Knödel formen.',
@@ -71,7 +71,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Fond angießen und die Rouladen zurück in den Bräter legen. Den Bräter zugedeckt in den vorgeheizten Combair schieben und 90 Minuten schmoren.',
-      settings: [{ device: 'combair', mode: 'Heissluft feucht', temp: 150, minutes: 90, note: 'vorheizen, Deckel drauf' }],
+      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 150, minutes: 90, note: 'vorheizen, Deckel drauf' }],
     },
     {
       text: 'Die Sauce durch ein Sieb passieren, abschmecken und nach Wunsch mit etwas angerührter Stärke binden.',
@@ -86,7 +86,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Für die Klöße die Kartoffeln im CombiSteamer dämpfen, pellen, durchpressen und abkühlen lassen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Die Kartoffelmasse mit 30 g Stärke, Salz und etwas Muskat verkneten, Klöße formen und 20 Minuten in siedendem Salzwasser ziehen lassen.',
@@ -111,7 +111,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Mit 500 ml Marinade ablöschen und den zugedeckten Bräter in den vorgeheizten Combair schieben. Etwa 2 Stunden schmoren, bis das Fleisch zart ist.',
-      settings: [{ device: 'combair', mode: 'Heissluft feucht', temp: 150, minutes: 120, core: 85, note: 'vorheizen, Deckel drauf' }],
+      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 150, minutes: 120, core: 85, note: 'vorheizen, Deckel drauf' }],
     },
     {
       text: 'Fleisch herausnehmen. Die Sauce passieren, zerbröselte Printen, Rosinen und Sirup einrühren und sämig einköcheln. Mit Salz und Zucker süß-sauer abschmecken.',
@@ -119,7 +119,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 30, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 30, note: 'gelocht' }],
     },
     {
       text: 'Den Rotkohl mit Deckel und wenig Wasser weich schmoren.',
@@ -133,7 +133,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'wiener-schnitzel': [
     {
       text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen, pellen und noch warm in Scheiben schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Fein gewürfelte Zwiebel in der Brühe aufkochen, mit Essig, Senf, Salz, Pfeffer und einer Prise Zucker über die Kartoffeln gießen und 30 Minuten ziehen lassen.',
@@ -160,8 +160,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Die Schnitzel im Combair bei 80 °C warm halten.',
-      settings: [{ device: 'combair', mode: 'Warmhalten', temp: 80, note: 'Teller vorwärmen' }],
+      text: 'Die Schnitzel im Combair mit „Warmhalten“ warm halten.',
+      settings: [{ device: 'combair', mode: 'Warmhalten', note: 'Teller vorwärmen' }],
     },
     {
       text: 'Im Bratfett Speck und Zwiebelwürfel anbraten, dann die in Scheiben geschnittenen Champignons zugeben und kräftig braten.',
@@ -190,8 +190,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Die Schnitzel im Combair bei 80 °C warm halten.',
-      settings: [{ device: 'combair', mode: 'Warmhalten', temp: 80 }],
+      text: 'Die Schnitzel im Combair mit „Warmhalten“ warm halten.',
+      settings: [{ device: 'combair', mode: 'Warmhalten' }],
     },
     {
       text: 'Paprika und Zwiebel in Streifen schneiden und im Bratfett andünsten. Tomatenmark und Paprikapulver kurz mitrösten.',
@@ -212,8 +212,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Die Schnitzel im Combair bei 80 °C warm halten.',
-      settings: [{ device: 'combair', mode: 'Warmhalten', temp: 80 }],
+      text: 'Die Schnitzel im Combair mit „Warmhalten“ warm halten.',
+      settings: [{ device: 'combair', mode: 'Warmhalten' }],
     },
     {
       text: 'Schalottenwürfel im Bratfett glasig dünsten, mit Fond ablöschen und den Bratensatz lösen.',
@@ -235,7 +235,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'cordon-bleu': [
     {
       text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen, pellen, abkühlen lassen und in Scheiben schneiden. Am besten schon am Vortag.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Schnitzel seitlich zu einer Tasche einschneiden oder dünn klopfen. Mit Schinken und Käse füllen, zuklappen und die Ränder andrücken. Salzen und pfeffern.',
@@ -259,7 +259,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Brühe mit Deckel aufkochen, Klopse hineingeben und bei schwacher Hitze 15 Minuten gar ziehen lassen. Herausnehmen und die Brühe aufbewahren.',
@@ -291,7 +291,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Frikadellen im Butterschmalz bei mittlerer Hitze 5 bis 6 Minuten je Seite braten.',
@@ -325,11 +325,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den zugedeckten Bräter in den vorgeheizten Combair schieben und 70 Minuten schmoren.',
-      settings: [{ device: 'combair', mode: 'Heissluft feucht', temp: 150, minutes: 70, note: 'vorheizen, Deckel drauf' }],
+      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 150, minutes: 70, note: 'vorheizen, Deckel drauf' }],
     },
     {
       text: 'Paprika würfeln, zugeben und weitere 20 Minuten garen, bis das Fleisch zart ist. Abschmecken.',
-      settings: [{ device: 'combair', mode: 'Heissluft feucht', temp: 150, minutes: 20 }],
+      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 150, minutes: 20 }],
     },
     {
       text: 'Die Bandnudeln in reichlich Salzwasser bissfest kochen und mit dem Gulasch servieren.',
@@ -362,7 +362,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Mit Salz und Pfeffer abschmecken. Mit einem Klecks Schmand und Salzkartoffeln servieren.',
@@ -383,7 +383,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Die Kartoffeln mit heißer Milch und Butter zu Püree stampfen. Mit Muskat und Salz würzen.',
@@ -397,7 +397,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   leberkaese: [
     {
       text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen, pellen und in Scheiben schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'In 2 EL Butterschmalz ohne zu wenden 5 Minuten anbraten, dann wenden und knusprig braten. Zwiebelwürfel zugeben und mit Salz, Pfeffer und etwas Kümmel würzen.',
@@ -429,7 +429,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Die Kartoffeln mit heißer Milch und Butter zu Püree stampfen. Mit Muskat und Salz würzen.',
@@ -551,7 +551,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'himmel-und-erde': [
     {
       text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Die Kartoffeln mit Milch und Butter stampfen. Mit Salz und Muskat würzen.',
@@ -574,7 +574,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   labskaus: [
     {
       text: 'Kartoffeln schälen, in Stücke schneiden, im CombiSteamer weich dämpfen und grob stampfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Zwiebel würfeln und im Butterschmalz glasig dünsten. Corned Beef zerpflücken, zugeben und mit etwas Gurkenwasser und Rote-Bete-Saft mischen.',
@@ -596,7 +596,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   senfeier: [
     {
       text: 'Die Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Die Eier 7 Minuten mitdämpfen, abschrecken und pellen.',
@@ -623,7 +623,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'spinat-spiegelei': [
     {
       text: 'Kartoffeln schälen, halbieren und im CombiSteamer als Salzkartoffeln gar dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Rahmspinat mit Deckel erhitzen, öfter umrühren und mit Muskat und Pfeffer abschmecken.',
@@ -640,11 +640,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   huehnerfrikassee: [
     {
-      text: 'Das Hähnchen in einer Schale mit der Brühe in den vorgeheizten CombiSteamer stellen und gar ziehen lassen. Den Kerntemperaturfühler in die dickste Stelle stecken. Das Fleisch in Stücke schneiden und die Brühe aufbewahren.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 18, core: 72, note: 'vorheizen, ungelocht' }],
+      text: 'Das Hähnchen in einer Schale mit der Brühe in den CombiSteamer stellen und gar ziehen lassen. Den Kerntemperaturfühler in die dickste Stelle stecken. Das Fleisch in Stücke schneiden und die Brühe aufbewahren.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 18, core: 72, note: 'Schale' }],
     },
     {
-      text: 'Den Reis mit der 1,5-fachen Menge Wasser und Salz auf einem ungelochten Blech daneben mitdämpfen.',
+      text: 'Den Reis mit der 1,5-fachen Menge Wasser und Salz in einer flachen Schale auf dem gelochten Garbehälter daneben mitdämpfen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 22, note: 'Ebene 2' }],
     },
     {
@@ -689,7 +689,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'zuercher-geschnetzeltes': [
     {
       text: 'Die Kartoffeln vorab im CombiSteamer als Pellkartoffeln dämpfen, auskühlen lassen und grob raspeln.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Die Kartoffelraspel salzen, in Butterschmalz zu 2 Rösti formen und von jeder Seite 8 Minuten knusprig braten.',
@@ -718,8 +718,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Die Medaillons im Combair bei 80 °C warm halten.',
-      settings: [{ device: 'combair', mode: 'Warmhalten', temp: 80 }],
+      text: 'Die Medaillons im Combair mit „Warmhalten“ warm halten.',
+      settings: [{ device: 'combair', mode: 'Warmhalten' }],
     },
     {
       text: 'Schalotte im Bratfett andünsten, mit Weinbrand ablöschen, dann Fond, Sahne und grünen Pfeffer zugeben und cremig einkochen.',
@@ -733,8 +733,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   kohlrouladen: [
     {
-      text: 'Den Strunk des Kohls herausschneiden und den Kohl im vorgeheizten CombiSteamer dämpfen, bis sich die Blätter lösen. 8 große Blätter nach und nach ablösen und die dicken Blattrippen flach schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'vorheizen, ungelocht' }],
+      text: 'Den Strunk des Kohls herausschneiden und den Kohl im CombiSteamer dämpfen, bis sich die Blätter lösen. 8 große Blätter nach und nach ablösen und die dicken Blattrippen flach schneiden.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'Schale' }],
     },
     {
       text: 'Hack mit eingeweichtem Brötchen, Ei, Zwiebelwürfeln, Salz, Pfeffer, Paprika und Kümmel verkneten. Auf die Blätter verteilen, einrollen und mit Garn binden.',
@@ -745,7 +745,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den zugedeckten Bräter in den vorgeheizten Combair schieben und 45 Minuten schmoren lassen.',
-      settings: [{ device: 'combair', mode: 'Heissluft feucht', temp: 160, minutes: 45, note: 'vorheizen, Deckel drauf' }],
+      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 160, minutes: 45, note: 'vorheizen, Deckel drauf' }],
     },
     {
       text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
@@ -758,8 +758,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'gefuellte-paprika': [
     {
-      text: 'Den Reis mit Wasser auf einem ungelochten Blech im vorgeheizten CombiSteamer halb gar dämpfen. Paprika köpfen und entkernen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 12, note: 'vorheizen, halb gar' }],
+      text: 'Den Reis mit Wasser in einer flachen Schale auf dem gelochten Garbehälter im CombiSteamer halb gar dämpfen. Paprika köpfen und entkernen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 12, note: 'halb gar' }],
     },
     {
       text: 'Hack, Reis, Ei, Zwiebelwürfel, Salz, Pfeffer und Paprikapulver vermengen und in die Schoten füllen. Deckel aufsetzen.',
@@ -770,7 +770,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Die Paprika in die Sauce setzen und den zugedeckten Topf in den vorgeheizten Combair schieben. 40 Minuten schmoren lassen.',
-      settings: [{ device: 'combair', mode: 'Heissluft feucht', temp: 170, minutes: 40, note: 'vorheizen, Deckel drauf' }],
+      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 170, minutes: 40, note: 'vorheizen, Deckel drauf' }],
     },
     {
       text: 'Den restlichen Reis im CombiSteamer fertig garen.',
@@ -787,14 +787,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Die harten Eier 12 Minuten im CombiSteamer dämpfen, abschrecken und pellen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 12, note: 'vorheizen, hart' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 12, note: 'hart' }],
     },
     {
       text: 'Die Hälfte der Masse zu einem flachen Laib formen, die gepellten harten Eier darauflegen, mit der restlichen Masse umhüllen und mit Bacon belegen.',
     },
     {
       text: 'In einer Form in den vorgeheizten Combair schieben und backen. Den Kerntemperaturfühler in die Mitte stecken. Nach 20 Minuten den Fond angießen.',
-      settings: [{ device: 'combair', mode: 'Heissluft', temp: 160, minutes: 50, core: 75, note: 'vorheizen' }],
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 160, minutes: 50, core: 75, note: 'vorheizen' }],
     },
     {
       text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen. Mit heißer Milch und Butter zu Püree stampfen und mit Muskat abschmecken.',
@@ -830,8 +830,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   flammkuchen: [
     {
-      text: 'Den Combair mit dem Blech auf der untersten Stufe vorheizen.',
-      settings: [{ device: 'combair', mode: 'PizzaPlus', temp: 250, minutes: 15, note: 'vorheizen, Einschub 1' }],
+      text: 'Den Combair mit dem Blech auf Ebene 2 vorheizen.',
+      settings: [{ device: 'combair', mode: 'PizzaPlus', temp: 250, minutes: 15, note: 'vorheizen, Ebene 2' }],
     },
     {
       text: 'Teig ausrollen und mit gewürztem Schmand (Salz, Pfeffer, Muskat) dünn bestreichen.',
@@ -841,14 +841,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Flammkuchen auf dem heißen Blech in den Combair schieben und knusprig backen.',
-      settings: [{ device: 'combair', mode: 'PizzaPlus', temp: 250, minutes: 11, note: 'Einschub 1' }],
+      settings: [{ device: 'combair', mode: 'PizzaPlus', temp: 250, minutes: 11, note: 'Ebene 2' }],
     },
   ],
 
   bauernfruehstueck: [
     {
       text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen, pellen und in Scheiben schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Im Butterschmalz knusprig braten, dann Speck und Zwiebel zugeben.',
@@ -869,7 +869,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'matjes-hausfrauenart': [
     {
       text: 'Die Kartoffeln mit Schale im CombiSteamer dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Apfel, Zwiebel und Gurke in feine Streifen schneiden.',
@@ -885,7 +885,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   backfisch: [
     {
       text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen und in Scheiben schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Die Brühe erhitzen und mit Zwiebelwürfeln, Essig, Salz und Pfeffer zu Kartoffelsalat anmachen.',
@@ -906,10 +906,10 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'lachs-senf-dill': [
     {
       text: 'Kartoffeln schälen und im CombiSteamer gar dämpfen. In Butter mit gehackter Petersilie schwenken.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Den Lachs salzen, pfeffern und mit Öl bestreichen. Auf dem gelochten Blech im CombiSteamer garen.',
+      text: 'Den Lachs salzen, pfeffern und mit Öl bestreichen. Auf dem gelochten Garbehälter im CombiSteamer garen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 85, minutes: 10, core: 58, note: 'nach den Kartoffeln' }],
     },
     {
@@ -926,8 +926,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'pellkartoffeln-kraeuterquark': [
     {
-      text: 'Die Kartoffeln mit Schale im vorgeheizten CombiSteamer garen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      text: 'Die Kartoffeln mit Schale im CombiSteamer garen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Quark mit Milch glatt rühren. Kräuter fein hacken, Zwiebel fein würfeln und beides unterrühren. Mit Salz und Pfeffer würzen.',
@@ -942,8 +942,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'gruene-sosse': [
     {
-      text: 'Die Kartoffeln mit Schale im vorgeheizten CombiSteamer dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      text: 'Die Kartoffeln mit Schale im CombiSteamer dämpfen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Nach 24 Minuten 4 Eier dazulegen und hart dämpfen. Dann abschrecken und pellen.',
@@ -978,7 +978,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
       text: 'Für die Sauce Butter schmelzen, Mehl anschwitzen, mit 300 ml Brühe und Sahne aufgießen, 5 Minuten köcheln lassen und Meerrettich einrühren.',
@@ -998,11 +998,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'Den Bräter auf Ebene 2 in den vorgeheizten CombiSteamer schieben und die Haxen garen. Den Kerntemperaturfühler in die dickste Stelle stecken, regelmäßig wenden und mit Bier übergießen.',
-      settings: [{ device: 'steamer', mode: 'Heissluft mit Beschwaden', temp: 160, minutes: 150, core: 88, note: 'vorheizen, Ebene 2' }],
+      settings: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 160, minutes: 150, core: 88, note: 'vorheizen, Ebene 2' }],
     },
     {
       text: 'Zum Schluss auf trockene Hitze umstellen und die Haxen knusprig backen.',
-      settings: [{ device: 'steamer', mode: 'Heissluft', temp: 220, minutes: 15, note: 'ohne Dampf' }],
+      settings: [{ device: 'steamer', mode: 'Heißluft', temp: 220, minutes: 15, note: 'ohne Dampf' }],
     },
     {
       text: 'Kohl fein hobeln, mit Salz kräftig durchkneten und mit Essig, Öl, Zucker und Kümmel zu Krautsalat anmachen.',
@@ -1023,7 +1023,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     {
       text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen. Mit Milch und Butter zu Püree stampfen.',
       settings: [
-        { device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'vorheizen, gelocht' },
+        { device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' },
         { device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' },
       ],
     },
@@ -1045,8 +1045,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'spargel-hollandaise': [
     {
-      text: 'Spargel schälen und die Enden abschneiden. Mit Zucker, Salz und einem Stück Butter in eine Schale geben und im vorgeheizten CombiSteamer garen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'vorheizen, Ebene 2' }],
+      text: 'Spargel schälen und die Enden abschneiden. Mit Zucker, Salz und einem Stück Butter in eine Schale geben und im CombiSteamer garen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'Ebene 2' }],
     },
     {
       text: 'Kartoffeln schälen, halbieren und auf Ebene 1 mitdämpfen.',
@@ -1127,8 +1127,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '8', minutes: 5, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Die Steaks im Combair warm stellen.',
-      settings: [{ device: 'combair', mode: 'Warmhalten', temp: 70 }],
+      text: 'Die Steaks im Combair mit „Warmhalten“ warm stellen.',
+      settings: [{ device: 'combair', mode: 'Warmhalten' }],
     },
     {
       text: 'Bratensatz mit Wein und Fond ablöschen und kräftig einkochen.',
@@ -1163,7 +1163,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   pannfisch: [
     {
       text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen und in Scheiben schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
       text: 'Die Kartoffelscheiben mit Zwiebeln im Butterschmalz zu Bratkartoffeln braten.',
@@ -1185,7 +1185,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   gruenkohl: [
     {
       text: 'Grünkohl von den Strünken zupfen, waschen, im CombiSteamer kurz blanchieren und grob hacken.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 5, note: 'vorheizen, gelocht' }],
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 5, note: 'gelocht' }],
     },
     {
       text: 'Zwiebeln im Schmalz andünsten, Grünkohl und Brühe zugeben, aufkochen und 1 Stunde zugedeckt schmoren.',
@@ -1227,8 +1227,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Den Reis mit der 1,5-fachen Menge Wasser und Salz auf einem ungelochten Blech im vorgeheizten CombiSteamer dämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 22, note: 'vorheizen, ungelocht' }],
+      text: 'Den Reis mit der 1,5-fachen Menge Wasser und Salz in einer flachen Schale auf dem gelochten Garbehälter im CombiSteamer dämpfen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 22, note: 'Schale' }],
     },
     {
       text: 'Kräftig abschmecken und mit Reis servieren.',
@@ -1237,8 +1237,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'ragout-fin': [
     {
-      text: 'Das Hähnchen in einer Schale mit der Brühe im vorgeheizten CombiSteamer gar ziehen lassen. Den Kerntemperaturfühler in die dickste Stelle stecken. Dann klein würfeln.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, core: 72, note: 'vorheizen, ungelocht' }],
+      text: 'Das Hähnchen in einer Schale mit der Brühe im CombiSteamer gar ziehen lassen. Den Kerntemperaturfühler in die dickste Stelle stecken. Dann klein würfeln.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, core: 72, note: 'Schale' }],
     },
     {
       text: 'Butter schmelzen, Mehl anschwitzen, mit Brühe, Wein und Sahne aufgießen und 5 Minuten köcheln lassen. Champignons fein würfeln und mitgaren.',
@@ -1252,7 +1252,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     {
       text: 'In ofenfeste Förmchen füllen, mit Käse bestreuen und im Combair kurz gratinieren. Mit Toast und Zitronenspalten servieren.',
-      settings: [{ device: 'combair', mode: 'Grill', minutes: 4, note: 'Einschub 3' }],
+      settings: [{ device: 'combair', mode: 'Grill', minutes: 4, note: 'Stufe 3 (stark), Ebene 3, 3 Min. vorheizen' }],
     },
   ],
 }
