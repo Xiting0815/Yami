@@ -16,6 +16,7 @@ export function PantryTab({ m }: { m: AppModel }) {
       onAdded={act.noteRequest}
       onCreate={act.createPantryItem}
       onCook={() => ui.setPantryChooser(true)}
+      onEat={act.eatPiece}
     />
   )
 }

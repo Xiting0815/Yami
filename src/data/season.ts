@@ -1,5 +1,6 @@
 import type { Recipe } from '../types'
 import { gramsOf } from './nutrition-calc'
+import { EXTRA_SEASON } from './extra'
 
 /**
  * Saisonkalender: Monate (1–12), in denen eine Gemüse-/Obstsorte in Deutschland regional
@@ -50,6 +51,9 @@ export const SEASON: Record<string, number[]> = {
 }
 
 /** true = in Saison, false = nicht in Saison, undefined = keine Saisondaten (immer passend) */
+// neue Obst-/Gemüsezutaten aus src/data/extra (Backen & Desserts)
+for (const [n, m] of Object.entries(EXTRA_SEASON)) if (!SEASON[n]) SEASON[n] = m
+
 export function inSeason(name: string, month: number): boolean | undefined {
   const months = SEASON[name]
   if (!months) return undefined

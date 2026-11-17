@@ -349,6 +349,8 @@ li.done .item-name, li.done .item-amt { text-decoration: line-through; color: va
 .exp { font-size: 12px; color: var(--muted); }
 .lot.soon .exp { color: var(--amber-ink); font-weight: 700; }
 .lot.urgent .exp { color: var(--red-ink); font-weight: 700; }
+/* Selbstgebackenes: „1 gegessen“ unter dem Namen */
+.lot .eat-btn { align-self: flex-start; margin-top: 4px; min-height: 36px; padding: 4px 12px; font-size: 13px; white-space: nowrap; }
 .lot-amt { display: flex; align-items: center; gap: 3px; font-size: 13px; color: var(--muted); }
 .lot-amt input { width: 56px; min-height: var(--tap); border: 1.5px solid var(--line); border-radius: 8px; padding: 4px 6px; text-align: right; background: var(--surface); }
 /* Datum: nur ein Kalender-Symbol, die ganze 44×44-Fläche öffnet die Auswahl */
@@ -362,6 +364,7 @@ li.done .item-name, li.done .item-amt { text-decoration: line-through; color: va
 
 /* ───── Frühstück & Meal-Prep ───── */
 .segmented { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 12px; padding: 3px; margin: 0 0 8px; }
+.segmented.three { grid-template-columns: 1fr 1fr 1fr; }
 .segmented button { border: none; background: transparent; border-radius: 10px; padding: 8px; min-height: 40px; font-weight: 700; font-size: 14px; color: var(--muted); }
 .segmented button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
 .chips-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 0 4px; flex-shrink: 0; }
@@ -572,6 +575,8 @@ img.thumb { display: block; }
 .balance-bar .seg.bf { background: var(--seg-bf); }
 .balance-bar .seg.lunch { background: var(--seg-lunch); }
 .balance-bar .seg.dinner { background: var(--seg-dinner); }
+/* Gebackenes / Dessert: Akzentfarbe, hebt sich von den Mahlzeiten ab */
+.balance-bar .seg.snack { background: var(--accent); }
 .balance-bar .seg.over { background: var(--red); }
 .target-mark { position: absolute; bottom: 0; width: 2px; height: 8px; background: var(--text); transform: translateX(-2px); }
 

@@ -2,6 +2,7 @@
 import { PRODUCTS } from '../data/products'
 import { RECIPE_BY_ID } from '../data/recipes'
 import { ownTiers, substituteTiers, substitutesFor } from '../data/substitutes'
+import { yieldStock } from '../data/define'
 import type { PlanEntry, Recipe, WeekPlan } from '../types'
 import { type PantryLot, type WastedItem, WASTED_MAX, WASTE_AFTER_DAYS, type PriceOverrides, addDaysIso, daysUntil, minIso, productFor, allNeedsOf, uid } from './base'
 
@@ -119,8 +120,8 @@ export function cookNow(plan: WeekPlan, pantry: PantryLot[], day: string, entry:
 }
 
 /**
- * Grundrezept fertig gekocht (z. B. Brauner Rinderfond): Zutaten vom Vorrat abziehen und das Ergebnis als neuen
- * Posten anlegen (Menge × Ansätze, Haltbarkeit eingefroren ab heute). Ausgangsvorrat bleibt unverändert.
+ * Grundrezept fertig gekocht bzw. Kuchen/Brot/Dessert fertig gebacken: Zutaten vom Vorrat abziehen und das Ergebnis
+ * als neuen Posten anlegen (Menge × Ansätze, Haltbarkeit ab heute). Ausgangsvorrat bleibt unverändert.
  */
 export function cookBasic(
   pantry: PantryLot[],
@@ -134,8 +135,10 @@ export function cookBasic(
   for (const n of allNeedsOf(recipe, servings)) consumed.push(...consume(lots, n.name, n.amount, day))
   const y = recipe.yields
   if (!recipe.basic || !y) return { pantry: lots, lot: null, consumed }
-  const unit = PRODUCTS[y.name]?.unit ?? y.unit
-  const lot: PantryLot = { id, name: y.name, amount: (y.amount * servings) / recipe.servings, unit, expires: addDaysIso(day, y.shelf) }
+  // Brotlaib (g) liegt in Scheiben im Vorrat, sonst in der Einheit des Ergebnisses
+  const st = yieldStock(recipe.kind, y)
+  const unit = PRODUCTS[y.name]?.unit ?? st.unit
+  const lot: PantryLot = { id, name: y.name, amount: (st.amount * servings) / recipe.servings, unit, expires: addDaysIso(day, y.shelf) }
   lots.push(lot)
   return { pantry: lots, lot, consumed }
 }

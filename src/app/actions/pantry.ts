@@ -2,6 +2,9 @@ import type { CustomIngredient } from '../../types'
 import type { SpiceStatus } from '../../staples'
 import { type PantryLot, discardWaste, WASTED_MAX } from '../../kitchen'
 import type { ActionContext } from './context'
+import { eatOne } from '../../bake'
+import { isWorkday } from '../../energy'
+import { SNACKS_MAX } from '../../store'
 
 /** Vorrat: Posten ändern/entfernen, eigene Zutaten, Gewürze */
 export function pantryActions({ state, setState, cal, flash, snapshot }: ActionContext) {
@@ -41,5 +44,18 @@ export function pantryActions({ state, setState, cal, flash, snapshot }: ActionC
     })
   }
 
-  return { changePantry, noteRequest, createPantryItem, setSpice }
+  /** „1 gegessen“ (Kuchen, Brot, Dessert aus dem Vorrat): Stück abziehen, kcal in die heutige Tagesbilanz; Rückgängig über den Toast */
+  function eatPiece(lotId: string) {
+    const r = eatOne(state.pantry, lotId, today)
+    const snack = r.snack
+    if (!snack) return
+    const snap = snapshot()
+    setState((s) => {
+      const x = eatOne(s.pantry, lotId, today)
+      return x.snack ? { ...s, pantry: x.pantry, snacks: [...s.snacks, x.snack].slice(-SNACKS_MAX) } : s
+    })
+    flash(`${snack.name}: ${snack.kcal} kcal ${isWorkday(today) ? 'in der Tagesbilanz' : 'gegessen (Sa/So ohne Bilanz)'} ✓`, snap)
+  }
+
+  return { changePantry, noteRequest, createPantryItem, setSpice, eatPiece }
 }

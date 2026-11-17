@@ -3,6 +3,8 @@ import type { Ingredient, Recipe } from '../types'
 import { formatAmount, scale } from '../shopping'
 import { ingredientsForStep, unmatched } from '../cookSteps'
 import { DeviceChips } from './DeviceChip'
+import { isBake } from '../types'
+import { shelfText, yieldText } from '../bake'
 
 /** „Fertig gekocht“ am Ende des Kochmodus (fehlt bei Frühstück) */
 export interface CookFinish {
@@ -11,11 +13,25 @@ export interface CookFinish {
   run: (servings: number, replace: boolean) => void
 }
 
-/** Grundrezept: was „Fertig gekocht“ in den Vorrat legt, z. B. „1,5 l Rinderfond selbstgemacht“ */
-function yieldText(recipe: Recipe, servings: number): string | undefined {
+/** Grundrezept/Gebackenes: was „Fertig gekocht/gebacken“ in den Vorrat legt, z. B. „1,5 l Rinderfond selbstgemacht“ */
+function stockText(recipe: Recipe, servings: number): string | undefined {
   const y = recipe.yields
   if (!recipe.basic || !y) return undefined
-  return `${formatAmount((y.amount * servings) / recipe.servings, y.unit)} ${y.name}`
+  return `${yieldText(recipe, servings)} ${y.name}`
+}
+
+/** Haltbarkeit des Ergebnisses für den Hinweis über dem Fertig-Knopf */
+function keepText(recipe: Recipe): string {
+  const y = recipe.yields!
+  if (recipe.kind === 'grundrezept' && y.shelf >= 60) return `eingefroren, hält ca. ${shelfText(y.shelf)}`
+  return `hält ${shelfText(y.shelf)}${y.store ? ` ${y.store}` : ''}`
+}
+
+/** Beschriftung des Fertig-Knopfs: Kuchen/Brot „Fertig gebacken“, Dessert „Fertig“, sonst „Fertig gekocht“ */
+function finishLabel(recipe: Recipe): string {
+  if (recipe.kind === 'kuchen' || recipe.kind === 'brot') return 'Fertig gebacken ✓'
+  if (recipe.kind === 'dessert') return 'Fertig ✓'
+  return 'Fertig gekocht ✓'
 }
 
 interface Props {
@@ -29,8 +45,8 @@ interface Props {
 type Wake = 'checking' | 'on' | 'off' | 'unsupported'
 
 /** Mengenangabe wie im Rezept, auf die gewählten Portionen umgerechnet */
-function Chip({ ing, base, servings }: { ing: Ingredient; base: number; servings: number }) {
-  const amt = formatAmount(scale(ing, base, servings), ing.unit) || 'n. B.'
+function Chip({ ing, base, servings, exact = false }: { ing: Ingredient; base: number; servings: number; exact?: boolean }) {
+  const amt = formatAmount(scale(ing, base, servings), ing.unit, exact) || 'n. B.'
   return (
     <span className="cook-chip">
       <b>{amt}</b> {ing.name}
@@ -105,7 +121,11 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
         <div className="cook-title">
           <h2>{recipe.title}</h2>
           <div className="muted small">
-            {recipe.basic ? `${servings} ${servings === 1 ? 'Ansatz' : 'Ansätze'} · ergibt ${yieldText(recipe, servings)}` : `für ${servings} ${servings === 1 ? 'Portion' : 'Portionen'}`}
+            {isBake(recipe)
+              ? `Rezept ×${servings} · ergibt ${yieldText(recipe, servings)}`
+              : recipe.basic
+                ? `${servings} ${servings === 1 ? 'Ansatz' : 'Ansätze'} · ergibt ${stockText(recipe, servings)}`
+                : `für ${servings} ${servings === 1 ? 'Portion' : 'Portionen'}`}
           </div>
         </div>
         <button className="cook-close" onClick={onClose} aria-label="Kochmodus beenden">
@@ -126,7 +146,7 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
             <h3>Alles bereitstellen</h3>
             <div className="cook-chips">
               {loose.map((ing, i) => (
-                <Chip key={i} ing={ing} base={recipe.servings} servings={servings} />
+                <Chip key={i} ing={ing} base={recipe.servings} servings={servings} exact={!!recipe.kind && recipe.kind !== 'grundrezept'} />
               ))}
             </div>
           </section>
@@ -145,7 +165,7 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
                   {needs.length > 0 && (
                     <span className="cook-chips">
                       {needs.map((ing, j) => (
-                        <Chip key={j} ing={ing} base={recipe.servings} servings={servings} />
+                        <Chip key={j} ing={ing} base={recipe.servings} servings={servings} exact={!!recipe.kind && recipe.kind !== 'grundrezept'} />
                       ))}
                     </span>
                   )}
@@ -156,7 +176,7 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
         </ol>
 
         {finish && (
-          <section className="cook-finish" aria-label="Fertig gekocht">
+          <section className="cook-finish" aria-label="Fertig">
             {asking && finish.conflict ? (
               <>
                 <p>Statt <b>{finish.conflict}</b> heute eintragen?</p>
@@ -167,11 +187,11 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
               </>
             ) : (
               <>
-                {yieldText(recipe, servings) && (
-                  <p className="muted small">Kommt in den Vorrat: <b>{yieldText(recipe, servings)}</b> (eingefroren, hält ca. {Math.round(recipe.yields!.shelf / 30)} Monate). Die Zutaten werden abgezogen.</p>
+                {stockText(recipe, servings) && (
+                  <p className="muted small">Kommt in den Vorrat: <b>{stockText(recipe, servings)}</b> ({keepText(recipe)}). Die Zutaten werden abgezogen.</p>
                 )}
                 <button className="btn primary wide" onClick={() => (finish.conflict ? setAsking(true) : finish.run(servings, false))}>
-                  Fertig gekocht ✓
+                  {finishLabel(recipe)}
                 </button>
               </>
             )}

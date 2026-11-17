@@ -9,7 +9,8 @@ interface Props {
   rating?: Rating
   portion?: PortionFeedback
   onRate: (v: Rating | undefined) => void
-  onPortion: (v: PortionFeedback | undefined) => void
+  /** fehlt bei Gebackenem (keine Portionsfrage) */
+  onPortion?: (v: PortionFeedback | undefined) => void
   onClose: () => void
 }
 
@@ -51,14 +52,18 @@ export function RateSheet({ title, day, today, rating, portion, onRate, onPortio
             </button>
           ))}
         </div>
-        <h3>Portion</h3>
-        <div className="portion-btns" role="group" aria-label="Portion">
-          {PORTIONS.map(([v, label]) => (
-            <button key={v} className={portion === v ? 'on' : ''} aria-pressed={portion === v} onClick={() => onPortion(portion === v ? undefined : v)}>
-              {label}
-            </button>
-          ))}
-        </div>
+        {onPortion && (
+          <>
+            <h3>Portion</h3>
+            <div className="portion-btns" role="group" aria-label="Portion">
+              {PORTIONS.map(([v, label]) => (
+                <button key={v} className={portion === v ? 'on' : ''} aria-pressed={portion === v} onClick={() => onPortion(portion === v ? undefined : v)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
         <button className={chosen ? 'btn primary wide' : 'link rate-later'} onClick={onClose}>
           {chosen ? 'Fertig' : 'Später'}
         </button>

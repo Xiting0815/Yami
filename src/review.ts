@@ -89,7 +89,7 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
   const balances = profile
     ? weekDays
         .filter((d) => isWorkday(d) && state.plan[d] && state.plan[d]!.status !== 'skipped' && RECIPE_BY_ID[state.plan[d]!.recipeId])
-        .map((d) => dayBalance(profile, state.breakfast[d], state.plan[d]))
+        .map((d) => dayBalance(profile, state.breakfast[d], state.plan[d], state.snacks, d))
     : []
   const avgKcal = avg(balances.map((b) => b.total))
   const avgProtein = avg(balances.map((b) => b.protein))
@@ -153,6 +153,9 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
     wasted: state.wasted,
     today,
     since: state.tasteSince,
+    baked: state.baked,
+    snacks: state.snacks,
+    bakeRatings: state.bakeRatings,
   })
   const learned = summarize(model).liked.slice(0, 2).map((l) => l.label)
 

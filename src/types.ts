@@ -57,15 +57,35 @@ export interface Nutrition {
   fiber: number
 }
 
-/** Grundrezept (Fond, Jus …): was ein Ansatz ergibt – kommt beim „Fertig gekocht“ als Posten in den Vorrat */
+/**
+ * Art eines Rezepts außerhalb der Abendessen: Grundrezept (Fond, Anstellgut …) oder „Backen & Desserts“.
+ * Alle diese Rezepte haben `basic: true` – sie sind nie im Wischstapel, nie planbar und zählen nicht für Abwechslung,
+ * Veggie-Quote oder Abendessen-Geschmack. „Fertig gekocht/gebacken“ legt `yields` in den Vorrat.
+ */
+export type BasicKind = 'grundrezept' | 'dessert' | 'kuchen' | 'brot'
+
+export const KIND_LABEL: Record<BasicKind, string> = { grundrezept: 'Grundrezepte', dessert: 'Desserts', kuchen: 'Kuchen', brot: 'Brot & Brötchen' }
+export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', dessert: '🍮', kuchen: '🍰', brot: '🍞' }
+
+/** Backen & Desserts (alles außer Grundrezept): Stücke davon zählen beim Essen in die Tagesbilanz */
+export const isBake = (r: { kind?: BasicKind } | undefined): boolean => !!r?.kind && r.kind !== 'grundrezept'
+
+/** Was ein Ansatz/Blech ergibt – kommt beim „Fertig gekocht/gebacken“ als Posten in den Vorrat */
 export interface BasicYield {
-  /** Zutat im Vorrat, z. B. „Rinderfond selbstgemacht“ (muss Katalog, Produkt und Nährwerte haben) */
+  /** Zutat im Vorrat, z. B. „Rinderfond selbstgemacht“, „Bienenstich (selbstgebacken)“ (Katalog/Produkt/Nährwerte werden bei Backen automatisch ergänzt) */
   name: string
-  /** Menge je Ansatz (in der Basiseinheit des Produkts) */
+  /** Menge je Ansatz in `unit` */
   amount: number
+  /** Fonds: Einheit des Produkts (ml); Backen: 'Stk' | 'Portion' | 'g' (Brotlaib → im Vorrat in Scheiben) | 'ml' */
   unit: string
-  /** Tage haltbar (eingefroren) */
+  /** Tage haltbar (Fond: eingefroren; Backen: wie angegeben gelagert, siehe `store`) */
   shelf: number
+  /** Nährwerte je Stück/Portion/Scheibe (wird aus dem Rezept berechnet, wenn nicht angegeben) */
+  perPiece?: { kcal: number; protein: number }
+  /** Lagerung, z. B. „im Kühlschrank“, „in Papier/Brotkasten“ */
+  store?: string
+  /** Tage haltbar eingefroren (nur Hinweis), z. B. 90 */
+  frozen?: number
 }
 
 export interface Recipe {
@@ -111,6 +131,10 @@ export interface Recipe {
    */
   basic?: true
   yields?: BasicYield
+  /** Grundrezept, Dessert, Kuchen oder Brot (nur bei `basic`) */
+  kind?: BasicKind
+  /** „💡 Leichter:“-Tipp (Backen & Desserts) */
+  lighter?: string
 }
 
 /** Küchengeräte im Haushalt */

@@ -1,6 +1,7 @@
 import type { CustomIngredient, CustomRecipe, Recipe } from '../types'
 import { CATALOG, NON_VEG } from './catalog'
-import type { RawRecipe } from './define'
+import { pieceSize, yieldStock, type RawRecipe } from './define'
+import { EXTRA_RECIPES } from './extra'
 import { recipesDe } from './recipes-de'
 import { recipesIt } from './recipes-it'
 import { recipesAs } from './recipes-as'
@@ -19,8 +20,8 @@ const images = imageMap as unknown as Record<string, { file: string } | null | u
 export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs, ...recipesGr]
 /** Frühstücke (Rohdaten) */
 export const RAW_BREAKFASTS = breakfasts
-/** Grundrezepte (Rohdaten) – Fonds usw., keine Abendessen */
-export const RAW_BASICS = basicsDe
+/** Grundrezepte und Backen & Desserts (Rohdaten) – Fonds, Anstellgut, Kuchen, Brot …, keine Abendessen */
+export const RAW_BASICS: RawRecipe[] = [...basicsDe, ...EXTRA_RECIPES]
 
 function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
   const servings = r.servings ?? 2
@@ -44,8 +45,23 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
     image: images[r.id]?.file,
     festive: r.festive,
     nutrition: nutritionOf(r.ingredients, servings),
-    ...(r.basic ? { basic: true as const, yields: r.yields } : {}),
+    ...(r.basic ? { basic: true as const, yields: withPerPiece(r), kind: r.kind ?? 'grundrezept', lighter: r.lighter } : {}),
   }
+}
+
+/**
+ * Nährwerte je Stück/Portion/Scheibe eines Back-Ergebnisses: Summe aller Zutaten ÷ Anzahl im Vorrat
+ * (Brotlaib: ÷ Scheiben à 50 g). Ein angegebener Wert (`perPiece`) hat Vorrang.
+ */
+function withPerPiece(r: RawRecipe): Recipe['yields'] {
+  const y = r.yields
+  if (!y || y.perPiece || !r.kind || r.kind === 'grundrezept') return y
+  // Zutaten und `yields` gelten beide für ein ganzes Rezept; Stück = 1 Stk/Portion/Scheibe (bzw. 50 g)
+  const st = yieldStock(r.kind, y)
+  const units = st.amount / pieceSize(st.unit)
+  if (!(units > 0)) return y
+  const n = nutritionOf(r.ingredients, units)
+  return { ...y, perPiece: { kcal: n.kcal, protein: n.protein } }
 }
 
 /** Abendessen */
@@ -58,6 +74,11 @@ export const BREAKFASTS: Recipe[] = RAW_BREAKFASTS.map((r) => build(r, 'breakfas
  * Veggie-Quote und Geschmackslernen heraus. Über RECIPE_BY_ID für Rezept-Sheet und Kochmodus erreichbar.
  */
 export const BASICS: Recipe[] = RAW_BASICS.map((r) => build(r, 'dinner'))
+
+/** Back-Rezept (Dessert, Kuchen, Brot), dessen Ergebnis so heißt – für „1 gegessen“ im Vorrat */
+export function bakeFor(yieldName: string): Recipe | undefined {
+  return BASICS.find((b) => b.kind && b.kind !== 'grundrezept' && b.yields?.name === yieldName)
+}
 
 /** Grundrezept, das diese Zutat selbst herstellt (Rinderfond → Brauner Rinderfond), sonst undefined */
 export function basicFor(name: string): Recipe | undefined {

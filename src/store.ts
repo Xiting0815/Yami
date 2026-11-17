@@ -8,7 +8,7 @@ import {
   type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type PlanEntry, type ShopCat, type WeekPlan,
 } from './types'
 import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
-import { DEFAULT_PROFILE, type Profile } from './energy'
+import { DEFAULT_PROFILE, type Profile, type Snack } from './energy'
 import type { WeighIn } from './progress'
 import type { PortionFeedback, Rating, RejectEvent } from './learning'
 
@@ -176,7 +176,16 @@ export interface AppState {
   staples: StapleMemos
   /** Home Assistant (optional) */
   ha?: HaSettings
+  /** gegessene Stücke Selbstgebackenes (Kuchen, Brot, Dessert) – zählen in die Tagesbilanz (höchstens die letzten 400) */
+  snacks: Snack[]
+  /** gebackene Rezepte (Backen & Desserts) mit Datum – fürs Lernen (höchstens die letzten 200) */
+  baked: { date: string; recipeId: string }[]
+  /** Bewertung nach „Fertig gebacken“: Schlüssel `Datum:Rezept-ID` → 👍/🔁/👎 (fürs Lernen) */
+  bakeRatings: Record<string, Rating>
 }
+
+/** höchstens so viele gegessene Stücke werden gespeichert */
+export const SNACKS_MAX = 400
 
 const KEY = 'yami-state-v1'
 
@@ -208,6 +217,9 @@ const INITIAL: AppState = {
   pantryRequests: {},
   spices: {},
   staples: {},
+  snacks: [],
+  baked: [],
+  bakeRatings: {},
 }
 
 const hasData = (s: AppState) =>
@@ -455,6 +467,20 @@ export function sanitize(parsed: unknown): AppState {
   state.ha = sanitizeHa(saved.ha)
   if (!state.ha) delete state.ha
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)
+  // Backen & Desserts: gegessene Stücke, Gebackenes, Bewertungen
+  state.snacks = state.snacks
+    .filter((x) => !!x && typeof x.date === 'string' && ISO.test(x.date) && typeof x.name === 'string' && x.name !== '' && isNum(x.kcal) && x.kcal >= 0 && x.kcal < 5000 && isNum(x.protein) && x.protein >= 0)
+    .map((x) => ({ date: x.date, name: x.name.slice(0, 80), kcal: x.kcal, protein: x.protein, ...(typeof x.recipeId === 'string' && x.recipeId ? { recipeId: x.recipeId } : {}) }))
+    .slice(-SNACKS_MAX)
+  state.baked = state.baked
+    .filter((x) => !!x && typeof x.date === 'string' && ISO.test(x.date) && typeof x.recipeId === 'string' && !!RECIPE_BY_ID[x.recipeId])
+    .map((x) => ({ date: x.date, recipeId: x.recipeId }))
+    .slice(-200)
+  state.bakeRatings = Object.fromEntries(
+    Object.entries(state.bakeRatings)
+      .filter(([k, v]) => /^\d{4}-\d{2}-\d{2}:.+/.test(k) && !!RECIPE_BY_ID[k.slice(11)] && (v === 'up' || v === 'again' || v === 'down'))
+      .slice(-200),
+  )
   // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
   if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'
   return state

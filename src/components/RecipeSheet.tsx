@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { Recipe } from '../types'
-import { BREAKFAST_LABEL, CUISINE_LABEL, TYPE_LABEL } from '../types'
+import { BREAKFAST_LABEL, CUISINE_LABEL, KIND_ICON, KIND_LABEL, TYPE_LABEL, isBake } from '../types'
+import { pieceName, shelfText, yieldText } from '../bake'
+import { yieldStock } from '../data/define'
 import { NutritionTable } from './NutritionRow'
 import { formatTime } from '../filter'
 import { formatAmount, scale } from '../shopping'
@@ -53,9 +55,12 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
   const hasDevice = !!recipe.deviceSteps && !!recipe.classicSteps
   const classic = hasDevice && !!showClassic
   const isBasic = !!recipe.basic && !!recipe.yields
-  // Grundrezepte, die eine Zutat dieses Rezepts selbst herstellen (Rinderfond → Brauner Rinderfond)
-  const basicTips = isBasic ? [] : [...new Map(recipe.ingredients.map((i) => basicFor(i.name)).filter((b): b is Recipe => !!b).map((b) => [b.id, b])).values()]
-  const yieldAmount = isBasic ? (recipe.yields!.amount * servings) / recipe.servings : 0
+  const bake = isBake(recipe) && !!recipe.yields
+  // Grundrezepte/Gebackenes, die eine Zutat dieses Rezepts selbst herstellen (Rinderfond → Brauner Rinderfond,
+  // Anstellgut → Sauerteig ansetzen, Vollkornbrot → selbstgebackenes Brot)
+  const basicTips = [...new Map(recipe.ingredients.map((i) => basicFor(i.name)).filter((b): b is Recipe => !!b && b.id !== recipe.id).map((b) => [b.id, b])).values()]
+  const y = recipe.yields
+  const piece = y && recipe.basic ? pieceName(yieldStock(recipe.kind, y).unit) : ''
 
   useEffect(() => {
     // Escape schließt zuerst den Kochmodus (dort), nicht das Sheet
@@ -79,7 +84,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
           <div className="sheet-body">
             <div className="card-tags dark">
               {isBasic ? (
-                <span>🫙 Grundrezept</span>
+                <span>{KIND_ICON[recipe.kind ?? 'grundrezept']} {recipe.kind && recipe.kind !== 'grundrezept' ? KIND_LABEL[recipe.kind] : 'Grundrezept'}</span>
               ) : recipe.breakfast ? (
                 <>
                   <span>☀️ Frühstück</span>
@@ -99,7 +104,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             {insight && <div className="sheet-badges"><InsightBadges ins={insight} /></div>}
 
             <div className="servings">
-              <span>{isBasic ? 'Ansätze' : 'Portionen'}</span>
+              <span>{bake ? 'Rezeptmenge' : isBasic ? 'Ansätze' : 'Portionen'}</span>
               <div className="stepper">
                 <button onClick={() => setServings((s) => Math.max(1, s - 1))} aria-label="weniger">−</button>
                 <b>{servings}</b>
@@ -113,11 +118,23 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               </p>
             )}
 
-            {isBasic ? (
+            {bake ? (
+              <div className="prep-facts bake-facts">
+                <div>{KIND_ICON[recipe.kind!]} Ergibt <b>{yieldText(recipe, servings)}</b> · hält <b>{shelfText(y!.shelf)}</b>{y!.store ? ` ${y!.store}` : ''}</div>
+                {y!.frozen ? <div>❄️ Eingefroren ca. {shelfText(y!.frozen)} haltbar</div> : null}
+                {y!.perPiece && (
+                  <div>🔥 Pro {piece}: <b>{y!.perPiece.kcal.toLocaleString('de-DE')} kcal</b> · {String(y!.perPiece.protein).replace('.', ',')} g Eiweiß</div>
+                )}
+                {recipe.lighter && <div className="lighter">💡 <b>Leichter:</b> {recipe.lighter}</div>}
+                <div className="muted small">✓ „{recipe.kind === 'dessert' ? 'Fertig' : 'Fertig gebacken'}“ im Kochmodus legt alles in den Vorrat. Dort „1 gegessen“ tippen – das Stück zählt in die Tagesbilanz.</div>
+              </div>
+            ) : isBasic ? (
               <div className="prep-facts">
-                <div>🫙 Ergibt <b>{formatAmount(yieldAmount, recipe.yields!.unit)} {recipe.yields!.name}</b></div>
-                <div>❄️ Portionsweise eingefroren ca. {Math.round(recipe.yields!.shelf / 30)} Monate haltbar</div>
-                <div>✓ „Fertig gekocht“ im Kochmodus legt den Fond in den Vorrat – Rezepte mit Fond nehmen dann zuerst den selbstgemachten.</div>
+                <div>🫙 Ergibt <b>{yieldText(recipe, servings)} {y!.name}</b></div>
+                <div>
+                  {y!.shelf >= 60 ? `❄️ Portionsweise eingefroren ca. ${shelfText(y!.shelf)} haltbar` : `🧊 Hält ${shelfText(y!.shelf)}${y!.store ? ` ${y!.store}` : ''}`}
+                </div>
+                <div>✓ „Fertig gekocht“ im Kochmodus legt es in den Vorrat – Rezepte damit nehmen dann zuerst das Selbstgemachte.</div>
               </div>
             ) : (
               <NutritionTable n={recipe.nutrition} servings={1} />
@@ -151,7 +168,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
 
             <p className="muted small cost-line">
               {isBasic
-                ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für ${formatAmount(yieldAmount, recipe.yields!.unit)} (ohne Gewürze)`
+                ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für ${yieldText(recipe, servings)} (ohne Gewürze und Grundzutaten)`
                 : `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} · ${formatEuro(recipeCost(recipe, servings, prices) / servings)} pro Portion (ohne Gewürze)`}
             </p>
 
@@ -163,7 +180,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             <ul className="ingredients">
               {recipe.ingredients.map((ing, i) => (
                 <li key={i}>
-                  <span className="amt">{formatAmount(scale(ing, recipe.servings, servings), ing.unit) || 'n. B.'}</span>
+                  <span className="amt">{formatAmount(scale(ing, recipe.servings, servings), ing.unit, !!recipe.kind && recipe.kind !== 'grundrezept') || 'n. B.'}</span>
                   <span>
                     {ing.name}
                     {INGREDIENT_HINT[ing.name] && <small className="ing-hint">{INGREDIENT_HINT[ing.name]}</small>}
@@ -174,7 +191,13 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
 
             {basicTips.map((b) => (
               <button key={b.id} className="basic-tip small" onClick={() => onOpenRecipe?.(b)}>
-                💡 Tipp: mit selbstgemachtem Fond (Grundrezept) noch besser – <u>{b.title}</u>
+                {b.kind === 'brot'
+                  ? <>🍞 Tipp: Brot selbst backen – <u>{b.title}</u></>
+                  : isBake(b)
+                    ? <>💡 Tipp: selbst gemacht – <u>{b.title}</u></>
+                    : b.yields && /fond/i.test(b.yields.name)
+                      ? <>💡 Tipp: mit selbstgemachtem Fond (Grundrezept) noch besser – <u>{b.title}</u></>
+                      : <>💡 Grundrezept dazu – <u>{b.title}</u></>}
               </button>
             ))}
 

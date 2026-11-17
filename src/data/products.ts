@@ -9,6 +9,10 @@
  * packName – Bezeichnung auf der Einkaufsliste (z. B. "Becher"); ohne = lose Ware
  * yields – Packung „ergibt“ die Menge (Brühpulver: 1 Glas ergibt 7,5 l fertige Brühe); pack ist dann die fertige Menge
  */
+import { SHOP_ALIAS } from './catalog'
+import { SLICE_G, yieldStock, type RawRecipe } from './define'
+import { EXTRA_CONVERT, EXTRA_PRODUCTS, EXTRA_YIELDS } from './extra'
+
 export interface Product {
   pack: number
   unit: string
@@ -484,4 +488,38 @@ export const CONVERT: Record<string, Record<string, number>> = {
   Weizenmehl: { EL: 10 },
   Speisestärke: { EL: 10, TL: 3 },
   Backpulver: { TL: 0.3 },
+}
+
+// ───────────── Backen & Desserts (src/data/extra) ─────────────
+
+/** Produkte aus src/data/extra, die es schon gab (Fehler in check-data – der eingebaute Eintrag gilt) */
+export const EXTRA_PRODUCT_DUPLICATES: string[] = []
+for (const [n, pr] of Object.entries(EXTRA_PRODUCTS)) {
+  if (PRODUCTS[n]) EXTRA_PRODUCT_DUPLICATES.push(n)
+  else PRODUCTS[n] = { ...pr }
+}
+for (const [n, c] of Object.entries(EXTRA_CONVERT)) if (!CONVERT[n]) CONVERT[n] = c
+
+const GENERIC_UNITS: Record<string, Record<string, number>> = { kg: { g: 1000 }, l: { ml: 1000 }, EL: { g: 15, ml: 15 }, TL: { g: 5, ml: 5 } }
+
+/** Warenwert eines ganzen Rezepts (alle Zutaten mit Produkt, auch Mehl & Zucker) – Preis des selbstgebackenen Ergebnisses */
+function batchCost(r: RawRecipe): number {
+  let sum = 0
+  for (const i of r.ingredients) {
+    if (i.amount == null) continue
+    const name = SHOP_ALIAS[i.name] ?? i.name
+    const pr = PRODUCTS[name]
+    if (!pr || !(pr.pack > 0)) continue
+    const f = i.unit === pr.unit ? 1 : CONVERT[name]?.[i.unit] ?? GENERIC_UNITS[i.unit]?.[pr.unit]
+    if (f != null) sum += ((i.amount * f) / pr.pack) * pr.price
+  }
+  return sum / (r.servings ?? 1)
+}
+
+// Ergebnis jedes Back-Rezepts als Produkt: Packung = ein Rezept (Brotlaib in Scheiben), Preis = Warenwert der Zutaten
+for (const { recipe, name } of EXTRA_YIELDS) {
+  if (PRODUCTS[name]) continue
+  const st = yieldStock(recipe.kind, recipe.yields!)
+  PRODUCTS[name] = { pack: st.amount, unit: st.unit, price: Math.round(batchCost(recipe) * 100) / 100, shelf: recipe.yields!.shelf }
+  if (st.unit === 'Scheibe') CONVERT[name] = { g: 1 / SLICE_G, kg: 1000 / SLICE_G }
 }

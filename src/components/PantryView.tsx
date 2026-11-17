@@ -6,6 +6,7 @@ import { searchIngredients, titleCase } from '../customIngredients'
 import { CAT_DEFAULTS } from '../data/custom-registry'
 import { formatAmount } from '../shopping'
 import { type PantryLot, addDaysIso, daysUntil, uid } from '../kitchen'
+import { eatInfo } from '../bake'
 import { SPICE_NAMES, type SpiceStatus, type StapleHint, isBrothBase, isQtyStaple, roughAmount, stapleKey } from '../staples'
 
 interface Props {
@@ -25,6 +26,8 @@ interface Props {
   /** ganz neue Zutat anlegen und gleich in den Vorrat legen */
   onCreate: (c: CustomIngredient, lot: PantryLot) => void
   onCook: () => void
+  /** „1 gegessen“ bei Selbstgebackenem (Kuchen, Brot, Dessert) → zählt in die Tagesbilanz */
+  onEat?: (lotId: string) => void
 }
 
 const NEW_UNITS = ['g', 'ml', 'Stk'] as const
@@ -55,7 +58,7 @@ function expiryText(days: number): string {
 /** Gewürze, die fast jedes Rezept braucht – zum schnellen Antippen */
 const COMMON_SPICES = ['Salz', 'Pfeffer', 'Muskatnuss', 'Paprikapulver edelsüß', 'Majoran', 'Oregano getrocknet']
 
-export function PantryView({ pantry, leftovers, today, hints = {}, spices = {}, onSpice, onChange, onAdded, onCreate, onCook }: Props) {
+export function PantryView({ pantry, leftovers, today, hints = {}, spices = {}, onSpice, onChange, onAdded, onCreate, onCook, onEat }: Props) {
   const [query, setQuery] = useState('')
   const [spiceQuery, setSpiceQuery] = useState('')
   /** Formular „neue Zutat anlegen“ */
@@ -239,12 +242,18 @@ export function PantryView({ pantry, leftovers, today, hints = {}, spices = {}, 
                 const key = stapleKey(l.name)
                 const hint = isQtyStaple(l.name) && hints[key] && pantry.find((x) => stapleKey(x.name) === key)?.id === l.id ? hints[key] : undefined
                 const yields = PRODUCTS[l.name]?.yields
+                const eat = onEat ? eatInfo(l) : undefined
                 return (
-                  <li key={l.id} className={`lot ${d <= 1 ? 'urgent' : d <= 3 ? 'soon' : ''}`}>
+                  <li key={l.id} className={`lot ${d <= 1 ? 'urgent' : d <= 3 ? 'soon' : ''} ${eat ? 'bake' : ''}`}>
                     <span className="item-name">
                       {l.name}
                       <small className="exp">{yields ? `${roughAmount(l.amount, l.unit)} übrig · ` : ''}{expiryText(d)}</small>
                       {hint && <small className={`exp ${hint.low ? 'low' : ''}`}>⏳ {key === l.name ? l.name : key} {hint.text}</small>}
+                      {eat && (
+                        <button className="chip eat-btn" onClick={() => onEat!(l.id)} aria-label={`${eat.label}: ${l.name}`}>
+                          🍽️ {eat.label}<span className="muted">{`\u00a0· ${eat.recipe.yields!.perPiece!.kcal} kcal`}</span>
+                        </button>
+                      )}
                     </span>
                     <span className="lot-amt">
                       <input

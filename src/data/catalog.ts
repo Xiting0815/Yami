@@ -1,4 +1,5 @@
 import type { ShopCat } from '../types'
+import { EXTRA_CATALOG, EXTRA_NON_VEG, EXTRA_YIELDS } from './extra'
 
 /**
  * Zutatenkatalog: jede Zutat aus den Rezepten gehört genau einer Einkaufslisten-Kategorie an.
@@ -112,6 +113,16 @@ for (const [cat, names] of Object.entries(groups) as [ShopCat, string[]][]) {
   for (const n of names) CATALOG[n] = cat
 }
 
+/** Zutaten aus src/data/extra, die es schon gab (Fehler in check-data – der eingebaute Eintrag gilt) */
+export const EXTRA_DUPLICATES: string[] = []
+for (const [cat, names] of Object.entries(EXTRA_CATALOG) as [ShopCat, string[]][])
+  for (const n of names) {
+    if (CATALOG[n]) EXTRA_DUPLICATES.push(n)
+    else CATALOG[n] = cat
+  }
+// Ergebnisse von Backen & Desserts (z. B. „Bienenstich (selbstgebacken)“) liegen unter Backwaren
+for (const { name } of EXTRA_YIELDS) if (!CATALOG[name]) CATALOG[name] = 'backwaren'
+
 /** Varianten, die auf der Einkaufsliste zusammengefasst werden */
 export const SHOP_ALIAS: Record<string, string> = {
   Eigelb: 'Ei',
@@ -146,4 +157,5 @@ export const NON_VEG = new Set([
   'Schweineschmalz', 'Lammfond', 'Rinderfond selbstgemacht', 'Kalbsfond selbstgemacht', 'Lammfond selbstgemacht',
   'Hühnerbrühe Pulver', 'Hühnerbrühe Würfel', 'Hühnerbrühe flüssig',
   'Rinderbrühe Pulver', 'Rinderbrühe Würfel', 'Rinderbrühe flüssig',
+  ...EXTRA_NON_VEG,
 ])

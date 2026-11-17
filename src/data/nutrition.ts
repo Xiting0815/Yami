@@ -4,6 +4,10 @@
  *
  * Fleisch mit Knochen/Muscheln mit Schale sind auf das Einkaufsgewicht bezogen (essbarer Anteil eingerechnet).
  */
+import { SLICE_G, type RawRecipe } from './define'
+import { SHOP_ALIAS } from './catalog'
+import { EXTRA_GRAMS, EXTRA_NUTRI, EXTRA_YIELDS } from './extra'
+
 type N = [number, number, number, number, number]
 
 export const NUTRI: Record<string, N> = {
@@ -483,3 +487,46 @@ export const DEFAULT_GRAMS: Record<string, number> = {
 
 /** Fett zum Ausbacken: nur ein Teil landet im Essen */
 export const FRYING_FATS = new Set(['Frittieröl', 'Butterschmalz', 'Sonnenblumenöl', 'Olivenöl', 'Schweineschmalz'])
+
+// ───────────── Backen & Desserts (src/data/extra) ─────────────
+
+/** Nährwerte/Gewichte aus src/data/extra, die es schon gab (Fehler in check-data – der eingebaute Eintrag gilt) */
+export const EXTRA_NUTRI_DUPLICATES: string[] = []
+for (const [n, v] of Object.entries(EXTRA_NUTRI)) {
+  if (NUTRI[n]) EXTRA_NUTRI_DUPLICATES.push(n)
+  else NUTRI[n] = v
+}
+for (const [n, g] of Object.entries(EXTRA_GRAMS)) if (!GRAMS[n]) GRAMS[n] = g
+
+const gramsLocal = (name: string, amount: number, unit: string): number | null => {
+  const sp = GRAMS[name]?.[unit]
+  if (sp != null) return amount * sp
+  if (unit === 'Stk') return null
+  const d = DEFAULT_GRAMS[unit]
+  return d != null ? amount * d : null
+}
+
+/** Summe der Nährwerte und Rohgewicht eines ganzen Rezepts */
+function batchTotals(r: RawRecipe): { n: N; grams: number } {
+  const n: N = [0, 0, 0, 0, 0]
+  let grams = 0
+  for (const i of r.ingredients) {
+    if (i.amount == null) continue
+    const v = NUTRI[i.name] ?? NUTRI[SHOP_ALIAS[i.name] ?? '']
+    const g = gramsLocal(i.name, i.amount, i.unit)
+    if (g == null) continue
+    grams += g
+    if (v) for (let k = 0; k < 5; k++) n[k] += (v[k] * g) / 100
+  }
+  return { n, grams }
+}
+
+// Ergebnis jedes Back-Rezepts: Nährwerte pro 100 g und Gewicht je Stück/Portion/Scheibe
+// (Gewicht: Brot laut Rezept in g, sonst Rohgewicht der Zutaten, Gebackenes −10 % Backverlust)
+for (const { recipe, name } of EXTRA_YIELDS) {
+  const y = recipe.yields!
+  const { n, grams } = batchTotals(recipe)
+  const weight = y.unit === 'g' || y.unit === 'ml' ? y.amount : grams * (recipe.kind === 'dessert' ? 1 : 0.9)
+  if (!GRAMS[name]) GRAMS[name] = y.unit === 'g' ? (recipe.kind === 'brot' ? { Scheibe: SLICE_G } : {}) : y.unit === 'ml' ? {} : { [y.unit]: weight / y.amount }
+  if (!NUTRI[name] && weight > 0) NUTRI[name] = n.map((v) => Math.round((v / weight) * 1000) / 10) as N
+}

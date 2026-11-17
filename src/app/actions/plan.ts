@@ -1,9 +1,9 @@
-import type { PlanEntry, Recipe } from '../../types'
+import { isBake, type PlanEntry, type Recipe } from '../../types'
 import { type PortionFeedback, type Rating, portionFactor } from '../../learning'
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
 import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
-import { formatAmount } from '../../shopping'
+import { yieldText } from '../../bake'
 import type { ActionContext } from './context'
 
 /** Abendessen planen: Wischen, Nehmen/Wegwischen, Tage leeren, gekocht/nicht gekocht, Bewertung, Woche wechseln */
@@ -162,23 +162,40 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
   }
 
   /**
-   * Grundrezept „Fertig gekocht“ (z. B. Brauner Rinderfond): Zutaten vom Vorrat abziehen und das Ergebnis als Posten
-   * (eingefroren, Haltbarkeit aus `yields`) in den Vorrat legen. Kein Planeintrag, keine Bewertung; Rückgängig über den Toast.
+   * Grundrezept „Fertig gekocht“ bzw. Backen & Desserts „Fertig gebacken“: Zutaten vom Vorrat abziehen und das Ergebnis
+   * als Posten (Haltbarkeit aus `yields`) in den Vorrat legen. Kein Planeintrag; Rückgängig über den Toast.
+   * Gebackenes zählt fürs Lernen (+ „Wie war’s?“), Grundrezepte nicht.
    */
   function finishBasic(recipe: Recipe, servings: number) {
     const y = recipe.yields
     if (!recipe.basic || !y) return
     const snap = snapshot()
-    const amount = (y.amount * servings) / recipe.servings
-    setState((s) => ({ ...s, pantry: cookBasic(s.pantry, recipe, servings, today).pantry }))
-    flash(`${formatAmount(amount, y.unit)} ${y.name} im Vorrat ✓`, snap)
+    const bake = isBake(recipe)
+    setState((s) => ({
+      ...s,
+      pantry: cookBasic(s.pantry, recipe, servings, today).pantry,
+      baked: bake ? [...s.baked, { date: today, recipeId: recipe.id }].slice(-200) : s.baked,
+    }))
+    flash(`${yieldText(recipe, servings)} ${y.name} im Vorrat ✓`, snap)
     ui.setCooking(false)
     ui.setSheet(null)
+    if (bake) ui.setRateBake({ recipeId: recipe.id, date: today })
+  }
+
+  /** Bewertung nach „Fertig gebacken“ (nochmal tippen nimmt zurück) */
+  function setBakeRating(date: string, recipeId: string, v: Rating | undefined) {
+    const key = `${date}:${recipeId}`
+    setState((s) => {
+      const bakeRatings = { ...s.bakeRatings }
+      if (v) bakeRatings[key] = v
+      else delete bakeRatings[key]
+      return { ...s, bakeRatings }
+    })
   }
 
   function dismissRating(day: string) {
     setState((s) => ({ ...s, ratingDismissed: [...s.ratingDismissed, day].slice(-60) }))
   }
 
-  return { setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, finishBasic, dismissRating }
+  return { setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, finishBasic, setBakeRating, dismissRating }
 }

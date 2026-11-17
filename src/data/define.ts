@@ -1,4 +1,4 @@
-import type { BasicYield, BreakfastType, Cuisine, DishType, Festive, Ingredient } from '../types'
+import type { BasicKind, BasicYield, BreakfastType, Cuisine, DishType, Festive, Ingredient } from '../types'
 
 /** Erlaubte Einheiten. Die Reihenfolge ist egal, Schreibweise zählt. */
 export const UNITS = [
@@ -20,9 +20,12 @@ export interface RawRecipe {
   /** Festtagsgericht (Zeitfenster) */
   festive?: Festive[]
   breakfast?: { type: BreakfastType; fridgeDays: number; freezer: boolean; container: string; morning: string }
-  /** Grundrezept (Fond …), siehe `basic()` */
+  /** Grundrezept (Fond …) oder Backen & Desserts, siehe `basic()` / `backen()` */
   basic?: true
   yields?: BasicYield
+  kind?: BasicKind
+  /** „💡 Leichter:“-Tipp */
+  lighter?: string
 }
 
 /**
@@ -103,5 +106,78 @@ export function fest(rec: RawRecipe, ...windows: Festive[]): RawRecipe {
  * in den Vorrat, Haltbarkeit eingefroren). Grundrezepte sind keine Abendessen: nicht im Stapel, nicht planbar.
  */
 export function basic(id: string, title: string, time: number, yields: BasicYield, ingredients: string, steps: string[], img?: string): RawRecipe {
-  return { id, title, cuisine: 'de', type: 'haupt', time, ingredients: splitIngredients(ingredients), steps, img, servings: 1, basic: true, yields }
+  return { id, title, cuisine: 'de', type: 'haupt', time, ingredients: splitIngredients(ingredients), steps, img, servings: 1, basic: true, yields, kind: 'grundrezept' }
+}
+
+// ───────────── Backen & Desserts ─────────────
+
+/** Gewicht einer Brotscheibe in g: Brotlaibe (Ergebnis in g) liegen im Vorrat in Scheiben, „1 Scheibe gegessen“ */
+export const SLICE_G = 50
+
+/** Ergebnis eines Back-Rezepts: Menge je Rezept (Blech, Form, Ansatz) */
+export interface BackYield {
+  /** Name im Vorrat, z. B. „Bienenstich (selbstgebacken)“ – eindeutig, Katalog/Produkt/Nährwerte entstehen automatisch */
+  name: string
+  amount: number
+  /** Stk (Kuchenstücke, Brötchen), Portion (Desserts), g (Brotlaib → Scheiben à 50 g), ml (flüssige Grundrezepte) */
+  unit: 'Stk' | 'Portion' | 'g' | 'ml'
+  /** Tage haltbar, so gelagert wie in `store` */
+  shelf: number
+  /** Lagerung, z. B. „im Kühlschrank“ */
+  store?: string
+  /** Tage haltbar eingefroren (Hinweis), z. B. 90 */
+  frozen?: number
+  /** nur wenn die Berechnung aus den Zutaten nicht passt (z. B. Frittiertes) */
+  perPiece?: { kcal: number; protein: number }
+}
+
+/** Optionen für `backen()` */
+export interface BackOptions {
+  /** Küche (nur Info/Bildsuche), Standard 'de' */
+  cuisine?: Cuisine
+  /** Gesamtzeit in Minuten inkl. Gehzeit (Sauerteig über Nacht: Arbeitszeit + Ruhezeit) */
+  time: number
+  yields: BackYield
+  /** „💡 Leichter:“-Tipp, ein Satz (Pflicht bei Dessert/Kuchen/Brot) */
+  lighter?: string
+}
+
+/**
+ * Backen & Desserts (oder ein Grundrezept wie Anstellgut). Mengen für 1 Rezept (1 Blech, 1 Form, 1 Laib, 1 Ansatz).
+ * Kein Abendessen: nicht im Wischstapel, nicht planbar. „Fertig gebacken“ legt `yields` in den Vorrat.
+ *
+ *   backen('kuchen', 'bienenstich', 'Bienenstich', { time: 150, yields: { name: 'Bienenstich (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 3, store: 'im Kühlschrank' }, lighter: '…' },
+ *     '375 g Weizenmehl | 21 g Hefe frisch | …', ['Schritt 1 …', 'Schritt 2 …', 'Schritt 3 …'])
+ */
+export function backen(kind: BasicKind, id: string, title: string, o: BackOptions, ingredients: string, steps: string[]): RawRecipe {
+  return {
+    id,
+    title,
+    cuisine: o.cuisine ?? 'de',
+    type: 'haupt',
+    time: o.time,
+    ingredients: splitIngredients(ingredients),
+    steps,
+    servings: 1,
+    basic: true,
+    yields: { ...o.yields },
+    kind,
+    lighter: o.lighter,
+  }
+}
+
+/** Wie ein Ergebnis im Vorrat liegt: Brotlaib (g) in Scheiben, sonst in der eigenen Einheit */
+export function yieldStock(kind: BasicKind | undefined, y: { amount: number; unit: string }): { amount: number; unit: string } {
+  if (kind === 'brot' && y.unit === 'g') return { amount: y.amount / SLICE_G, unit: 'Scheibe' }
+  return { amount: y.amount, unit: y.unit }
+}
+
+/** Ein „Stück“ zum Essen in der Vorratseinheit: 1 Stk/Portion/Scheibe, bei g/ml 50 (≈ eine Scheibe bzw. ein Schluck) */
+export function pieceSize(unit: string): number {
+  return unit === 'g' || unit === 'ml' ? SLICE_G : 1
+}
+
+/** Produkt-Kurzform für die Extra-Dateien: Packung, Einheit, Preis €, Tage haltbar, angebrochen, Packungsname */
+export function prod(pack: number, unit: string, price: number, shelf: number, opened?: number, packName?: string) {
+  return opened == null && packName == null ? { pack, unit, price, shelf } : { pack, unit, price, shelf, opened, packName }
 }

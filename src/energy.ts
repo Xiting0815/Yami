@@ -102,6 +102,16 @@ export function isWorkday(iso: string): boolean {
   return d >= 1 && d <= 5
 }
 
+/** Gegessenes Stück Selbstgebackenes (Kuchen, Brot, Dessert) – zählt in die Tagesbilanz dieses Tages */
+export interface Snack {
+  date: string
+  name: string
+  kcal: number
+  protein: number
+  /** Back-Rezept (fürs Lernen) */
+  recipeId?: string
+}
+
 export interface DayBalance {
   target: number
   breakfast: number
@@ -122,6 +132,9 @@ export interface DayBalance {
   lunchProtein: number
   /** Abendportion (g), falls ein Gericht geplant ist */
   dinnerProtein?: number
+  /** Selbstgebackenes/Desserts dieses Tages (kcal, Eiweiß g) – zählt in total/protein, nicht ins Abendbudget */
+  snacks: number
+  snackProtein: number
 }
 
 export interface Portion {
@@ -158,7 +171,19 @@ export function portionFor(recipe: Recipe, budget: number, servingsCooked: numbe
   return { fraction, label: step[1] === '1' ? 'volle Portion' : `${step[1]} Portion`, kcal, tip, rest: Math.max(0, servingsCooked - fraction) }
 }
 
-export function dayBalance(p: Profile, breakfast?: PlanEntry, dinner?: PlanEntry): DayBalance {
+/** Summe der gegessenen Stücke an einem Tag */
+export function snacksOn(snacks: Snack[] | undefined, day: string): { kcal: number; protein: number } {
+  let kcal = 0
+  let protein = 0
+  for (const s of snacks ?? []) if (s.date === day) { kcal += s.kcal; protein += s.protein }
+  return { kcal, protein }
+}
+
+/**
+ * Tagesbilanz (Mo–Fr): Frühstück + Mittags-Pauschale + Abendportion + gegessene Stücke (Kuchen, Brot, Dessert).
+ * Die Stücke verkleinern die Abendportion nicht (sie können auch nach dem Abendessen gegessen sein), zählen aber zum Tag.
+ */
+export function dayBalance(p: Profile, breakfast?: PlanEntry, dinner?: PlanEntry, snacks?: Snack[], day?: string): DayBalance {
   const target = targetKcal(p)
   const bf = breakfast && breakfast.status !== 'skipped' ? RECIPE_BY_ID[breakfast.recipeId] : undefined
   const bKcal = bf ? bf.nutrition.kcal : DEFAULT_BREAKFAST_KCAL
@@ -168,7 +193,8 @@ export function dayBalance(p: Profile, breakfast?: PlanEntry, dinner?: PlanEntry
   const dKcal = portion?.kcal
   const breakfastProtein = bf ? bf.nutrition.protein : DEFAULT_BREAKFAST_PROTEIN
   const dinnerProtein = dr ? dr.nutrition.protein * (portion?.fraction ?? 1) : undefined
-  const protein = breakfastProtein + LUNCH_PROTEIN + (dinnerProtein ?? 0)
+  const sn = day ? snacksOn(snacks, day) : { kcal: 0, protein: 0 }
+  const protein = breakfastProtein + LUNCH_PROTEIN + (dinnerProtein ?? 0) + sn.protein
   return {
     target,
     breakfast: bKcal,
@@ -176,11 +202,13 @@ export function dayBalance(p: Profile, breakfast?: PlanEntry, dinner?: PlanEntry
     lunch: p.lunchKcal,
     dinnerBudget,
     dinner: dKcal,
-    total: bKcal + p.lunchKcal + (dKcal ?? 0),
+    total: bKcal + p.lunchKcal + (dKcal ?? 0) + Math.round(sn.kcal),
     protein: Math.round(protein),
     proteinTarget: proteinTarget(p),
     breakfastProtein,
     lunchProtein: LUNCH_PROTEIN,
     dinnerProtein,
+    snacks: Math.round(sn.kcal),
+    snackProtein: sn.protein,
   }
 }

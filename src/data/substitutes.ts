@@ -1,3 +1,5 @@
+import { EXTRA_PREFERRED, EXTRA_SUBSTITUTE_GROUPS } from './extra'
+
 /**
  * Austauschbare Zutaten: Was im Vorrat liegt, deckt den Bedarf einer anderen Zutat derselben Gruppe.
  * Eine Stelle für alles – Empfehlungen, Einkaufsliste, Abziehen beim Kochen und Rückgängig nutzen sie gemeinsam.
@@ -22,17 +24,26 @@ export const SUBSTITUTE_GROUPS: Record<string, string[]> = {
   'fond-rind': ['Rinderfond', 'Rinderfond selbstgemacht'],
   'fond-kalb': ['Kalbsfond', 'Kalbsfond selbstgemacht'],
   'fond-lamm': ['Lammfond', 'Lammfond selbstgemacht'],
+  /** Brot: selbstgebackenes (Grundrezept/Backen, im Vorrat in Scheiben/Stück) ersetzt das gekaufte – und wird zuerst genommen */
+  'brot-scheibe': ['Vollkornbrot'],
+  ciabatta: ['Ciabatta'],
+  broetchen: ['Brötchen vom Vortag'],
 }
+// Backen & Desserts (src/data/extra): Gruppen ergänzen bzw. neu anlegen
+for (const [g, names] of Object.entries(EXTRA_SUBSTITUTE_GROUPS)) SUBSTITUTE_GROUPS[g] = [...new Set([...(SUBSTITUTE_GROUPS[g] ?? []), ...names])]
+for (const g of Object.keys(SUBSTITUTE_GROUPS)) if (SUBSTITUTE_GROUPS[g].length < 2) delete SUBSTITUTE_GROUPS[g]
 
 /**
  * Vorrang: braucht ein Rezept die linke Zutat, wird zuerst die rechte genommen (der selbstgemachte Fond aus dem
- * Gefrierfach vor dem gekauften Glas). Für Abziehen beim Kochen und die Wochenplanung zählt sie wie die Zutat selbst.
+ * Gefrierfach vor dem gekauften Glas, selbstgebackenes Brot vor gekauftem; mehrere = eine Stufe, frühestes Ablaufdatum zuerst). Für Abziehen beim Kochen und die Wochenplanung zählt sie wie die Zutat selbst.
  */
-export const PREFERRED: Record<string, string> = {
-  Rinderfond: 'Rinderfond selbstgemacht',
-  Kalbsfond: 'Kalbsfond selbstgemacht',
-  Lammfond: 'Lammfond selbstgemacht',
+export const PREFERRED: Record<string, string[]> = {
+  Rinderfond: ['Rinderfond selbstgemacht'],
+  Kalbsfond: ['Kalbsfond selbstgemacht'],
+  Lammfond: ['Lammfond selbstgemacht'],
 }
+// Selbstgebackenes Brot vor gekauftem (src/data/extra), z. B. Vollkornbrot ← Bauernbrot selbstgebacken
+for (const [n, prefs] of Object.entries(EXTRA_PREFERRED)) PREFERRED[n] = [...new Set([...(PREFERRED[n] ?? []), ...prefs])]
 
 /**
  * Notlösung, nur in eine Richtung: fehlt Hühner- oder Rinderbrühe, darf Gemüsebrühe einspringen –
@@ -62,8 +73,8 @@ export function substituteTiers(name: string): string[][] {
  * (je eine Stufe, damit nicht das Ablaufdatum die Reihenfolge umdreht), sonst nur die Zutat selbst.
  */
 export function ownTiers(name: string): string[][] {
-  const pref = PREFERRED[name]
-  return pref ? [[pref], [name]] : [[name]]
+  const pref = PREFERRED[name]?.filter((n) => n !== name)
+  return pref?.length ? [pref, [name]] : [[name]]
 }
 
 /** Andere Zutaten, die diese ersetzen können, in der Reihenfolge, in der sie genommen werden (leer, wenn es keine gibt) */

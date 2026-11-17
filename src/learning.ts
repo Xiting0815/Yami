@@ -6,6 +6,8 @@
  *   gekocht          +0,8    nicht gekocht −1
  *   Bewertung 👍 +2 · 🔁 „bald wieder“ +2,5 · 👎 −3
  *   Gerichte einer Woche, die eine weggeworfene Zutat brauchen −0,3 (höchstens 1× pro Tag)
+ *   Backen & Desserts: gebacken +0,8 · ein Stück gegessen +0,3 · Bewertung wie oben
+ *   (eigenes Muster „bake:kuchen“ usw. – Abendessen-Muster wie Küche oder Hauptzutat bleiben davon unberührt)
  *
  * Gelernt wird pro Gericht UND pro Muster (Küche, Gerichtart, Hauptzutat, schnell/aufwendig an Werktagen
  * bzw. am Wochenende, Frühstückstyp). So bekommen auch nie gesehene Gerichte einen passenden Platz.
@@ -17,7 +19,7 @@ import { gramsOf } from './data/nutrition-calc'
 import { isWorkday } from './energy'
 import { type WastedItem, canonical, daysUntil, needsOf } from './kitchen'
 import { isoDate, mondayOf, parseIso } from './store'
-import { BREAKFAST_LABEL, CUISINE_LABEL, TYPE_LABEL, type Recipe, type WeekPlan } from './types'
+import { BREAKFAST_LABEL, CUISINE_LABEL, KIND_LABEL, TYPE_LABEL, type BasicKind, type Recipe, type WeekPlan } from './types'
 
 export type Rating = 'up' | 'again' | 'down'
 
@@ -27,7 +29,7 @@ export interface RejectEvent {
 }
 
 const HALF_LIFE = 60
-const W = { waste: -0.3, take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3 }
+const W = { waste: -0.3, take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3, eaten: 0.3 }
 /** Glättung: so viele „neutrale“ Beobachtungen werden angenommen, bevor etwas als Vorliebe gilt */
 const PRIOR_RECIPE = 2
 const PRIOR_FEATURE = 4
@@ -66,6 +68,8 @@ const quick = (r: Recipe) => r.time <= 35
 
 /** Merkmale eines Gerichts; `day` bestimmt Werktag/Wochenende für das Zeit-Muster */
 export function features(r: Recipe, day?: string): string[] {
+  // Backen & Desserts / Grundrezepte: nur das eigene Muster (sonst würde Tiramisu „Italienisch“ für Abendessen hochziehen)
+  if (r.basic) return [`bake:${r.kind ?? 'grundrezept'}`]
   if (r.breakfast) return [`bf:${r.breakfast.type}`, `protein:${mainProtein(r)}`]
   const f = [`cuisine:${r.cuisine}`, `type:${r.type}`, `protein:${mainProtein(r)}`]
   if (day) f.push(`speed:${quick(r) ? 'schnell' : 'aufwendig'}@${isWorkday(day) ? 'werktag' : 'wochenende'}`)
@@ -78,6 +82,7 @@ export function featureLabel(key: string): string {
   if (kind === 'cuisine') return `${CUISINE_LABEL[value as keyof typeof CUISINE_LABEL]}e Küche`
   if (kind === 'type') return TYPE_LABEL[value as keyof typeof TYPE_LABEL]
   if (kind === 'protein') return value === 'vegetarisch' ? 'Vegetarisches' : `Gerichte mit ${value}`
+  if (kind === 'bake') return KIND_LABEL[value as BasicKind] ?? value
   if (kind === 'bf') return `Frühstück ${BREAKFAST_LABEL[value as keyof typeof BREAKFAST_LABEL]}`
   if (kind === 'speed') {
     const [s, when] = value.split('@')
@@ -113,6 +118,12 @@ export interface TasteInput {
   since?: string
   /** selbst angelegte Rezepte: Anlegen zählt einmal wie „genommen“ (+1) */
   customRecipes?: { id: string; created: string }[]
+  /** Backen & Desserts: gebacken (+0,8) */
+  baked?: { date: string; recipeId: string }[]
+  /** Backen & Desserts: ein Stück gegessen (+0,3 je Stück) */
+  snacks?: { date: string; recipeId?: string }[]
+  /** Backen & Desserts: Bewertung, Schlüssel `Datum:Rezept-ID` */
+  bakeRatings?: Record<string, Rating>
 }
 
 export function buildModel(inp: TasteInput): TasteModel {
@@ -149,6 +160,10 @@ export function buildModel(inp: TasteInput): TasteModel {
   for (const c of inp.customRecipes ?? []) add(c.id, c.created, W.take)
   // Weggewischt
   for (const r of inp.rejects) add(r.id, r.date, W.reject)
+  // Backen & Desserts: gebacken, gegessen, bewertet
+  for (const b of inp.baked ?? []) add(b.recipeId, b.date, W.cooked)
+  for (const s of inp.snacks ?? []) if (s.recipeId) add(s.recipeId, s.date, W.eaten)
+  for (const [key, v] of Object.entries(inp.bakeRatings ?? {})) add(key.slice(11), key.slice(0, 10), W[v])
   // Weggeworfen: Gerichte derselben Woche, die die Zutat brauchen, leicht abwerten
   const hit = new Set<string>()
   for (const w of inp.wasted ?? []) {

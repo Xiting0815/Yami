@@ -64,8 +64,11 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
         today,
         since: state.tasteSince,
         customRecipes: state.customRecipes,
+        baked: state.baked,
+        snacks: state.snacks,
+        bakeRatings: state.bakeRatings,
       }),
-    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes],
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings],
   )
 
   // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────
@@ -76,9 +79,9 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
       .filter((d) => d <= weekEnd && isWorkday(d) && state.plan[d] && state.plan[d]!.status !== 'skipped')
       .sort()
       .slice(-10)
-    const low = last.filter((d) => isProteinLow(dayBalance(state.profile!, state.breakfast[d], state.plan[d]))).length
+    const low = last.filter((d) => isProteinLow(dayBalance(state.profile!, state.breakfast[d], state.plan[d], state.snacks, d))).length
     return low >= 3
-  }, [state.profile, state.plan, state.breakfast, today])
+  }, [state.profile, state.plan, state.breakfast, state.snacks, today])
 
   // Einkauf am Wochenanfang (oder heute) → wie viele Tage bis zum gewischten Kochtag?
   const freshDays = Math.max(0, daysUntil(swipeDay, today > days[0] ? today : days[0]))

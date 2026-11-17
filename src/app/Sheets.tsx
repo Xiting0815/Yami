@@ -187,6 +187,20 @@ export function Sheets({ m }: { m: AppModel }) {
         />
       )}
 
+      {ui.rateBake && RECIPE_BY_ID[ui.rateBake.recipeId] && (
+        <RateSheet
+          title={RECIPE_BY_ID[ui.rateBake.recipeId].title}
+          day={ui.rateBake.date}
+          today={today}
+          rating={state.bakeRatings[`${ui.rateBake.date}:${ui.rateBake.recipeId}`]}
+          onRate={(v) => act.setBakeRating(ui.rateBake!.date, ui.rateBake!.recipeId, v)}
+          onClose={() => {
+            if (state.bakeRatings[`${ui.rateBake!.date}:${ui.rateBake!.recipeId}`] !== undefined) m.flash('Danke – gemerkt ✓')
+            ui.setRateBake(null)
+          }}
+        />
+      )}
+
       {ui.showPrep && (
         <PrepSheet
           items={bf.prepItems}

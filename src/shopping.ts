@@ -39,8 +39,10 @@ function niceNumber(n: number, unit: string): string {
   return `${num} ${unit}`.trim()
 }
 
-export function formatAmount(amount: number | null, unit: string): string {
+export function formatAmount(amount: number | null, unit: string, exact = false): string {
   if (amount == null) return ''
+  // Backen: Gramm/Milliliter genau (21 g Hefe bleibt 21 g)
+  if (exact && (unit === 'g' || unit === 'ml') && amount >= 1) return `${Math.round(amount).toLocaleString('de-DE')} ${unit}`
   // Einkaufsliste: Kleinstmengen in g (z. B. Safran) lesbar halten
   if (unit === 'g' && amount < 1) return `${String(Math.round(amount * 10) / 10).replace('.', ',')} g`
   return niceNumber(amount, unit)

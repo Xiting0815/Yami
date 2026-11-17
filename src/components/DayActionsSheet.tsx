@@ -59,10 +59,11 @@ export function DayActionsSheet({ day, entry, recipe, today, prices, balance: b,
           <div className="act-balance">
             <span>
               Frühstück {b.breakfastPlanned ? kcal(b.breakfast) : `≈ ${kcal(b.breakfast)} (Schätzwert)`} · Mittag {kcal(b.lunch)} · Abendessen {b.dinner != null ? kcal(b.dinner) : '–'}
+              {b.snacks > 0 && <> · Gebackenes {kcal(b.snacks)}</>}
             </span>
             <span className="act-protein">
               Eiweiß: <b className={isProteinLow(b) ? 'low' : ''}>{b.protein} von {b.proteinTarget} g</b>{' '}
-              (Frühstück {!b.breakfastPlanned && '≈ '}{Math.round(b.breakfastProtein)} · Mittag ≈ {b.lunchProtein} · Abendessen {b.dinnerProtein != null ? Math.round(b.dinnerProtein) : '–'})
+              (Frühstück {!b.breakfastPlanned && '≈ '}{Math.round(b.breakfastProtein)} · Mittag ≈ {b.lunchProtein} · Abendessen {b.dinnerProtein != null ? Math.round(b.dinnerProtein) : '–'}{b.snackProtein > 0 ? ` · Gebackenes ${Math.round(b.snackProtein)}` : ''})
             </span>
             <b className={left < -50 ? 'over' : ''}>
               {left < 0

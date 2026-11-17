@@ -182,17 +182,21 @@ export function WeekView(props: Props) {
   )
 }
 
-/** Tagesbilanz als 4-px-Leiste am unteren Kartenrand: Frühstück + Mittag + Abendportion im Vergleich zum Ziel */
+/** Tagesbilanz als 4-px-Leiste am unteren Kartenrand: Frühstück + Mittag + Abendportion + Gebackenes im Vergleich zum Ziel */
 function BalanceBar({ b }: { b: DayBalance }) {
   const max = Math.max(b.target, b.total)
   const pct = (v: number) => `${(v / max) * 100}%`
   const dinner = b.dinner ?? 0
   const overPart = Math.max(0, b.total - b.target)
+  // über dem Ziel: der Überschuss wird zuerst vom Gebackenen, dann vom Abendessen abgezogen und rot gezeigt
+  const snackOver = Math.min(b.snacks, overPart)
+  const dinnerOver = Math.min(dinner, overPart - snackOver)
   return (
     <div className="balance-bar" aria-hidden>
       <div className="seg bf" style={{ width: pct(b.breakfast) }} />
       <div className="seg lunch" style={{ width: pct(b.lunch) }} />
-      <div className="seg dinner" style={{ width: pct(dinner - Math.min(dinner, overPart)) }} />
+      <div className="seg dinner" style={{ width: pct(dinner - dinnerOver) }} />
+      {b.snacks > 0 && <div className="seg snack" style={{ width: pct(b.snacks - snackOver) }} />}
       <div className="seg over" style={{ width: pct(overPart) }} />
       <div className="target-mark" style={{ left: pct(b.target) }} />
     </div>
