@@ -5,7 +5,7 @@ import { shortDate, weekdayName } from '../store'
 import { formatTime } from '../filter'
 import { type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { RecipeImage } from './RecipeImage'
-import { Icon } from './Icon'
+import { Icon, type IconName } from './Icon'
 import { type DayBalance, type Portion, isProteinLow } from '../energy'
 
 export const kcal = (n: number) => n.toLocaleString('de-DE')
@@ -14,6 +14,8 @@ export const kcal = (n: number) => n.toLocaleString('de-DE')
 export interface Notice {
   text: string
   tone?: 'warn' | 'ok'
+  /** kleines Symbol vor dem Text */
+  icon?: IconName
   onClick?: () => void
 }
 
@@ -47,6 +49,7 @@ interface Props {
 export function NoticeRow({ notice }: { notice: Notice }) {
   const inner = (
     <>
+      <span className="notice-icon"><Icon name={notice.icon ?? 'info'} size={18} /></span>
       <span className="notice-text">{notice.text}</span>
       {notice.onClick && <Icon name="chevron" size={18} />}
     </>
@@ -61,6 +64,8 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 export function WeekView(props: Props) {
   const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions } = props
   const planned = days.filter((d) => plan[d]).length
+  // nur der nächste freie Tag bekommt die Akzentfarbe – die übrigen leeren Tage bleiben ruhig
+  const nextOpen = days.find((d) => d >= today && !plan[d])
 
   return (
     <div className="week">
@@ -70,7 +75,9 @@ export function WeekView(props: Props) {
 
       {!hideDays && (
         <div className="week-status">
-          <span className={planned === 7 ? 'full' : ''}>{planned} von 7 geplant{planned === 7 ? ' ✓' : ''}</span>
+          <span className={planned === 7 ? 'full' : ''}>
+            <b>{planned}</b> von 7 geplant{planned === 7 ? ' ✓' : ''}
+          </span>
           {(planned > 0 || total > 0) && (
             <button className="link status-link" onClick={onShop}>
               Einkauf ≈ {formatEuro(total)} <Icon name="chevron" size={14} />
@@ -109,8 +116,8 @@ export function WeekView(props: Props) {
                   {past ? (
                     <div className="day-empty past" aria-label="nichts geplant">–</div>
                   ) : (
-                    <button className="day-empty" onClick={() => onSwipeDay(day)}>
-                      <span>+ Gericht wischen</span>
+                    <button className={`day-empty ${day === nextOpen ? 'next' : ''}`} onClick={() => onSwipeDay(day)}>
+                      <span className="day-empty-text"><Icon name="plus" size={18} /> Gericht wischen</span>
                       {b && <small>bis {kcal(b.dinnerBudget)} kcal</small>}
                     </button>
                   )}
@@ -136,7 +143,7 @@ export function WeekView(props: Props) {
             return (
               <li key={day} className={cls}>
                 {label}
-                <div className={`day-card ${skipped ? 'skipped' : ''}`}>
+                <div className={`day-card ${skipped ? 'skipped' : ''} ${cooked ? 'cooked' : ''}`}>
                   <button className="day-main" onClick={() => onOpen(recipe, day)}>
                     <span className="day-thumb">
                       <RecipeImage recipe={recipe} className="thumb" />

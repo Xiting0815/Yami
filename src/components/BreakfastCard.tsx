@@ -43,7 +43,7 @@ export function BreakfastCard({ picks, assignment, prep, prepChoices, covered, o
   if (!picks.length) {
     return (
       <button className="bf-bar empty" onClick={onPlan}>
-        <span className="bf-sun">☀️</span>
+        <span className="bf-sun"><Icon name="sun" size={22} /></span>
         <span className="bf-mid">
           <b>Frühstück für {dayRange(covered) || 'die Woche'} planen</b>
           <small>1–2 Rezepte, einmal vorbereiten ({weekdayName(prep, true)}, {shortDate(prep)})</small>
@@ -75,7 +75,7 @@ export function BreakfastCard({ picks, assignment, prep, prepChoices, covered, o
           <small>{summary}</small>
         </span>
         <button className="bf-prep" onClick={onPrep} aria-label={`Prep-Liste, ${prepProgress.done} von ${prepProgress.total} Schritten erledigt`}>
-          <span className={`pill ${prepDone ? 'ghost' : ''}`}>{prepDone ? 'Prep ✓' : `Prep ${prepProgress.done}/${prepProgress.total}`}</span>
+          <span className={`pill ${prepDone ? 'ghost' : 'soft'}`}>{prepDone ? 'Prep ✓' : `Prep ${prepProgress.done}/${prepProgress.total}`}</span>
         </button>
         <span className="bf-chev"><Icon name="chevronDown" size={20} /></span>
       </div>
@@ -101,7 +101,7 @@ export function BreakfastCard({ picks, assignment, prep, prepChoices, covered, o
             <button className="link small" onClick={onPlan}>+ zweites Frühstück für den Rest der Woche wählen</button>
           )}
           {assignment.notes.map((n) => (
-            <p key={n} className="bf-note">ℹ️ {n}</p>
+            <p key={n} className="bf-note"><Icon name="info" size={16} /><span>{n}</span></p>
           ))}
           <button className="link small" onClick={onReset}>Neu wählen</button>
         </div>

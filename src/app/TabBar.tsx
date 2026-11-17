@@ -1,12 +1,13 @@
 import type { Tab } from './types'
 import type { AppModel } from './useAppModel'
+import { Icon, type IconName } from '../components/Icon'
 
-const TABS: [Tab, string, string][] = [
-  ['woche', '📅', 'Woche'],
-  ['wischen', '👆', 'Wischen'],
-  ['liste', '🛒', 'Liste'],
-  ['vorrat', '🧺', 'Vorrat'],
-  ['rezepte', '📖', 'Rezepte'],
+const TABS: [Tab, IconName, string][] = [
+  ['woche', 'calendar', 'Woche'],
+  ['wischen', 'cards', 'Wischen'],
+  ['liste', 'cart', 'Liste'],
+  ['vorrat', 'basket', 'Vorrat'],
+  ['rezepte', 'book', 'Rezepte'],
 ]
 
 /** Tab-Leiste unten; „Wischen“ springt zum nächsten freien Tag */
@@ -20,13 +21,14 @@ export function TabBar({ m }: { m: AppModel }) {
         <button
           key={t}
           className={ui.tab === t ? 'active' : ''}
+          aria-current={ui.tab === t ? 'page' : undefined}
           onClick={() => {
             if (t === 'wischen') ui.setSwipeDay(days.find((d) => !state.plan[d] && d >= today) ?? ui.swipeDay)
             ui.setTab(t)
           }}
         >
           <span className="tab-icon">
-            {icon}
+            <Icon name={icon} size={24} />
             {t === 'vorrat' && urgent > 0 && <i className="tab-badge">{urgent}</i>}
           </span>
           <span>{label}</span>

@@ -67,15 +67,15 @@ export function WeekTab({ m }: { m: AppModel }) {
 
   // höchstens ein Hinweis über dem Plan: Vorrat läuft ab > Vorschlag > Wiegetag
   const notice: Notice | undefined = status.justFinished
-    ? { text: '✓ Alles eingerichtet – guten Appetit!', tone: 'ok' }
+    ? { text: 'Alles eingerichtet – guten Appetit!', tone: 'ok', icon: 'check' }
     : urgentNames.size > 0
-      ? { text: `⚠ ${urgentNames.size} ${urgentNames.size === 1 ? 'Zutat läuft' : 'Zutaten laufen'} bald ab`, tone: 'warn', onClick: () => ui.setTab('vorrat') }
+      ? { text: `${urgentNames.size} ${urgentNames.size === 1 ? 'Zutat läuft' : 'Zutaten laufen'} bald ab`, tone: 'warn', icon: 'alert', onClick: () => ui.setTab('vorrat') }
       : pendingSuggestion
-        ? { text: `Vorschlag: Tagesziel ${pendingSuggestion.title}`, onClick: () => ui.setShowProgress(true) }
+        ? { text: `Vorschlag: Tagesziel ${pendingSuggestion.title}`, icon: 'trend', onClick: () => ui.setShowProgress(true) }
         : status.weighDue
-          ? { text: 'Wiegetag – Werte eintragen', onClick: () => ui.setShowProgress(true) }
+          ? { text: 'Wiegetag – Werte eintragen', icon: 'scale', onClick: () => ui.setShowProgress(true) }
           : status.backupDue
-            ? { text: '💾 Lange nicht gesichert – jetzt Sicherung speichern', onClick: () => ui.setShowProfile(true) }
+            ? { text: 'Lange nicht gesichert – jetzt Sicherung speichern', icon: 'save', onClick: () => ui.setShowProfile(true) }
             : undefined
 
   return (
@@ -99,7 +99,7 @@ export function WeekTab({ m }: { m: AppModel }) {
             onOpen={() => ui.setReviewMonday(status.cardMonday)}
             onDismiss={() => {
               setState((s) => ({ ...s, reviewDismissed: [...s.reviewDismissed, status.cardMonday].slice(-60) }))
-              flash('Rückblick ausgeblendet – du findest ihn unter ⚖️')
+              flash('Rückblick ausgeblendet – du findest ihn oben rechts unter „Wiegen & Fortschritt“')
             }}
           />
         ) : undefined

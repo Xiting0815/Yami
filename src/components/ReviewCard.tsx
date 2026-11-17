@@ -1,5 +1,6 @@
 import { formatEuro } from '../kitchen'
 import { type WeekReview } from '../review'
+import { Icon } from './Icon'
 
 export const de1 = (v: number) => v.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 export const signedKg = (v: number) => (v > 0 ? '+' : v < 0 ? '−' : '±') + de1(Math.abs(v))
@@ -32,7 +33,7 @@ export function ReviewCard({ review, onOpen, onDismiss }: Props) {
       <div className="review-head">
         <h2>Dein Wochenrückblick · KW {review.kw}</h2>
         <button className="icon-btn tiny" aria-label="Rückblick ausblenden" onClick={onDismiss}>
-          ✕
+          <Icon name="close" size={18} />
         </button>
       </div>
       <div className="stat-grid">

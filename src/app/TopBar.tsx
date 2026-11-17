@@ -1,5 +1,6 @@
 import { weekLabel } from '../store'
 import type { AppModel } from './useAppModel'
+import { Icon } from '../components/Icon'
 
 /** Kopfzeile: Logo bzw. Tab-Titel, Wochenwechsel, Wiegen & Profil */
 export function TopBar({ m }: { m: AppModel }) {
@@ -11,12 +12,12 @@ export function TopBar({ m }: { m: AppModel }) {
 
   const weekNav = (
     <div className="weeknav">
-      <button className="icon-btn" onClick={() => act.changeWeek(-1)} aria-label="Vorige Woche">‹</button>
+      <button className="icon-btn" onClick={() => act.changeWeek(-1)} aria-label="Vorige Woche"><Icon name="chevronLeft" size={20} /></button>
       <span className="week-label">
         <b>{weekLabel(monday).split(' · ')[0]}</b>
         <small>{weekLabel(monday).split(' · ')[1]}</small>
       </span>
-      <button className="icon-btn" onClick={() => act.changeWeek(1)} aria-label="Nächste Woche">›</button>
+      <button className="icon-btn" onClick={() => act.changeWeek(1)} aria-label="Nächste Woche"><Icon name="chevron" size={20} /></button>
     </div>
   )
 
@@ -33,10 +34,10 @@ export function TopBar({ m }: { m: AppModel }) {
           aria-label="Wiegen & Fortschritt"
           title="Wiegen & Fortschritt"
         >
-          ⚖️
+          <Icon name="scale" />
         </button>
         <button className="icon-btn profile-btn" onClick={() => ui.setShowProfile(true)} aria-label="Profil & Kalorienziel" title="Profil & Kalorienziel">
-          👤
+          <Icon name="user" />
         </button>
       </div>
     </header>
