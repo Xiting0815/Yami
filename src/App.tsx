@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CustomIngredient, CustomRecipe, PlanEntry, Recipe } from './types'
 import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from './data/recipes'
 import { BREAKFAST_LABEL, type BreakfastType } from './types'
-import { assignBreakfasts, coveredDays, learnedPrepWeekday, prepOptions, prepPlan, resolvePrepDay, workdays } from './breakfast'
+import { applyBreakfastPicks, assignBreakfasts, coveredDays, learnedPrepWeekday, prepOptions, prepPlan, resolvePrepDay } from './breakfast'
 import { BreakfastCard, shortTitle } from './components/BreakfastCard'
 import { DayActionsSheet } from './components/DayActionsSheet'
 import { PantryDaySheet } from './components/PantryDaySheet'
@@ -37,6 +37,7 @@ import {
   planWeek,
   uid,
   uncook,
+  unbuy,
   PANTRY_ONLY_MAX_EURO,
   WASTED_MAX,
 } from './kitchen'
@@ -215,8 +216,11 @@ export default function App() {
   // Saison: Monat des gewischten Kochtags (Abendessen) bzw. heute (Frühstück & Wocheneinkauf)
   const todayMonth = new Date(today + 'T12:00:00').getMonth() + 1
   const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
+  // ab Samstag ist die Liste die der nächsten Woche: was für Sa/So der laufenden Woche noch fehlt, kommt mit drauf
+  const carryFor = (key: string) => today < key && key === defaultMonday(today)
   const week = useMemo(
-    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices }),
+    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(weekKey) }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
   )
   // Lernen: wie lange reichen Öl, Brühe & Co. noch (aus dem Verbrauch der gekochten Gerichte)
@@ -227,7 +231,8 @@ export default function App() {
     () =>
       haKey === weekKey
         ? week
-        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices }),
+        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(haKey) }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [haKey, weekKey, week, state.plan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
   )
   const haLocal = useMemo(() => localItems(haWeek.buy), [haWeek])
@@ -292,7 +297,8 @@ export default function App() {
     () =>
       new Map(
         RECIPES.map((r) => {
-          const ins = insight(r, state.defaultServings, week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
+          // „Was koche ich damit?“: nur der echte Vorrat (ohne geplante Einkäufe) zählt für „x von y da“ und die Reihenfolge
+          const ins = insight(r, state.defaultServings, pantryMode ? week.pantryLeft : week.leftovers, today, state.prices, lastSeen, jitter.get(r.id) ?? 0, weekRecipes, {
             freshDays: freshDays,
             month: swipeMonth,
             day: swipeDay,
@@ -303,7 +309,7 @@ export default function App() {
           return [r.id, { ...ins, score: ins.score + pref.score + bonus, modeScore: ins.modeScore + pref.score * 0.3, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
         }),
       ),
-    [week.leftovers, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
+    [week.leftovers, week.pantryLeft, pantryMode, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 
@@ -377,19 +383,12 @@ export default function App() {
 
   /** Frühstücke für die Woche festlegen und auf die Tage nach dem Prep-Tag verteilen (Tage davor bekommen keins) */
   function setPicks(ids: string[], prepDay: string = prep) {
-    const a = assignBreakfasts(ids, days, prepDay)
     setState((s) => {
-      const breakfast = { ...s.breakfast }
-      let pantry = s.pantry
-      for (const d of workdays(days)) {
-        const old = breakfast[d]
-        if (old?.status === 'cooked') pantry = uncook(old, pantry)
-        delete breakfast[d]
-        if (a.days[d]) breakfast[d] = { recipeId: a.days[d], servings: 1 }
-      }
+      // schon gegessene Tage bleiben (auch ihr Abzug im Vorrat)
+      const breakfast = applyBreakfastPicks(s.breakfast, ids, days, prepDay, today)
       // Der gewählte Prep-Tag wird gemerkt – daraus lernt die App den üblichen Wochentag
       const prepDays = ids.length || s.prepDays[weekKey] ? { ...s.prepDays, [weekKey]: prepDay } : s.prepDays
-      return { ...s, breakfast, pantry, prepDays, breakfastPicks: { ...s.breakfastPicks, [weekKey]: ids } }
+      return { ...s, breakfast, prepDays, breakfastPicks: { ...s.breakfastPicks, [weekKey]: ids } }
     })
   }
 
@@ -625,6 +624,7 @@ export default function App() {
       const wk = { ...(s.bought[forWeek] ?? {}) }
       const checked = new Set(s.checked[forWeek] ?? [])
       let pantry = s.pantry
+      let { plan, breakfast } = s
       const b = wk[item.name]
       const needed = item.packs * item.product.pack
       if (b && b.amount < needed - 1e-6) {
@@ -636,7 +636,10 @@ export default function App() {
         wk[item.name] = { lotId: b.lotId, amount: needed }
         checked.add(item.key)
       } else if (b) {
-        pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount - b.amount } : l)).filter((l) => l.amount > 1e-6)
+        // doch nicht gekauft: nur den Rest des Postens entfernen; schon damit Gekochtes verweist danach nicht mehr darauf
+        const u = unbuy(pantry, [plan, breakfast], b.lotId, b.amount)
+        pantry = u.pantry
+        ;[plan, breakfast] = u.plans
         delete wk[item.name]
         checked.delete(item.key)
       } else {
@@ -646,7 +649,7 @@ export default function App() {
         wk[item.name] = { lotId: lot.id, amount }
         checked.add(item.key)
       }
-      return { ...s, pantry, bought: { ...s.bought, [forWeek]: wk }, checked: { ...s.checked, [forWeek]: [...checked] } }
+      return { ...s, pantry, plan, breakfast, bought: { ...s.bought, [forWeek]: wk }, checked: { ...s.checked, [forWeek]: [...checked] } }
     })
   }
 
@@ -656,15 +659,16 @@ export default function App() {
     setState((s) => {
       const wk = s.bought[weekKey] ?? {}
       let pantry = s.pantry
+      let plans = [s.plan, s.breakfast]
       const spices = { ...s.spices }
       for (const [name, b] of Object.entries(wk)) {
         if (b.lotId.startsWith('spice:')) {
           spices[name] = 'alle'
           continue
         }
-        pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount - b.amount } : l)).filter((l) => l.amount > 1e-6)
+        ;({ pantry, plans } = unbuy(pantry, plans, b.lotId, b.amount))
       }
-      return { ...s, spices, pantry, bought: { ...s.bought, [weekKey]: {} }, checked: { ...s.checked, [weekKey]: [] } }
+      return { ...s, spices, pantry, plan: plans[0], breakfast: plans[1], bought: { ...s.bought, [weekKey]: {} }, checked: { ...s.checked, [weekKey]: [] } }
     })
   }
 

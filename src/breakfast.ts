@@ -4,7 +4,7 @@
 import { RECIPE_BY_ID } from './data/recipes'
 import { addDaysIso, daysUntil } from './kitchen'
 import { isoDate, mondayOf, parseIso, weekdayName } from './store'
-import type { Ingredient, Recipe } from './types'
+import type { Ingredient, Recipe, WeekPlan } from './types'
 
 /** Arbeitstage Mo–Fr einer Woche (days = Mo–So) */
 export function workdays(days: string[]): string[] {
@@ -149,4 +149,19 @@ export function prepMinutes(items: PrepItem[]): number {
   if (!items.length) return 0
   const times = items.map((i) => i.recipe.time + Math.max(0, i.portions - 1) * 2)
   return Math.max(...times) + Math.round(times.reduce((a, b) => a + b, 0) - Math.max(...times)) / 2
+}
+
+/**
+ * Gewählte Frühstücke auf die Woche legen. Schon gegessene Tage (vor heute oder als gekocht abgezogen) bleiben, wie sie
+ * waren – ein Neu-Wählen oder Zurücksetzen mitten in der Woche gibt nichts Gegessenes in den Vorrat zurück.
+ */
+export function applyBreakfastPicks(breakfast: WeekPlan, ids: string[], days: string[], prep: string, today: string): WeekPlan {
+  const a = assignBreakfasts(ids, days, prep)
+  const next = { ...breakfast }
+  for (const d of workdays(days)) {
+    if (d < today || next[d]?.status === 'cooked') continue
+    delete next[d]
+    if (a.days[d]) next[d] = { recipeId: a.days[d], servings: 1 }
+  }
+  return next
 }

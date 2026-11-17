@@ -10,7 +10,7 @@ import { CATALOG, SHOP_ALIAS } from './data/catalog'
 import { CONVERT, PRODUCTS, type Product } from './data/products'
 import { inSeason, seasonOf } from './data/season'
 import { RECIPE_BY_ID } from './data/recipes'
-import { substitutesFor } from './data/substitutes'
+import { substituteTiers, substitutesFor } from './data/substitutes'
 import type { Festive, PlanEntry, Recipe, ShopCat, WeekPlan } from './types'
 import {
   type SpiceStatus, isSpice, type StapleMemos, STAPLE_SHOP_CAT, buyName, defaultAmount, isQtyStaple, isTrackedStaple, runningLow,
@@ -180,21 +180,26 @@ export function pantryCovering(lots: PantryLot[], name: string): number {
   return lots.filter((l) => l.name === name || subs.has(l.name)).reduce((s, l) => s + l.amount, 0)
 }
 
+/** Ist ein Posten an diesem Tag noch gut? (Haltbarkeit = letzter guter Tag) – Abgelaufenes zählt nicht mehr als Vorrat */
+export const usableOn = (lot: { expires: string; amount: number }, day: string) => lot.amount > 1e-6 && lot.expires >= day
+
+/** Posten, die den Bedarf an `name` decken können, in Entnahme-Reihenfolge: Zutat selbst, dann Ersatz-Stufen; je Stufe frühestes Ablaufdatum zuerst */
+export function lotsFor<T extends PantryLot>(lots: T[], name: string, day: string, exactOnly = false): T[] {
+  const byExpiry = (a: T, b: T) => a.expires.localeCompare(b.expires)
+  const tiers = exactOnly ? [[name]] : [[name], ...substituteTiers(name)]
+  return tiers.flatMap((t) => lots.filter((l) => t.includes(l.name) && usableOn(l, day)).sort(byExpiry))
+}
+
 /**
- * Menge nach FIFO (frühestes Ablaufdatum zuerst) entnehmen. Angebrochene Posten bekommen
- * die kürzere "angebrochen"-Haltbarkeit. Gibt die entnommenen Teilmengen zurück.
+ * Menge nach FIFO (frühestes Ablaufdatum zuerst) entnehmen – erst die Zutat selbst, dann austauschbare (z. B. Penne
+ * statt Spaghetti, Olivenöl statt Sonnenblumenöl, notfalls Gemüsebrühe statt Hühnerbrühe). Am Kochtag schon
+ * abgelaufene Posten werden nicht genommen. Angebrochene Posten bekommen die kürzere "angebrochen"-Haltbarkeit.
+ * Gibt die entnommenen Teilmengen zurück.
  */
 export function consume(lots: PantryLot[], name: string, amount: number, date: string): PantryLot[] {
   const taken: PantryLot[] = []
   let rest = amount
-  // erst die Zutat selbst, dann austauschbare (z. B. Penne statt Spaghetti), jeweils das früheste Ablaufdatum zuerst
-  const byExpiry = (a: PantryLot, b: PantryLot) => a.expires.localeCompare(b.expires)
-  const subs = new Set(substitutesFor(name))
-  const mine = [
-    ...lots.filter((l) => l.name === name).sort(byExpiry),
-    ...lots.filter((l) => subs.has(l.name)).sort(byExpiry),
-  ]
-  for (const lot of mine) {
+  for (const lot of lotsFor(lots, name, date)) {
     const prod = PRODUCTS[lot.name]
     if (rest <= 1e-9) break
     const t = Math.min(lot.amount, rest)
@@ -218,12 +223,15 @@ export function wasteOf(lot: PantryLot, date: string, overrides?: PriceOverrides
   return { name: lot.name, amount: lot.amount, unit: lot.unit, date, value: Math.round(amountValue(lot.name, lot.amount, overrides) * 100) / 100 }
 }
 
-/** Ein entfernter Posten zählt als weggeworfen, wenn er abgelaufen war (Haltbarkeit ≤ heute) */
+/**
+ * Ein entfernter Posten zählt als weggeworfen, wenn er abgelaufen war (Haltbarkeit ≤ heute). Datum = Ablaufdatum,
+ * damit er im Rückblick und beim Lernen in der Woche landet, in der er verdorben ist.
+ */
 export function discardWaste(lot: PantryLot, today: string, overrides?: PriceOverrides): WastedItem | null {
-  return lot.expires <= today && lot.amount > 1e-6 ? wasteOf(lot, today, overrides) : null
+  return lot.expires <= today && lot.amount > 1e-6 ? wasteOf(lot, lot.expires, overrides) : null
 }
 
-/** Posten, die vor mehr als 7 Tagen abgelaufen sind, wandern automatisch in „weggeworfen“ (idempotent) */
+/** Posten, die vor mehr als 7 Tagen abgelaufen sind, wandern automatisch in „weggeworfen“ (idempotent), datiert aufs Ablaufdatum */
 export function moveExpired(
   pantry: PantryLot[],
   wasted: WastedItem[],
@@ -234,7 +242,7 @@ export function moveExpired(
   if (!gone.length) return { pantry, wasted, changed: false }
   return {
     pantry: pantry.filter((l) => !gone.includes(l)),
-    wasted: [...wasted, ...gone.map((l) => wasteOf(l, today, overrides))].slice(-WASTED_MAX),
+    wasted: [...wasted, ...gone.map((l) => wasteOf(l, minIso(l.expires, today), overrides))].slice(-WASTED_MAX),
     changed: true,
   }
 }
@@ -270,6 +278,32 @@ export function uncook(entry: PlanEntry, pantry: PantryLot[]): PantryLot[] {
   return lots
 }
 
+/**
+ * Abgehakten Einkauf wieder abwählen („doch nicht gekauft“): nur das, was vom gekauften Posten noch übrig ist,
+ * verlässt den Vorrat. Wurde schon damit gekocht, verweisen die „entnommen“-Einträge der Gerichte auf einen Posten,
+ * den es nie gab – sie werden gestrichen, damit „nicht gekocht“ später keinen Vorrat aus dem Nichts zurückbringt.
+ */
+export function unbuy(
+  pantry: PantryLot[],
+  plans: WeekPlan[],
+  lotId: string,
+  amount: number,
+): { pantry: PantryLot[]; plans: WeekPlan[] } {
+  const lot = pantry.find((l) => l.id === lotId)
+  const used = lot ? Math.max(0, amount - lot.amount) : amount
+  const next = pantry
+    .map((l) => (l.id === lotId ? { ...l, amount: Math.max(0, l.amount - amount) } : l))
+    .filter((l) => l.amount > 1e-6)
+  if (used <= 1e-6) return { pantry: next, plans }
+  const strip = (p: WeekPlan): WeekPlan => {
+    if (!Object.values(p).some((e) => e?.consumed?.some((c) => c.id === lotId))) return p
+    return Object.fromEntries(
+      Object.entries(p).map(([d, e]) => [d, e?.consumed?.some((c) => c.id === lotId) ? { ...e, consumed: e.consumed.filter((c) => c.id !== lotId) } : e]),
+    )
+  }
+  return { pantry: next, plans: plans.map(strip) }
+}
+
 // ───────────── Wochenplanung ─────────────
 
 export interface BuyItem {
@@ -293,6 +327,8 @@ export interface BuyItem {
   bought: number
   /** Grundzutaten: warum sie auf der Liste stehen (wird knapp / bald leer / Gewürz ist alle) */
   note?: 'knapp' | 'leer' | 'alle'
+  /** Teil des Bedarfs für noch offene Tage VOR dieser Woche (ab Samstag: Sa/So der laufenden Woche) – ISO-Tage */
+  forDays?: string[]
 }
 
 export interface StapleItem {
@@ -308,6 +344,11 @@ export interface StapleContext {
   memo?: StapleMemos
   /** Gewürze: da / alle */
   spices?: Record<string, SpiceStatus>
+  /**
+   * Liste der nächsten Woche ab Samstag: was für die restlichen Tage der laufenden Woche (ab heute) noch fehlt,
+   * kommt mit auf die Liste (markiert mit `forDays`), statt beim Wochenwechsel zu verschwinden.
+   */
+  carry?: boolean
 }
 
 export interface WeekResult {
@@ -317,8 +358,10 @@ export interface WeekResult {
   covered: BuyItem[]
   staples: StapleItem[]
   total: number
-  /** voraussichtlicher Vorrat nach allen noch offenen Gerichten der Woche */
+  /** voraussichtlicher Vorrat nach allen noch offenen Gerichten der Woche (inklusive der Einkäufe) */
   leftovers: PantryLot[]
+  /** echter Vorrat jetzt, abzüglich dessen, was schon geplante, noch offene Gerichte brauchen (ohne Einkäufe) */
+  pantryLeft: PantryLot[]
 }
 
 function activeEntries(plan: WeekPlan, days: string[]) {
@@ -343,8 +386,17 @@ export function planWeek(
   staple: StapleContext = {},
 ): WeekResult {
   const memo = staple.memo ?? {}
-  // Mengen-Grundzutaten zählen erst, wenn du sie führst (Vorrat oder gemerkt) – sonst bleiben sie bei „Vorrat prüfen“
-  const trackedKey = (key: string) => isTrackedStaple(key, pantry, memo) || Object.keys(bought).some((n) => stapleKey(n) === key)
+  const own = (key: string) => isTrackedStaple(key, pantry, memo) || Object.keys(bought).some((n) => stapleKey(n) === key)
+  // Mengen-Grundzutaten zählen erst, wenn du sie führst (Vorrat oder gemerkt) – oder etwas, das sie ersetzt
+  // (Olivenöl für Sonnenblumenöl, Gemüsebrühe für Hühnerbrühe) – sonst bleiben sie bei „Vorrat prüfen“
+  const trackedKey = (key: string) => own(key) || substitutesFor(key).some((n) => own(stapleKey(n)))
+  /** gekauft wird die Grundzutat, die du führst (bei Brühe die gemerkte Form); führst du nur einen Ersatz, dieser */
+  const stapleBuyName = (name: string) => {
+    const key = stapleKey(name)
+    if (own(key)) return buyName(key, memo)
+    const sub = substitutesFor(key).find((n) => own(stapleKey(n)))
+    return sub ? buyName(stapleKey(sub), memo) : buyName(key, memo)
+  }
   const needsFor = (r: Recipe, servings: number) => [
     ...needsOf(r, servings),
     ...stapleNeedsOf(r, servings).filter((n) => trackedKey(stapleKey(n.name))),
@@ -352,15 +404,19 @@ export function planWeek(
   const entries = [...activeEntries(plan, days), ...activeEntries(breakfast, days)].sort((a, b) => a[0].localeCompare(b[0]))
 
   // Bedarf der Woche
-  const req = new Map<string, { amount: number; recipes: Set<string> }>()
+  const req = new Map<string, { amount: number; recipes: Set<string>; forDays: Set<string> }>()
+  const reqOf = (name: string) => {
+    const cur = req.get(name) ?? { amount: 0, recipes: new Set<string>(), forDays: new Set<string>() }
+    req.set(name, cur)
+    return cur
+  }
   const staples = new Map<string, { parts: Map<string, number>; recipes: Set<string> }>()
   for (const [, e] of entries) {
     const r = RECIPE_BY_ID[e.recipeId]
     for (const n of needsFor(r, e.servings)) {
-      const cur = req.get(n.name) ?? { amount: 0, recipes: new Set<string>() }
+      const cur = reqOf(n.name)
       cur.amount += n.amount
       cur.recipes.add(r.title)
-      req.set(n.name, cur)
     }
     for (const ing of r.ingredients) {
       const name = canonical(ing.name)
@@ -378,13 +434,42 @@ export function planWeek(
     }
   }
 
-  // Vorrat vor dem Einkauf rekonstruieren: jetzt − Gekauftes + diese Woche schon Verbrauchtes (je Zutat zusammengefasst)
-  const pool = new Map<string, number>()
-  const bump = (name: string, d: number) => pool.set(name, (pool.get(name) ?? 0) + d)
-  for (const l of pantry) bump(l.name, l.amount)
-  for (const [name, b] of Object.entries(bought)) bump(name, -b.amount)
-  for (const [, e] of entries) for (const c of e.consumed ?? []) bump(c.name, c.amount)
-  for (const [k, v] of pool) if (v < 0) pool.set(k, 0)
+  // Vorrat vor dem Einkauf rekonstruieren – postenweise (Ablaufdaten zählen): jetzt + diese Woche schon Verbrauchtes − Gekauftes
+  const pool: PantryLot[] = pantry.map((l) => ({ ...l }))
+  for (const [, e] of entries)
+    for (const c of e.consumed ?? []) {
+      const same = pool.find((l) => l.id === c.id)
+      if (same) {
+        same.amount += c.amount
+        if (c.expires > same.expires) same.expires = c.expires
+      } else pool.push({ ...c })
+    }
+  for (const [name, b] of Object.entries(bought)) {
+    let rest = b.amount
+    for (const l of [...pool.filter((x) => x.id === b.lotId), ...pool.filter((x) => x.id !== b.lotId && x.name === name)]) {
+      const t = Math.min(l.amount, rest)
+      l.amount -= t
+      rest -= t
+    }
+  }
+  /** Menge aus dem Pool nehmen (nur Posten, die am Tag noch gut sind): erst die Zutat selbst, dann austauschbare */
+  const take = (name: string, amount: number, day: string, exactOnly: boolean) => {
+    const got: { name: string; amount: number }[] = []
+    let rest = amount
+    const lots = lotsFor(pool, name, day, exactOnly).filter((l) => exactOnly || l.name !== name)
+    for (const l of lots) {
+      if (rest <= 1e-9) break
+      const t = Math.min(l.amount, rest)
+      l.amount -= t
+      rest -= t
+      const g = got.find((x) => x.name === l.name)
+      if (g) g.amount += t
+      else got.push({ name: l.name, amount: t })
+    }
+    return got
+  }
+  const sum = (xs: { amount: number }[]) => xs.reduce((s, x) => s + x.amount, 0)
+  const useDay = (day: string, e: PlanEntry) => (e.status === 'cooked' || day >= today ? day : today)
 
   // Noch offene Gerichte VOR dieser Woche (z. B. Sa/So, wenn schon die nächste Woche geplant wird)
   // brauchen ihre Zutaten noch – die dürfen für diese Woche nicht als vorhanden zählen.
@@ -392,44 +477,46 @@ export function planWeek(
     .flatMap((p) => Object.entries(p))
     .filter((x): x is [string, PlanEntry] => !!x[1] && x[0] < days[0] && !x[1].status && !!RECIPE_BY_ID[x[1].recipeId])
     .sort((a, b) => a[0].localeCompare(b[0]))
-  /** Menge aus dem Pool nehmen: erst die Zutat selbst, dann austauschbare; gibt die Teilmengen zurück */
-  const take = (name: string, amount: number, exactOnly: boolean) => {
-    const got: { name: string; amount: number }[] = []
-    let rest = amount
-    for (const n of exactOnly ? [name] : substitutesFor(name)) {
-      const t = Math.min(pool.get(n) ?? 0, rest)
-      if (t > 1e-9) {
-        pool.set(n, (pool.get(n) ?? 0) - t)
-        rest -= t
-        got.push({ name: n, amount: t })
+  for (const [day, e] of earlier) {
+    const r = RECIPE_BY_ID[e.recipeId]
+    for (const n of needsFor(r, e.servings)) {
+      const d = useDay(day, e)
+      const got = sum(take(n.name, n.amount, d, true))
+      const rest = n.amount - got - (n.amount - got > 1e-6 ? sum(take(n.name, n.amount - got, d, false)) : 0)
+      // ab Samstag: was für Sa/So noch fehlt, kommt mit auf die Liste der nächsten Woche
+      if (staple.carry && day >= today && rest > 1e-6) {
+        const cur = reqOf(n.name)
+        cur.amount += rest
+        cur.recipes.add(r.title)
+        cur.forDays.add(day)
       }
     }
-    return got
   }
-  const reservedNeeds = earlier.flatMap(([, e]) => needsFor(RECIPE_BY_ID[e.recipeId], e.servings))
-  const reservedRest = reservedNeeds.map((n) => n.amount - take(n.name, n.amount, true).reduce((s, x) => s + x.amount, 0))
-  reservedNeeds.forEach((n, i) => {
-    if (reservedRest[i] > 1e-6) take(n.name, reservedRest[i], false)
-  })
 
-  // 1. Durchgang: Zutat selbst – 2. Durchgang: austauschbare Posten für den Rest
-  const have = new Map<string, { exact: number; availExact: number; subs: { name: string; amount: number }[] }>()
-  for (const [name, { amount: required }] of req) {
-    const availExact = pool.get(name) ?? 0
-    const exact = take(name, required, true).reduce((s, x) => s + x.amount, 0)
-    have.set(name, { exact, availExact, subs: [] })
-  }
-  for (const [name, { amount: required }] of req) {
-    const h = have.get(name)!
-    if (required - h.exact > 1e-6) h.subs = take(name, required - h.exact, false)
+  // diese Woche: 1. Durchgang Zutat selbst (Tag für Tag) – 2. Durchgang austauschbare Posten für den Rest
+  const availExact = new Map<string, number>()
+  for (const name of req.keys()) availExact.set(name, sum(lotsFor(pool, name, today, true)))
+  const weekNeeds = entries.flatMap(([day, e]) => needsFor(RECIPE_BY_ID[e.recipeId], e.servings).map((n) => ({ ...n, day: useDay(day, e), exact: 0 })))
+  for (const n of weekNeeds) n.exact = sum(take(n.name, n.amount, n.day, true))
+  const have = new Map<string, { exact: number; subs: { name: string; amount: number }[] }>()
+  for (const name of req.keys()) have.set(name, { exact: 0, subs: [] })
+  for (const n of weekNeeds) {
+    const h = have.get(n.name)!
+    h.exact += n.exact
+    if (n.amount - n.exact <= 1e-6) continue
+    for (const g of take(n.name, n.amount - n.exact, n.day, false)) {
+      const cur = h.subs.find((x) => x.name === g.name)
+      if (cur) cur.amount += g.amount
+      else h.subs.push({ ...g })
+    }
   }
 
   const buy: BuyItem[] = []
   const covered: BuyItem[] = []
   let total = 0
-  for (const [name, { amount: required, recipes }] of req) {
-    // Brühe: gekauft wird die Form, die du zuletzt im Vorrat hattest (sonst Pulver)
-    const itemName = isQtyStaple(name) ? buyName(name, memo) : name
+  for (const [name, { amount: required, recipes, forDays }] of req) {
+    // Grundzutaten: gekauft wird die Form, die du führst (Brühe: zuletzt gehabte Form, sonst Pulver)
+    const itemName = isQtyStaple(name) ? stapleBuyName(name) : name
     const product = productFor(itemName, overrides, month)!
     const h = have.get(name)!
     const subAmount = h.subs.reduce((s, x) => s + x.amount, 0)
@@ -447,15 +534,32 @@ export function planWeek(
       packs,
       product,
       cost: packs * product.price,
-      leftover: h.availExact + subAmount + packs * product.pack - required,
+      leftover: (availExact.get(name) ?? 0) + subAmount + packs * product.pack - required,
       bought: bought[itemName]?.amount ?? 0,
       recipes: [...recipes],
     }
+    if (forDays.size) item.forDays = [...forDays].sort()
     if (packs > 0 && isQtyStaple(name)) item.note = 'knapp'
     // Brühe: der Bedarf heißt „Gemüsebrühe“, die Packung „Gemüsebrühe Würfel“ – fürs „schon im Vorrat“ bleibt der Rezeptname
     if (packs === 0 && itemName !== name) {
       item.key = name
       item.name = name
+    }
+    // zwei Bedarfe, dieselbe Packung (Sonnenblumenöl + Olivenöl → Olivenöl): zusammenfassen
+    const twin = packs > 0 ? buy.find((b) => b.key === item.key) : undefined
+    if (twin) {
+      total -= twin.cost
+      twin.required += item.required
+      twin.fromPantry += item.fromPantry
+      twin.substitutes = [...twin.substitutes, ...item.substitutes]
+      const miss = Math.max(0, twin.required - twin.fromPantry)
+      twin.packs = Math.ceil(miss / product.pack - 1e-6)
+      twin.cost = twin.packs * product.price
+      twin.leftover = twin.fromPantry + twin.packs * product.pack - twin.required
+      twin.recipes = [...new Set([...twin.recipes, ...item.recipes])]
+      if (item.forDays) twin.forDays = [...new Set([...(twin.forDays ?? []), ...item.forDays])].sort()
+      total += twin.cost
+      continue
     }
     total += item.cost
     ;(packs > 0 ? buy : covered).push(item)
@@ -473,7 +577,7 @@ export function planWeek(
     const group = (n: string) => stapleKey(n) === key
     // nach dem Wochenplan: was dann noch da ist (alle Formen zusammen, z. B. Brühwürfel für „Gemüsebrühe“;
     // nicht abgedeckter Bedarf kam schon oben auf die Liste). `inCovered.leftover` zählt nur die Rezeptform selbst.
-    const after = Math.max(0, [...pool].filter(([n]) => group(n)).reduce((s, [, v]) => s + v, 0))
+    const after = Math.max(0, pool.filter((l) => group(l.name) && usableOn(l, today)).reduce((s, l) => s + l.amount, 0))
     if (!runningLow(after, product.pack, useRate(events, key, today))) continue
     const item: BuyItem = {
       key: name, name, cat: STAPLE_SHOP_CAT, unit: product.unit, required: inCovered?.required ?? 0, fromPantry: 0, substitutes: [], packs: 1, product,
@@ -484,8 +588,9 @@ export function planWeek(
     buy.push(item)
   }
 
-  // Vorrat simulieren: aktueller Vorrat + noch nicht Gekauftes − offene Gerichte
+  // Vorrat simulieren: aktueller Vorrat + noch nicht Gekauftes − offene Gerichte (ohne Einkäufe: was wirklich frei ist)
   const lots = pantry.map((l) => ({ ...l }))
+  const free = pantry.map((l) => ({ ...l }))
   for (const b of buy) {
     if (bought[b.name]) continue
     lots.push({ id: 'v-' + b.name, name: b.name, amount: b.packs * b.product.pack, unit: b.unit, expires: addDaysIso(today, b.product.shelf) })
@@ -493,7 +598,10 @@ export function planWeek(
   // erst die noch offenen Gerichte vor dieser Woche, dann die dieser Woche
   for (const [day, e] of [...earlier, ...entries]) {
     if (e.status === 'cooked') continue
-    for (const n of allNeedsOf(RECIPE_BY_ID[e.recipeId], e.servings)) consume(lots, n.name, n.amount, day < today ? today : day)
+    for (const n of allNeedsOf(RECIPE_BY_ID[e.recipeId], e.servings)) {
+      consume(lots, n.name, n.amount, day < today ? today : day)
+      consume(free, n.name, n.amount, day < today ? today : day)
+    }
   }
 
   // Gewürze, die „alle“ sind: stehen als echter Artikel auf der Liste (abgehakt → wieder „da“)
@@ -517,7 +625,7 @@ export function planWeek(
     recipes: [...s.recipes],
   }))
 
-  return { buy, covered, staples: stapleItems, total, leftovers: lots }
+  return { buy, covered, staples: stapleItems, total, leftovers: lots, pantryLeft: free }
 }
 
 // ───────────── Empfehlungen ─────────────
@@ -651,12 +759,8 @@ export function insight(
   let longLasting = true
   for (const n of needs) {
     const prod = productFor(n.name, overrides, opts.month)!
-    const byExpiry = (x: PantryLot, y: PantryLot) => x.expires.localeCompare(y.expires)
-    const subNames = new Set(substitutesFor(n.name))
-    const cand = [
-      ...leftovers.filter((l) => l.name === n.name).sort(byExpiry),
-      ...leftovers.filter((l) => subNames.has(l.name) && l.unit === prod.unit).sort(byExpiry),
-    ]
+    // gleiche Reihenfolge wie beim Abziehen; am Kochtag Abgelaufenes zählt nicht
+    const cand = lotsFor(leftovers, n.name, opts.day ?? today).filter((l) => l.name === n.name || l.unit === prod.unit)
     let rest = n.amount
     let have = 0
     const used: PantryLot[] = []

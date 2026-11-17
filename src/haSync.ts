@@ -8,7 +8,7 @@ import { HaError } from './homeassistant'
 import { addDaysIso } from './kitchen'
 import type { PantryLot } from './kitchen'
 import { weighedThisWeek, type WeighIn } from './progress'
-import { formatAmount, isBought, missingPacks, packText, scale } from './shopping'
+import { forDaysText, formatAmount, isBought, missingPacks, packText, scale } from './shopping'
 import { type HaSettings, isoDate, parseIso, weekDays } from './store'
 import type { BuyItem } from './kitchen'
 import type { WeekPlan } from './types'
@@ -34,7 +34,9 @@ export interface RemoteTodo {
 export function todoSummary(it: BuyItem): string {
   const partly = !isBought(it) && it.bought > 0
   const amt = partly ? `noch ${missingPacks(it)} ${it.product.packName ?? 'Stk'}` : packText(it)
-  return amt ? `${it.name} – ${amt}` : it.name
+  const base = amt ? `${it.name} – ${amt}` : it.name
+  // ab Samstag: Bedarf für Sa/So der laufenden Woche kenntlich machen
+  return it.forDays?.length ? `${base} (${forDaysText(it)})` : base
 }
 
 /** Was Yami in die HA-Liste schicken will: alle Artikel der Woche (Vorrat-prüfen-Zutaten und eigene Artikel nicht) */

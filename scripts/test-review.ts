@@ -49,7 +49,7 @@ ok(r.food.waste.count === 0, 'Nichts weggeworfen')
 // Abgelaufenen Posten entfernen → Verschwendung erfasst
 const lot: PantryLot = { id: 'l1', name: 'Champignons', amount: 400, unit: 'g', expires: '2026-11-18' }
 const w1 = discardWaste(lot, '2026-11-20')
-ok(!!w1 && w1.value > 0 && w1.date === '2026-11-20', 'Entfernen eines abgelaufenen Postens → weggeworfen mit Wert')
+ok(!!w1 && w1.value > 0 && w1.date === '2026-11-18', 'Entfernen eines abgelaufenen Postens → weggeworfen mit Wert, datiert aufs Ablaufdatum')
 ok(discardWaste({ ...lot, expires: '2026-12-01' }, '2026-11-20') === null, 'Frischer Posten zählt nicht als weggeworfen')
 
 // Automatisch: vor > 7 Tagen abgelaufen
@@ -59,6 +59,10 @@ const mv = moveExpired([old, fresh], [], '2026-11-20')
 ok(mv.changed && mv.pantry.length === 1 && mv.pantry[0].id === 'l3' && mv.wasted.length === 1 && mv.wasted[0].name === 'Sahne', 'Auto: >7 Tage abgelaufen wandert in „weggeworfen“')
 const mv2 = moveExpired(mv.pantry, mv.wasted, '2026-11-20')
 ok(!mv2.changed && mv2.wasted.length === 1, 'Idempotent')
+// Regression: datiert aufs Ablaufdatum, nicht auf den Tag des Wegräumens (sonst landet es in der falschen Woche)
+ok(mv.wasted[0].date === '2026-11-10', 'Auto: Datum = Ablaufdatum (10.11.), nicht der 20.11.')
+const late = moveExpired([{ ...old, expires: '2026-11-20' }], [], '2026-12-20')
+ok(late.wasted[0].date === '2026-11-20', 'App einen Monat zu: trotzdem in der Woche des Ablaufs')
 
 // Tipps
 ok(r.tip.kind === 'ok', 'Tipp: Ermutigung bei guter Woche')

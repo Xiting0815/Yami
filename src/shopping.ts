@@ -58,3 +58,10 @@ export function packText(it: BuyItem): string {
   if (!p.packName) return formatAmount(packs * p.pack, p.unit)
   return p.pack === 1 ? `${packs} ${p.packName}` : `${packs} ${p.packName} (${formatAmount(p.pack, p.unit)})`
 }
+
+/** „für Sa, So“ – Teil des Bedarfs für die restlichen Tage der laufenden Woche (Liste der nächsten Woche ab Samstag) */
+export function forDaysText(it: Pick<BuyItem, 'forDays'>): string {
+  if (!it.forDays?.length) return ''
+  const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+  return `für ${it.forDays.map((d) => WD[new Date(d + 'T12:00:00').getDay()]).join(', ')}`
+}

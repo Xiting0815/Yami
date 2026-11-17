@@ -3,10 +3,10 @@
 import { RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { PRODUCTS } from '../src/data/products'
 import {
-  addDaysIso, cookDue, discardWaste, insight, lastSeenMap, moveExpired, pantryAmount, planWeek, uncook,
+  addDaysIso, consume, cookDue, discardWaste, insight, lastSeenMap, moveExpired, pantryAmount, planWeek, unbuy, uncook,
   type PantryLot, type WeekResult,
 } from '../src/kitchen'
-import { assignBreakfasts, prepPlan, resolvePrepDay, workdays } from '../src/breakfast'
+import { applyBreakfastPicks, assignBreakfasts, prepPlan, resolvePrepDay, workdays } from '../src/breakfast'
 import { dayBalance } from '../src/energy'
 import { buildModel, pendingRating, preference } from '../src/learning'
 import { weekReview, defaultReviewMonday } from '../src/review'
@@ -70,10 +70,10 @@ function tick(s: AppState, today: string): AppState {
   const staples = rememberStaples(next.staples, next.pantry)
   return staples === next.staples ? next : { ...next, staples }
 }
-function week(s: AppState, days: string[], today: string): WeekResult {
-  return planWeek(s.plan, days, s.pantry, s.bought[days[0]] ?? {}, today, s.prices, formatAmount, s.breakfast, parseIso(today).getMonth() + 1, { memo: s.staples, spices: s.spices })
+function week(s: AppState, days: string[], today: string, carry = false): WeekResult {
+  return planWeek(s.plan, days, s.pantry, s.bought[days[0]] ?? {}, today, s.prices, formatAmount, s.breakfast, parseIso(today).getMonth() + 1, { memo: s.staples, spices: s.spices, carry })
 }
-/** „Was koche ich damit?“ → Tag: Stapel wie in App.tsx (Vorrats-Modus) */
+/** „Was koche ich damit?“ → Tag: Stapel wie in App.tsx (Vorrats-Modus: echter Vorrat ohne geplante Einkäufe) */
 function pantryDeck(s: AppState, days: string[], day: string, today: string) {
   const w = week(s, days, today)
   const taste = buildModel({ plan: s.plan, breakfast: s.breakfast, breakfastPicks: s.breakfastPicks, rejects: s.rejects, ratings: s.ratings, wasted: s.wasted, today, customRecipes: s.customRecipes })
@@ -82,7 +82,7 @@ function pantryDeck(s: AppState, days: string[], day: string, today: string) {
   const freshDays = Math.max(0, Math.round((parseIso(day).getTime() - parseIso(today > days[0] ? today : days[0]).getTime()) / 864e5))
   return RECIPES.filter((r) => !planned.has(r.id))
     .map((r) => {
-      const ins = insight(r, s.defaultServings, w.leftovers, today, s.prices, lastSeenMap(s.plan, days[0]), 0.5, weekRecipes, { freshDays, month: parseIso(day).getMonth() + 1, day })
+      const ins = insight(r, s.defaultServings, w.pantryLeft, today, s.prices, lastSeenMap(s.plan, days[0]), 0.5, weekRecipes, { freshDays, month: parseIso(day).getMonth() + 1, day })
       return { r, ins, key: ins.modeScore + preference(taste, r, day).score * 0.3 }
     })
     .filter((x) => x.ins.fromPantry.length > 0)
@@ -97,6 +97,10 @@ console.log('  Stapel:', deck.slice(0, 5).map((x) => `${x.r.id} (${x.key.toFixed
 const DISH = 'haehnchen-rahm-bandnudeln'
 ok(deck[0].r.id === DISH, 'oberste Karte: Hähnchen-Champignon-Rahm mit Bandnudeln')
 ok(deck[0].ins.urgent.includes('Hähnchenbrustfilet'), 'Hähnchen als „läuft bald ab“ markiert')
+// Regression: Karte „x von y Zutaten da · Zukauf“ aus dem echten Vorrat – nicht mit der Petersilie, die erst fürs Frühstück gekauft wird
+ok(deck[0].ins.haveCount === 4 && deck[0].ins.needCount === 6 && near(deck[0].ins.buyCost, 2.18, 0.005), 'Karte: 4 von 6 Zutaten da, Zukauf 2,18 € (Zwiebel + Petersilie)')
+const wPlan = week(state, days1, today)
+ok(wPlan.leftovers.some((l) => l.name === 'Petersilie') && !wPlan.pantryLeft.some((l) => l.name === 'Petersilie'), 'pantryLeft ohne geplante Einkäufe, leftovers mit')
 // genommen für Montag
 state = { ...state, plan: { ...state.plan, [MON]: { recipeId: DISH, servings: 2 } } }
 const w1 = week(state, days1, today)
@@ -111,6 +115,12 @@ ok(['Bandnudeln', 'Hähnchenbrustfilet', 'Sahne', 'Champignons'].every((x) => co
 ok(!buyNames.includes('Ei') && !buyNames.includes('Tellerlinsen') && !buyNames.includes('Olivenöl'), 'Frühstück: Ei, Linsen, Öl aus dem Vorrat')
 ok(buyNames.includes('Muskatnuss') && !buyNames.includes('Pfeffer') && !checkNames.includes('Pfeffer'), 'Gewürze: Muskatnuss „alle“ auf der Liste, Pfeffer „da“ nicht')
 ok(!buyNames.some((x) => x.startsWith('Gemüsebrühe')), 'Gemüsebrühe reicht – nicht auf der Liste')
+// Regression: Sonnenblumenöl ← Olivenöl, Hühnerbrühe ← (Notlösung) Gemüsebrühe – gedeckt statt „Vorrat prüfen“
+ok(!checkNames.includes('Sonnenblumenöl') && !checkNames.includes('Hühnerbrühe'), 'Sonnenblumenöl/Hühnerbrühe nicht mehr bei „Vorrat prüfen“')
+const sbo = w1.covered.find((b) => b.name === 'Sonnenblumenöl')
+const hb = w1.covered.find((b) => b.name === 'Hühnerbrühe')
+ok(!!sbo && sbo.substitutes[0]?.name === 'Olivenöl' && near(sbo.substitutes[0].amount, 30), 'Sonnenblumenöl: 30 ml aus dem Olivenöl')
+ok(!!hb && hb.substitutes[0]?.name === 'Gemüsebrühe Würfel' && near(hb.substitutes[0].amount, 100), 'Hühnerbrühe: 100 ml aus den Gemüsebrühwürfeln')
 const eggs = w1.covered.find((b) => b.name === 'Ei')!
 ok(near(eggs.required, 7), 'Ei: 3× Brot-Box (2) + 1× Linsen-Ei-Salat (1) = 7 Stk')
 // Home Assistant: was in die geteilte Liste geht
@@ -132,7 +142,9 @@ ok(near(amt(state, 'Hähnchenbrustfilet'), 0) && near(amt(state, 'Champignons'),
 const oil = amt(before, 'Olivenöl') - amt(state, 'Olivenöl')
 const broth = amt(before, 'Gemüsebrühe Würfel') - amt(state, 'Gemüsebrühe Würfel')
 console.log(`  Olivenöl −${oil} ml, Gemüsebrühe −${broth} ml (Rezept: 2 EL Sonnenblumenöl, 100 ml Hühnerbrühe)`)
-ok(oil === 0 && broth === 0, 'Öl/Brühe: Rezept nennt Sonnenblumenöl/Hühnerbrühe – andere Sorte wird nicht abgezogen (keine Austauschgruppe)')
+ok(near(oil, 30) && near(broth, 100), 'Öl/Brühe: Olivenöl −30 ml (statt Sonnenblumenöl), Gemüsebrühe −100 ml (Notlösung für Hühnerbrühe)')
+const unOil = uncook(mon, state.pantry)
+ok(near(pantryAmount(unOil, 'Olivenöl'), amt(before, 'Olivenöl')), 'nicht gekocht: Olivenöl wieder voll')
 ok(state.pantry.find((l) => l.name === 'Champignons')!.expires === '2026-11-19', 'angebrochene Champignons: Haltbarkeit 3 Tage ab Kochtag (19.11.)')
 ok(pendingRating(state.plan, state.ratings, today, state.ratingDismissed) === MON, 'Di: Bewertungsfrage für Montag')
 // Rückgängig: „nicht gekocht“ stellt den Vorrat exakt wieder her
@@ -168,8 +180,27 @@ const defMon = (iso: string) => { const d = parseIso(iso); const m = mondayOf(d)
 ok(defMon(today) === '2026-11-23', 'ab Samstag zeigt die App die nächste Woche')
 const deck2 = pantryDeck(state, days2, '2026-11-23', today)
 ok(deck2.length > 0 && deck2[0].r.id !== DISH, 'nächste Woche: Stapel aus dem Vorrat, nicht schon wieder dasselbe Gericht oben')
-// Hinweis (Designfrage, nicht geändert): abgelaufene, noch nicht entfernte Posten zählen weiter als Vorrat (sogar als „dringend“)
-console.log('  abgelaufene Champignons noch im Stapel:', deck2.some((x) => x.ins.fromPantry.includes('Champignons')))
+// Regression: abgelaufene (19.11.), noch nicht entfernte Champignons zählen nicht mehr als Vorrat
+ok(!deck2.some((x) => x.ins.fromPantry.includes('Champignons')), 'abgelaufene Champignons zählen nicht als Vorrat für nächste Woche')
+const ragout = RECIPES.find((r) => r.meal === 'dinner' && r.ingredients.some((i) => i.name === 'Champignons' && (i.amount ?? 0) <= 150))!
+const wCh = week({ ...state, plan: { ...state.plan, '2026-11-24': { recipeId: ragout.id, servings: 2 } } }, days2, today)
+ok(wCh.buy.some((b) => b.name === 'Champignons'), `abgelaufene Champignons decken ${ragout.title} nicht → auf der Liste`)
+ok(consume(state.pantry.map((l) => ({ ...l })), 'Champignons', 100, today).length === 0, 'Abziehen nimmt keine abgelaufenen Posten')
+ok(state.pantry.some((l) => l.name === 'Champignons'), '… sie bleiben aber sichtbar im Vorrat, bis sie entfernt werden')
+
+// Regression Samstag: Liste der nächsten Woche nimmt auch mit, was für So (laufende Woche) noch fehlt
+{
+  const sun = '2026-11-22'
+  const s5 = { ...state, plan: { ...state.plan, [sun]: { recipeId: 'huehnerfrikassee', servings: 2 } } }
+  const wc = week(s5, days2, today, true)
+  const sp = wc.buy.find((b) => b.name === 'Spargel weiß')
+  ok(!!sp && sp.forDays?.join() === sun, 'Sa: Spargel für So steht auf der Liste der nächsten Woche (für So)')
+  ok(!week(s5, days2, today).buy.some((b) => b.name === 'Spargel weiß'), '… nur mit carry (also nicht für Wochen weiter weg)')
+  const li = localItems(wc.buy).find((i) => i.key === 'Spargel weiß')!
+  ok(/\(für So\)$/.test(li.summary), `HA-Text markiert: ${li.summary}`)
+  const d = diffTodo(localItems(wc.buy), [{ uid: 'u1', summary: li.summary, status: 'needs_action', description: 'Yami' }], { 'Spargel weiß': 'u1' })
+  ok(d.remove.length === 0 && d.items['Spargel weiß'] === 'u1', 'HA: offener Eintrag für So wird beim Wochenwechsel nicht gelöscht')
+}
 state = { ...state, plan: { ...state.plan, '2026-11-23': { recipeId: deck2[0].r.id, servings: 2 } } }
 const w2 = week(state, days2, today)
 ok(Number.isFinite(w2.total) && w2.buy.every((b) => b.packs > 0 && Number.isFinite(b.cost)), 'Einkaufsliste nächste Woche: Packungen und Preise gültig')
@@ -180,6 +211,7 @@ state = tick(state, today)
 const ch = state.pantry.find((l) => l.name === 'Champignons')!
 const waste = discardWaste(ch, today, state.prices)
 ok(!!waste && near(waste.amount, 150) && waste.value > 0, 'Champignons entfernt → als weggeworfen erfasst (150 g)')
+ok(waste!.date === '2026-11-19', 'weggeworfen datiert aufs Ablaufdatum (angebrochen bis 19.11.)')
 state = { ...state, pantry: state.pantry.filter((l) => l !== ch), wasted: [...state.wasted, waste!] }
 ok(defaultReviewMonday(today) === MON, 'Sonntag: Rückblick für die Woche ab 16.11.')
 const rev = weekReview(state, days1, today)
@@ -201,6 +233,29 @@ ok(resolvePrepDay(state.prepDays, days2, today) === '2026-11-22', 'nächste Woch
 // ───── 29.11.: nicht entfernte, abgelaufene Posten wandern nach 7 Tagen in „weggeworfen“ ─────
 const s2 = tick({ ...state, pantry: [...state.pantry, lot('Schmand', 100, '2026-11-20')] }, '2026-11-28')
 ok(!s2.pantry.some((l) => l.expires === '2026-11-20') && s2.wasted.some((w) => w.name === 'Schmand'), '8 Tage nach Ablauf automatisch weggeworfen')
+
+// Regression: Einkauf wieder abwählen, nachdem schon damit gekocht wurde
+{
+  const zw = { id: 'kauf-zw', name: 'Zwiebel', amount: 10, unit: 'Stk', expires: '2026-12-20' }
+  const p0: WeekPlan = { [MON]: { recipeId: DISH, servings: 2 } }
+  const c = cookDue(p0, [zw], '2026-11-17')
+  ok(near(pantryAmount(c.pantry, 'Zwiebel'), 9) && c.plan[MON]!.consumed!.some((x) => x.id === 'kauf-zw'), 'gekocht: 1 Zwiebel aus dem gekauften Netz')
+  const u = unbuy(c.pantry, [c.plan], 'kauf-zw', 10)
+  ok(pantryAmount(u.pantry, 'Zwiebel') === 0 && !u.plans[0][MON]!.consumed!.some((x) => x.id === 'kauf-zw'), 'abgewählt: Rest (9) weg, Verweis im Gericht gestrichen')
+  ok(pantryAmount(uncook(u.plans[0][MON]!, u.pantry), 'Zwiebel') === 0, '„nicht gekocht“ danach bringt keine Zwiebel aus dem Nichts zurück')
+  const keep = unbuy([zw], [p0], 'kauf-zw', 10)
+  ok(keep.pantry.length === 0 && keep.plans[0] === p0, 'ungebraucht abgewählt: Posten weg, Plan unverändert')
+}
+
+// Regression: Frühstück mitten in der Woche neu wählen/zurücksetzen gibt Gegessenes nicht zurück
+{
+  const s7 = tick(sanitize({ breakfast, breakfastPicks: { [MON]: BF }, prepDays: { [MON]: MON }, pantry: pantry0, onboarding: 'done' }), '2026-11-19')
+  ok(s7.breakfast['2026-11-17']!.status === 'cooked' && s7.breakfast['2026-11-18']!.status === 'cooked', 'Do 19.11.: Frühstück Di/Mi gegessen')
+  const reset = applyBreakfastPicks(s7.breakfast, [], days1, MON, '2026-11-19')
+  ok(reset['2026-11-17']?.status === 'cooked' && reset['2026-11-18']?.status === 'cooked' && !reset['2026-11-19'] && !reset['2026-11-20'], 'Zurücksetzen: Di/Mi bleiben, Do/Fr leer')
+  const re = applyBreakfastPicks(s7.breakfast, ['oats-beeren'], days1, MON, '2026-11-19')
+  ok(re['2026-11-17']?.recipeId === 'brot-box' && re['2026-11-19']?.recipeId === 'oats-beeren', 'Neu wählen: nur Do/Fr bekommen das neue Frühstück')
+}
 
 console.log(fails ? `\n${fails} Fehler` : '\nAlle Tests OK')
 if (fails) process.exit(1)

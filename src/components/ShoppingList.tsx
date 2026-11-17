@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { ShopCat } from '../types'
 import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER } from '../types'
-import { formatAmount, isBought, missingPacks, packText } from '../shopping'
+import { forDaysText, formatAmount, isBought, missingPacks, packText } from '../shopping'
 import type { CustomItem } from '../store'
 import { type BuyItem, type WeekResult, formatEuro } from '../kitchen'
 
@@ -38,7 +38,8 @@ export function ShoppingList(props: Props) {
   const [showCovered, setShowCovered] = useState(false)
   const checkedSet = new Set(checked)
 
-  if (planned === 0 && custom.length === 0) {
+  // leer nur, wenn auch nichts für Sa/So der laufenden Woche fehlt (ab Samstag zeigt die Liste schon die nächste Woche)
+  if (planned === 0 && custom.length === 0 && !result.buy.some((b) => b.forDays?.length)) {
     return (
       <div className="empty-state">
         <div className="big-emoji">🛒</div>
@@ -96,6 +97,7 @@ export function ShoppingList(props: Props) {
                       <span className="item-name">
                         {it.name}
                         {it.note && <small className="item-note">{NOTE_TEXT[it.note]}</small>}
+                        {it.forDays && <small className="item-note">{forDaysText(it)}</small>}
                       </span>
                       <span className="item-amt">
                         {partly ? `noch ${missingPacks(it)} ${it.product.packName ?? 'Stk'}` : packText(it)}
