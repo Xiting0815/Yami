@@ -2,7 +2,8 @@ import type { PlanEntry, Recipe } from '../../types'
 import { type PortionFeedback, type Rating, portionFactor } from '../../learning'
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
-import { cookDue, cookNow, uncook } from '../../kitchen'
+import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
+import { formatAmount } from '../../shopping'
 import type { ActionContext } from './context'
 
 /** Abendessen planen: Wischen, Nehmen/Wegwischen, Tage leeren, gekocht/nicht gekocht, Bewertung, Woche wechseln */
@@ -39,6 +40,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
   }
 
   function take(recipe: Recipe, day: string, servings = state.defaultServings) {
+    if (recipe.basic) return // Grundrezepte sind kein Abendessen
     const snap = snapshot()
     setEntry(day, { recipeId: recipe.id, servings })
     if (ui.pantryMode) {
@@ -60,6 +62,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
 
   /** Rezept aus dem Rezepte-Tab direkt auf einen Tag legen */
   function planOn(recipe: Recipe, day: string) {
+    if (recipe.basic) return
     const snap = snapshot()
     setEntry(day, { recipeId: recipe.id, servings: state.defaultServings })
     flash(`${recipe.title} → ${weekdayName(day)} ✓`, snap)
@@ -158,9 +161,24 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
     ui.setRateDay(t.day)
   }
 
+  /**
+   * Grundrezept „Fertig gekocht“ (z. B. Brauner Rinderfond): Zutaten vom Vorrat abziehen und das Ergebnis als Posten
+   * (eingefroren, Haltbarkeit aus `yields`) in den Vorrat legen. Kein Planeintrag, keine Bewertung; Rückgängig über den Toast.
+   */
+  function finishBasic(recipe: Recipe, servings: number) {
+    const y = recipe.yields
+    if (!recipe.basic || !y) return
+    const snap = snapshot()
+    const amount = (y.amount * servings) / recipe.servings
+    setState((s) => ({ ...s, pantry: cookBasic(s.pantry, recipe, servings, today).pantry }))
+    flash(`${formatAmount(amount, y.unit)} ${y.name} im Vorrat ✓`, snap)
+    ui.setCooking(false)
+    ui.setSheet(null)
+  }
+
   function dismissRating(day: string) {
     setState((s) => ({ ...s, ratingDismissed: [...s.ratingDismissed, day].slice(-60) }))
   }
 
-  return { setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, dismissRating }
+  return { setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, finishBasic, dismissRating }
 }

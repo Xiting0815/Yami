@@ -57,6 +57,17 @@ export interface Nutrition {
   fiber: number
 }
 
+/** Grundrezept (Fond, Jus …): was ein Ansatz ergibt – kommt beim „Fertig gekocht“ als Posten in den Vorrat */
+export interface BasicYield {
+  /** Zutat im Vorrat, z. B. „Rinderfond selbstgemacht“ (muss Katalog, Produkt und Nährwerte haben) */
+  name: string
+  /** Menge je Ansatz (in der Basiseinheit des Produkts) */
+  amount: number
+  unit: string
+  /** Tage haltbar (eingefroren) */
+  shelf: number
+}
+
 export interface Recipe {
   id: string
   title: string
@@ -94,6 +105,12 @@ export interface Recipe {
   festive?: Festive[]
   /** selbst angelegtes Rezept (Id beginnt mit "my-") */
   custom?: boolean
+  /**
+   * Grundrezept (z. B. Brauner Rinderfond): nicht im Wischstapel, nicht planbar, zählt nicht für Abwechslung,
+   * Veggie-Quote oder Geschmack. „Fertig gekocht“ zieht die Zutaten ab und legt `yields` in den Vorrat.
+   */
+  basic?: true
+  yields?: BasicYield
 }
 
 /** Küchengeräte im Haushalt */

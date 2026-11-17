@@ -1,9 +1,9 @@
 /** Küchenlogik – Vorrat: Posten verbrauchen, Wegwerfen, Kochen/Zurücknehmen, Einkauf zurücknehmen. */
 import { PRODUCTS } from '../data/products'
 import { RECIPE_BY_ID } from '../data/recipes'
-import { substituteTiers, substitutesFor } from '../data/substitutes'
-import type { PlanEntry, WeekPlan } from '../types'
-import { type PantryLot, type WastedItem, WASTED_MAX, WASTE_AFTER_DAYS, type PriceOverrides, addDaysIso, daysUntil, minIso, productFor, allNeedsOf } from './base'
+import { ownTiers, substituteTiers, substitutesFor } from '../data/substitutes'
+import type { PlanEntry, Recipe, WeekPlan } from '../types'
+import { type PantryLot, type WastedItem, WASTED_MAX, WASTE_AFTER_DAYS, type PriceOverrides, addDaysIso, daysUntil, minIso, productFor, allNeedsOf, uid } from './base'
 
 export function pantryAmount(lots: PantryLot[], name: string): number {
   return lots.filter((l) => l.name === name).reduce((s, l) => s + l.amount, 0)
@@ -18,10 +18,16 @@ export function pantryCovering(lots: PantryLot[], name: string): number {
 /** Ist ein Posten an diesem Tag noch gut? (Haltbarkeit = letzter guter Tag) – Abgelaufenes zählt nicht mehr als Vorrat */
 export const usableOn = (lot: { expires: string; amount: number }, day: string) => lot.amount > 1e-6 && lot.expires >= day
 
-/** Posten, die den Bedarf an `name` decken können, in Entnahme-Reihenfolge: Zutat selbst, dann Ersatz-Stufen; je Stufe frühestes Ablaufdatum zuerst */
+/**
+ * Posten, die den Bedarf an `name` decken können, in Entnahme-Reihenfolge: Zutat selbst (bei Vorrang zuerst die
+ * bevorzugte, z. B. selbstgemachter Fond vor gekauftem), dann Ersatz-Stufen; je Stufe frühestes Ablaufdatum zuerst.
+ * `exactOnly`: nur die eigene Stufe (Zutat selbst bzw. bevorzugte + Zutat).
+ */
 export function lotsFor<T extends PantryLot>(lots: T[], name: string, day: string, exactOnly = false): T[] {
   const byExpiry = (a: T, b: T) => a.expires.localeCompare(b.expires)
-  const tiers = exactOnly ? [[name]] : [[name], ...substituteTiers(name)]
+  const own = ownTiers(name)
+  const ownNames = own.flat()
+  const tiers = exactOnly ? own : [...own, ...substituteTiers(name).map((t) => t.filter((n) => !ownNames.includes(n))).filter((t) => t.length)]
   return tiers.flatMap((t) => lots.filter((l) => t.includes(l.name) && usableOn(l, day)).sort(byExpiry))
 }
 
@@ -110,6 +116,28 @@ export function cookNow(plan: WeekPlan, pantry: PantryLot[], day: string, entry:
   const base = old?.status ? uncook(old, pantry) : pantry
   const r = cookDue({ [day]: { recipeId: entry.recipeId, servings: entry.servings } }, base, addDaysIso(day, 1), factor)
   return { plan: { ...plan, [day]: r.plan[day]! }, pantry: r.pantry }
+}
+
+/**
+ * Grundrezept fertig gekocht (z. B. Brauner Rinderfond): Zutaten vom Vorrat abziehen und das Ergebnis als neuen
+ * Posten anlegen (Menge × Ansätze, Haltbarkeit eingefroren ab heute). Ausgangsvorrat bleibt unverändert.
+ */
+export function cookBasic(
+  pantry: PantryLot[],
+  recipe: Recipe,
+  servings: number,
+  day: string,
+  id = uid(),
+): { pantry: PantryLot[]; lot: PantryLot | null; consumed: PantryLot[] } {
+  const lots = pantry.map((l) => ({ ...l }))
+  const consumed: PantryLot[] = []
+  for (const n of allNeedsOf(recipe, servings)) consumed.push(...consume(lots, n.name, n.amount, day))
+  const y = recipe.yields
+  if (!recipe.basic || !y) return { pantry: lots, lot: null, consumed }
+  const unit = PRODUCTS[y.name]?.unit ?? y.unit
+  const lot: PantryLot = { id, name: y.name, amount: (y.amount * servings) / recipe.servings, unit, expires: addDaysIso(day, y.shelf) }
+  lots.push(lot)
+  return { pantry: lots, lot, consumed }
 }
 
 /** "Nicht gekocht": entnommene Mengen zurück in den Vorrat */

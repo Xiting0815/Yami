@@ -38,12 +38,12 @@ const PROTEIN_RULES: [RegExp, string][] = [
   [/hack/i, 'Hackfleisch'],
   [/lachs|kabeljau|seelachs|dorade|scholle|matjes|rollmops|garnel|krabben|muschel|thunfisch|sardell/i, 'Fisch'],
   [/hähnchen|huhn|ente|gans|gänse/i, 'Geflügel'],
-  [/rind|tafelspitz|rumpsteak|suppenfleisch|corned/i, 'Rind'],
+  [/rind|tafelspitz|rumpsteak|suppenfleisch|corned|ochs|roastbeef/i, 'Rind'],
   [/kalb/i, 'Kalb'],
   [/lamm/i, 'Lamm'],
   [/gyros/i, 'Schwein'],
   [/wurst|würstchen|mettend|cabanossi|salami|salsiccia|leberkäse|pinkel|bockwurst/i, 'Wurst'],
-  [/schwein|kasseler|speck|bacon|schinken|guanciale|pancetta|bauch|haxe/i, 'Schwein'],
+  [/schwein|kasseler|speck|bacon|schinken|guanciale|pancetta|bauch|haxe|schäufele/i, 'Schwein'],
 ]
 
 /** Hauptzutat eines Gerichts (größte Fleisch-/Fischmenge), sonst „vegetarisch“ */

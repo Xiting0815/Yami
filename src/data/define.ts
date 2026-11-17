@@ -1,4 +1,4 @@
-import type { BreakfastType, Cuisine, DishType, Festive, Ingredient } from '../types'
+import type { BasicYield, BreakfastType, Cuisine, DishType, Festive, Ingredient } from '../types'
 
 /** Erlaubte Einheiten. Die Reihenfolge ist egal, Schreibweise zählt. */
 export const UNITS = [
@@ -20,6 +20,9 @@ export interface RawRecipe {
   /** Festtagsgericht (Zeitfenster) */
   festive?: Festive[]
   breakfast?: { type: BreakfastType; fridgeDays: number; freezer: boolean; container: string; morning: string }
+  /** Grundrezept (Fond …), siehe `basic()` */
+  basic?: true
+  yields?: BasicYield
 }
 
 /**
@@ -93,4 +96,12 @@ export function b(
 /** Rezept als Festtagsgericht markieren */
 export function fest(rec: RawRecipe, ...windows: Festive[]): RawRecipe {
   return { ...rec, festive: windows }
+}
+
+/**
+ * Grundrezept (Fond, Jus …): Mengen für 1 Ansatz. `yields` = was der Ansatz ergibt (kommt beim „Fertig gekocht“
+ * in den Vorrat, Haltbarkeit eingefroren). Grundrezepte sind keine Abendessen: nicht im Stapel, nicht planbar.
+ */
+export function basic(id: string, title: string, time: number, yields: BasicYield, ingredients: string, steps: string[], img?: string): RawRecipe {
+  return { id, title, cuisine: 'de', type: 'haupt', time, ingredients: splitIngredients(ingredients), steps, img, servings: 1, basic: true, yields }
 }

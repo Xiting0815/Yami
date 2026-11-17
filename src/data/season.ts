@@ -30,6 +30,8 @@ export const SEASON: Record<string, number[]> = {
   'Kirschtomaten': [7, 8, 9],
   'Kohlrabi': [5, 6, 7, 8, 9, 10, 11],
   'Kopfsalat': [5, 6, 7, 8, 9, 10],
+  // Esskastanien: frische Ernte Okt.–Dez.; vorgegarte gibt es ganzjährig, im Herbst/Winter aber günstiger und überall
+  'Maronen vorgegart': [10, 11, 12, 1],
   'Paprika gelb': [7, 8, 9],
   'Paprika grün': [7, 8, 9],
   'Paprika rot': [7, 8, 9],

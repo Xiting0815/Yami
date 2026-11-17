@@ -869,6 +869,140 @@ export const recipesDe = [
       'Spätzle in Butter schwenken oder nach Packung erhitzen. Braten aufschneiden und mit Rahmsauce und Spätzle servieren.',
     ], 'veal roast cream sauce spaetzle'),
 
+  // ───────────── Gehobene Braten (Wochenendprojekte; Fond: gekauft oder Grundrezept) ─────────────
+  r('rinderschmorbraten-rotwein', 'Rinderschmorbraten in Rotweinsauce mit Serviettenknödeln und Apfelrotkohl', 'de', 'haupt', 210,
+    '800 g Rinderbraten aus der Keule | 2 EL Butterschmalz | 2 Stk Zwiebel | 2 Stk Möhre | 150 g Knollensellerie | 1 EL Tomatenmark | 400 ml Rotwein | 400 ml Rinderfond | 1 Blatt Lorbeerblatt | 4 Stk Wacholderbeere | 2 Zweig Thymian | 4 Stk Brötchen vom Vortag | 200 ml Milch | 2 Stk Ei | 0.5 Bund Petersilie | 40 g Butter | 500 g Rotkohl | 1 Stk Apfel | 2 EL Rotweinessig | 1 EL Zucker | 2 Stk Nelke | Muskatnuss | Salz | Pfeffer',
+    [
+      'Den Rinderbraten salzen, pfeffern und im Butterschmalz im Bräter rundum kräftig anbraten, dann herausnehmen. 1 Zwiebel, Möhren und Sellerie grob würfeln und im Bratfett anrösten, das Tomatenmark kurz mitrösten.',
+      'Mit dem Rotwein in drei Portionen ablöschen und jeweils fast ganz einkochen lassen. Rinderfond, Lorbeer, Wacholderbeeren und Thymian zugeben, den Braten einlegen und zugedeckt bei 150 °C ca. 2,5 Stunden schmoren, bis eine Gabel leicht hineingleitet.',
+      'Für die Serviettenknödel die Brötchen würfeln, mit warmer Milch übergießen und 15 Minuten ziehen lassen. Die zweite Zwiebel fein würfeln und in 10 g Butter glasig dünsten. Mit Eiern, gehackter Petersilie, Salz und Muskat unter die Brötchen kneten.',
+      'Die Masse zu einer Rolle (ca. 7 cm dick) formen, fest in gebutterte Frischhaltefolie oder ein Tuch wickeln, die Enden abbinden und 35 Minuten über Dampf garen.',
+      'Den Rotkohl fein hobeln und mit gewürfeltem Apfel, Essig, Zucker, Nelken, Salz und 100 ml Wasser zugedeckt 45 Minuten weich schmoren.',
+      'Den Braten herausnehmen, die Sauce durch ein Sieb passieren, auf ca. 300 ml einkochen und 20 g kalte Butter einschwenken. Knödelscheiben in der restlichen Butter goldbraun braten, den Braten aufschneiden und alles mit Sauce und Rotkohl anrichten.',
+    ], 'braised beef red wine sauce bread dumpling'),
+
+  r('ochsenbaeckchen-spaetburgunder', 'Ochsenbäckchen in Spätburgunder mit Selleriepüree und glasierten Möhren', 'de', 'haupt', 240,
+    '800 g Ochsenbäckchen | 1 EL Weizenmehl | 2 EL Butterschmalz | 2 Stk Schalotte | 5 Stk Möhre | 600 g Knollensellerie | 1 Zehe Knoblauch | 1 EL Tomatenmark | 500 ml Rotwein | 500 ml Rinderfond | 2 Zweig Thymian | 1 Blatt Lorbeerblatt | 150 ml Milch | 50 g Butter | 1 TL Zucker | 0.5 Bund Petersilie | Muskatnuss | Salz | Pfeffer',
+    [
+      'Die Ochsenbäckchen von Fett und Silberhaut befreien, salzen, pfeffern und dünn im Mehl wenden. Im Butterschmalz im Bräter rundum dunkel anbraten und herausnehmen.',
+      'Schalotten, 1 Möhre, 100 g Sellerie und Knoblauch würfeln und im Bratfett anrösten, Tomatenmark mitrösten. Den Rotwein (Spätburgunder) nach und nach angießen und jeweils sirupartig einkochen.',
+      'Rinderfond, Thymian und Lorbeer zugeben, die Bäckchen einlegen und zugedeckt bei 140 °C ca. 3 Stunden schmoren, bis sie butterweich sind.',
+      'Für das Püree den restlichen Sellerie schälen, würfeln und in der Milch mit etwas Salz zugedeckt 20 Minuten weich garen. Mit 30 g Butter fein pürieren und mit Muskat abschmecken.',
+      'Die übrigen Möhren schräg in Scheiben schneiden und mit 20 g Butter, Zucker, Salz und 50 ml Wasser glasieren, bis die Flüssigkeit verkocht ist. Mit Petersilie bestreuen.',
+      'Die Bäckchen herausnehmen, die Sauce passieren und sämig einkochen. Die Bäckchen darin glasieren und mit Püree und Möhren anrichten.',
+    ], 'braised ox cheeks red wine celeriac puree'),
+
+  r('rinderfilet-rotweinjus', 'Rinderfilet rosa mit Rotweinjus, Herzoginkartoffeln und Speckbohnen', 'de', 'haupt', 150,
+    '500 g Rinderfilet | 1 EL Butterschmalz | 2 Zweig Thymian | 2 Stk Schalotte | 200 ml Rotwein | 300 ml Rinderfond | 70 g Butter | 500 g Kartoffeln mehligkochend | 2 Stk Eigelb | 300 g Grüne Bohnen | 6 Scheibe Bacon | Muskatnuss | Salz | Pfeffer',
+    [
+      'Das Rinderfilet 1 Stunde vorher aus dem Kühlschrank nehmen, parieren und mit Küchengarn in Form binden. Direkt vor dem Anbraten salzen und im Butterschmalz rundum höchstens 5 Minuten anbraten, den Thymian kurz mitbraten.',
+      'Das Filet bei 80 °C mit Bratenthermometer garen, bis die Kerntemperatur 54 °C erreicht (ca. 1,5 Stunden). Pfeffern und kurz ruhen lassen.',
+      'Die Kartoffeln schälen und weich garen, die Bohnen putzen und 7 Minuten garen, dann kalt abschrecken.',
+      'Die Kartoffeln ausdampfen lassen, durchpressen und mit Eigelb, 30 g Butter, Salz und Muskat glatt rühren. Mit einem Spritzbeutel Rosetten auf ein Blech spritzen und bei 200 °C ca. 15 Minuten goldbraun backen.',
+      'Die Bohnen zu 6 Bündeln mit je einer Scheibe Bacon umwickeln und in der Pfanne rundum knusprig braten.',
+      'Für den Jus die Schalotten fein würfeln und im Bratensatz anschwitzen. Mit Rotwein ablöschen und fast ganz einkochen, Rinderfond zugeben und auf ein Drittel reduzieren. Durch ein Sieb gießen und 40 g kalte Butter einschwenken. Das Filet aufschneiden und anrichten.',
+    ], 'beef tenderloin medium rare red wine jus duchess potatoes'),
+
+  r('roastbeef-remoulade', 'Roastbeef rosa mit Remoulade und Bratkartoffeln', 'de', 'haupt', 150,
+    '600 g Roastbeef | 2 EL Butterschmalz | 600 g Kartoffeln festkochend | 50 g Speckwürfel | 1 Stk Zwiebel | 100 g Mayonnaise | 100 g Joghurt natur | 2 Stk Gewürzgurke | 1 EL Kapern | 1 TL Senf mittelscharf | 0.5 Bund Petersilie | 0.5 Bund Schnittlauch | Pfeffer schwarz grob | Salz',
+    [
+      'Das Roastbeef 1 Stunde vorher aus dem Kühlschrank nehmen und den Fettdeckel rautenförmig einritzen. Direkt vor dem Anbraten salzen und in 1 EL Butterschmalz rundum höchstens 5 Minuten anbraten, die Fettseite zuerst.',
+      'Bei 80 °C mit Bratenthermometer garen, bis die Kerntemperatur 55 °C erreicht (ca. 2 Stunden). Mit grobem Pfeffer einreiben, ruhen lassen und lauwarm oder kalt hauchdünn aufschneiden.',
+      'Die Kartoffeln mit Schale garen (gern schon am Vortag), pellen und in Scheiben schneiden.',
+      'Für die Remoulade Gewürzgurken, Kapern, Petersilie und Schnittlauch fein hacken und mit Mayonnaise, Joghurt und Senf verrühren. Mit Salz, Pfeffer und etwas Gurkenwasser abschmecken.',
+      'Die Speckwürfel in der Pfanne auslassen, die Kartoffeln im restlichen Butterschmalz goldbraun braten und die gewürfelte Zwiebel die letzten Minuten mitbraten. Salzen, pfeffern und mit Roastbeef und Remoulade servieren.',
+    ], 'roast beef sliced remoulade fried potatoes'),
+
+  r('schaeufele-kloesse', 'Fränkisches Schäufele mit Kartoffelklößen und Speck-Krautsalat', 'de', 'haupt', 210,
+    '1000 g Schäufele | 1 TL Kümmel | 2 Stk Zwiebel | 1 Stk Möhre | 100 g Knollensellerie | 330 ml Dunkelbier | 300 ml Rinderfond | 1 EL Speisestärke | 800 g Kartoffeln mehligkochend | 1 Stk Brötchen vom Vortag | 10 g Butter | 400 g Weißkohl | 50 g Speckwürfel | 3 EL Weißweinessig | 2 EL Sonnenblumenöl | 1 TL Zucker | Salz | Pfeffer',
+    [
+      'Die Schwarte des Schäufele rautenförmig einschneiden, ohne ins Fleisch zu schneiden. Das Fleisch mit Salz, Pfeffer und Kümmel einreiben und mit der Schwarte nach unten in einen Bräter mit 2 cm Wasser legen. Bei 180 °C 30 Minuten garen.',
+      'Das Schäufele umdrehen, Zwiebeln, Möhre und Sellerie grob geschnitten zugeben, das Dunkelbier angießen und bei 170 °C 2 Stunden garen. Dabei immer wieder mit dem Sud übergießen.',
+      'Zum Schluss bei 220 °C 20 Minuten weiterbraten, bis die Schwarte knusprig aufpoppt.',
+      'Für die Klöße 300 g Kartoffeln mit Schale garen, pellen und fein stampfen. Die übrigen Kartoffeln schälen, fein reiben und in einem Tuch kräftig ausdrücken, die abgesetzte Stärke aus dem Saft wieder zugeben. Alles mit Salz zu einem Teig verkneten. Das Brötchen würfeln und in Butter rösten, 6 Klöße formen und je einige Croutons in die Mitte drücken.',
+      'Die Klöße 25 Minuten über Dampf oder in siedendem Salzwasser garen, ohne dass das Wasser sprudelt.',
+      'Für den Krautsalat den Weißkohl fein hobeln und mit Salz kräftig durchkneten. Die Speckwürfel knusprig auslassen und mit Essig, Öl und Zucker unter den Kohl mischen.',
+      'Den Bratensud durch ein Sieb gießen, entfetten, mit Rinderfond aufgießen und etwas einkochen. Mit angerührter Speisestärke binden und abschmecken.',
+    ], 'Schäufele'),
+
+  r('krustenbraten-dunkelbier', 'Krustenbraten vom Schweinebauch mit Dunkelbiersauce, Brezenknödeln und Rosenkohl mit Maronen', 'de', 'haupt', 180,
+    '600 g Schweinebauch mit Schwarte | 1 TL Kümmel | 1 TL Majoran | 2 Zehe Knoblauch | 2 Stk Zwiebel | 1 Stk Möhre | 330 ml Dunkelbier | 200 ml Rinderfond | 1 TL Speisestärke | 3 Stk Laugenbrezel | 150 ml Milch | 2 Stk Ei | 0.5 Bund Petersilie | 30 g Butter | 400 g Rosenkohl | 100 g Maronen vorgegart | 1 TL Zucker | Muskatnuss | Salz | Pfeffer',
+    [
+      'Die Schwarte des Schweinebauchs in 1-cm-Rauten einschneiden. Die Fleischseite mit Salz, Pfeffer, Kümmel, Majoran und Knoblauch einreiben, die Schwarte nur salzen. Mit der Schwarte nach unten in einen Bräter mit 2 cm Wasser legen und bei 170 °C 30 Minuten garen.',
+      'Den Braten umdrehen, 1 Zwiebel und die Möhre grob geschnitten zugeben, das Dunkelbier angießen und bei 160 °C ca. 75 Minuten garen, bis der Kern 75 °C erreicht.',
+      'Für die Kruste bei 220 °C 20 Minuten weiterbraten, bis die Schwarte aufpoppt.',
+      'Für die Brezenknödel die Laugenbrezeln in Würfel schneiden und mit warmer Milch übergießen. Die zweite Zwiebel fein würfeln, in 10 g Butter glasig dünsten und mit Eiern, Petersilie, Salz und Muskat unter die Brezen mischen. 15 Minuten ziehen lassen und 6 Knödel formen.',
+      'Die Knödel in reichlich Salzwasser 20 Minuten sanft ziehen lassen, ohne dass es kocht.',
+      'Den Rosenkohl putzen und in Salzwasser 8 Minuten garen. In der restlichen Butter mit den Maronen und dem Zucker kurz glasieren.',
+      'Den Bratensud durch ein Sieb gießen, entfetten, mit Rinderfond aufgießen, etwas einkochen und mit angerührter Speisestärke binden. Den Braten in Scheiben schneiden und mit Knödeln, Rosenkohl und Sauce servieren.',
+    ], 'crispy pork belly roast crackling dumpling'),
+
+  r('schweinefilet-speckmantel', 'Schweinefilet im Speck-Kräuter-Mantel mit Rahmwirsing und Schupfnudeln', 'de', 'haupt', 60,
+    '500 g Schweinefilet | 8 Scheibe Bacon | 2 Zweig Thymian | 1 Zweig Rosmarin | 0.5 Bund Petersilie | 1 TL Senf mittelscharf | 1 EL Butterschmalz | 500 g Wirsing | 1 Stk Zwiebel | 100 ml Kalbsfond | 150 ml Sahne | 400 g Schupfnudeln | 20 g Butter | Muskatnuss | Salz | Pfeffer',
+    [
+      'Das Schweinefilet parieren, pfeffern und dünn mit Senf bestreichen. Thymian, Rosmarin und Petersilie fein hacken, das Filet darin wälzen und mit den Baconscheiben überlappend umwickeln.',
+      'Im Butterschmalz rundum 4 Minuten anbraten und bei 180 °C ca. 18 Minuten garen, bis der Kern 62 °C erreicht. 5 Minuten ruhen lassen.',
+      'Den Wirsing in feine Streifen schneiden, die Zwiebel würfeln und in 10 g Butter glasig dünsten. Wirsing zugeben, mit Kalbsfond und Sahne aufgießen und 10 Minuten sämig garen. Mit Salz, Pfeffer und Muskat abschmecken.',
+      'Die Schupfnudeln in der restlichen Butter goldbraun braten.',
+      'Das Filet in dicke Scheiben schneiden und mit Rahmwirsing und Schupfnudeln anrichten.',
+    ], 'pork tenderloin wrapped bacon savoy cabbage'),
+
+  r('kalbshuefte-morchelrahm', 'Kalbshüfte rosa mit Morchelrahm und Butterspätzle', 'de', 'haupt', 150,
+    '600 g Kalbshüfte | 1 EL Butterschmalz | 20 g Morcheln getrocknet | 2 Stk Schalotte | 100 ml Weißwein | 200 ml Kalbsfond | 150 ml Sahne | 250 g Weizenmehl | 3 Stk Ei | 40 g Butter | 0.5 Bund Schnittlauch | Muskatnuss | Salz | Pfeffer',
+    [
+      'Die Morcheln in 200 ml lauwarmem Wasser 30 Minuten einweichen. Abgießen, das Einweichwasser durch einen Kaffeefilter auffangen, die Pilze gründlich waschen und große halbieren.',
+      'Die Kalbshüfte 1 Stunde vorher aus dem Kühlschrank nehmen und Sehnen entfernen. Direkt vor dem Anbraten salzen und im Butterschmalz rundum höchstens 5 Minuten anbraten.',
+      'Bei 80 °C mit Bratenthermometer garen, bis die Kerntemperatur 61 °C erreicht (ca. 1,5 bis 2 Stunden). Pfeffern und ruhen lassen.',
+      'Für die Spätzle Mehl, Eier, ca. 80 ml Wasser, Salz und Muskat kräftig schlagen, bis der Teig Blasen wirft, und 10 Minuten ruhen lassen.',
+      'Den Teig portionsweise in siedendes Salzwasser schaben oder drücken. Sobald die Spätzle oben schwimmen, abschöpfen.',
+      'Für den Rahm die Schalotten fein würfeln und in 10 g Butter anschwitzen, die Morcheln 2 Minuten mitdünsten. Mit Weißwein ablöschen und einkochen, Kalbsfond, Einweichwasser und Sahne zugeben und sämig einkochen.',
+      'Die Spätzle in der restlichen Butter schwenken und mit Schnittlauch bestreuen. Die Hüfte aufschneiden und mit Morchelrahm und Spätzle anrichten.',
+    ], 'veal roast morel cream sauce spaetzle'),
+
+  r('kalbsbaeckchen-weissweinrahm', 'Geschmorte Kalbsbäckchen in Weißweinrahm mit Kartoffelpüree und Butter-Erbsen', 'de', 'haupt', 180,
+    '600 g Kalbsbäckchen | 1 EL Weizenmehl | 2 EL Butterschmalz | 2 Stk Schalotte | 1 Stk Möhre | 100 g Knollensellerie | 200 ml Weißwein | 500 ml Kalbsfond | 1 Blatt Lorbeerblatt | 2 Zweig Thymian | 100 ml Sahne | 600 g Kartoffeln mehligkochend | 150 ml Milch | 50 g Butter | 200 g Erbsen TK | Muskatnuss | Salz | Pfeffer',
+    [
+      'Die Kalbsbäckchen parieren, salzen, pfeffern und dünn im Mehl wenden. Im Butterschmalz rundum hell anbraten und herausnehmen.',
+      'Schalotten, Möhre und Sellerie fein würfeln und glasig anschwitzen. Mit Weißwein ablöschen und zur Hälfte einkochen.',
+      'Kalbsfond, Lorbeer und Thymian zugeben, die Bäckchen einlegen und zugedeckt bei 150 °C ca. 2 Stunden schmoren, bis sie weich sind.',
+      'Die Kartoffeln schälen und weich garen. Ausdampfen lassen, durchpressen und mit heißer Milch, 30 g Butter, Salz und Muskat zu Püree rühren.',
+      'Die Erbsen in der restlichen Butter 4 Minuten dünsten und salzen.',
+      'Die Bäckchen herausnehmen, die Sauce passieren, Sahne zugeben und sämig einkochen. Die Bäckchen in der Sauce erwärmen und mit Püree und Erbsen anrichten.',
+    ], 'braised veal cheeks mashed potatoes'),
+
+  r('lammkeule-rosmarinjus', 'Lammkeule rosa mit Rosmarin-Knoblauch-Jus, grünen Bohnen und Kartoffelgratin', 'de', 'haupt', 180,
+    '800 g Lammkeule ohne Knochen | 4 Zehe Knoblauch | 3 Zweig Rosmarin | 1 EL Olivenöl | 600 g Kartoffeln festkochend | 150 ml Sahne | 100 ml Milch | 40 g Gruyère | 40 g Butter | 2 Stk Schalotte | 150 ml Rotwein | 300 ml Lammfond | 300 g Grüne Bohnen | Muskatnuss | Salz | Pfeffer',
+    [
+      'Die Lammkeule 1 Stunde vorher aus dem Kühlschrank nehmen und mit Küchengarn in Form binden. Direkt vor dem Anbraten salzen und im Olivenöl rundum höchstens 5 Minuten anbraten, 2 angedrückte Knoblauchzehen und 2 Zweige Rosmarin kurz mitbraten.',
+      'Bei 80 °C mit Bratenthermometer garen, bis die Kerntemperatur 60 °C erreicht (ca. 2 Stunden). Pfeffern und ruhen lassen.',
+      'Für das Gratin die Kartoffeln schälen und in dünne Scheiben hobeln. Eine Form mit 1 Knoblauchzehe ausreiben und mit 10 g Butter fetten. Kartoffeln einschichten, Sahne und Milch mit Salz, Pfeffer und Muskat darübergießen, mit Gruyère bestreuen und bei 170 °C ca. 45 Minuten backen.',
+      'Für den Jus die Schalotten fein würfeln und im Bratensatz anschwitzen, den restlichen Rosmarin zugeben. Mit Rotwein ablöschen und fast ganz einkochen, Lammfond zugeben und auf ein Drittel reduzieren. Passieren und 20 g kalte Butter einschwenken.',
+      'Die Bohnen in Salzwasser 7 Minuten garen und in der restlichen Butter mit der letzten, fein gehackten Knoblauchzehe schwenken.',
+      'Die Keule aufschneiden und mit Jus, Bohnen und Gratin anrichten.',
+    ], 'roast leg of lamb pink gratin green beans'),
+
+  r('lammhaxen-polenta', 'Geschmorte Lammhaxen mit Rosmarin, Schmorgemüse und cremiger Polenta', 'de', 'haupt', 180,
+    '2 Stk Lammhaxe | 2 EL Olivenöl | 2 Stk Zwiebel | 2 Stk Möhre | 100 g Knollensellerie | 3 Zehe Knoblauch | 1 EL Tomatenmark | 250 ml Rotwein | 500 ml Lammfond | 1 Dose Gehackte Tomaten | 3 Zweig Rosmarin | 1 Blatt Lorbeerblatt | 150 g Polenta | 300 ml Milch | 30 g Parmigiano Reggiano | 20 g Butter | 0.5 Bund Petersilie | 1 Stk Zitrone unbehandelt | Salz | Pfeffer',
+    [
+      'Die Lammhaxen salzen, pfeffern und im Olivenöl im Bräter rundum kräftig anbraten, dann herausnehmen.',
+      'Zwiebeln, Möhren und Sellerie grob würfeln, 2 Knoblauchzehen andrücken und alles im Bratfett anrösten. Tomatenmark mitrösten, mit Rotwein ablöschen und einkochen.',
+      'Lammfond, Tomaten, Rosmarin und Lorbeer zugeben, die Haxen einlegen und zugedeckt bei 160 °C ca. 2,5 Stunden schmoren, bis sich das Fleisch vom Knochen löst. Nach der Hälfte wenden.',
+      'Für die Polenta Milch, 300 ml Wasser und Salz aufkochen, die Polenta einrieseln lassen und unter Rühren bei kleiner Hitze 15 Minuten quellen lassen. Parmesan und Butter unterrühren.',
+      'Für die Gremolata Petersilie und den letzten Knoblauch fein hacken und mit abgeriebener Zitronenschale mischen.',
+      'Die Schmorsauce etwas einkochen und abschmecken. Die Haxen mit Schmorgemüse und Sauce auf der Polenta anrichten und mit Gremolata bestreuen.',
+    ], 'braised lamb shank polenta'),
+
+  r('kalbsbrust-gefuellt', 'Gefüllte Kalbsbrust mit Kräuterfüllung und schwäbischem Kartoffelsalat', 'de', 'haupt', 180,
+    '800 g Kalbsbrust | 3 Stk Brötchen vom Vortag | 150 ml Milch | 2 Stk Ei | 3 Stk Zwiebel | 1 Bund Petersilie | 20 g Butter | 2 EL Butterschmalz | 1 Stk Möhre | 150 ml Weißwein | 400 ml Kalbsfond | 600 g Kartoffeln festkochend | 200 ml Rinderbrühe | 3 EL Weißweinessig | 2 EL Sonnenblumenöl | 1 TL Senf mittelscharf | 0.5 Bund Schnittlauch | Muskatnuss | Salz | Pfeffer',
+    [
+      'Für die Füllung die Brötchen würfeln, mit warmer Milch übergießen und 15 Minuten ziehen lassen. 1 Zwiebel fein würfeln und in der Butter glasig dünsten, mit Eiern, gehackter Petersilie, Salz und Muskat unter die Brötchen kneten.',
+      'Die Kalbsbrust (vom Metzger eine Tasche einschneiden lassen) innen und außen salzen und pfeffern. Die Füllung hineingeben und die Öffnung mit Küchengarn zunähen.',
+      'Die Brust im Butterschmalz im Bräter rundum anbraten, 1 Zwiebel und die Möhre grob geschnitten mitrösten. Mit Weißwein ablöschen und den Kalbsfond angießen.',
+      'Zugedeckt bei 150 °C ca. 2 Stunden garen, bis der Kern 75 °C erreicht, dabei öfter begießen. Die letzten 15 Minuten ohne Deckel bei 200 °C bräunen.',
+      'Für den Kartoffelsalat die Kartoffeln mit Schale garen, pellen und warm in dünne Scheiben schneiden. Die letzte Zwiebel fein würfeln, mit Brühe, Essig, Senf, Salz und Pfeffer aufkochen und heiß über die Kartoffeln gießen. 20 Minuten ziehen lassen, dann Öl und Schnittlauch unterheben.',
+      'Den Bratensud passieren und etwas einkochen. Die Kalbsbrust in dicke Scheiben schneiden und mit Sauce und Kartoffelsalat servieren.',
+    ], 'stuffed veal breast potato salad'),
+
   // ───────────── Eintöpfe ─────────────
   r('bud-spencer-eintopf', 'Bud-Spencer-Eintopf mit Hack, Bohnen und Mais', 'de', 'eintopf', 45,
     '400 g Hackfleisch gemischt | 1 Stk Zwiebel | 2 Zehe Knoblauch | 1 Stk Paprika rot | 1 Dose Kidneybohnen | 1 Dose Weiße Bohnen | 1 Dose Mais | 400 g Passierte Tomaten | 2 EL Tomatenmark | 400 ml Rinderbrühe | 2 TL Paprikapulver edelsüß | 1 TL Kreuzkümmel | 1 TL Chiliflocken | 2 EL Sonnenblumenöl | Salz | Pfeffer',

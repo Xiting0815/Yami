@@ -49,7 +49,9 @@ export function Sheets({ m }: { m: AppModel }) {
           servings={
             sheet.recipe.breakfast
               ? 1
-              : ((sheet.day && state.plan[sheet.day]?.recipeId === sheet.recipe.id ? state.plan[sheet.day]?.servings : undefined) ??
+              : sheet.recipe.basic
+                ? sheet.recipe.servings
+                : ((sheet.day && state.plan[sheet.day]?.recipeId === sheet.recipe.id ? state.plan[sheet.day]?.servings : undefined) ??
                 state.defaultServings)
           }
           onClose={() => ui.setSheet(null)}
@@ -58,7 +60,9 @@ export function Sheets({ m }: { m: AppModel }) {
           onFinish={
             sheet.recipe.breakfast
               ? undefined
-              : (() => {
+              : sheet.recipe.basic
+                ? { run: (servings: number) => act.finishBasic(sheet.recipe, servings) }
+                : (() => {
                   const t = cookTarget(state.plan, sheet.recipe.id, today, sheet.day)
                   return {
                     conflict: t.kind === 'conflict' ? t.title : undefined,
@@ -66,6 +70,7 @@ export function Sheets({ m }: { m: AppModel }) {
                   }
                 })()
           }
+          onOpenRecipe={(r) => ui.setSheet({ recipe: r, mode: 'view' })}
           showClassic={state.showClassicSteps}
           onShowClassic={(v) => m.setState((s) => ({ ...s, showClassicSteps: v }))}
           onEdit={() => {
@@ -117,7 +122,7 @@ export function Sheets({ m }: { m: AppModel }) {
         />
       )}
 
-      {sheet?.mode === 'pick' && !sheet.recipe.breakfast && (
+      {sheet?.mode === 'pick' && !sheet.recipe.breakfast && !sheet.recipe.basic && (
         <DayPicker
           days={days}
           plan={state.plan}

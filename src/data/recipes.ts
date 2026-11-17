@@ -6,9 +6,11 @@ import { recipesIt } from './recipes-it'
 import { recipesAs } from './recipes-as'
 import { recipesGr } from './recipes-gr'
 import { breakfasts } from './breakfasts'
+import { basicsDe } from './recipes-basic'
 import { nutritionOf } from './nutrition-calc'
 import { registerCustomIngredients } from './custom-registry'
 import { DEVICE_STEPS } from './device-steps'
+import { substitutesFor } from './substitutes'
 import imageMap from './images.json'
 
 const images = imageMap as unknown as Record<string, { file: string } | null | undefined>
@@ -17,6 +19,8 @@ const images = imageMap as unknown as Record<string, { file: string } | null | u
 export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs, ...recipesGr]
 /** Frühstücke (Rohdaten) */
 export const RAW_BREAKFASTS = breakfasts
+/** Grundrezepte (Rohdaten) – Fonds usw., keine Abendessen */
+export const RAW_BASICS = basicsDe
 
 function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
   const servings = r.servings ?? 2
@@ -40,6 +44,7 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
     image: images[r.id]?.file,
     festive: r.festive,
     nutrition: nutritionOf(r.ingredients, servings),
+    ...(r.basic ? { basic: true as const, yields: r.yields } : {}),
   }
 }
 
@@ -48,7 +53,18 @@ export const RECIPES: Recipe[] = RAW_RECIPES.map((r) => build(r, 'dinner'))
 /** Meal-Prep-Frühstücke (Mengen für 1 Portion) */
 export const BREAKFASTS: Recipe[] = RAW_BREAKFASTS.map((r) => build(r, 'breakfast'))
 
-export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries([...RECIPES, ...BREAKFASTS].map((r) => [r.id, r]))
+/**
+ * Grundrezepte (Fonds): bewusst NICHT in RECIPES – so bleiben sie aus Wischstapel, Planung, Abwechslung,
+ * Veggie-Quote und Geschmackslernen heraus. Über RECIPE_BY_ID für Rezept-Sheet und Kochmodus erreichbar.
+ */
+export const BASICS: Recipe[] = RAW_BASICS.map((r) => build(r, 'dinner'))
+
+/** Grundrezept, das diese Zutat selbst herstellt (Rinderfond → Brauner Rinderfond), sonst undefined */
+export function basicFor(name: string): Recipe | undefined {
+  return BASICS.find((b) => b.yields && (b.yields.name === name || substitutesFor(name).includes(b.yields.name)))
+}
+
+export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries([...RECIPES, ...BREAKFASTS, ...BASICS].map((r) => [r.id, r]))
 
 // ───────────── eigene Rezepte (zur Laufzeit) ─────────────
 

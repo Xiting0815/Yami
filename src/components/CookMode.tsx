@@ -11,6 +11,13 @@ export interface CookFinish {
   run: (servings: number, replace: boolean) => void
 }
 
+/** Grundrezept: was „Fertig gekocht“ in den Vorrat legt, z. B. „1,5 l Rinderfond selbstgemacht“ */
+function yieldText(recipe: Recipe, servings: number): string | undefined {
+  const y = recipe.yields
+  if (!recipe.basic || !y) return undefined
+  return `${formatAmount((y.amount * servings) / recipe.servings, y.unit)} ${y.name}`
+}
+
 interface Props {
   recipe: Recipe
   /** Portionen aus dem Rezept-Sheet */
@@ -97,7 +104,9 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
       <header className="cook-head">
         <div className="cook-title">
           <h2>{recipe.title}</h2>
-          <div className="muted small">für {servings} {servings === 1 ? 'Portion' : 'Portionen'}</div>
+          <div className="muted small">
+            {recipe.basic ? `${servings} ${servings === 1 ? 'Ansatz' : 'Ansätze'} · ergibt ${yieldText(recipe, servings)}` : `für ${servings} ${servings === 1 ? 'Portion' : 'Portionen'}`}
+          </div>
         </div>
         <button className="cook-close" onClick={onClose} aria-label="Kochmodus beenden">
           ✕
@@ -157,9 +166,14 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
                 </div>
               </>
             ) : (
-              <button className="btn primary wide" onClick={() => (finish.conflict ? setAsking(true) : finish.run(servings, false))}>
-                Fertig gekocht ✓
-              </button>
+              <>
+                {yieldText(recipe, servings) && (
+                  <p className="muted small">Kommt in den Vorrat: <b>{yieldText(recipe, servings)}</b> (eingefroren, hält ca. {Math.round(recipe.yields!.shelf / 30)} Monate). Die Zutaten werden abgezogen.</p>
+                )}
+                <button className="btn primary wide" onClick={() => (finish.conflict ? setAsking(true) : finish.run(servings, false))}>
+                  Fertig gekocht ✓
+                </button>
+              </>
             )}
           </section>
         )}

@@ -1,5 +1,5 @@
 // Prüft die Rezeptdatenbank: eindeutige IDs, bekannte Zutaten, gültige Einheiten
-import { RAW_BREAKFASTS, RAW_RECIPES, BREAKFASTS } from '../src/data/recipes'
+import { RAW_BASICS, RAW_BREAKFASTS, RAW_RECIPES, BREAKFASTS, RECIPES } from '../src/data/recipes'
 import { NUTRI } from '../src/data/nutrition'
 import { gramsOf } from '../src/data/nutrition-calc'
 import { BROTH_FORMS, CATALOG, SPICES } from '../src/data/catalog'
@@ -12,7 +12,7 @@ import { validateSetting } from '../src/deviceText'
 let errors = 0
 const ids = new Set<string>()
 const used = new Set<string>()
-for (const r of [...RAW_RECIPES, ...RAW_BREAKFASTS]) {
+for (const r of [...RAW_RECIPES, ...RAW_BREAKFASTS, ...RAW_BASICS]) {
   if (ids.has(r.id)) { console.error('Doppelte ID:', r.id); errors++ }
   ids.add(r.id)
   if (r.steps.length < 3) { console.error('Zu wenige Schritte:', r.id); errors++ }
@@ -49,7 +49,21 @@ for (const [base, forms] of Object.entries(BROTH_FORMS)) {
   }
 }
 for (const n of Object.keys(CATALOG)) if (CATALOG[n] === 'vorrat' && !PRODUCTS[canonical(n)]) { console.error(`Grundzutat "${n}": kein Produkt`); errors++ }
-const formNames = new Set(Object.values(BROTH_FORMS).flat())
+// Grundrezepte: Ergebnis (z. B. „Rinderfond selbstgemacht“) braucht Katalog, Produkt in derselben Einheit und Nährwerte;
+// sie dürfen nicht unter den Abendessen landen
+const yieldNames = new Set<string>()
+for (const r of RAW_BASICS) {
+  const y = r.yields
+  if (!r.basic || !y) { console.error(`Grundrezept ${r.id} ohne basic/yields`); errors++; continue }
+  yieldNames.add(y.name)
+  if (!CATALOG[y.name]) { console.error(`Grundrezept ${r.id}: Ergebnis "${y.name}" fehlt im Katalog`); errors++ }
+  if (!NUTRI[y.name]) { console.error(`Grundrezept ${r.id}: keine Nährwerte für "${y.name}"`); errors++ }
+  const prod = PRODUCTS[y.name]
+  if (!prod || prod.unit !== y.unit) { console.error(`Grundrezept ${r.id}: Produkt für "${y.name}" fehlt oder Einheit ≠ ${y.unit}`); errors++ }
+  if (!(y.amount > 0) || !(y.shelf > 0)) { console.error(`Grundrezept ${r.id}: Menge/Haltbarkeit ungültig`); errors++ }
+  if (RECIPES.some((x) => x.id === r.id)) { console.error(`Grundrezept ${r.id} steht unter den Abendessen`); errors++ }
+}
+const formNames = new Set([...Object.values(BROTH_FORMS).flat(), ...yieldNames])
 for (const n of Object.keys(CATALOG)) if (!used.has(n) && !formNames.has(n)) console.warn('Unbenutzt im Katalog:', n)
 const by = (k: string) => RAW_RECIPES.filter((r) => r.cuisine === k).length
 const byType: Record<string, number> = {}
@@ -62,7 +76,7 @@ for (const r of BREAKFASTS) {
     console.error(`Frühstück ${r.id} verfehlt Ziel: ${n.kcal} kcal, ${n.protein} g Eiweiß, ${n.fiber} g Ballaststoffe`); errors++
   }
 }
-console.log(`${BREAKFASTS.length} Frühstücke`)
+console.log(`${BREAKFASTS.length} Frühstücke, ${RAW_BASICS.length} Grundrezepte`)
 // Geräte-Schritte: bekannte Rezepte, Texte, Einstellungen im gültigen Bereich
 for (const [id, steps] of Object.entries(DEVICE_STEPS)) {
   if (!ids.has(id)) { console.error(`Geräte-Schritte für unbekanntes Rezept: ${id}`); errors++; continue }

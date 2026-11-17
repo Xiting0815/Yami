@@ -750,6 +750,7 @@ img.thumb { display: block; }
 
 /* ───── Eigene Rezepte ───── */
 .own-row { margin: 2px 0 8px; align-items: center; }
+.own-row .chip { padding: 0 11px; }
 .chip.own-new { border-style: dashed; border-color: var(--accent); color: var(--accent-text); font-weight: 800; }
 .own-badge {
   display: inline-block; vertical-align: 1px; margin-right: 6px; padding: 1px 7px; border-radius: 999px;
@@ -758,6 +759,13 @@ img.thumb { display: block; }
 .own-actions { display: flex; gap: 8px; margin-top: 22px; }
 .own-actions .btn { flex: 1; }
 .btn.danger { color: var(--red-ink); }
+
+/* ───── Grundrezepte (Fonds) ───── */
+.basic-tip {
+  display: block; width: 100%; text-align: left; margin-top: 14px; padding: 9px 12px; border: 0; border-radius: var(--r-md);
+  background: var(--surface-2); color: var(--text); font: inherit; font-size: 13.5px; line-height: 1.4; cursor: pointer;
+}
+.basic-tip u { color: var(--accent-text); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
 .sheet.editor { max-height: 96dvh; }
 .sheet.editor .sheet-body { padding-top: 22px; }

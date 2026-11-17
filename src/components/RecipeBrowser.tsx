@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import type { CustomRecipe, Recipe } from '../types'
 import { CUISINE_LABEL } from '../types'
-import { BREAKFASTS, RECIPES } from '../data/recipes'
+import { BASICS, BREAKFASTS, RECIPES } from '../data/recipes'
 import { BREAKFAST_LABEL } from '../types'
 import { NutritionRow } from './NutritionRow'
 import type { Filters } from '../store'
 import { matches, formatTime } from '../filter'
-import { formatEuro } from '../kitchen'
+import { formatEuro, recipeCost } from '../kitchen'
+import { formatAmount } from '../shopping'
 import { FilterBar } from './FilterBar'
 import { RecipeImage } from './RecipeImage'
 import { searchIngredients } from '../customIngredients'
@@ -31,10 +32,12 @@ function norm(s: string) {
 export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, onMeal, custom, onNew }: Props) {
   const [q, setQ] = useState('')
   const [mine, setMine] = useState(false)
+  // Grundrezepte (Fonds): eigene Ansicht, unabhängig von Frühstück/Abendessen und Filtern
+  const [basics, setBasics] = useState(false)
   const list = useMemo(() => {
     const nq = norm(q.trim())
-    const base = meal === 'breakfast' ? BREAKFASTS : RECIPES.filter((r) => matches(r, filters, perPortion.get(r.id)))
-    const pool = base.filter((r) => !mine || r.custom)
+    const base = basics ? BASICS : meal === 'breakfast' ? BREAKFASTS : RECIPES.filter((r) => matches(r, filters, perPortion.get(r.id)))
+    const pool = base.filter((r) => basics || !mine || r.custom)
     const exact = pool.filter((r) => !nq || norm(r.title).includes(nq) || r.ingredients.some((i) => norm(i.name).includes(nq)))
     // nichts gefunden (z. B. Tippfehler „Tunfisch“) → über ähnlich geschriebene Zutaten suchen
     const fuzzy = exact.length || nq.length < 3 ? [] : (() => {
@@ -42,7 +45,7 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
       return pool.filter((r) => r.ingredients.some((i) => names.has(i.name)))
     })()
     return (exact.length ? exact : fuzzy).sort((a, b) => a.title.localeCompare(b.title, 'de'))
-  }, [q, filters, perPortion, meal, mine, custom])
+  }, [q, filters, perPortion, meal, mine, custom, basics])
   // Wortvorschläge beim Tippen (Zutaten, auch bei Tippfehlern)
   const words = useMemo(() => {
     const t = q.trim()
@@ -70,16 +73,21 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
         <button className="chip own-new" onClick={onNew}>
           + Eigenes Rezept
         </button>
-        <button className={`chip ${mine ? 'on' : ''}`} onClick={() => setMine(!mine)} aria-pressed={mine}>
+        <button className={`chip ${mine && !basics ? 'on' : ''}`} onClick={() => { setMine(!mine); setBasics(false) }} aria-pressed={mine && !basics}>
           Meine Rezepte{custom.length ? ` (${custom.length})` : ''}
         </button>
+        <button className={`chip ${basics ? 'on' : ''}`} onClick={() => setBasics(!basics)} aria-pressed={basics}>
+          Grundrezepte
+        </button>
       </div>
-      {meal === 'dinner' ? (
+      {basics ? (
+        <p className="muted small">{list.length} Grundrezepte · Fond auf Vorrat kochen und portionsweise einfrieren – Braten und Saucen nehmen ihn dann zuerst.</p>
+      ) : meal === 'dinner' ? (
         <FilterBar filters={filters} onChange={onFilters} count={list.length} />
       ) : (
         <p className="muted small">{list.length} Meal-Prep-Frühstücke · je ca. 370–470 kcal, ≥ 25 g Eiweiß, ≥ 8 g Ballaststoffe</p>
       )}
-      {mine && list.length === 0 && (
+      {mine && !basics && list.length === 0 && (
         <p className="muted small">Noch kein eigenes Rezept{meal === 'breakfast' ? ' fürs Frühstück' : ' fürs Abendessen'}. Tipp auf „+ Eigenes Rezept“.</p>
       )}
       <div className="grid">
@@ -91,7 +99,11 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
                 {r.custom && <span className="own-badge">Eigenes</span>}
                 {r.title}
               </div>
-              {r.breakfast ? (
+              {r.basic && r.yields ? (
+                <div className="muted small">
+                  Grundrezept · {formatTime(r.time)} · ergibt {formatAmount(r.yields.amount, r.yields.unit)} · ≈ {formatEuro(recipeCost(r, r.servings))}
+                </div>
+              ) : r.breakfast ? (
                 <>
                   <div className="muted small">{BREAKFAST_LABEL[r.breakfast.type]} · hält {r.breakfast.fridgeDays} T.</div>
                   <NutritionRow n={r.nutrition} className="tiny" />

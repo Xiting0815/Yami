@@ -16,7 +16,7 @@ const groups: Record<ShopCat, string[]> = {
     'Salbei', 'Schalotte', 'Schnittlauch', 'Schwarzkohl', 'Shiitake', 'Sojasprossen', 'Spargel weiß',
     'Spitzpaprika grün', 'Staudensellerie', 'Steckrübe', 'Thai-Basilikum', 'Thymian', 'Tomate',
     'Weißkohl', 'Wirsing', 'Orange', 'Zitrone', 'Zitrone unbehandelt', 'Zitronengras', 'Zucchini', 'Zuckerschoten', 'Zwiebel',
-    'Zwiebel rot',
+    'Zwiebel rot', 'Maronen vorgegart',
   ],
   konserven: [
     'Chiasamen', 'Leinsamen geschrotet', 'Backkakao', 'Erdnussmus', 'Kokosraspeln', 'Haselnusskerne', 'Kidneybohnen',
@@ -32,10 +32,10 @@ const groups: Record<ShopCat, string[]> = {
     'Rinderfond', 'Risottoreis', 'Rosinen', 'Röstzwiebeln', 'Rotwein', 'Safranfäden', 'Sake', 'Sardellenfilet',
     'Sauerkraut', 'Schälerbsen gelb', 'Sesam', 'Sesampaste', 'Shaoxing-Reiswein', 'Sojabohnenpaste gelb',
     'Steinpilze getrocknet', 'Sushireis', 'Tamarindenpaste', 'Tellerlinsen', 'Thunfisch in Olivenöl', 'Tomatenmark',
-    'Walnusskerne', 'Metaxa', 'Weinbrand', 'Weiße Bohnen', 'Weißwein', 'Weizenmehl Tipo 00', 'Wodka', 'Yakisoba-Sauce',
+    'Walnusskerne', 'Metaxa', 'Weinbrand', 'Lammfond', 'Morcheln getrocknet', 'Weiße Bohnen', 'Weißwein', 'Weizenmehl Tipo 00', 'Wodka', 'Yakisoba-Sauce',
     'Zuckerrübensirup',
   ],
-  backwaren: ['Pitabrot', 'Vollkornbrot', 'Vollkorn-Knäckebrot', 'Vollkorn-Tortilla','Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
+  backwaren: ['Laugenbrezel', 'Pitabrot', 'Vollkornbrot', 'Vollkorn-Knäckebrot', 'Vollkorn-Tortilla','Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
   molkerei: [
     'Skyr', 'Magerquark', 'Hüttenkäse', 'Eiklar', 'Hummus',
     'Bandnudeln', 'Bergkäse', 'Bucatini', 'Butter', 'Butterschmalz', 'Cannelloni', 'Ditalini', 'Ei', 'Kritharaki', 'Tzatziki', 'Eigelb',
@@ -61,11 +61,16 @@ const groups: Record<ShopCat, string[]> = {
     'Schweinegulasch', 'Schweinehackfleisch', 'Schweinekotelett', 'Schweinenacken',
     'Schweineschnitzel', 'Schweineschnitzel klein', 'Schweineschulter mit Schwarte', 'Schweinshaxe hinten',
     'Seelachsfilet', 'Speckwürfel', 'Suppenfleisch Rind', 'Tafelspitz', 'Venusmuscheln', 'Wiener Würstchen',
+    // Braten & Schmorstücke (gehoben) und Knochen für Fonds
+    'Ochsenbäckchen', 'Rinderfilet', 'Roastbeef', 'Schäufele', 'Schweinebauch mit Schwarte', 'Kalbshüfte',
+    'Kalbsbäckchen', 'Kalbsbrust', 'Lammkeule ohne Knochen', 'Lammhaxe', 'Rinderknochen', 'Kalbsknochen', 'Lammknochen',
   ],
   tk: [
     'Beerenmischung TK', 'Heidelbeeren TK', 'Himbeeren TK', 'Mango TK',
     'Blattspinat TK', 'Erbsen TK', 'Erbsen und Möhren TK', 'Garnelen roh TK', 'Jiaozi-Teigblätter TK',
     'Pommes frites TK', 'Rahmspinat TK', 'Wan-Tan-Teigblätter TK',
+    // selbst gekocht (Grundrezepte), portionsweise eingefroren
+    'Rinderfond selbstgemacht', 'Kalbsfond selbstgemacht', 'Lammfond selbstgemacht',
   ],
   vorrat: [
     'Zimt gemahlen', 'Backpulver', 'Kreuzkümmel',
@@ -138,7 +143,7 @@ export const RENAMED: Record<string, string> = {
 export const NON_VEG = new Set([
   'Corned Beef', 'Sardellenfilet', 'Thunfisch in Olivenöl', 'Fischsauce', 'Austernsauce', 'Garnelenpaste',
   'Rinderfond', 'Kalbsfond', 'Fischfond', 'Hühnerbrühe', 'Rinderbrühe', 'Garnelen roh TK', 'Jiaozi-Teigblätter TK',
-  'Schweineschmalz',
+  'Schweineschmalz', 'Lammfond', 'Rinderfond selbstgemacht', 'Kalbsfond selbstgemacht', 'Lammfond selbstgemacht',
   'Hühnerbrühe Pulver', 'Hühnerbrühe Würfel', 'Hühnerbrühe flüssig',
   'Rinderbrühe Pulver', 'Rinderbrühe Würfel', 'Rinderbrühe flüssig',
 ])

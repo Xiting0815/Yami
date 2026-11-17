@@ -11,6 +11,7 @@ import { InsightBadges } from './SwipeDeck'
 import type { Portion } from '../energy'
 import { CookMode, type CookFinish } from './CookMode'
 import { DeviceChips } from './DeviceChip'
+import { basicFor } from '../data/recipes'
 
 /** kurze Erklärung für Zutaten, die man leicht verwechselt */
 const INGREDIENT_HINT: Record<string, string> = {
@@ -39,16 +40,22 @@ interface Props {
   /** nur bei eigenen Rezepten */
   onEdit?: () => void
   onDelete?: () => void
+  /** anderes Rezept öffnen (Tipp „Fond selbst kochen“ → Grundrezept) */
+  onOpenRecipe?: (r: Recipe) => void
   /** klassische Schritte statt Geräte-Schritte zeigen (gemerkt) */
   showClassic?: boolean
   onShowClassic?: (v: boolean) => void
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onFinish, onCooking, onEdit, onDelete, showClassic, onShowClassic }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onFinish, onCooking, onEdit, onDelete, onOpenRecipe, showClassic, onShowClassic }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
   const hasDevice = !!recipe.deviceSteps && !!recipe.classicSteps
   const classic = hasDevice && !!showClassic
+  const isBasic = !!recipe.basic && !!recipe.yields
+  // Grundrezepte, die eine Zutat dieses Rezepts selbst herstellen (Rinderfond → Brauner Rinderfond)
+  const basicTips = isBasic ? [] : [...new Map(recipe.ingredients.map((i) => basicFor(i.name)).filter((b): b is Recipe => !!b).map((b) => [b.id, b])).values()]
+  const yieldAmount = isBasic ? (recipe.yields!.amount * servings) / recipe.servings : 0
 
   useEffect(() => {
     // Escape schließt zuerst den Kochmodus (dort), nicht das Sheet
@@ -71,7 +78,9 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
           </div>
           <div className="sheet-body">
             <div className="card-tags dark">
-              {recipe.breakfast ? (
+              {isBasic ? (
+                <span>🫙 Grundrezept</span>
+              ) : recipe.breakfast ? (
                 <>
                   <span>☀️ Frühstück</span>
                   <span>{BREAKFAST_LABEL[recipe.breakfast.type]}</span>
@@ -90,7 +99,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             {insight && <div className="sheet-badges"><InsightBadges ins={insight} /></div>}
 
             <div className="servings">
-              <span>Portionen</span>
+              <span>{isBasic ? 'Ansätze' : 'Portionen'}</span>
               <div className="stepper">
                 <button onClick={() => setServings((s) => Math.max(1, s - 1))} aria-label="weniger">−</button>
                 <b>{servings}</b>
@@ -104,7 +113,15 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               </p>
             )}
 
-            <NutritionTable n={recipe.nutrition} servings={1} />
+            {isBasic ? (
+              <div className="prep-facts">
+                <div>🫙 Ergibt <b>{formatAmount(yieldAmount, recipe.yields!.unit)} {recipe.yields!.name}</b></div>
+                <div>❄️ Portionsweise eingefroren ca. {Math.round(recipe.yields!.shelf / 30)} Monate haltbar</div>
+                <div>✓ „Fertig gekocht“ im Kochmodus legt den Fond in den Vorrat – Rezepte mit Fond nehmen dann zuerst den selbstgemachten.</div>
+              </div>
+            ) : (
+              <NutritionTable n={recipe.nutrition} servings={1} />
+            )}
 
             {portion && (
               <div className={`portion-box ${portion.fraction < 1 ? 'smaller' : ''}`}>
@@ -133,7 +150,9 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             )}
 
             <p className="muted small cost-line">
-              Warenwert ≈ {formatEuro(recipeCost(recipe, servings, prices))} · {formatEuro(recipeCost(recipe, servings, prices) / servings)} pro Portion (ohne Gewürze)
+              {isBasic
+                ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für ${formatAmount(yieldAmount, recipe.yields!.unit)} (ohne Gewürze)`
+                : `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} · ${formatEuro(recipeCost(recipe, servings, prices) / servings)} pro Portion (ohne Gewürze)`}
             </p>
 
             <button className="btn ghost wide cook-start" onClick={() => onCooking(true)}>
@@ -152,6 +171,12 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                 </li>
               ))}
             </ul>
+
+            {basicTips.map((b) => (
+              <button key={b.id} className="basic-tip small" onClick={() => onOpenRecipe?.(b)}>
+                💡 Tipp: mit selbstgemachtem Fond (Grundrezept) noch besser – <u>{b.title}</u>
+              </button>
+            ))}
 
             <h3>{recipe.breakfast ? 'Vorbereitung (am Prep-Tag)' : 'Zubereitung'}</h3>
             {hasDevice && (
