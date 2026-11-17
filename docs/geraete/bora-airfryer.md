@@ -1,5 +1,7 @@
 # BORA-Kochfeld und Airfryer: Kurzreferenz für Yami
 
+**Modell bestätigt vom Nutzer: BORA X Pure** (2 Flächen mit freier Topfplatzierung, Brückenfunktion, 3 Warmhaltestufen Schmelzen/Warmhalten/Simmern).
+
 Stand der Recherche: 2026-11-17. Wichtig: Die BORA-Seiten (bora.com) und mehrere PDF-Hosts waren in dieser Umgebung nicht abrufbar. Alles zu BORA stammt aus Suchergebnis-Ausschnitten der Herstelleranleitungen, nicht aus dem Volltext. Was nicht belegt ist, steht unter "Unsicher". Bitte einmal das Typenschild bzw. die Anleitung gegenprüfen.
 
 ## 1. Welches BORA-Modell ist es?
