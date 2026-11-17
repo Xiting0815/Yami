@@ -55,6 +55,30 @@ ok(s.lastBackup === undefined, 'ungültiges lastBackup-Datum wird verworfen')
 const s2 = sanitize({ plan: { '2026-11-16': { recipeId: rid, servings: 2 }, '2026-11-17': { recipeId: 'gibt-es-nicht', servings: 2 } } })
 ok(Object.keys(s2.plan).length === 1 && s2.plan['2026-11-16'] !== undefined, 'unbekanntes Rezept im Plan wird entfernt, bekanntes bleibt')
 
+// Regression: kaputte Einzelwerte (Hand-Bearbeitung, beschädigte Datei) dürfen die App nicht bei jedem Start abstürzen lassen
+{
+  const lot = { id: 'a', name: 'Zwiebel', amount: 3, unit: 'Stk', expires: '2026-12-01' }
+  const j = sanitize({
+    plan: { '2026-11-10': { recipeId: rid, status: 'cooked', consumed: [null, lot] }, '2026-11-11': { recipeId: rid, servings: 3, status: 'foo' } },
+    pantry: [null, lot, { ...lot, id: undefined, amount: '2' }, { name: 'Ei', amount: 2, unit: 'Stk' }, { ...lot, amount: NaN }],
+    weighIns: [null, { date: 'x', weight: 90 }, { date: '2026-11-09', weight: 91, fat: 'viel' }, { date: '2026-11-02', weight: 92 }],
+    rejects: [null, 5, { id: rid, date: '2026-11-01' }],
+    ratings: { '2026-11-10': 'up', '2026-11-11': 'super' },
+    bought: { '2026-11-09': { Zwiebel: null, Sahne: { lotId: 'x', amount: 200 } } },
+    checked: { '2026-11-09': null },
+    profile: { weightKg: 90, age: 'vierzig' },
+    defaultServings: 0,
+  })
+  ok(j.pantry.length === 2 && j.pantry.every((l) => typeof l.amount === 'number' && l.amount > 0 && !!l.id), 'Vorrat: kaputte Posten verworfen, Menge als Text umgewandelt, fehlende Id ergänzt')
+  ok(j.plan['2026-11-10'].servings === 2 && j.plan['2026-11-10'].consumed!.length === 1, 'Plan: fehlende Portionen = Standard, kaputte „entnommen“-Einträge verworfen')
+  ok(j.plan['2026-11-11'].servings === 3 && j.plan['2026-11-11'].status === undefined, 'Plan: unbekannter Status verworfen')
+  ok(j.weighIns.length === 2 && j.weighIns[0].date === '2026-11-02' && j.weighIns[1].fat === undefined, 'Messungen: kaputte verworfen, sortiert, ungültiges Körperfett entfernt')
+  ok(j.rejects.length === 1 && Object.keys(j.ratings).join() === '2026-11-10', 'Wischen/Bewertungen: kaputte verworfen')
+  ok(Object.keys(j.bought['2026-11-09']).join() === 'Sahne' && Array.isArray(j.checked['2026-11-09']), 'Einkäufe/Haken: kaputte verworfen')
+  ok(j.profile!.weightKg === 90 && Number.isFinite(j.profile!.age) && Number.isFinite(j.profile!.lunchKcal), 'Profil: fehlende Werte bekommen Startwerte (kein NaN-Kalorienziel)')
+  ok(j.defaultServings === 2, 'Standard-Portionen 0 → 2')
+}
+
 if (fails) {
   console.log(`\n${fails} Test(s) fehlgeschlagen`)
   process.exit(1)

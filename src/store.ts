@@ -5,10 +5,10 @@ import { PRODUCTS } from './data/products'
 import { rememberStaples, sanitizeMemos, sanitizeSpices, type SpiceStatus, type StapleMemos } from './staples'
 import {
   BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, TYPE_LABEL,
-  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type ShopCat, type WeekPlan,
+  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type PlanEntry, type ShopCat, type WeekPlan,
 } from './types'
-import { WASTED_MAX, addDaysIso, toBase, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
-import type { Profile } from './energy'
+import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
+import { DEFAULT_PROFILE, type Profile } from './energy'
 import type { WeighIn } from './progress'
 import type { Rating, RejectEvent } from './learning'
 
@@ -239,6 +239,42 @@ function validRecipe(x: unknown): CustomRecipe | null {
   }
 }
 
+const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
+
+/** Vorratsposten (auch „entnommen“-Einträge im Plan) prüfen; fehlende Id wird ergänzt, Zahlen als Text umgewandelt */
+function validLot(x: unknown): PantryLot | null {
+  const l = x as Partial<PantryLot> | null
+  if (!l || typeof l !== 'object' || typeof l.name !== 'string' || !l.name || typeof l.unit !== 'string') return null
+  const amount = typeof l.amount === 'string' ? parseFloat(l.amount) : l.amount
+  if (!isNum(amount) || amount <= 1e-6 || typeof l.expires !== 'string' || !ISO.test(l.expires)) return null
+  return { id: typeof l.id === 'string' && l.id ? l.id : uid(), name: l.name, amount, unit: l.unit, expires: l.expires }
+}
+
+function validEntry(e: PlanEntry, defaultServings: number): PlanEntry {
+  const servings = isNum(e.servings) && e.servings >= 1 ? Math.min(12, Math.round(e.servings)) : defaultServings
+  const status = e.status === 'cooked' || e.status === 'skipped' ? e.status : undefined
+  const consumed = Array.isArray(e.consumed) ? e.consumed.map(validLot).filter((l): l is PantryLot => !!l) : undefined
+  return { recipeId: e.recipeId, servings, ...(status ? { status } : {}), ...(consumed ? { consumed } : {}) }
+}
+
+function validWeighIn(x: unknown): x is WeighIn {
+  const w = x as Partial<WeighIn> | null
+  if (!w || typeof w.date !== 'string' || !ISO.test(w.date) || !isNum(w.weight) || w.weight <= 0) return false
+  for (const k of ['fat', 'muscle', 'water'] as const) if (w[k] != null && !isNum(w[k])) delete w[k]
+  return true
+}
+
+/** Profil: fehlende oder kaputte Pflichtwerte bekommen den Startwert (sonst wird das Kalorienziel NaN) */
+function validProfile(x: unknown): Profile | undefined {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return undefined
+  const p = { ...(x as Partial<Profile>) }
+  const out = { ...DEFAULT_PROFILE, ...p } as Profile
+  for (const k of ['age', 'heightCm', 'weightKg', 'activity', 'deficit', 'lunchKcal'] as const) if (!isNum(out[k])) out[k] = DEFAULT_PROFILE[k]
+  if (out.sex !== 'm' && out.sex !== 'w') out.sex = DEFAULT_PROFILE.sex
+  for (const k of ['fatPct', 'goalWeight', 'adjust'] as const) if (out[k] != null && !isNum(out[k])) delete out[k]
+  return out
+}
+
 const renameKey = (n: string) => RENAMED[n] ?? n
 
 /** Umbenennungen zusammengeführter Zutaten (RENAMED) in einem gespeicherten Stand nachziehen */
@@ -328,10 +364,19 @@ export function sanitize(parsed: unknown): AppState {
     .map(validRecipe)
     .filter((r): r is CustomRecipe => !!r && !seen.has(r.id) && !!seen.add(r.id))
   registerCustom(state.customIngredients, state.customRecipes)
+  // Vorrat & Plan-Einträge Stück für Stück prüfen (kaputte Posten würden sonst beim Abziehen/Rechnen abstürzen oder NaN liefern)
+  state.pantry = state.pantry.map(validLot).filter((l): l is PantryLot => !!l)
   // Einträge zu Rezepten, die es nicht mehr gibt, entfernen
-  const clean = (p: WeekPlan) => Object.fromEntries(Object.entries(p).filter(([, e]) => e && RECIPE_BY_ID[e.recipeId]))
-  state.plan = clean(state.plan)
-  state.breakfast = clean(state.breakfast)
+  const clean = (p: WeekPlan, servings: number) =>
+    Object.fromEntries(
+      Object.entries(p)
+        .filter(([d, e]) => ISO.test(d) && e && typeof e === 'object' && RECIPE_BY_ID[e.recipeId])
+        .map(([d, e]) => [d, validEntry(e!, servings)]),
+    )
+  if (!Number.isFinite(state.defaultServings) || state.defaultServings < 1) state.defaultServings = INITIAL.defaultServings
+  state.defaultServings = Math.min(12, Math.round(state.defaultServings))
+  state.plan = clean(state.plan, state.defaultServings)
+  state.breakfast = clean(state.breakfast, 1)
   state.breakfastPicks = Object.fromEntries(
     Object.entries(state.breakfastPicks).map(([k, ids]) => [k, (Array.isArray(ids) ? ids : []).filter((id) => RECIPE_BY_ID[id])]),
   )
@@ -353,6 +398,25 @@ export function sanitize(parsed: unknown): AppState {
   )
   state.spices = sanitizeSpices(state.spices)
   state.staples = rememberStaples(sanitizeMemos(state.staples), Array.isArray(state.pantry) ? state.pantry : [])
+  state.weighIns = state.weighIns.filter(validWeighIn).sort((a, b) => a.date.localeCompare(b.date))
+  state.rejects = state.rejects.filter((r) => !!r && typeof r.id === 'string' && typeof r.date === 'string' && ISO.test(r.date)).slice(-400)
+  state.ratings = Object.fromEntries(Object.entries(state.ratings).filter(([d, v]) => ISO.test(d) && (v === 'up' || v === 'again' || v === 'down')))
+  state.ratingDismissed = state.ratingDismissed.filter((d) => typeof d === 'string')
+  state.bought = Object.fromEntries(
+    Object.entries(state.bought)
+      .filter(([, m]) => m && typeof m === 'object' && !Array.isArray(m))
+      .map(([w, m]) => [w, Object.fromEntries(Object.entries(m).filter(([, b]) => !!b && typeof b.lotId === 'string' && isNum(b.amount)))]),
+  )
+  state.checked = Object.fromEntries(Object.entries(state.checked).map(([w, ks]) => [w, Array.isArray(ks) ? ks.filter((k) => typeof k === 'string') : []]))
+  state.custom = Object.fromEntries(
+    Object.entries(state.custom).map(([w, xs]) => [
+      w,
+      Array.isArray(xs) ? xs.filter((c) => !!c && typeof c.id === 'string' && typeof c.name === 'string' && c.cat in SHOP_LABEL) : [],
+    ]),
+  )
+  state.prices = Object.fromEntries(Object.entries(state.prices).filter(([, p]) => !!p && isNum(p.pack) && p.pack > 0 && isNum(p.price) && p.price >= 0))
+  if (state.profile) state.profile = validProfile(state.profile)
+  if (!state.profile) delete state.profile
   state.ha = sanitizeHa(saved.ha)
   if (!state.ha) delete state.ha
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)

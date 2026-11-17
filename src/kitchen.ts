@@ -471,11 +471,9 @@ export function planWeek(
     if (!product) continue
     const inCovered = covered.find((c) => c.key === key)
     const group = (n: string) => stapleKey(n) === key
-    const now =
-      pantry.filter((l) => group(l.name)).reduce((s, l) => s + l.amount, 0) -
-      Object.entries(bought).filter(([n]) => group(n)).reduce((s, [, b]) => s + b.amount, 0)
-    // nach dem Wochenplan: was dann noch da ist (nicht abgedeckter Bedarf kam schon oben auf die Liste)
-    const after = inCovered ? inCovered.leftover : Math.max(0, now)
+    // nach dem Wochenplan: was dann noch da ist (alle Formen zusammen, z. B. Brühwürfel für „Gemüsebrühe“;
+    // nicht abgedeckter Bedarf kam schon oben auf die Liste). `inCovered.leftover` zählt nur die Rezeptform selbst.
+    const after = Math.max(0, [...pool].filter(([n]) => group(n)).reduce((s, [, v]) => s + v, 0))
     if (!runningLow(after, product.pack, useRate(events, key, today))) continue
     const item: BuyItem = {
       key: name, name, cat: STAPLE_SHOP_CAT, unit: product.unit, required: inCovered?.required ?? 0, fromPantry: 0, substitutes: [], packs: 1, product,

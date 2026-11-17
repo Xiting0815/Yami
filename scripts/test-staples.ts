@@ -237,5 +237,17 @@ let lost = 0
 for (const r of RECIPES) for (const i of r.ingredients) if (isQtyStaple(i.name === 'Frittieröl' ? 'Sonnenblumenöl' : i.name) && i.amount != null && !stapleNeedsOf({ ...r, ingredients: [i] }, r.servings).length) lost++
 ok(lost === 0, `alle Mengenangaben bei Grundzutaten sind umrechenbar (${lost} verloren)`)
 
+// Regression: Brühe aus Würfeln gedeckt → „bald leer“ rechnet mit dem, was von den Würfeln übrig bleibt (nicht mit 0)
+{
+  const gul = RECIPES.find((r) => r.id === 'szegediner-gulasch')!
+  const cube = { id: 'w', name: 'Gemüsebrühe Würfel', amount: 3500, unit: 'ml', expires: '2027-09-01' }
+  const used = (d: string) => ({ recipeId: gul.id, servings: 2, status: 'cooked' as const, consumed: [{ ...cube, amount: 500 }] })
+  const hist: WeekPlan = { [today]: { recipeId: gul.id, servings: 2 }, '2026-11-02': used('2026-11-02'), '2026-11-09': used('2026-11-09') }
+  const wb = planWeek(hist, days, [cube], {}, today, {}, formatAmount, {}, 11, { memo: rememberStaples({}, [cube]) })
+  ok(!wb.buy.some((b) => b.name.startsWith('Gemüsebrühe')) && wb.covered.some((b) => b.name === 'Gemüsebrühe'), 'Brühe aus Würfeln gedeckt, 3,1 l bleiben → nicht „bald leer“ auf der Liste')
+  const low = planWeek(hist, days, [{ ...cube, amount: 450 }], {}, today, {}, formatAmount, {}, 11, { memo: rememberStaples({}, [cube]) })
+  ok(low.buy.some((b) => b.name === 'Gemüsebrühe Würfel' && b.note === 'leer'), '… aber mit nur 50 ml Rest schon')
+}
+
 if (fails) { console.error(`${fails} Fehler`); process.exit(1) }
 console.log('Alle Tests OK')

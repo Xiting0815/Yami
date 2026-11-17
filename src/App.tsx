@@ -141,7 +141,8 @@ export default function App() {
     }
   }, [])
 
-  // vergangene Gerichte gelten als gekocht → Zutaten vom Vorrat abziehen
+  // vergangene Gerichte gelten als gekocht → Zutaten vom Vorrat abziehen – beim Tageswechsel und sobald ein vergangener
+  // Tag neu belegt wird (z. B. „Anderes Gericht wischen“ für gestern, Frühstück neu verteilt); cookDue ist idempotent
   useEffect(() => {
     setState((s) => {
       const r = cookDue(s.plan, s.pantry, today)
@@ -150,7 +151,7 @@ export default function App() {
       const x = moveExpired(b.pantry, s.wasted, today, s.prices)
       return r.changed || b.changed || x.changed ? { ...s, plan: r.plan, breakfast: b.plan, pantry: x.pantry, wasted: x.wasted } : s
     })
-  }, [today, setState])
+  }, [today, state.plan, state.breakfast, setState])
 
   useEffect(() => setRejected([]), [weekKey])
 
