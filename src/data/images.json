@@ -82,6 +82,13 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Bokkeum_Bibimbap_and_Little_Piggy_Bao_Bun_by_Bao_Bun_Brighton.jpg"
  },
+ "bifteki-feta": {
+  "author": "Simon Legner (User:simon04)",
+  "commonsTitle": "File:Bifteki mit frittierten Kartoffeln und Tsatsiki (IMG 20250217 132109).jpg",
+  "file": "img/bifteki-feta.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Bifteki_mit_frittierten_Kartoffeln_und_Tsatsiki_(IMG_20250217_132109).jpg"
+ },
  "bircher": {
   "author": "Gemini",
   "file": "img/bircher.webp",
@@ -134,6 +141,13 @@
   "file": "img/brot-box.webp",
   "license": "KI",
   "source": ""
+ },
+ "bud-spencer-eintopf": {
+  "author": "avlxyz",
+  "commonsTitle": "File:锅巴肉 Crispy Fried Pork with Sweet and Sour Sauce - Original Taste.jpg",
+  "file": "img/bud-spencer-eintopf.webp",
+  "license": "CC BY-SA 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:%E9%94%85%E5%B7%B4%E8%82%89_Crispy_Fried_Pork_with_Sweet_and_Sour_Sauce_-_Original_Taste.jpg"
  },
  "bulgogi": {
   "author": "Debbie Tingzon",
@@ -225,6 +239,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Jielbeaumadier_chicon_au_jambon_maroilles_2010.jpg"
  },
+ "chili-con-carne": {
+  "author": "René Hourdry",
+  "commonsTitle": "File:Chili con carne 50 A.jpg",
+  "file": "img/chili-con-carne.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Chili_con_carne_50_A.jpg"
+ },
  "chow-mein": {
   "author": "Gaurav Dhwaj Khadka",
   "commonsTitle": "File:Chow Mein 1.jpg",
@@ -278,6 +299,20 @@
   "file": "img/eiermuffins-spinat-feta.webp",
   "license": "KI",
   "source": ""
+ },
+ "entenbrust-orangensauce": {
+  "author": "Daderot",
+  "commonsTitle": "File:Duck breast and mashed potatoes with an orange and honey sauce - Massachusetts.jpg",
+  "file": "img/entenbrust-orangensauce.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Duck_breast_and_mashed_potatoes_with_an_orange_and_honey_sauce_-_Massachusetts.jpg"
+ },
+ "entenkeulen-rotkohl": {
+  "author": "Marek Ślusarczyk (Tupungato) Photo portfolio",
+  "commonsTitle": "File:034 Polish cuisine, Silesian cuisine - Duck leg with Silesian dumplings, red cabbage.jpg",
+  "file": "img/entenkeulen-rotkohl.webp",
+  "license": "CC BY 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:034_Polish_cuisine,_Silesian_cuisine_-_Duck_leg_with_Silesian_dumplings,_red_cabbage.jpg"
  },
  "erbseneintopf": {
   "author": "Dirk Vorderstraße",
@@ -340,6 +375,13 @@
   "license": "KI",
   "source": ""
  },
+ "gaensekeulen-rotkohl": {
+  "author": "Gerda Arendt",
+  "commonsTitle": "File:Leg of goose, Steckenroth, 1. Advent.jpg",
+  "file": "img/gaensekeulen-rotkohl.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Leg_of_goose,_Steckenroth,_1._Advent.jpg"
+ },
  "gaisburger-marsch": {
   "author": "MarkusHagenlocher at German Wikipedia",
   "commonsTitle": "File:Gaisburger Marsch.jpg",
@@ -368,6 +410,13 @@
   "license": "CC BY 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Stuffed_red_peppers,_dark_rye_bread,_Rostov-on-Don,_Russia.jpg"
  },
+ "gemista": {
+  "author": "Photo and cooking: Badseed",
+  "commonsTitle": "File:Gemista.jpg",
+  "file": "img/gemista.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Gemista.jpg"
+ },
  "geschmaelzte-maultaschen": {
   "author": "Soljaguar",
   "commonsTitle": "File:Maultaschen beim Metzger.jpg",
@@ -375,6 +424,8 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Maultaschen_beim_Metzger.jpg"
  },
+ "gigantes-feta": null,
+ "giouvetsi-kritharaki": null,
  "gnocchi-gorgonzola": {
   "author": "cyclonebill",
   "commonsTitle": "File:Flickr - cyclonebill - Gnocchi med gorgonzola og valnødder.jpg",
@@ -452,6 +503,14 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:02021_1020_(2)_Goulash_soup_of_Poland.jpg"
  },
+ "gyros-kritharaki-topf": null,
+ "gyros-metaxa-ueberbacken": {
+  "author": "Antonio Fajardo i López",
+  "commonsTitle": "File:Pita giros.JPG",
+  "file": "img/gyros-metaxa-ueberbacken.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Pita_giros.JPG"
+ },
  "hackbraten": {
   "author": "Indrajit Das",
   "commonsTitle": "File:Homemade meatloaf 04.jpg",
@@ -459,6 +518,7 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Homemade_meatloaf_04.jpg"
  },
+ "haehnchen-rahm-bandnudeln": null,
  "himmel-und-erde": {
   "author": "Anagoria",
   "commonsTitle": "File:2016-01-03 Himmel und Erde anagoria.JPG",
@@ -557,6 +617,13 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kaiserschmarrn_und_Apfelmus.jpg"
  },
+ "kalbsbraten-rahmsauce": {
+  "author": "Hayford Peirce @ Citizendum",
+  "commonsTitle": "File:Veal Orloff 4.jpg",
+  "file": "img/kalbsbraten-rahmsauce.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Veal_Orloff_4.jpg"
+ },
  "kartoffel-hack-auflauf": {
   "author": "Kotivalo",
   "commonsTitle": "File:Jauheliha-perunasoselaatikko.jpg",
@@ -612,6 +679,20 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Pumpkin_Katsu_Curry_and_Chicken_Katsu_Curry_-_Sunoso.jpg"
  },
+ "keftedes-reis": {
+  "author": "Miansari66",
+  "commonsTitle": "File:Kofta Curry (cropped).JPG",
+  "file": "img/keftedes-reis.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Kofta_Curry_(cropped).JPG"
+ },
+ "knusprige-ente-suess-sauer": {
+  "author": "Alpha from Melbourne, Australia",
+  "commonsTitle": "File:干煸牛肉丝 Crispy Beef Strips - Sung's Kitchen (3042618951).jpg",
+  "file": "img/knusprige-ente-suess-sauer.webp",
+  "license": "CC BY-SA 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:%E5%B9%B2%E7%85%B8%E7%89%9B%E8%82%89%E4%B8%9D_Crispy_Beef_Strips_-_Sung%27s_Kitchen_(3042618951).jpg"
+ },
  "koenigsberger-klopse": {
   "author": "Anagoria",
   "commonsTitle": "File:2022-11-13 Königsberger Klopse Restaurant Dicke Paula Berlin anagoria.jpg",
@@ -632,12 +713,26 @@
   "license": "KI",
   "source": ""
  },
+ "kotopoulo-lemonato": {
+  "author": "Andy Li",
+  "commonsTitle": "File:Sunday roasts in Haus on the Hill pub, Brighton.jpg",
+  "file": "img/kotopoulo-lemonato.webp",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Sunday_roasts_in_Haus_on_the_Hill_pub,_Brighton.jpg"
+ },
  "krautschupfnudeln": {
   "author": "MarkusHagenlocher",
   "commonsTitle": "File:Schupfnudeln mit Sauerkraut-RZ.jpg",
   "file": "img/krautschupfnudeln.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schupfnudeln_mit_Sauerkraut-RZ.jpg"
+ },
+ "kuerbis-hack-eintopf": {
+  "author": "U.S. Department of Agriculture",
+  "commonsTitle": "File:20171027-AMS-LSC-1141 (24215480678).jpg",
+  "file": "img/kuerbis-hack-eintopf.webp",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:20171027-AMS-LSC-1141_(24215480678).jpg"
  },
  "kuerbissuppe": {
   "author": "Minja Klarić",
@@ -778,6 +873,13 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Beef_stew_with_potatoes_and_carrots_-_Massachusetts.jpg"
  },
+ "moussaka": {
+  "author": "Original: Cuklev",
+  "commonsTitle": "File:Мусака од компири.jpg",
+  "file": "img/moussaka.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:%D0%9C%D1%83%D1%81%D0%B0%D0%BA%D0%B0_%D0%BE%D0%B4_%D0%BA%D0%BE%D0%BC%D0%BF%D0%B8%D1%80%D0%B8.jpg"
+ },
  "nasi-goreng": {
   "author": "Wiki Farazi",
   "commonsTitle": "File:Nasi goreng pattaya 20231028 120535.jpg",
@@ -891,6 +993,7 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pappa_al_pomodoro-piatto.jpg"
  },
+ "paprika-hack-topf": null,
  "paprikaschnitzel": {
   "author": "Benreis",
   "commonsTitle": "File:Zigeunerschnitzel Jennrkaser.JPG",
@@ -939,6 +1042,13 @@
   "file": "img/pasta-tonno.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pasta_al_rag%C3%B9_di_tonno_rosso.jpg"
+ },
+ "pastitsio": {
+  "author": "GeoO",
+  "commonsTitle": "File:Pastitsio ingredients.png",
+  "file": "img/pastitsio.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Pastitsio_ingredients.png"
  },
  "pellkartoffeln-kraeuterquark": {
   "author": "abnehmen.net",
@@ -1206,6 +1316,7 @@
   "license": "KI",
   "source": ""
  },
+ "sauerkrauteintopf-kasseler": null,
  "savory-oats": {
   "author": "Gemini",
   "file": "img/savory-oats.webp",
@@ -1233,6 +1344,14 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pastitsio_homemade.jpg"
  },
+ "schnippelbohneneintopf": {
+  "author": "Horacio Cambeiro",
+  "commonsTitle": "File:Argentine red kidney bean stew with smoked sausage and white rice.jpg",
+  "file": "img/schnippelbohneneintopf.webp",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Argentine_red_kidney_bean_stew_with_smoked_sausage_and_white_rice.jpg"
+ },
+ "schnuesch": null,
  "scholle-finkenwerder": {
   "author": "Sir James",
   "commonsTitle": "File:2017-05-01 Scholle Finkenwerder Art.JPG",
@@ -1309,6 +1428,20 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Soljanka_with_olives.jpg"
  },
+ "soutzoukakia": {
+  "author": "Perique des Palottes",
+  "commonsTitle": "File:Soutzoukakia smyrneika.jpg",
+  "file": "img/soutzoukakia.webp",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Soutzoukakia_smyrneika.jpg"
+ },
+ "souvlaki-pita": {
+  "author": "StevenBjerke97",
+  "commonsTitle": "File:Quebec style souvlaki pita.jpg",
+  "file": "img/souvlaki-pita.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Quebec_style_souvlaki_pita.jpg"
+ },
  "spaetzle-auflauf": {
   "author": "Gemini",
   "file": "img/spaetzle-auflauf.webp",
@@ -1378,6 +1511,7 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Steckr%C3%BCbeneintopf.JPG"
  },
+ "stifado": null,
  "stracciatella": {
   "author": "Mike.lifeguard",
   "commonsTitle": "File:Straciatella - bowl.JPG",
@@ -1474,6 +1608,13 @@
   "file": "img/weisskohleintopf.webp",
   "license": "KI",
   "source": ""
+ },
+ "westfaelisches-blindhuhn": {
+  "author": "Raimond Spekking",
+  "commonsTitle": "File:Westfälisches Blindhuhn mit Mettenden und Schweinespeck-6650.jpg",
+  "file": "img/westfaelisches-blindhuhn.webp",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Westf%C3%A4lisches_Blindhuhn_mit_Mettenden_und_Schweinespeck-6650.jpg"
  },
  "wiener-schnitzel": {
   "author": "Burkhard Mücke",
