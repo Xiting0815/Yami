@@ -140,7 +140,10 @@ export function prepPlan(assignment: BreakfastAssignment): PrepItem[] {
       ingredients: recipe.ingredients.map((i) => ({ ...i, amount: i.amount == null ? null : i.amount * portions })),
     }
   })
-  const usesOven = (r: Recipe) => r.steps.some((s) => /Ofen/.test(s))
+  // Ofen = Combair oder CombiSteamer mit Backen (nicht nur Dämpfen); klassische Schritte: Wort „Ofen“
+  const usesOven = (r: Recipe) =>
+    r.deviceSteps?.some((s) => s.settings?.some((x) => x.device === 'combair' || (x.device === 'steamer' && x.mode !== 'Dämpfen'))) ??
+    (r.classicSteps ?? r.steps).some((s) => /Ofen/.test(s))
   return items.sort((a, b) => Number(usesOven(b.recipe)) - Number(usesOven(a.recipe)))
 }
 
