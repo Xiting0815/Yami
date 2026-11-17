@@ -4,10 +4,18 @@ import { formatAmount, scale } from '../shopping'
 import { ingredientsForStep, unmatched } from '../cookSteps'
 import { DeviceChips } from './DeviceChip'
 
+/** „Fertig gekocht“ am Ende des Kochmodus (fehlt bei Frühstück) */
+export interface CookFinish {
+  /** heute steht schon ein anderes Gericht: Titel für die Rückfrage „Statt … heute eintragen?“ */
+  conflict?: string
+  run: (servings: number, replace: boolean) => void
+}
+
 interface Props {
   recipe: Recipe
   /** Portionen aus dem Rezept-Sheet */
   servings: number
+  finish?: CookFinish
   onClose: () => void
 }
 
@@ -23,8 +31,9 @@ function Chip({ ing, base, servings }: { ing: Ingredient; base: number; servings
   )
 }
 
-export function CookMode({ recipe, servings, onClose }: Props) {
+export function CookMode({ recipe, servings, finish, onClose }: Props) {
   const [done, setDone] = useState<Set<number>>(() => new Set())
+  const [asking, setAsking] = useState(false)
   const [wake, setWake] = useState<Wake>('checking')
   const loose = unmatched(recipe)
 
@@ -136,6 +145,24 @@ export function CookMode({ recipe, servings, onClose }: Props) {
             )
           })}
         </ol>
+
+        {finish && (
+          <section className="cook-finish" aria-label="Fertig gekocht">
+            {asking && finish.conflict ? (
+              <>
+                <p>Statt <b>{finish.conflict}</b> heute eintragen?</p>
+                <div className="cook-finish-btns">
+                  <button className="btn primary" onClick={() => finish.run(servings, true)}>Ja</button>
+                  <button className="btn ghost" onClick={onClose}>Nein</button>
+                </div>
+              </>
+            ) : (
+              <button className="btn primary wide" onClick={() => (finish.conflict ? setAsking(true) : finish.run(servings, false))}>
+                Fertig gekocht ✓
+              </button>
+            )}
+          </section>
+        )}
       </div>
     </div>
   )

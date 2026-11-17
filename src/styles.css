@@ -869,3 +869,21 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .cook-step .dev-chip { font-size: 15px; padding: 6px 12px 6px 10px; }
 .dev-toggle { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 10px; }
 .dev-toggle button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 13px; color: var(--accent-text); text-decoration: underline; cursor: pointer; }
+
+/* ───── Fertig gekocht & „Wie war’s?“ ───── */
+.cook-finish { margin: 8px 0 24px; padding: 14px; background: var(--accent-soft); border-radius: var(--radius); }
+.cook-finish p { margin: 0 0 10px; font-size: 17px; line-height: 1.4; }
+.cook-finish .btn { min-height: 52px; font-size: 17px; }
+.cook-finish-btns { display: flex; gap: 10px; }
+.cook-finish-btns .btn { flex: 1; }
+.sheet.rate-sheet { padding: 22px 18px calc(16px + env(safe-area-inset-bottom)); }
+.sheet.rate-sheet h2 { margin: 0 0 2px; font-size: 22px; }
+.sheet.rate-sheet h3 { margin: 18px 0 8px; font-size: 16px; }
+.sheet.rate-sheet .rate-btns { margin: 14px 0 0; }
+.rate-btns button.on, .portion-btns button.on { background: var(--accent); color: var(--accent-ink); }
+.portion-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.portion-btns button { min-height: 48px; border: none; background: var(--surface-2); border-radius: var(--r-md); font-weight: 700; font-size: 14px; color: var(--text); }
+.rate-later { display: block; margin: 16px auto 0; min-height: var(--tap); font-size: 15px; }
+.sheet.rate-sheet .btn.wide { margin-top: 18px; min-height: 52px; }
+.portion-btns.compact { margin: 8px 10px 0 0; }
+.portion-btns.compact button { min-height: 36px; font-size: 13px; font-weight: 600; }

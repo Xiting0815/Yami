@@ -9,7 +9,7 @@ import imageMap from '../data/images.json'
 import { type Insight, type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { InsightBadges } from './SwipeDeck'
 import type { Portion } from '../energy'
-import { CookMode } from './CookMode'
+import { CookMode, type CookFinish } from './CookMode'
 import { DeviceChips } from './DeviceChip'
 
 type Credit = { author: string; license: string; source: string } | null | undefined
@@ -24,9 +24,11 @@ interface Props {
   insight?: Insight
   prices: PriceOverrides
   /** deine Portion (Abendessen, mit Profil) */
-  portion?: Portion & { budget: number }
+  portion?: Portion & { budget: number; /** gelernt: „ihr braucht eher etwas mehr (+10 %)“ */ household?: string }
   /** Kochmodus offen – App zählt ihn als Zurück-Ebene */
   cooking: boolean
+  /** „Fertig gekocht“ im Kochmodus */
+  onFinish?: CookFinish
   onCooking: (on: boolean) => void
   /** nur bei eigenen Rezepten */
   onEdit?: () => void
@@ -36,7 +38,7 @@ interface Props {
   onShowClassic?: (v: boolean) => void
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onCooking, onEdit, onDelete, showClassic, onShowClassic }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onFinish, onCooking, onEdit, onDelete, showClassic, onShowClassic }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
   const hasDevice = !!recipe.deviceSteps && !!recipe.classicSteps
@@ -106,6 +108,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                     })()}
                 </div>
                 {portion.tip && <div className="small">🥗 {portion.tip}</div>}
+                {portion.household && <div className="muted small">👥 Erfahrungsgemäß: {portion.household}. Fürs Einkaufen rechne ich damit.</div>}
               </div>
             )}
 
@@ -186,7 +189,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
           )}
         </div>
       </div>
-      {cooking && <CookMode recipe={recipe} servings={servings} onClose={() => onCooking(false)} />}
+      {cooking && <CookMode recipe={recipe} servings={servings} finish={onFinish} onClose={() => onCooking(false)} />}
     </>
   )
 }

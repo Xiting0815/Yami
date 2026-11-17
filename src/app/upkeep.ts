@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { cookDue, moveExpired } from '../kitchen'
+import { portionFactor } from '../learning'
 import type { AppState } from '../store'
 import type { SetAppState } from './types'
 
@@ -7,8 +8,8 @@ import type { SetAppState } from './types'
  * Vergangene Gerichte (Abendessen & Frühstück) gelten als gekocht → Zutaten vom Vorrat abziehen;
  * vor mehr als 7 Tagen Abgelaufenes gilt als weggeworfen. Idempotent.
  */
-export function settleDue(s: Pick<AppState, 'plan' | 'breakfast' | 'pantry' | 'wasted' | 'prices'>, today: string) {
-  const r = cookDue(s.plan, s.pantry, today)
+export function settleDue(s: Pick<AppState, 'plan' | 'breakfast' | 'pantry' | 'wasted' | 'prices'> & Partial<Pick<AppState, 'portionFeedback'>>, today: string) {
+  const r = cookDue(s.plan, s.pantry, today, portionFactor(s.portionFeedback, today))
   const b = cookDue(s.breakfast, r.pantry, today)
   const x = moveExpired(b.pantry, s.wasted, today, s.prices)
   return { plan: r.plan, breakfast: b.plan, pantry: x.pantry, wasted: x.wasted, changed: r.changed || b.changed || x.changed }

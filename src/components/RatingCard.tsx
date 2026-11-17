@@ -1,9 +1,10 @@
-import type { Rating } from '../learning'
+import type { PortionFeedback, Rating } from '../learning'
 import { weekdayName } from '../store'
 import { Icon } from './Icon'
+import { PORTIONS } from './RateSheet'
 
 /** „Wie war … am …?“ – Bewertung eines gekochten Gerichts (Lernsignal) */
-export function RatingCard({ title, day, onRate, onDismiss }: { title: string; day: string; onRate: (v: Rating) => void; onDismiss: () => void }) {
+export function RatingCard({ title, day, portion, onRate, onPortion, onDismiss }: { title: string; day: string; portion?: PortionFeedback; onRate: (v: Rating) => void; onPortion: (v: PortionFeedback) => void; onDismiss: () => void }) {
   return (
     <section className="rate-card" aria-label="Bewertung">
       <div className="rate-head">
@@ -18,6 +19,13 @@ export function RatingCard({ title, day, onRate, onDismiss }: { title: string; d
         <button onClick={() => onRate('up')}><span aria-hidden>👍</span> Gut</button>
         <button onClick={() => onRate('again')}><span aria-hidden>🔁</span> Bald wieder</button>
         <button onClick={() => onRate('down')}><span aria-hidden>👎</span> Nicht so</button>
+      </div>
+      <div className="portion-btns compact" role="group" aria-label="Portion">
+        {PORTIONS.map(([v, label]) => (
+          <button key={v} className={portion === v ? 'on' : ''} aria-pressed={portion === v} onClick={() => onPortion(v)}>
+            {label}
+          </button>
+        ))}
       </div>
     </section>
   )

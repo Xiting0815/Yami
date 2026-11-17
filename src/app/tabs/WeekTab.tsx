@@ -84,7 +84,7 @@ export function WeekTab({ m }: { m: AppModel }) {
         const day = pendingRating(state.plan, state.ratings, today, state.ratingDismissed)
         const r = day ? RECIPE_BY_ID[state.plan[day]!.recipeId] : undefined
         if (!day || !r) return null
-        return <RatingCard title={r.title} day={day} onRate={(v) => act.rate(day, v)} onDismiss={() => act.dismissRating(day)} />
+        return <RatingCard title={r.title} day={day} portion={state.portionFeedback[day]} onPortion={(v) => act.setPortionFeedback(day, v)} onRate={(v) => act.rate(day, v)} onDismiss={() => act.dismissRating(day)} />
       })()}
       days={days}
       plan={state.plan}

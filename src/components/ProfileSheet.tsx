@@ -12,6 +12,8 @@ interface Props {
   onClose: () => void
   /** gelernte Vorlieben */
   learned?: LearnedSummary
+  /** gelernter Portionsfaktor als Text (leer = 1,0) */
+  portionNote?: string
   /** oft in den Vorrat gelegt, aber kaum Rezepte dafür */
   wishes?: { name: string; count: number; recipes: number }[]
   /** gelernter Prep-Wochentag (0 = Sonntag = Standard) */
@@ -30,7 +32,7 @@ interface Props {
 
 const fmt = (n: number) => Math.round(n).toLocaleString('de-DE')
 
-export function ProfileSheet({ profile, onSave, onClose, learned, wishes = [], prepWeekday = 0, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing }: Props) {
+export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, wishes = [], prepWeekday = 0, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing }: Props) {
   const [p, setP] = useState<Profile>(profile ?? DEFAULT_PROFILE)
   const fileInput = useRef<HTMLInputElement>(null)
   const [backupError, setBackupError] = useState<string | null>(null)
@@ -185,6 +187,7 @@ export function ProfileSheet({ profile, onSave, onClose, learned, wishes = [], p
                   <p className="muted small">Aus {learned.signals} Signalen; ältere zählen weniger, damit sich dein Geschmack ändern darf.</p>
                 </>
               )}
+              {portionNote && <p><b>Portionen:</b> {portionNote}.</p>}
               {wishes.map((w) => (
                 <p key={w.name}>
                   <b>Vorrat:</b> Du hast oft {w.name} im Vorrat – dafür gibt es noch {w.recipes === 0 ? 'keine' : 'kaum'} Rezepte.

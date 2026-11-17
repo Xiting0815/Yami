@@ -1,7 +1,8 @@
 import type { PlanEntry, Recipe } from '../../types'
-import type { Rating } from '../../learning'
+import { type PortionFeedback, type Rating, portionFactor } from '../../learning'
+import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
-import { cookDue, uncook } from '../../kitchen'
+import { cookDue, cookNow, uncook } from '../../kitchen'
 import type { ActionContext } from './context'
 
 /** Abendessen planen: Wischen, Nehmen/Wegwischen, Tage leeren, gekocht/nicht gekocht, Bewertung, Woche wechseln */
@@ -103,7 +104,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
       const e = s.plan[day]
       if (!e) return s
       const plan = { ...s.plan, [day]: { ...e, status: undefined } }
-      const r = cookDue(plan, s.pantry, today)
+      const r = cookDue(plan, s.pantry, today, portionFactor(s.portionFeedback, today))
       return { ...s, plan: r.plan, pantry: r.pantry }
     })
   }
@@ -114,9 +115,52 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
     flash(v === 'down' ? 'Gemerkt – kommt seltener ✓' : v === 'again' ? 'Gemerkt – kommt bald wieder ✓' : 'Danke – gemerkt ✓')
   }
 
+  /** Bewertung im „Wie war’s?“-Sheet: sofort speichern, nochmal tippen nimmt sie zurück (kein Toast – das Sheet bleibt offen) */
+  function setRating(day: string, v: Rating | undefined) {
+    setState((s) => {
+      const ratings = { ...s.ratings }
+      if (v) ratings[day] = v
+      else delete ratings[day]
+      return { ...s, ratings }
+    })
+  }
+
+  /** Portion im „Wie war’s?“-Sheet (zu wenig / passt / zu viel) → lernt den Portionsfaktor */
+  function setPortionFeedback(day: string, v: PortionFeedback | undefined) {
+    setState((s) => {
+      const portionFeedback = { ...s.portionFeedback }
+      if (v != null) portionFeedback[day] = v
+      else delete portionFeedback[day]
+      return { ...s, portionFeedback }
+    })
+  }
+
+  /**
+   * „Fertig gekocht“: Eintrag sofort als gekocht eintragen (Vorrat wird jetzt abgezogen, cookDue morgen nicht noch einmal),
+   * danach fragt das „Wie war’s?“-Sheet nach Bewertung und Portion. Bei `replace` wird ein anderes Gericht von heute ersetzt.
+   */
+  function finishCooking(recipe: Recipe, servings: number, ctxDay?: string, replace = false) {
+    const t = cookTarget(state.plan, recipe.id, today, ctxDay)
+    if (t.kind === 'conflict' && !replace) return
+    const snap = snapshot()
+    if (!(t.kind === 'entry' && t.done)) {
+      setState((s) => {
+        const r = cookNow(s.plan, s.pantry, t.day, { recipeId: recipe.id, servings }, portionFactor(s.portionFeedback, today))
+        // für später geplant, heute gekocht → verschieben statt doppelt
+        const moved = futureDuplicate(s.plan, recipe.id, today, ctxDay)
+        if (moved && moved !== t.day) delete r.plan[moved]
+        return { ...s, plan: r.plan, pantry: r.pantry }
+      })
+    }
+    flash(`${recipe.title} als gekocht eingetragen`, snap)
+    ui.setCooking(false)
+    ui.setSheet(null)
+    ui.setRateDay(t.day)
+  }
+
   function dismissRating(day: string) {
     setState((s) => ({ ...s, ratingDismissed: [...s.ratingDismissed, day].slice(-60) }))
   }
 
-  return { setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, dismissRating }
+  return { setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, dismissRating }
 }

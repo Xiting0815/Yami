@@ -10,7 +10,7 @@ import {
 import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
 import { DEFAULT_PROFILE, type Profile } from './energy'
 import type { WeighIn } from './progress'
-import type { Rating, RejectEvent } from './learning'
+import type { PortionFeedback, Rating, RejectEvent } from './learning'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -144,6 +144,8 @@ export interface AppState {
   ratings: Record<string, Rating>
   /** Tage, deren Bewertungsfrage weggeklickt wurde */
   ratingDismissed: string[]
+  /** Menge nach dem Essen: Tag → −1 zu wenig · 0 passt · 1 zu viel (lernt den Portionsfaktor des Haushalts) */
+  portionFeedback: Record<string, PortionFeedback>
   /** gelernte Vorlieben gelten erst ab diesem Datum (nach „Zurücksetzen“) */
   tasteSince?: string
   /** Start-Checkliste: fehlt = läuft noch, 'done' = erledigt, 'dismissed' = ausgeblendet */
@@ -198,6 +200,7 @@ const INITIAL: AppState = {
   rejects: [],
   ratings: {},
   ratingDismissed: [],
+  portionFeedback: {},
   wasted: [],
   reviewDismissed: [],
   customRecipes: [],
@@ -427,6 +430,12 @@ export function sanitize(parsed: unknown): AppState {
   state.rejects = state.rejects.filter((r) => !!r && typeof r.id === 'string' && typeof r.date === 'string' && ISO.test(r.date)).slice(-400)
   state.ratings = Object.fromEntries(Object.entries(state.ratings).filter(([d, v]) => ISO.test(d) && (v === 'up' || v === 'again' || v === 'down')))
   state.ratingDismissed = state.ratingDismissed.filter((d) => typeof d === 'string')
+  state.portionFeedback = Object.fromEntries(
+    Object.entries(state.portionFeedback)
+      .filter(([d, v]) => ISO.test(d) && (v === -1 || v === 0 || v === 1))
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-120),
+  )
   state.bought = Object.fromEntries(
     Object.entries(state.bought)
       .filter(([, m]) => m && typeof m === 'object' && !Array.isArray(m))

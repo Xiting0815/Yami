@@ -60,7 +60,7 @@ export function profileActions({ state, setState, cal, ui, flash, snapshot }: Ac
 
   function resetLearning() {
     const snap = snapshot()
-    setState((s) => ({ ...s, tasteSince: today, rejects: [], ratings: {}, ratingDismissed: [] }))
+    setState((s) => ({ ...s, tasteSince: today, rejects: [], ratings: {}, ratingDismissed: [], portionFeedback: {} }))
     flash('Gelerntes zurückgesetzt', snap)
   }
 

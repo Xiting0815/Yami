@@ -1,6 +1,7 @@
 import { RECIPE_BY_ID } from '../data/recipes'
 import { learnedPrepWeekday } from '../breakfast'
-import { pantryWishes, summarize } from '../learning'
+import { pantryWishes, portionNote, summarize } from '../learning'
+import { cookTarget } from '../cookDone'
 import { portionFor } from '../energy'
 import { defaultReviewMonday } from '../review'
 import { addDays, isoDate, parseIso, weekdayName } from '../store'
@@ -12,6 +13,7 @@ import { PrepSheet } from '../components/PrepSheet'
 import { ProfileSheet } from '../components/ProfileSheet'
 import { ProgressSheet } from '../components/ProgressSheet'
 import { RecipeEditor } from '../components/RecipeEditor'
+import { RateSheet } from '../components/RateSheet'
 import { RecipeSheet } from '../components/RecipeSheet'
 import { ReviewSheet } from '../components/ReviewSheet'
 import type { AppModel } from './useAppModel'
@@ -40,7 +42,9 @@ export function Sheets({ m }: { m: AppModel }) {
             const day = sheet.day
             if (sheet.recipe.breakfast || !day) return undefined
             const budget = energy.dinnerBudgetFor(day)
-            return budget != null ? { ...portionFor(sheet.recipe, budget, state.plan[day]?.servings ?? state.defaultServings), budget } : undefined
+            return budget != null
+              ? { ...portionFor(sheet.recipe, budget, state.plan[day]?.servings ?? state.defaultServings), budget, household: portionNote(plan.portion) }
+              : undefined
           })()}
           servings={
             sheet.recipe.breakfast
@@ -51,6 +55,17 @@ export function Sheets({ m }: { m: AppModel }) {
           onClose={() => ui.setSheet(null)}
           cooking={ui.cooking}
           onCooking={ui.setCooking}
+          onFinish={
+            sheet.recipe.breakfast
+              ? undefined
+              : (() => {
+                  const t = cookTarget(state.plan, sheet.recipe.id, today, sheet.day)
+                  return {
+                    conflict: t.kind === 'conflict' ? t.title : undefined,
+                    run: (servings: number, replace: boolean) => act.finishCooking(sheet.recipe, servings, sheet.day, replace),
+                  }
+                })()
+          }
           showClassic={state.showClassicSteps}
           onShowClassic={(v) => m.setState((s) => ({ ...s, showClassicSteps: v }))}
           onEdit={() => {
@@ -151,6 +166,22 @@ export function Sheets({ m }: { m: AppModel }) {
         />
       )}
 
+      {ui.rateDay && state.plan[ui.rateDay] && RECIPE_BY_ID[state.plan[ui.rateDay]!.recipeId] && (
+        <RateSheet
+          title={RECIPE_BY_ID[state.plan[ui.rateDay]!.recipeId].title}
+          day={ui.rateDay}
+          today={today}
+          rating={state.ratings[ui.rateDay]}
+          portion={state.portionFeedback[ui.rateDay]}
+          onRate={(v) => act.setRating(ui.rateDay!, v)}
+          onPortion={(v) => act.setPortionFeedback(ui.rateDay!, v)}
+          onClose={() => {
+            if (state.ratings[ui.rateDay!] !== undefined || state.portionFeedback[ui.rateDay!] !== undefined) m.flash('Danke – gemerkt ✓')
+            ui.setRateDay(null)
+          }}
+        />
+      )}
+
       {ui.showPrep && (
         <PrepSheet
           items={bf.prepItems}
@@ -184,6 +215,7 @@ export function Sheets({ m }: { m: AppModel }) {
         <ProfileSheet
           profile={profile}
           learned={summarize(plan.taste)}
+          portionNote={portionNote(plan.portion)}
           wishes={pantryWishes(state.pantryRequests)}
           prepWeekday={learnedPrepWeekday(state.prepDays, today)}
           onResetLearning={act.resetLearning}

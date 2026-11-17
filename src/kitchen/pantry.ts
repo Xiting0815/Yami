@@ -83,7 +83,7 @@ export function moveExpired(
 }
 
 /** Gekochte Gerichte (Tage vor heute) automatisch vom Vorrat abziehen */
-export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string): { plan: WeekPlan; pantry: PantryLot[]; changed: boolean } {
+export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string, factor = 1): { plan: WeekPlan; pantry: PantryLot[]; changed: boolean } {
   const due = Object.keys(plan)
     .filter((d) => d < today && plan[d] && !plan[d]!.status)
     .sort()
@@ -94,10 +94,22 @@ export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string): { p
     const entry = next[day]!
     const recipe = RECIPE_BY_ID[entry.recipeId]
     const consumed: PantryLot[] = []
-    if (recipe) for (const n of allNeedsOf(recipe, entry.servings)) consumed.push(...consume(lots, n.name, n.amount, day))
+    if (recipe) for (const n of allNeedsOf(recipe, entry.servings * factor)) consumed.push(...consume(lots, n.name, n.amount, day))
     next[day] = { ...entry, status: 'cooked', consumed }
   }
   return { plan: next, pantry: lots, changed: true }
+}
+
+/**
+ * „Fertig gekocht“: den Eintrag dieses Tages sofort als gekocht eintragen und die Zutaten vom Vorrat abziehen –
+ * genau wie cookDue am nächsten Tag (dort ist der Eintrag dann schon „gekocht“ und wird nicht noch einmal abgezogen).
+ * Ein vorhandener Eintrag mit Status wird zuerst zurückgenommen (Zutaten zurück), damit nie doppelt abgezogen wird.
+ */
+export function cookNow(plan: WeekPlan, pantry: PantryLot[], day: string, entry: { recipeId: string; servings: number }, factor = 1): { plan: WeekPlan; pantry: PantryLot[] } {
+  const old = plan[day]
+  const base = old?.status ? uncook(old, pantry) : pantry
+  const r = cookDue({ [day]: { recipeId: entry.recipeId, servings: entry.servings } }, base, addDaysIso(day, 1), factor)
+  return { plan: { ...plan, [day]: r.plan[day]! }, pantry: r.pantry }
 }
 
 /** "Nicht gekocht": entnommene Mengen zurück in den Vorrat */

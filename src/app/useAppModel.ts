@@ -54,6 +54,7 @@ export function useAppModel() {
     ui.setSwipeDay(u.swipeDay)
     ui.setTab(u.tab)
     ui.setMeal(u.meal)
+    ui.setRateDay(null)
     flash('Rückgängig gemacht ✓')
   }
 

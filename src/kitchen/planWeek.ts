@@ -51,6 +51,8 @@ export interface StapleContext {
    * kommt mit auf die Liste (markiert mit `forDays`), statt beim Wochenwechsel zu verschwinden.
    */
   carry?: boolean
+  /** gelernter Portionsfaktor des Haushalts (Abendessen): offene Gerichte brauchen Portionen × Faktor, Standard 1 */
+  portion?: number
 }
 
 export interface WeekResult {
@@ -73,7 +75,7 @@ function activeEntries(plan: WeekPlan, days: string[]) {
 }
 
 export function planWeek(
-  plan: WeekPlan,
+  planIn: WeekPlan,
   days: string[],
   pantry: PantryLot[],
   bought: BoughtMap,
@@ -88,6 +90,9 @@ export function planWeek(
   staple: StapleContext = {},
 ): WeekResult {
   const memo = staple.memo ?? {}
+  // gelernte Haushalts-Portion: noch offene Abendessen brauchen mehr/weniger (schon gekochte sind über „entnommen“ erfasst)
+  const pf = staple.portion ?? 1
+  const plan: WeekPlan = pf === 1 ? planIn : Object.fromEntries(Object.entries(planIn).map(([d, e]) => [d, e && !e.status ? { ...e, servings: e.servings * pf } : e]))
   const own = (key: string) => isTrackedStaple(key, pantry, memo) || Object.keys(bought).some((n) => stapleKey(n) === key)
   // Mengen-Grundzutaten zählen erst, wenn du sie führst (Vorrat oder gemerkt) – oder etwas, das sie ersetzt
   // (Olivenöl für Sonnenblumenöl, Gemüsebrühe für Hühnerbrühe) – sonst bleiben sie bei „Vorrat prüfen“

@@ -1,7 +1,7 @@
 // Logiktest lernende Vorlieben:  npx vite-node scripts/test-learning.ts
 import { RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { addDaysIso } from '../src/kitchen'
-import { buildModel, mainProtein, pendingRating, preference, summarize, type RejectEvent } from '../src/learning'
+import { buildModel, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
 import type { WeekPlan } from '../src/types'
 
 let fails = 0
@@ -62,6 +62,24 @@ ok(s.liked.some((x) => x.label === 'Eintopf') && s.disliked.some((x) => x.label 
 // Bewertungsfrage: gestern gekocht, nicht bewertet
 ok(pendingRating({ '2026-11-15': { recipeId: 'carbonara', servings: 2, status: 'cooked' } }, {}, today, []) === '2026-11-15', 'Bewertungsfrage für gestern')
 ok(pendingRating({ '2026-11-10': { recipeId: 'carbonara', servings: 2, status: 'cooked' } }, {}, today, []) === undefined, 'Keine Frage für Essen vor 6 Tagen')
+
+// Portionsfaktor: lernt aus „zu wenig / passt / zu viel“, vorsichtig, mit Zeitverfall
+const fb = (xs: [number, PortionFeedback][]) => Object.fromEntries(xs.map(([ago, v]) => [addDaysIso(today, -ago), v]))
+ok(portionFactor({}, today) === 1 && portionFactor(undefined, today) === 1, 'Portionsfaktor ohne Rückmeldung: 1,0')
+ok(portionFactor(fb([[1, -1]]), today) === 1, 'Portionsfaktor: eine Rückmeldung bewegt noch nichts')
+const pMore2 = portionFactor(fb([[1, -1], [3, -1]]), today)
+ok(pMore2 > 1 && pMore2 <= 1.1, `Portionsfaktor: 2× „zu wenig“ → leicht mehr (${pMore2})`)
+const pMore = portionFactor(fb(Array.from({ length: 30 }, (_, i) => [i, -1] as [number, PortionFeedback])), today)
+ok(pMore === 1.2, `Portionsfaktor: dauerhaft „zu wenig“ → Obergrenze 1,2 (${pMore})`)
+const pLess = portionFactor(fb(Array.from({ length: 30 }, (_, i) => [i, 1] as [number, PortionFeedback])), today)
+ok(pLess === 0.85, `Portionsfaktor: dauerhaft „zu viel“ → Untergrenze 0,85 (${pLess})`)
+ok(portionFactor(fb([[1, 0], [2, 0], [3, 0], [4, 0]]), today) === 1, 'Portionsfaktor: „passt“ → 1,0')
+ok(portionFactor(fb([[1, -1], [2, 1]]), today) === 1, 'Portionsfaktor: gegenläufig → 1,0')
+const pOld = portionFactor(fb([[300, -1], [301, -1], [302, -1], [303, -1]]), today)
+ok(pOld < 1.05, `Portionsfaktor: sehr alte Rückmeldungen verblassen (${pOld})`)
+const recent = portionFactor(fb([[1, -1], [2, -1], [3, -1], [4, -1], [200, 1], [201, 1], [202, 1]]), today)
+ok(recent > 1, `Portionsfaktor: neue Rückmeldungen zählen mehr als alte (${recent})`)
+ok(portionNote(1) === undefined && portionNote(1.1) === 'ihr braucht eher etwas mehr (+10 %)' && portionNote(0.9) === 'ihr braucht eher etwas weniger (−10 %)', 'Portionsfaktor: Text für „Das habe ich gelernt“')
 
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }
 console.log('Alle Tests OK')

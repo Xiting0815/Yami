@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { Recipe } from '../types'
 import { RECIPES, RECIPE_BY_ID } from '../data/recipes'
-import { buildModel, preference } from '../learning'
+import { buildModel, portionFactor, preference } from '../learning'
 import { dayBalance, isProteinLow, isWorkday, proteinBoost } from '../energy'
 import { type AppState, addDays, isoDate, mondayOf, parseIso, weekDays } from '../store'
 import { matches } from '../filter'
@@ -19,12 +19,14 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
   // Saison: Monat des gewischten Kochtags (Abendessen) bzw. heute (Frühstück & Wocheneinkauf)
   const todayMonth = new Date(today + 'T12:00:00').getMonth() + 1
   const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
+  // Lernen: wie groß sind die Portionen wirklich (Rückmeldung nach dem Essen) → Mengen fürs Einkaufen
+  const portion = useMemo(() => portionFactor(state.portionFeedback, today), [state.portionFeedback, today])
   // ab Samstag ist die Liste die der nächsten Woche: was für Sa/So der laufenden Woche noch fehlt, kommt mit drauf
   const carryFor = (key: string) => today < key && key === defaultMonday(today)
   const week = useMemo(
-    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(weekKey) }),
+    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(weekKey), portion }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
+    [state.plan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices, portion],
   )
   // Lernen: wie lange reichen Öl, Brühe & Co. noch (aus dem Verbrauch der gekochten Gerichte)
   const hints = useMemo(() => stapleHints(useEvents(state.plan, state.breakfast), state.pantry, today), [state.plan, state.breakfast, state.pantry, today])
@@ -34,9 +36,9 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
     () =>
       haKey === weekKey
         ? week
-        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(haKey) }),
+        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(haKey), portion }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [haKey, weekKey, week, state.plan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices],
+    [haKey, weekKey, week, state.plan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices, portion],
   )
   const haLocal = useMemo(() => localItems(haWeek.buy), [haWeek])
   const weekRecipes = useMemo(
@@ -124,7 +126,7 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
     return [...fresh, ...later]
   }, [state.filters, perPortion, plannedIds, rejected, insights, pantryMode])
 
-  return { todayMonth, week, hints, haKey, haWeek, haLocal, jitter, taste, insights, perPortion, activeFilters, filteredCount, deck }
+  return { portion, todayMonth, week, hints, haKey, haWeek, haLocal, jitter, taste, insights, perPortion, activeFilters, filteredCount, deck }
 }
 
 export type Planning = ReturnType<typeof usePlanning>

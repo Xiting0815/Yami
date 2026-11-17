@@ -235,3 +235,41 @@ export function pendingRating(plan: WeekPlan, ratings: Record<string, Rating>, t
     .sort()
     .pop()
 }
+
+// ───────────── Portionen ─────────────
+
+/** Rückmeldung zur Menge nach dem Essen: −1 zu wenig · 0 passt · 1 zu viel (Tag → Wert) */
+export type PortionFeedback = -1 | 0 | 1
+
+export const PORTION_MIN = 0.85
+export const PORTION_MAX = 1.2
+/** so viele Rückmeldungen braucht es, bevor sich der Faktor von 1,0 wegbewegt */
+const PORTION_MIN_FEEDBACK = 2
+
+/**
+ * Gelernter Portionsfaktor des Haushalts (Abendessen). „Zu wenig“ hebt ihn, „zu viel“ senkt ihn – mit Zeitverfall
+ * (Halbwertszeit 60 Tage), gedämpft (zwei gedachte „passt“-Werte ziehen zur 1,0), in 5-%-Schritten, begrenzt auf 0,85–1,2.
+ * Erst ab 2 Rückmeldungen. Das ist die Menge fürs Einkaufen/Planen – nicht deine persönliche Kalorienportion.
+ */
+export function portionFactor(feedback: Record<string, PortionFeedback> | undefined, today: string): number {
+  const entries = Object.entries(feedback ?? {}).filter(([d, v]) => d <= today && (v === -1 || v === 0 || v === 1))
+  if (entries.length < PORTION_MIN_FEEDBACK) return 1
+  let sum = 0
+  let n = 0
+  for (const [d, v] of entries) {
+    const w = Math.pow(0.5, Math.max(0, -daysUntil(d, today)) / HALF_LIFE)
+    sum += -v * w // „zu wenig“ (−1) → mehr kochen
+    n += w
+  }
+  const avg = sum / (n + 2)
+  const raw = 1 + (avg > 0 ? 0.2 : 0.15) * avg
+  const f = Math.round(Math.max(PORTION_MIN, Math.min(PORTION_MAX, raw)) * 20) / 20
+  return Math.round(f * 100) / 100
+}
+
+/** Text für „Das habe ich gelernt“ bzw. die Portionsbox; leer, solange der Faktor 1,0 ist */
+export function portionNote(factor: number): string | undefined {
+  const pct = Math.round((factor - 1) * 100)
+  if (pct === 0) return undefined
+  return `ihr braucht eher etwas ${pct > 0 ? 'mehr' : 'weniger'} (${pct > 0 ? '+' : '−'}${Math.abs(pct)} %)`
+}
