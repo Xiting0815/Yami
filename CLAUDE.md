@@ -20,4 +20,4 @@
 
 ## Geplante Erweiterungen (vom Nutzer bestätigt)
 
-Erledigt: lernende Vorschläge (ohne Favoriten/„nie wieder“ – vom Nutzer so gewählt) · Saison · eigene Rezepte · Eiweißziel · Wochenrückblick · Kochmodus · Datensicherung · Home Assistant (geteilte Einkaufsliste todo.einkaufsliste, Kalender calendar.yami, Erinnerungen calendar.yami_erinnerungen + Automation „Yami: Erinnerung aufs Handy“; nur WebSocket-API, Token bleibt lokal). Offen: Google Kalender (später in HA einbinden) · Körperfettwaage in HA (keine Entitäten vorhanden).
+Erledigt: lernende Vorschläge (ohne Favoriten/„nie wieder“ – vom Nutzer so gewählt) · Saison · eigene Rezepte · Eiweißziel · Wochenrückblick · Kochmodus · Datensicherung · Home Assistant (Einkaufsliste Google Tasks todo.einkaufen, Abendessen im Google-Kalender calendar.familie 18:30–19:30, Erinnerungen calendar.yami_erinnerungen + Automation „Yami: Erinnerung aufs Handy“; nur WebSocket-API, Token bleibt lokal). Offen: Körperfettwaage in HA (keine Entitäten vorhanden).
