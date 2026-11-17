@@ -142,6 +142,12 @@
   "license": "KI",
   "source": ""
  },
+ "bud-spencer-eintopf": {
+  "author": "Gemini",
+  "file": "img/bud-spencer-eintopf.webp",
+  "license": "KI",
+  "source": ""
+ },
  "bulgogi": {
   "author": "Debbie Tingzon",
   "commonsTitle": "File:Bulgogi 3.jpg",
@@ -231,6 +237,12 @@
   "file": "img/chicoree-gratin.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Jielbeaumadier_chicon_au_jambon_maroilles_2010.jpg"
+ },
+ "chili-con-carne": {
+  "author": "Gemini",
+  "file": "img/chili-con-carne.webp",
+  "license": "KI",
+  "source": ""
  },
  "chow-mein": {
   "author": "Gaurav Dhwaj Khadka",
@@ -410,8 +422,18 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Maultaschen_beim_Metzger.jpg"
  },
- "gigantes-feta": null,
- "giouvetsi-kritharaki": null,
+ "gigantes-feta": {
+  "author": "Gemini",
+  "file": "img/gigantes-feta.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "giouvetsi-kritharaki": {
+  "author": "Gemini",
+  "file": "img/giouvetsi-kritharaki.webp",
+  "license": "KI",
+  "source": ""
+ },
  "gnocchi-gorgonzola": {
   "author": "cyclonebill",
   "commonsTitle": "File:Flickr - cyclonebill - Gnocchi med gorgonzola og valnødder.jpg",
@@ -489,7 +511,18 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:02021_1020_(2)_Goulash_soup_of_Poland.jpg"
  },
- "gyros-kritharaki-topf": null,
+ "gyros-kritharaki-topf": {
+  "author": "Gemini",
+  "file": "img/gyros-kritharaki-topf.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "gyros-metaxa-ueberbacken": {
+  "author": "Gemini",
+  "file": "img/gyros-metaxa-ueberbacken.webp",
+  "license": "KI",
+  "source": ""
+ },
  "hackbraten": {
   "author": "Indrajit Das",
   "commonsTitle": "File:Homemade meatloaf 04.jpg",
@@ -497,7 +530,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Homemade_meatloaf_04.jpg"
  },
- "haehnchen-rahm-bandnudeln": null,
+ "haehnchen-rahm-bandnudeln": {
+  "author": "Gemini",
+  "file": "img/haehnchen-rahm-bandnudeln.webp",
+  "license": "KI",
+  "source": ""
+ },
  "himmel-und-erde": {
   "author": "Anagoria",
   "commonsTitle": "File:2016-01-03 Himmel und Erde anagoria.JPG",
@@ -596,6 +634,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kaiserschmarrn_und_Apfelmus.jpg"
  },
+ "kalbsbraten-rahmsauce": {
+  "author": "Gemini",
+  "file": "img/kalbsbraten-rahmsauce.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kartoffel-hack-auflauf": {
   "author": "Kotivalo",
   "commonsTitle": "File:Jauheliha-perunasoselaatikko.jpg",
@@ -685,12 +729,24 @@
   "license": "KI",
   "source": ""
  },
+ "kotopoulo-lemonato": {
+  "author": "Gemini",
+  "file": "img/kotopoulo-lemonato.webp",
+  "license": "KI",
+  "source": ""
+ },
  "krautschupfnudeln": {
   "author": "MarkusHagenlocher",
   "commonsTitle": "File:Schupfnudeln mit Sauerkraut-RZ.jpg",
   "file": "img/krautschupfnudeln.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schupfnudeln_mit_Sauerkraut-RZ.jpg"
+ },
+ "kuerbis-hack-eintopf": {
+  "author": "Gemini",
+  "file": "img/kuerbis-hack-eintopf.webp",
+  "license": "KI",
+  "source": ""
  },
  "kuerbissuppe": {
   "author": "Minja Klarić",
@@ -831,6 +887,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Beef_stew_with_potatoes_and_carrots_-_Massachusetts.jpg"
  },
+ "moussaka": {
+  "author": "Gemini",
+  "file": "img/moussaka.webp",
+  "license": "KI",
+  "source": ""
+ },
  "nasi-goreng": {
   "author": "Wiki Farazi",
   "commonsTitle": "File:Nasi goreng pattaya 20231028 120535.jpg",
@@ -944,7 +1006,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pappa_al_pomodoro-piatto.jpg"
  },
- "paprika-hack-topf": null,
+ "paprika-hack-topf": {
+  "author": "Gemini",
+  "file": "img/paprika-hack-topf.webp",
+  "license": "KI",
+  "source": ""
+ },
  "paprikaschnitzel": {
   "author": "Benreis",
   "commonsTitle": "File:Zigeunerschnitzel Jennrkaser.JPG",
@@ -993,6 +1060,12 @@
   "file": "img/pasta-tonno.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pasta_al_rag%C3%B9_di_tonno_rosso.jpg"
+ },
+ "pastitsio": {
+  "author": "Gemini",
+  "file": "img/pastitsio.webp",
+  "license": "KI",
+  "source": ""
  },
  "pellkartoffeln-kraeuterquark": {
   "author": "abnehmen.net",
@@ -1260,7 +1333,12 @@
   "license": "KI",
   "source": ""
  },
- "sauerkrauteintopf-kasseler": null,
+ "sauerkrauteintopf-kasseler": {
+  "author": "Gemini",
+  "file": "img/sauerkrauteintopf-kasseler.webp",
+  "license": "KI",
+  "source": ""
+ },
  "savory-oats": {
   "author": "Gemini",
   "file": "img/savory-oats.webp",
@@ -1288,7 +1366,18 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pastitsio_homemade.jpg"
  },
- "schnuesch": null,
+ "schnippelbohneneintopf": {
+  "author": "Gemini",
+  "file": "img/schnippelbohneneintopf.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "schnuesch": {
+  "author": "Gemini",
+  "file": "img/schnuesch.webp",
+  "license": "KI",
+  "source": ""
+ },
  "scholle-finkenwerder": {
   "author": "Sir James",
   "commonsTitle": "File:2017-05-01 Scholle Finkenwerder Art.JPG",
@@ -1448,7 +1537,12 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Steckr%C3%BCbeneintopf.JPG"
  },
- "stifado": null,
+ "stifado": {
+  "author": "Gemini",
+  "file": "img/stifado.webp",
+  "license": "KI",
+  "source": ""
+ },
  "stracciatella": {
   "author": "Mike.lifeguard",
   "commonsTitle": "File:Straciatella - bowl.JPG",
