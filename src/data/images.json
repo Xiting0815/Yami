@@ -48,6 +48,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Penne_Arrabbiata.jpg"
  },
+ "baci-di-dama": {
+  "author": "Gemini",
+  "file": "img/baci-di-dama.webp",
+  "license": "KI",
+  "source": ""
+ },
  "backfisch": {
   "author": "Shukanto Das",
   "commonsTitle": "File:Fish Cutlets.JPG",
@@ -82,6 +88,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Mi_Goreng_GM.jpg"
  },
+ "bauernbrot-sauerteig": {
+  "author": "Gemini",
+  "file": "img/bauernbrot-sauerteig.webp",
+  "license": "KI",
+  "source": ""
+ },
  "bauernfruehstueck": {
   "author": "Josef Türk Reit im Winkl Chiemgau",
   "commonsTitle": "File:Bauernfrühstück-01.jpg",
@@ -89,7 +101,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Bauernfr%C3%BChst%C3%BCck-01.jpg"
  },
- "bauernsalat-speck": null,
+ "bauernsalat-speck": {
+  "author": "Gemini",
+  "file": "img/bauernsalat-speck.webp",
+  "license": "KI",
+  "source": ""
+ },
  "bibimbap": {
   "author": "Andy Li",
   "commonsTitle": "File:Bokkeum Bibimbap and Little Piggy Bao Bun by Bao Bun Brighton.jpg",
@@ -114,6 +131,12 @@
  "bircher": {
   "author": "Gemini",
   "file": "img/bircher.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "biscotti-al-limone": {
+  "author": "Gemini",
+  "file": "img/biscotti-al-limone.webp",
   "license": "KI",
   "source": ""
  },
@@ -144,6 +167,12 @@
   "license": "CC BY 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:N%C3%BCrnberger_Rostbratw%C3%BCrste.JPG"
  },
+ "brioche-burger-buns": {
+  "author": "Gemini",
+  "file": "img/brioche-burger-buns.webp",
+  "license": "KI",
+  "source": ""
+ },
  "broccoli-acciughe": {
   "author": "Rocky Masum This work was made by Masum-al-Hasan Rocky and released under the license(s) stated below. Please feel free ",
   "commonsTitle": "File:A plate of red sauce pasta.jpg",
@@ -164,7 +193,12 @@
   "license": "KI",
   "source": ""
  },
- "brotzeitbrett": null,
+ "brotzeitbrett": {
+  "author": "Gemini",
+  "file": "img/brotzeitbrett.webp",
+  "license": "KI",
+  "source": ""
+ },
  "bud-spencer-eintopf": {
   "author": "Gemini",
   "file": "img/bud-spencer-eintopf.webp",
@@ -192,8 +226,18 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Butterkuchen_traditionell.jpg"
  },
- "butterplaetzchen": null,
- "cacciatora-leggera": null,
+ "butterplaetzchen": {
+  "author": "Gemini",
+  "file": "img/butterplaetzchen.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "cacciatora-leggera": {
+  "author": "Gemini",
+  "file": "img/cacciatora-leggera.webp",
+  "license": "KI",
+  "source": ""
+ },
  "cacio-e-pepe": {
   "author": "Andy Li",
   "commonsTitle": "File:Spaghetti, cacio e pepe & bitter leaf salad - Tutto 2024-04-04.jpg",
@@ -214,6 +258,12 @@
   "file": "img/cannelloni.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Cannelloni2.png"
+ },
+ "cannoli-creme": {
+  "author": "Gemini",
+  "file": "img/cannoli-creme.webp",
+  "license": "KI",
+  "source": ""
  },
  "cantuccini": {
   "author": "Matteo Bertini",
@@ -339,6 +389,12 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cotoletta_e_patate_al_forno.jpg"
  },
+ "crostata-marmellata": {
+  "author": "Gemini",
+  "file": "img/crostata-marmellata.webp",
+  "license": "KI",
+  "source": ""
+ },
  "currywurst": {
   "author": "Superbass",
   "commonsTitle": "File:Curryking-4612.jpg",
@@ -360,7 +416,18 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Dan-dan_noodles,_Shanghai.jpg"
  },
- "dinkelbroetchen-ueber-nacht": null,
+ "dinkelbroetchen-ueber-nacht": {
+  "author": "Gemini",
+  "file": "img/dinkelbroetchen-ueber-nacht.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "dinkelvollkornbrot": {
+  "author": "Gemini",
+  "file": "img/dinkelvollkornbrot.webp",
+  "license": "KI",
+  "source": ""
+ },
  "double-chocolate-cookies": {
   "author": "Tcbeane",
   "commonsTitle": "File:Warm Double Chocolate Chip Cookie.jpg",
@@ -400,6 +467,12 @@
   "file": "img/erbseneintopf.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Erbsensuppe_mit_Bockwurst_(10583434296).jpg"
+ },
+ "erdnussbutter-cookies": {
+  "author": "Gemini",
+  "file": "img/erdnussbutter-cookies.webp",
+  "license": "KI",
+  "source": ""
  },
  "fegato-veneziana": {
   "author": "Xaura",
@@ -647,8 +720,18 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Noodle_stir_fry_with_chicken,_shrimp,_and_broccoli_(18471621051).jpg"
  },
- "haehnchen-chop-suey": null,
- "haehnchen-paprika-pfanne": null,
+ "haehnchen-chop-suey": {
+  "author": "Gemini",
+  "file": "img/haehnchen-chop-suey.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "haehnchen-paprika-pfanne": {
+  "author": "Gemini",
+  "file": "img/haehnchen-paprika-pfanne.webp",
+  "license": "KI",
+  "source": ""
+ },
  "haehnchen-rahm-bandnudeln": {
   "author": "Gemini",
   "file": "img/haehnchen-rahm-bandnudeln.webp",
@@ -895,6 +978,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:00101_Vorkarpatische_K%C3%BCche_Piroggen,_Kohlrouladen,_Kroketten.JPG"
  },
+ "kokosmakronen": {
+  "author": "Gemini",
+  "file": "img/kokosmakronen.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kotelett-rahmkohlrabi": {
   "author": "Gemini",
   "file": "img/kotelett-rahmkohlrabi.webp",
@@ -980,7 +1069,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Lasagne_-_stonesoup.jpg"
  },
- "laugenbroetchen": null,
+ "laugenbroetchen": {
+  "author": "Gemini",
+  "file": "img/laugenbroetchen.webp",
+  "license": "KI",
+  "source": ""
+ },
  "leber-berliner-art": {
   "author": "Joe Foodie",
   "commonsTitle": "File:Chicken Livers.jpg",
@@ -1078,7 +1172,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Maultaschensuppe.jpg"
  },
- "merluzzo-livornese": null,
+ "merluzzo-livornese": {
+  "author": "Gemini",
+  "file": "img/merluzzo-livornese.webp",
+  "license": "KI",
+  "source": ""
+ },
  "minestrone": {
   "author": "Katrin Morenz from Aachen, Deutschland",
   "commonsTitle": "File:Minestrone soup.jpg",
@@ -1180,6 +1279,12 @@
  "ochsenbaeckchen-spaetburgunder": {
   "author": "Gemini",
   "file": "img/ochsenbaeckchen-spaetburgunder.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "orecchiette-rosenkohl-salsiccia": {
+  "author": "Gemini",
+  "file": "img/orecchiette-rosenkohl-salsiccia.webp",
   "license": "KI",
   "source": ""
  },
@@ -1369,7 +1474,12 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pichelsteiner_Eintopf.jpg"
  },
- "pittule-salentine": null,
+ "pittule-salentine": {
+  "author": "Gemini",
+  "file": "img/pittule-salentine.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pizza-diavola": {
   "author": "掬茶",
   "commonsTitle": "File:Pizza Diavola (Verde Ischia).jpg",
@@ -1425,8 +1535,24 @@
   "license": "KI",
   "source": ""
  },
- "puten-champignon-geschnetzeltes": null,
- "puten-saltimbocca": null,
+ "pute-paprika-cashew": {
+  "author": "Gemini",
+  "file": "img/pute-paprika-cashew.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "puten-champignon-geschnetzeltes": {
+  "author": "Gemini",
+  "file": "img/puten-champignon-geschnetzeltes.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "puten-saltimbocca": {
+  "author": "Gemini",
+  "file": "img/puten-saltimbocca.webp",
+  "license": "KI",
+  "source": ""
+ },
  "puttanesca": {
   "author": "Popo le Chien",
   "commonsTitle": "File:Pasta Puttanesca.jpg",
@@ -1460,7 +1586,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Tagliatelle_al_rag%C3%B9_03.jpg"
  },
- "rahm-rosenkohl-frikadellen": null,
+ "rahm-rosenkohl-frikadellen": {
+  "author": "Gemini",
+  "file": "img/rahm-rosenkohl-frikadellen.webp",
+  "license": "KI",
+  "source": ""
+ },
  "rahmschnitzel": {
   "author": "Christian Michelides",
   "commonsTitle": "File:Kaiserschnitzel Waldviertlerhof 2020 (Wien).jpg",
@@ -1494,6 +1625,12 @@
   "file": "img/rind-brokkoli.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Broccoli_beef_(5457397534).jpg"
+ },
+ "rind-gemuese-wok": {
+  "author": "Gemini",
+  "file": "img/rind-gemuese-wok.webp",
+  "license": "KI",
+  "source": ""
  },
  "rinderfilet-rotweinjus": {
   "author": "Gemini",
@@ -1575,7 +1712,18 @@
   "license": "KI",
   "source": ""
  },
- "rosenkohl-speck-bratwurst": null,
+ "rosenkohl-speck-bratwurst": {
+  "author": "Gemini",
+  "file": "img/rosenkohl-speck-bratwurst.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "rosenkohl-speck-kasseler": {
+  "author": "Gemini",
+  "file": "img/rosenkohl-speck-kasseler.webp",
+  "license": "KI",
+  "source": ""
+ },
  "rote-gruetze": {
   "author": "Olaf Simons",
   "commonsTitle": "File:Rote Grütze mit Vanillesoße.JPG",
@@ -1690,7 +1838,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schweinebraten_Goldener_Adler_M%C3%BCrsbach.jpg"
  },
- "schweinefilet-bohnen": null,
+ "schweinefilet-bohnen": {
+  "author": "Gemini",
+  "file": "img/schweinefilet-bohnen.webp",
+  "license": "KI",
+  "source": ""
+ },
  "schweinefilet-speckmantel": {
   "author": "PattayaPatrol",
   "commonsTitle": "File:DSCF0414 Four bite-sized bacon-wrapped pork medallions served with a side of creamy pasta coleslaw greens and a jug of savory gravy.jpg",
@@ -1712,8 +1865,24 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schweinshaxe_Chiang_Mai.JPG"
  },
- "seelachs-gemuesebett": null,
- "seelachs-shiitake-pakchoi": null,
+ "seelachs-gemuesebett": {
+  "author": "Gemini",
+  "file": "img/seelachs-gemuesebett.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "seelachs-shiitake-pakchoi": {
+  "author": "Gemini",
+  "file": "img/seelachs-shiitake-pakchoi.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "semifreddo-himbeeren": {
+  "author": "Gemini",
+  "file": "img/semifreddo-himbeeren.webp",
+  "license": "KI",
+  "source": ""
+ },
  "semmelknoedel-rahmpilze": {
   "author": "Kritzolina",
   "commonsTitle": "File:Kalbsbeuschel mit Semmelknödel.jpg",
@@ -1721,7 +1890,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kalbsbeuschel_mit_Semmelkn%C3%B6del.jpg"
  },
- "senf-haehnchen-ofengemuese": null,
+ "senf-haehnchen-ofengemuese": {
+  "author": "Gemini",
+  "file": "img/senf-haehnchen-ofengemuese.webp",
+  "license": "KI",
+  "source": ""
+ },
  "senfeier": {
   "author": "Raboe001",
   "commonsTitle": "File:Hannover 2026 - Café Ausblick - Senfeier - by-RaBoe 006.jpg",
@@ -1753,6 +1927,18 @@
  "skyr-birne": {
   "author": "Gemini",
   "file": "img/skyr-birne.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "skyr-haferflocken-cookies": {
+  "author": "Gemini",
+  "file": "img/skyr-haferflocken-cookies.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "smashed-burger": {
+  "author": "Gemini",
+  "file": "img/smashed-burger.webp",
   "license": "KI",
   "source": ""
  },
@@ -1846,6 +2032,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Creamed_Spinach_with_Nueske%27s_Bacon.jpg"
  },
+ "spitzbuben": {
+  "author": "Gemini",
+  "file": "img/spitzbuben.webp",
+  "license": "KI",
+  "source": ""
+ },
  "spritzgebaeck": {
   "author": "Lothar Wilhelm",
   "commonsTitle": "File:Spritzgebäck.jpg",
@@ -1866,7 +2058,12 @@
   "license": "KI",
   "source": ""
  },
- "straccetti-rucola": null,
+ "straccetti-rucola": {
+  "author": "Gemini",
+  "file": "img/straccetti-rucola.webp",
+  "license": "KI",
+  "source": ""
+ },
  "stracciatella": {
   "author": "Mike.lifeguard",
   "commonsTitle": "File:Straciatella - bowl.JPG",
@@ -1880,6 +2077,12 @@
   "file": "img/strammer-max.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Strammer_Max_Potsdam.jpg"
+ },
+ "streuselkuchen-apfel": {
+  "author": "Gemini",
+  "file": "img/streuselkuchen-apfel.webp",
+  "license": "KI",
+  "source": ""
  },
  "suan-la-tang": {
   "author": "Evan-Amos",
@@ -2059,6 +2262,12 @@
   "file": "img/zabaione-beeren.webp",
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Marsala_sabayon_with_cookie_and_local_stone_fruit.jpg"
+ },
+ "zander-gurkengemuese": {
+  "author": "Gemini",
+  "file": "img/zander-gurkengemuese.webp",
+  "license": "KI",
+  "source": ""
  },
  "zhajiangmian": {
   "author": "N509FZ",
