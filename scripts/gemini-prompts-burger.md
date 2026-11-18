@@ -1,0 +1,15 @@
+# Rosenkohl-Abendessen, Burger und Burger-Buns – Fotos mit Gemini erzeugen
+
+Datei-Name (ohne Endung, Rezept-ID) und Beschreibung für das Bild. Stil wie die bisherigen Fotos: Draufsicht/45°, Tageslicht, echtes Essen auf einem Teller, keine Schrift.
+
+| Datei-Name | Gericht |
+|---|---|
+| rosenkohl-speck-bratwurst | Gerösteter Rosenkohl mit Speck und Zwiebeln, Bratwurst und Kartoffelpüree: Dunkel geröstete Rosenkohlhälften mit knusprigen Speckwürfeln und Zwiebelspalten, daneben zwei braun gebratene Bratwürste und ein Hügel cremiges Kartoffelpüree mit einem Stich Butter auf einem Teller. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| rahm-rosenkohl-frikadellen | Rahm-Rosenkohl mit Muskat, Frikadellen und Salzkartoffeln: Zarter Rosenkohl in heller Sahnesauce, zwei goldbraune Frikadellen und gekochte Salzkartoffeln mit gehackter Petersilie auf einem tiefen Teller. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| rosenkohl-speck-kasseler | Rosenkohl mit Speck, Kasseler-Kotelett und Kartoffeln: Ein gebratenes Kasseler-Kotelett mit Röststreifen, daneben Rosenkohl mit Speckwürfeln und Zwiebeln und halbierte Petersilienkartoffeln auf einem Teller. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| orecchiette-rosenkohl-salsiccia | Orecchiette mit Rosenkohl, Salsiccia und Parmigiano: Kleine Ohrnudeln mit feinen Rosenkohlstreifen und krümelig gebratener Salsiccia, Chiliringen und frisch gehobeltem Parmigiano Reggiano in einer tiefen Schale. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| cheeseburger-classic | Classic Cheeseburger mit Pommes aus dem Airfryer: Ein dicker Rindfleisch-Patty mit geschmolzenem Cheddar, Salat, Tomatenscheiben, roten Zwiebelringen, Gewürzgurke und Burgersauce im glänzenden Burger-Brötchen, daneben eine Portion goldgelber Pommes auf einem Teller. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| smashed-burger | Smashed Burger mit doppelt Cheddar, Zwiebeln und Pommes: Ein Burger mit zwei dünnen, knusprig gebräunten Smash-Patties mit zerlaufenem Cheddar und karamellisierten Zwiebeln im gerösteten Brötchen, dazu Pommes auf einem Teller. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| bacon-bbq-burger | Bacon-BBQ-Burger mit Röstzwiebeln und Coleslaw: Ein hoher Burger mit Rindfleisch-Patty, Cheddar, knusprigem Bacon, glänzender BBQ-Sauce und Röstzwiebeln im Brötchen, daneben eine kleine Schale cremiger Coleslaw mit Weißkohl und Möhre. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| chicken-burger-leicht | Leichter Chicken-Burger mit Coleslaw: Ein knusprig panierter Hähnchenbrust-Burger mit Salat und Tomatenscheiben in einem Burger-Brötchen, daneben frischer Coleslaw mit Joghurt-Dressing auf einem Teller. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |
+| brioche-burger-buns | Brioche-Burger-Buns: Acht goldbraune, glänzende Brioche-Brötchen mit Sesam auf einem Kuchengitter, eines waagerecht aufgeschnitten, sodass die weiche, helle Krume zu sehen ist. Fotorealistisch, appetitlich angerichtet, natürliches Licht. |

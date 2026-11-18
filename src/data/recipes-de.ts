@@ -1167,4 +1167,72 @@ export const recipesDe = [
       'Essig, Öl, Senf, 3 EL Wasser, Salz und Pfeffer verrühren, mit allem mischen und 15 Minuten durchziehen lassen.',
       'Mit Schnittlauch bestreuen und mit den Brötchen servieren.',
     ], 'Swiss sausage salad Wurstsalat'),
+
+  // ───────────── Rosenkohl (Saison Oktober bis Februar) ─────────────
+  r('rosenkohl-speck-bratwurst', 'Gerösteter Rosenkohl mit Speck und Zwiebeln, Bratwurst und Kartoffelpüree', 'de', 'haupt', 50,
+    '400 g Rosenkohl | 80 g Speckwürfel | 1 Stk Zwiebel | 1 EL Olivenöl | 4 Stk Bratwurst | 1 EL Butterschmalz | 700 g Kartoffeln mehligkochend | 150 ml Milch | 40 g Butter | Muskatnuss | Salz | Pfeffer',
+    [
+      'Rosenkohl putzen, den Strunk kürzen und die Röschen halbieren. Die Zwiebel in Spalten schneiden. Beides mit Speckwürfeln, Olivenöl, Salz und Pfeffer mischen und auf einem mit Backpapier belegten Blech verteilen.',
+      'Im Ofen bei 200 °C ca. 25 Minuten rösten, nach der Hälfte einmal wenden, bis die Ränder dunkel und der Speck knusprig ist.',
+      'Kartoffeln schälen, vierteln und in Salzwasser ca. 20 Minuten weich kochen. Abgießen, mit heißer Milch und Butter stampfen und mit Muskat und Salz abschmecken.',
+      'Die Bratwürste im Butterschmalz bei mittlerer Hitze 10 bis 12 Minuten rundum braun braten. Mit Rosenkohl und Püree anrichten.',
+    ], 'Rosenkohl Speck Bratwurst Kartoffelpüree'),
+
+  r('rahm-rosenkohl-frikadellen', 'Rahm-Rosenkohl mit Muskat, Frikadellen und Salzkartoffeln', 'de', 'haupt', 45,
+    '500 g Rosenkohl | 1 EL Butter | 120 ml Sahne | 100 ml Gemüsebrühe | Muskatnuss | 300 g Hackfleisch gemischt | 1 Stk Brötchen vom Vortag | 1 Stk Ei | 1 Stk Zwiebel | 1 TL Senf mittelscharf | 0.5 TL Majoran | 1 EL Butterschmalz | 700 g Kartoffeln festkochend | 0.5 Bund Petersilie | Salz | Pfeffer | Paprikapulver edelsüß',
+    [
+      'Brötchen einweichen und ausdrücken. Zwiebel fein würfeln und mit Hack, Ei, Senf, Majoran, Salz, Pfeffer und Paprika verkneten. Daraus 4 flache Frikadellen formen.',
+      'Kartoffeln schälen, halbieren und in Salzwasser 20 bis 25 Minuten weich kochen. Abgießen und mit gehackter Petersilie bestreuen.',
+      'Rosenkohl putzen und halbieren. In der Butter 3 Minuten andünsten, Brühe und Sahne zugießen und zugedeckt 12 Minuten köcheln lassen. Mit Muskat, Salz und Pfeffer abschmecken.',
+      'Frikadellen im Butterschmalz bei mittlerer Hitze 5 bis 6 Minuten je Seite braten. Mit Rahm-Rosenkohl und Salzkartoffeln servieren.',
+    ], 'Rosenkohl Sahne Frikadellen'),
+
+  r('rosenkohl-speck-kasseler', 'Rosenkohl mit Speck, Kasseler-Kotelett und Kartoffeln', 'de', 'haupt', 40,
+    '400 g Rosenkohl | 80 g Speckwürfel | 1 Stk Zwiebel | 1 EL Butter | Muskatnuss | 360 g Kasseler Kotelett | 1 EL Butterschmalz | 700 g Kartoffeln festkochend | 0.5 Bund Petersilie | Salz | Pfeffer',
+    [
+      'Kartoffeln schälen, halbieren und in Salzwasser 20 bis 25 Minuten weich kochen. Rosenkohl putzen, halbieren und in den letzten 12 Minuten im selben Topf oder daneben bissfest garen.',
+      'Speckwürfel in einer Pfanne knusprig auslassen. Die fein gewürfelte Zwiebel mit der Butter zugeben und glasig dünsten.',
+      'Den abgetropften Rosenkohl in die Speckpfanne geben, 3 Minuten schwenken und mit Muskat, Salz und Pfeffer abschmecken.',
+      'Die Kasseler-Koteletts im Butterschmalz bei mittlerer Hitze 3 bis 4 Minuten je Seite braten. Mit Rosenkohl und den Kartoffeln in Petersilie anrichten.',
+    ], 'Kasseler Kotelett Rosenkohl Kartoffeln'),
+
+  // ───────────── Burger (Brötchen aus dem Haus oder gekauft) ─────────────
+  r('cheeseburger-classic', 'Classic Cheeseburger mit Pommes aus dem Airfryer', 'de', 'haupt', 55,
+    '360 g Rinderhackfleisch | 2 Stk Burger-Brötchen | 2 Scheibe Cheddar | 60 g Kopfsalat | 1 Stk Tomate | 0.5 Stk Zwiebel rot | 3 Stk Gewürzgurke | 2 EL Mayonnaise | 1 EL Tomatenketchup | 1 TL Senf mittelscharf | 1 EL Butter | 2 EL Sonnenblumenöl | 450 g Kartoffeln festkochend | Salz | Pfeffer',
+    [
+      'Kartoffeln schälen, in 1 cm dicke Stifte schneiden, 30 Minuten in kaltem Wasser wässern, gründlich abtrocknen und mit 1 EL Öl und Salz mischen.',
+      'Für die Burgersauce Mayonnaise, Ketchup, Senf und eine fein gehackte Gewürzgurke verrühren. Die übrigen Gurken in Scheiben, Tomate und rote Zwiebel in Ringe schneiden, den Salat zupfen.',
+      'Das Hack leicht kneten, in 2 Patties à 180 g formen und in der Mitte eine kleine Mulde eindrücken. Kalt stellen.',
+      'Die Pommes bei 180 °C ca. 22 Minuten backen, nach 10 und 16 Minuten schütteln.',
+      'Die Patties salzen und pfeffern und im restlichen Öl bei starker Hitze 4 Minuten je Seite braten. In der letzten Minute je eine Scheibe Cheddar auflegen und mit Deckel schmelzen lassen.',
+      'Die Brötchen aufschneiden und in der Butter anrösten. Unterseite mit Sauce, Salat, Tomate, Zwiebel, Gurke und Patty belegen, Deckel darauf. Mit den Pommes servieren.',
+    ], 'Cheeseburger'),
+
+  r('smashed-burger', 'Smashed Burger mit doppelt Cheddar, Zwiebeln und Pommes', 'de', 'haupt', 35,
+    '360 g Rinderhackfleisch | 2 Stk Burger-Brötchen | 4 Scheibe Cheddar | 1 Stk Zwiebel | 3 Stk Gewürzgurke | 2 EL Mayonnaise | 1 EL Tomatenketchup | 1 TL Senf mittelscharf | 1 EL Butter | 1 EL Sonnenblumenöl | 400 g Pommes frites TK | Salz | Pfeffer',
+    [
+      'Das Hack in 4 lockere Kugeln à 90 g formen und kalt stellen (nicht kneten). Die Zwiebel in hauchdünne Scheiben hobeln, die Gurken in Scheiben schneiden.',
+      'Mayonnaise, Ketchup und Senf zur Sauce verrühren. Die Pommes bei 190 °C 16 bis 18 Minuten knusprig backen, einmal schütteln.',
+      'Eine Gusseisenpfanne sehr heiß werden lassen, dünn ölen und 2 Kugeln hineinlegen. Einige Zwiebelscheiben darauflegen und jede Kugel sofort mit einem stabilen Wender fest flach drücken. Salzen, pfeffern und 2 Minuten braten, bis der Rand dunkel und knusprig ist.',
+      'Die Patties abkratzen, wenden, je eine Scheibe Cheddar auflegen und 1 Minute braten. Die zweite Runde genauso braten.',
+      'Die Brötchenhälften in der Butter anrösten, mit Sauce bestreichen und je 2 Patties mit Käse und restlichen Zwiebeln und Gurken belegen. Mit den Pommes servieren.',
+    ], 'Smash burger'),
+
+  r('bacon-bbq-burger', 'Bacon-BBQ-Burger mit Röstzwiebeln und Coleslaw', 'de', 'haupt', 45,
+    '360 g Rinderhackfleisch | 2 Stk Burger-Brötchen | 6 Scheibe Bacon | 2 Scheibe Cheddar | 3 EL BBQ-Sauce | 2 EL Röstzwiebeln | 40 g Kopfsalat | 1 EL Butter | 1 EL Sonnenblumenöl | 250 g Weißkohl | 1 Stk Möhre | 2 EL Mayonnaise | 50 g Joghurt natur | 1 EL Apfelessig | 1 TL Zucker | Salz | Pfeffer',
+    [
+      'Für den Coleslaw den Weißkohl fein hobeln, die Möhre raspeln. Mit Salz und Zucker kräftig durchkneten. Mayonnaise, Joghurt und Essig verrühren, untermischen und 20 Minuten durchziehen lassen.',
+      'Das Hack in 2 Patties à 180 g formen, salzen und pfeffern. Den Bacon in einer Pfanne knusprig braten und auf Küchenpapier legen.',
+      'Die Patties im restlichen Öl bei starker Hitze 4 Minuten braten, wenden, mit je 1 EL BBQ-Sauce bestreichen, Cheddar auflegen und 3 Minuten fertig braten.',
+      'Die Brötchen aufschneiden, in der Butter anrösten und mit Salat belegen. Patty, Bacon, Röstzwiebeln und die restliche BBQ-Sauce daraufgeben, Deckel auflegen. Mit dem Coleslaw servieren.',
+    ], 'Bacon BBQ burger coleslaw'),
+
+  r('chicken-burger-leicht', 'Leichter Chicken-Burger mit Coleslaw', 'de', 'haupt', 40,
+    '300 g Hähnchenbrustfilet | 2 Stk Burger-Brötchen | 1 EL Weizenmehl | 1 Stk Ei | 40 g Panko | 1 TL Paprikapulver edelsüß | 1 TL Sonnenblumenöl | 40 g Kopfsalat | 1 Stk Tomate | 200 g Weißkohl | 1 Stk Möhre | 80 g Joghurt natur | 1 EL Apfelessig | 1 TL Senf mittelscharf | 1 TL Honig | Salz | Pfeffer',
+    [
+      'Für den Coleslaw den Weißkohl fein hobeln, die Möhre raspeln. Joghurt, Essig, Senf, Honig, Salz und Pfeffer verrühren, untermischen und durchziehen lassen.',
+      'Das Hähnchenbrustfilet waagerecht halbieren, zwischen Folie dünn klopfen, salzen und pfeffern. Mehl, das verquirlte Ei und Panko mit Paprikapulver in drei Teller geben und die Schnitzel nacheinander darin wenden. Das Panko gut andrücken.',
+      'Die Schnitzel mit Öl einsprühen oder einpinseln und im Airfryer bei 180 °C 12 bis 14 Minuten goldbraun backen, nach der Hälfte wenden. Innen darf nichts mehr rosa sein.',
+      'Die Brötchen kurz aufbacken. Unterseite mit Salat, Tomatenscheiben, Hähnchenschnitzel und etwas Coleslaw belegen, Deckel darauf. Den übrigen Coleslaw dazu servieren.',
+    ], 'Chicken burger'),
 ]

@@ -94,6 +94,22 @@ export const brot: ExtraGroup = {
         'Den Dampf ablassen, auf 190 °C herunterschalten und weitere 8–10 Minuten backen, bis die Brötchen goldbraun sind und hohl klingen. Auf einem Gitter auskühlen lassen.',
       ]),
 
+    // ---------- Brioche-Burger-Buns ----------
+    backen('brot', 'brioche-burger-buns', 'Brioche-Burger-Buns',
+      {
+        time: 180,
+        yields: { name: 'Burger-Buns selbstgebacken', amount: 8, unit: 'Stk', shelf: 3, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
+        lighter: 'Die Butter auf 30 g und den Zucker auf 25 g verringern – spart rund 25 kcal pro Bun.',
+      },
+      '400 g Weizenmehl | 7 g Salz | 40 g Zucker | 20 g Hefe frisch | 170 ml Milch | 2 Stk Ei | 50 g Butter | 2 TL Sesam',
+      [
+        'Die Hefe frisch mit dem Zucker in der lauwarmen Milch auflösen. Mit Weizenmehl, Salz, einem Ei und der weichen Butter 10 Minuten zu einem weichen, glänzenden Teig kneten, der sich vom Schüsselrand löst.',
+        'Den Teig in der Schüssel abdecken und 60 Minuten gehen lassen, bis er sich verdoppelt hat.',
+        'Den Teig in 8 Stücke (je ca. 90 g) teilen, rund wirken und mit Abstand auf ein mit Backpapier belegtes Blech setzen. Mit der Handfläche auf ca. 8 cm flach drücken und abgedeckt 40 Minuten gehen lassen.',
+        'Den Backofen auf 180 °C vorheizen. Das zweite Ei verquirlen, die Buns damit bestreichen und mit Sesam bestreuen.',
+        'Die Buns 15–18 Minuten backen, bis sie goldbraun sind. Auf einem Gitter auskühlen lassen und vor dem Belegen waagerecht aufschneiden.',
+      ]),
+
     // ---------- Sonntagsbrötchen / Kaiserbrötchen ----------
     backen('brot', 'sonntagsbroetchen-kaiser', 'Sonntagsbrötchen (Kaiserbrötchen)',
       {
@@ -229,12 +245,15 @@ export const brot: ExtraGroup = {
       // Brötchen (Stk): selbstgebackene vor „Brötchen vom Vortag“; Laugengebäck deckt Laugenbrezeln
       broetchen: ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken'],
       laugen: ['Laugenbrezel', 'Laugenbrötchen selbstgebacken'],
+      // Burger-Brötchen (Stk): selbstgebackene Buns vor den gekauften
+      'burger-broetchen': ['Burger-Brötchen', 'Burger-Buns selbstgebacken'],
     },
     preferred: {
       Vollkornbrot: ['Bauernbrot selbstgebacken', 'Dinkelvollkornbrot selbstgebacken', 'Roggenmischbrot selbstgebacken'],
       Ciabatta: ['Ciabatta selbstgebacken'],
       'Brötchen vom Vortag': ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken'],
       Laugenbrezel: ['Laugenbrötchen selbstgebacken'],
+      'Burger-Brötchen': ['Burger-Buns selbstgebacken'],
     },
   },
   deviceSteps: {
@@ -293,6 +312,13 @@ export const brot: ExtraGroup = {
       st('Die Brötchen 10 Minuten mit Dampf backen – die Tür dabei geschlossen lassen.', steamer('Heißluft mit Beschwaden', 220, 10, 'Ebene 2')),
       st('Auf Heißluft ohne Dampf umschalten und weitere 8 Minuten backen, bis sie goldbraun sind. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 190, 8, 'trocken, für die Kruste')),
     ],
+    'brioche-burger-buns': [
+      st('Die Hefe frisch mit dem Zucker in der lauwarmen Milch auflösen. Mit Weizenmehl, Salz, einem Ei und der weichen Butter 10 Minuten zu einem weichen, glänzenden Teig kneten, der sich vom Schüsselrand löst.'),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 60 Minuten gehen lassen, bis er sich verdoppelt hat.', gare(60)),
+      st('Den Teig in 8 Stücke (je ca. 90 g) teilen, rund wirken und mit Abstand auf Backpapier auf das Kuchenblech setzen. Mit der Handfläche auf ca. 8 cm flach drücken und abgedeckt im CombiSteamer 40 Minuten gehen lassen.', gare(40, 'Kuchenblech Ebene 2')),
+      st('Den Wasserbehälter füllen und den CombiSteamer auf Ebene 2 mit dem Blech vorheizen. Das zweite Ei verquirlen, die Buns damit bestreichen und mit Sesam bestreuen.', preheat(180)),
+      st('Die Buns 16 Minuten mit Dampf backen, bis sie goldbraun sind – die Tür dabei geschlossen lassen. Auf einem Gitter auskühlen lassen und vor dem Belegen waagerecht aufschneiden.', steamer('Heißluft mit Beschwaden', 180, 16, 'Ebene 2')),
+    ],
     'laugenbroetchen': [
       st('Die Hefe frisch mit dem Zucker in 270 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 10 g vom Salz und der weichen Butter 8 Minuten zu einem festen, glatten Teig kneten.'),
       st('Den Teig in der Schüssel abdecken und im CombiSteamer 40 Minuten gehen lassen, bis er sich fast verdoppelt hat.', gare(40)),
@@ -343,6 +369,7 @@ export const brot: ExtraGroup = {
     'dinkelbroetchen-ueber-nacht': 'Dinkelbrötchen spelt bread rolls',
     'sonntagsbroetchen-kaiser': 'Kaiserbrötchen Kaisersemmel',
     'laugenbroetchen': 'Laugenbrötchen pretzel rolls',
+    'brioche-burger-buns': 'Brioche burger buns',
     'ciabatta': 'Ciabatta bread',
     'focaccia-genovese': 'Focaccia genovese',
     'pane-pugliese': 'Pane pugliese Altamura bread',

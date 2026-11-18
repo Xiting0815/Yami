@@ -36,9 +36,9 @@ const groups: Record<ShopCat, string[]> = {
     'Walnusskerne', 'Metaxa', 'Weinbrand', 'Lammfond', 'Morcheln getrocknet', 'Weiße Bohnen', 'Weißwein', 'Weizenmehl Tipo 00', 'Wodka', 'Yakisoba-Sauce',
     'Zuckerrübensirup',
   ],
-  backwaren: ['Laugenbrezel', 'Pitabrot', 'Vollkornbrot', 'Vollkorn-Knäckebrot', 'Vollkorn-Tortilla','Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
+  backwaren: ['Burger-Brötchen', 'Laugenbrezel', 'Pitabrot', 'Vollkornbrot', 'Vollkorn-Knäckebrot', 'Vollkorn-Tortilla','Brötchen vom Vortag', 'Ciabatta', 'Printen', 'Toastbrot', 'Toskanisches Brot', 'Weißbrot'],
   molkerei: [
-    'Skyr', 'Camembert', 'Magerquark', 'Hüttenkäse', 'Eiklar', 'Hummus',
+    'Cheddar', 'Skyr', 'Camembert', 'Magerquark', 'Hüttenkäse', 'Eiklar', 'Hummus',
     'Bandnudeln', 'Bergkäse', 'Bucatini', 'Butter', 'Butterschmalz', 'Cannelloni', 'Ditalini', 'Ei', 'Kritharaki', 'Tzatziki', 'Eigelb',
     'Ei hart gekocht', 'Emmentaler', 'Emmentaler gerieben', 'Feta', 'Fettuccine', 'Flammkuchenteig', 'Fusilli',
     'Gnocchi', 'Gorgonzola dolce', 'Gouda gerieben', 'Gruyère', 'Hefe frisch', 'Joghurt natur', 'Kartoffelsalat',
@@ -74,7 +74,7 @@ const groups: Record<ShopCat, string[]> = {
     'Rinderfond selbstgemacht', 'Kalbsfond selbstgemacht', 'Lammfond selbstgemacht',
   ],
   vorrat: [
-    'Zimt gemahlen', 'Backpulver', 'Kreuzkümmel',
+    'BBQ-Sauce', 'Zimt gemahlen', 'Backpulver', 'Kreuzkümmel',
     'Apfelessig', 'Chili getrocknet', 'Chiliflocken', 'Currypulver', 'Frittieröl', 'Fünf-Gewürze-Pulver',
     'Gemüsebrühe', 'Honig', 'Hühnerbrühe', 'Kümmel', 'Kümmel gemahlen', 'Kürbiskernöl', 'Leinöl', 'Lorbeerblatt',
     'Majoran', 'Muskatnuss', 'Nelke', 'Olivenöl', 'Oregano getrocknet', 'Paprikapulver edelsüß',

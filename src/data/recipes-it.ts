@@ -663,4 +663,13 @@ export const recipesIt = [
       'Tomaten kurz mit anbraten und mit Essig ablöschen.',
       'Rucola auf zwei Tellern verteilen, das Fleisch darauf anrichten und mit gehobeltem Parmigiano Reggiano und dem Brot servieren.',
     ], 'straccetti di manzo rucola'),
+
+  r('orecchiette-rosenkohl-salsiccia', 'Orecchiette mit Rosenkohl, Salsiccia und Parmigiano', 'it', 'pasta', 35,
+    '250 g Orecchiette | 250 g Salsiccia | 300 g Rosenkohl | 1 Stk Schalotte | 2 Zehe Knoblauch | 1 Stk Chili rot | 3 EL Olivenöl | 50 ml Weißwein | 40 g Parmigiano Reggiano | Salz | Pfeffer',
+    [
+      'Rosenkohl putzen, den Strunk kürzen und die Röschen in feine Streifen schneiden. Schalotte würfeln, Knoblauch hacken, Chili in Ringe schneiden.',
+      'Salsiccia aus der Haut drücken und im Olivenöl krümelig und knusprig braten. Schalotte, Knoblauch und Chili zugeben und 2 Minuten mitbraten.',
+      'Rosenkohl zugeben, 5 Minuten braten und mit Weißwein ablöschen. Salzen und pfeffern.',
+      'Orecchiette in Salzwasser bissfest kochen, abgießen und mit einer Kelle Nudelwasser in die Pfanne geben. Schwenken, bis eine leichte Sauce entsteht, und mit geriebenem Parmigiano Reggiano servieren.',
+    ], 'Orecchiette Rosenkohl Salsiccia'),
 ]

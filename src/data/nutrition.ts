@@ -208,6 +208,7 @@ export const NUTRI: Record<string, N> = {
 
   // ───── Backwaren ─────
   'Brötchen vom Vortag': [260, 8.5, 1.5, 52, 3],
+  'Burger-Brötchen': [270, 9, 4.5, 49, 2.5],
   Ciabatta: [260, 9, 3, 50, 2.5],
   Printen: [380, 6, 4, 78, 3],
   Toastbrot: [260, 8, 4, 47, 3],
@@ -252,6 +253,7 @@ export const NUTRI: Record<string, N> = {
   Eigelb: [320, 16, 27, 3.6, 0],
   Eiklar: [48, 11, 0.2, 0.7, 0],
   Emmentaler: [380, 29, 30, 0, 0],
+  Cheddar: [400, 25, 33, 1, 0],
   'Emmentaler gerieben': [380, 29, 30, 0, 0],
   Feta: [260, 17, 21, 0.7, 0],
   Flammkuchenteig: [300, 7, 9, 47, 2],
@@ -426,6 +428,7 @@ export const NUTRI: Record<string, N> = {
   Sternanis: [340, 18, 16, 35, 15],
   Szechuanpfeffer: [300, 10, 9, 40, 25],
   Tomatenketchup: [110, 1.5, 0.2, 25, 0.5],
+  'BBQ-Sauce': [150, 1, 0.5, 34, 0.5],
   Vanillezucker: [400, 0, 0, 100, 0],
   Wacholderbeere: [350, 4, 16, 45, 0],
   Weißweinessig: [20, 0, 0, 0.3, 0],
@@ -462,7 +465,7 @@ export const GRAMS: Record<string, Record<string, number>> = {
   'Toskanisches Brot': { Scheibe: 40 }, Weißbrot: { Scheibe: 30 }, Vollkornbrot: { Scheibe: 50 },
   'Vollkorn-Knäckebrot': { Scheibe: 10 }, 'Vollkorn-Tortilla': { Stk: 62 },
   Cannelloni: { Stk: 10 }, Lasagneplatten: { Stk: 20 }, Ei: { Stk: 60 }, 'Ei hart gekocht': { Stk: 60 }, Eigelb: { Stk: 18 },
-  Emmentaler: { Scheibe: 20 }, Flammkuchenteig: { Pck: 260 }, Maultaschen: { Stk: 60 }, Butter: { EL: 15 },
+  Emmentaler: { Scheibe: 20 }, Cheddar: { Scheibe: 20 }, 'Burger-Brötchen': { Stk: 70 }, Flammkuchenteig: { Pck: 260 }, Maultaschen: { Stk: 60 }, Butter: { EL: 15 },
   Butterschmalz: { EL: 13 }, Schweineschmalz: { EL: 13 },
   Bacon: { Scheibe: 12.5 }, Bockwurst: { Stk: 100 }, Bratwurst: { Stk: 100 }, Cabanossi: { Stk: 100 }, Doradenfilet: { Stk: 130 },
   Hähnchenschenkel: { Stk: 250 }, 'Kalbshaxe in Scheiben': { Stk: 350 }, Kalbskotelett: { Stk: 300 }, Kalbsschnitzel: { Stk: 150 },

@@ -462,4 +462,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Die Tomaten kurz mitbraten und mit dem Rotweinessig ablöschen.', settings: [bora('7', { minutes: 2 })] },
     { text: 'Den Rucola auf zwei Tellern verteilen, das Fleisch darauf anrichten und mit gehobeltem Parmigiano Reggiano und dem Toskanischen Brot servieren.' },
   ],
+
+  'orecchiette-rosenkohl-salsiccia': [
+    { text: 'Einen großen Topf Salzwasser für die Orecchiette aufsetzen. Den Rosenkohl putzen, den Strunk kürzen und die Röschen in feine Streifen schneiden. Schalotte würfeln, Knoblauch hacken, Chili in Ringe schneiden.', settings: [bora('Power', { note: 'Nudelwasser' })] },
+    { text: 'Die Orecchiette ins kochende Salzwasser geben und bissfest kochen. Gleichzeitig die Salsiccia aus der Haut drücken und im Olivenöl krümelig und knusprig braten. Schalotte, Knoblauch und Chili zugeben und 2 Minuten mitbraten.', settings: [bora('7', { minutes: 12, note: 'Nudeln' }), bora('7', { minutes: 8, note: 'Salsiccia' }), bora('5', { minutes: 2 })] },
+    { text: 'Den Rosenkohl zugeben, 5 Minuten braten und mit dem Weißwein ablöschen. Salzen und pfeffern.', settings: [bora('6', { minutes: 5 })] },
+    { text: 'Die Orecchiette abgießen und mit einer Kelle Nudelwasser in die Pfanne geben. Schwenken, bis eine leichte Sauce entsteht, und mit geriebenem Parmigiano Reggiano servieren.', settings: [bora('5', { minutes: 2 })] },
+  ],
 }

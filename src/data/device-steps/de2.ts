@@ -523,4 +523,54 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Radieschen putzen, die Gurke in Scheiben, die Tomate in Spalten schneiden.' },
     { text: 'Vollkornbrot, Katenschinken, Kochschinken, Obazda und das Gemüse auf einem Brett anrichten. Kein Gerät nötig.' },
   ],
+
+  // ───────────── Rosenkohl ─────────────
+  'rosenkohl-speck-bratwurst': [
+    { text: 'Den Rosenkohl putzen, den Strunk kürzen und die Röschen halbieren. Die Zwiebel in Spalten schneiden. Beides mit den Speckwürfeln, dem Olivenöl, Salz und Pfeffer mischen und auf einem mit Backpapier belegten Blech verteilen. Im vorgeheizten Combair rösten und nach der Hälfte der Zeit wenden.', settings: [ca('Heißluft', 200, 25, 'vorheizen, Ebene 2, einmal wenden')] },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, vierteln, mit Salz bestreuen, auf den gelochten Garbehälter legen und dämpfen.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
+    { text: 'Die Milch mit der Butter erwärmen, die Kartoffeln abgießen und mit der heißen Milch stampfen. Mit Muskat und Salz abschmecken.', settings: [b('3', 3, 'Milch und Butter erwärmen, nicht kochen')] },
+    { text: 'Die Bratwürste im Butterschmalz bei mittlerer Hitze rundum braun braten. Mit dem Rosenkohl und dem Püree anrichten.', settings: [b('5', 12, 'Pfanne')] },
+  ],
+  'rahm-rosenkohl-frikadellen': [
+    { text: 'Das Brötchen einweichen und ausdrücken. Die Zwiebel fein würfeln und mit dem Hack, Ei, Senf, Majoran, Salz, Pfeffer und Paprika verkneten. Daraus 4 flache Frikadellen formen.' },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, mit Salz bestreuen, auf den gelochten Garbehälter legen und dämpfen. Danach mit gehackter Petersilie bestreuen.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
+    { text: 'Den Rosenkohl putzen und halbieren. In der Butter andünsten, die Brühe und die Sahne zugießen und zugedeckt köcheln lassen. Mit Muskat, Salz und Pfeffer abschmecken.', settings: [b('4', 3, 'andünsten'), b('3', 12, 'köcheln, Deckel drauf')] },
+    { text: 'Die Frikadellen im heißen Butterschmalz bei mittlerer Hitze 6 Minuten je Seite braten. Mit dem Rahm-Rosenkohl und den Salzkartoffeln servieren.', settings: [b('5', 12, 'Pfanne')] },
+  ],
+  'rosenkohl-speck-kasseler': [
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, mit Salz bestreuen, auf den gelochten Garbehälter legen und dämpfen.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
+    { text: 'Den Rosenkohl putzen, halbieren und nach 13 Minuten zu den Kartoffeln in den CombiSteamer geben, bis er bissfest ist.', settings: [cs('Dämpfen', 100, 12, 'zu den Kartoffeln, gelochter Garbehälter')] },
+    { text: 'Die Speckwürfel in einer Pfanne knusprig auslassen. Die fein gewürfelte Zwiebel mit der Butter zugeben und glasig dünsten.', settings: [b('5', 4, 'Speck'), b('4', 3, 'Zwiebel glasig')] },
+    { text: 'Den abgetropften Rosenkohl in die Pfanne geben, 3 Minuten schwenken und mit Muskat, Salz und Pfeffer abschmecken.', settings: [b('5', 3)] },
+    { text: 'Die Kasseler-Koteletts im Butterschmalz 3 bis 4 Minuten je Seite braten. Mit dem Rosenkohl und den Kartoffeln in Petersilie anrichten.', settings: [b('5', 8, 'Pfanne')] },
+  ],
+
+  // ───────────── Burger ─────────────
+  'cheeseburger-classic': [
+    { text: 'Die Kartoffeln schälen, in 1 cm dicke Stifte schneiden, 30 Minuten in kaltem Wasser wässern, gründlich abtrocknen und mit 1 EL Sonnenblumenöl und Salz mischen.' },
+    { text: 'Für die Burgersauce Mayonnaise, Ketchup, Senf und eine fein gehackte Gewürzgurke verrühren. Die übrigen Gurken in Scheiben, Tomate und rote Zwiebel in Ringe schneiden, den Kopfsalat zupfen.' },
+    { text: 'Die Pommes in den Airfryer geben (Korb höchstens halb voll) und backen, nach 10 und 16 Minuten schütteln.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 180, minutes: 22, note: 'Pommes frisch, 2x schütteln' }] },
+    { text: 'Das Rinderhackfleisch leicht kneten, in 2 Patties à 180 g formen und in der Mitte eine kleine Mulde eindrücken. Mit Salz und Pfeffer würzen.' },
+    { text: 'Die Patties im restlichen Sonnenblumenöl braten. In der letzten Minute je eine Scheibe Cheddar auflegen und mit Deckel schmelzen lassen. Beim scharfen Anbraten den Abzug eine Stufe höher stellen.', settings: [b('8', 2, 'Pfanne vorheizen, Abzug höher'), b('7', 8, 'je 4 Minuten, Cheddar zum Schluss')] },
+    { text: 'Die Burger-Brötchen aufschneiden und in der Butter anrösten. Unterseite mit Sauce, Kopfsalat, Tomate, Zwiebel, Gurke und Patty belegen, Deckel darauf. Mit den Pommes servieren.', settings: [b('5', 2, 'Brötchen rösten')] },
+  ],
+  'smashed-burger': [
+    { text: 'Das Rinderhackfleisch in 4 lockere Kugeln à 90 g formen (nicht kneten) und kalt stellen. Die Zwiebel in hauchdünne Scheiben hobeln, die Gewürzgurken in Scheiben schneiden. Mayonnaise, Ketchup und Senf zur Sauce verrühren.' },
+    { text: 'Die Pommes frites TK im Airfryer backen und einmal schütteln.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 190, minutes: 17, note: 'Pommes TK, 1x schütteln' }] },
+    { text: 'Die Gusseisenpfanne sehr heiß werden lassen, dünn mit Sonnenblumenöl ölen und 2 Kugeln hineinlegen. Einige Zwiebelscheiben daraufgeben, jede Kugel sofort mit einem stabilen Wender fest flach drücken, salzen, pfeffern und 2 Minuten braten. Abzug eine Stufe höher stellen.', settings: [b('9', 3, 'Gusseisenpfanne vorheizen, Abzug höher'), b('9', 2, 'smashen, Abzug höher')] },
+    { text: 'Die Patties abkratzen, wenden, je eine Scheibe Cheddar auflegen und 1 Minute braten. Die zweite Runde genauso braten.', settings: [b('9', 1, 'Cheddar schmelzen'), b('9', 3, 'zweite Runde')] },
+    { text: 'Die Burger-Brötchen aufschneiden und in der Butter anrösten, mit Sauce bestreichen und je 2 Patties mit Käse, Zwiebeln und Gurken belegen. Mit den Pommes servieren.', settings: [b('5', 2, 'Brötchen rösten')] },
+  ],
+  'bacon-bbq-burger': [
+    { text: 'Für den Coleslaw den Weißkohl fein hobeln, die Möhre raspeln. Mit Salz und Zucker kräftig durchkneten. Mayonnaise, Joghurt und Apfelessig verrühren, untermischen und 20 Minuten durchziehen lassen.' },
+    { text: 'Den Bacon in einer kalten Pfanne langsam knusprig braten und auf Küchenpapier legen.', settings: [b('5', 6, 'kalte Pfanne, Bacon')] },
+    { text: 'Das Rinderhackfleisch in 2 Patties à 180 g formen, salzen und pfeffern. Im Sonnenblumenöl braten, wenden, mit je 1 EL BBQ-Sauce bestreichen, Cheddar auflegen und fertig braten. Abzug eine Stufe höher stellen.', settings: [b('8', 2, 'Pfanne vorheizen, Abzug höher'), b('6', 7, 'braten, wenden, Cheddar')] },
+    { text: 'Die Burger-Brötchen aufschneiden, in der Butter anrösten und mit Kopfsalat belegen. Patty, Bacon, Röstzwiebeln und die restliche BBQ-Sauce daraufgeben, Deckel auflegen. Mit dem Coleslaw servieren.', settings: [b('5', 2, 'Brötchen rösten')] },
+  ],
+  'chicken-burger-leicht': [
+    { text: 'Für den Coleslaw den Weißkohl fein hobeln, die Möhre raspeln. Joghurt, Apfelessig, Senf, Honig, Salz und Pfeffer verrühren, untermischen und durchziehen lassen.' },
+    { text: 'Das Hähnchenbrustfilet waagerecht halbieren, zwischen Folie dünn klopfen, salzen und pfeffern. Weizenmehl, das verquirlte Ei und Panko mit Paprikapulver in drei Teller geben und die Schnitzel nacheinander darin wenden. Das Panko gut andrücken und die Schnitzel mit Sonnenblumenöl einsprühen oder einpinseln.' },
+    { text: 'Den Airfryer vorheizen, die Schnitzel einlegen, nach der Hälfte der Zeit wenden und goldbraun backen. Innen darf nichts mehr rosa sein.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 180, minutes: 13, note: 'vorheizen, nach der Hälfte wenden' }] },
+    { text: 'Die Burger-Brötchen kurz aufbacken. Unterseite mit Kopfsalat, Tomatenscheiben, Hähnchenschnitzel und etwas Coleslaw belegen, Deckel darauf. Den übrigen Coleslaw dazu servieren.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 170, minutes: 3, note: 'Brötchen aufbacken' }] },
+  ],
 }
