@@ -197,6 +197,21 @@ export const brot: ExtraGroup = {
       ]),
 
     // ---------- Grissini ----------
+    backen('brot', 'pittule-salentine', 'Pittule aus dem Salento',
+      {
+        cuisine: 'it',
+        time: 150,
+        yields: { name: 'Pittule frisch', amount: 30, unit: 'Stk', shelf: 1, store: 'am besten sofort warm essen' },
+        lighter: 'Kleinere Pittule (1 TL statt 1 EL Teig) und nach dem Frittieren gut auf Küchenpapier abtropfen lassen – pro 5 Stück spart das rund 60 kcal. Süß mit Puderzucker statt Honig spart nochmal ca. 30 kcal.',
+      },
+      '500 g Weizenmehl Tipo 00 | 12 g Hefe frisch | 10 g Salz | 100 g Kirschtomaten | 40 g Oliven schwarz | 1 EL Kapern | 1000 ml Frittieröl | 2 EL Honig | 2 EL Puderzucker',
+      [
+        'Die Hefe frisch in 420 ml lauwarmem Wasser auflösen. Weizenmehl in eine große Schüssel geben, das Hefewasser nach und nach einrühren und zum Schluss das Salz zugeben. Mit der Hand oder einem Holzlöffel 10 Minuten kräftig schlagen, bis ein sehr weicher, klebriger, glatter Teig entsteht.',
+        'Den Teig abgedeckt an einem warmen Ort 2 Stunden gehen lassen, bis er sich mindestens verdoppelt hat und viele Blasen wirft.',
+        'Die Kirschtomaten klein würfeln und gut abtropfen lassen, die Oliven schwarz entsteinen und hacken, die Kapern abspülen. Ein Drittel des Teigs vorsichtig mit Kirschtomaten, Oliven und Kapern vermengen, der Rest bleibt pur.',
+        'Das Frittieröl in einem hohen Topf auf 175 °C erhitzen. Die Hände bzw. einen Esslöffel immer wieder in Wasser tauchen, walnussgroße Teigstücke abstechen und portionsweise ins heiße Öl gleiten lassen. 3–4 Minuten rundum goldbraun ausbacken und auf Küchenpapier abtropfen lassen.',
+        'Die herzhaften Pittule pur oder mit Salz servieren, die puren nach Wunsch mit Honig beträufeln oder mit Puderzucker bestäuben. Am besten sofort warm essen.',
+      ]),
     backen('brot', 'grissini', 'Grissini',
       {
         cuisine: 'it',
@@ -354,6 +369,13 @@ export const brot: ExtraGroup = {
       st('Auf Heißluft ohne Dampf umschalten und weitere 40 Minuten backen, bis das Brot beim Klopfen auf die Unterseite hohl klingt.', steamer('Heißluft', 200, 40, 'trocken, für die Kruste')),
       st('Auf einem Gitter mindestens 2 Stunden auskühlen lassen, erst dann anschneiden.'),
     ],
+    'pittule-salentine': [
+      st('Die Hefe frisch in 420 ml lauwarmem Wasser auflösen. Weizenmehl in eine große Schüssel geben, das Hefewasser nach und nach einrühren und zum Schluss das Salz zugeben. 10 Minuten kräftig schlagen, bis ein sehr weicher, klebriger, glatter Teig entsteht.'),
+      st('Die Schüssel abdecken und den Teig im CombiSteamer gehen lassen, bis er sich mindestens verdoppelt hat und viele Blasen wirft.', gare(90)),
+      st('Die Kirschtomaten klein würfeln und abtropfen lassen, die Oliven schwarz hacken, die Kapern abspülen. Ein Drittel des Teigs vorsichtig mit Kirschtomaten, Oliven und Kapern vermengen, der Rest bleibt pur.'),
+      st('Das Frittieröl in einem hohen Topf auf 175 °C erhitzen (Thermometer). Mit einem in Wasser getauchten Esslöffel walnussgroße Teigstücke abstechen, portionsweise ins Öl gleiten lassen und 3–4 Minuten rundum goldbraun ausbacken. Auf Küchenpapier abtropfen lassen.', { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'Öl aufheizen' } as DeviceSetting, { device: 'bora', mode: 'Kochzone', level: '7', minutes: 4, note: '175 °C halten, Abzug Power' } as DeviceSetting),
+      st('Die herzhaften Pittule pur servieren, die puren nach Wunsch mit Honig beträufeln oder mit Puderzucker bestäuben. Sofort warm essen.'),
+    ],
     'grissini': [
       st('Die Hefe frisch in 160 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 30 g vom Hartweizengrieß, Salz und Olivenöl 6 Minuten zu einem glatten Teig kneten.'),
       st('Den Teig in der Schüssel abdecken und im CombiSteamer 30 Minuten gehen lassen.', gare(30)),
@@ -373,6 +395,7 @@ export const brot: ExtraGroup = {
     'ciabatta': 'Ciabatta bread',
     'focaccia-genovese': 'Focaccia genovese',
     'pane-pugliese': 'Pane pugliese Altamura bread',
+    'pittule-salentine': 'pittule Salento fried dough balls',
     'grissini': 'Grissini breadsticks',
   },
 }
