@@ -8,7 +8,7 @@ export function ListTab({ m }: { m: AppModel }) {
   return (
     <ShoppingList
       result={plan.week}
-      planned={days.filter((d) => state.plan[d] || state.breakfast[d]).length}
+      planned={days.filter((d) => state.plan[d] || state.breakfast[d] || state.bakePlan[d]?.some((e) => !e.status)).length}
       checked={state.checked[weekKey] ?? []}
       custom={state.custom[weekKey] ?? []}
       onToggleBuy={(it) => act.toggleBuy(it)}

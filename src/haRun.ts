@@ -26,7 +26,7 @@ export function haLocalFor(s: AppState, today: string): LocalItem[] {
     spices: s.spices,
     carry: today < key,
     portion,
-  })
+  }, s.bakePlan)
   return localItems(week.buy)
 }
 

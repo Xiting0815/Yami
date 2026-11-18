@@ -10,7 +10,7 @@
  *   live: `todo/item/subscribe`. Jeder benutzt seinen eigenen HA-Token.
  *
  * DOKUMENTE
- *   kitchen        Plan (Abendessen), Vorrat, Einkauf (gekauft/abgehakt/eigene Artikel), Weggeworfenes
+ *   kitchen        Plan (Abendessen), Backplan, Vorrat, Einkauf (gekauft/abgehakt/eigene Artikel), Weggeworfenes
  *                  – bewusst EIN Dokument: Kochen/Einkaufen ändern Plan + Vorrat zusammen, so wird beides
  *                    immer gemeinsam gelesen und geschrieben (kein halber Stand → kein doppeltes Abziehen).
  *   recipes        eigene Rezepte und eigene Zutaten
@@ -20,7 +20,7 @@
  *   main           Haupt-Gerät: welches Gerät Einkaufsliste (Google Tasks) und Kalender in HA pflegt (+ dessen
  *                  Zuordnungen), damit dort nichts doppelt entsteht.
  *
- * GETEILT (AppState-Felder): plan, pantry, bought, checked, custom, wasted, customRecipes, customIngredients,
+ * GETEILT (AppState-Felder): plan, bakePlan, pantry, bought, checked, custom, wasted, customRecipes, customIngredients,
  *   prices, staples, spices, pantryRequests.
  * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked.
  * PERSÖNLICH (nie geteilt): profile, weighIns, adjustDecidedAt, profileCreated, breakfast, breakfastPicks, prepDays,
@@ -28,7 +28,7 @@
  *   bfOpen, showClassicSteps, lastBackup, ha (Token, Person, Gerät), sync (dieser Abgleich-Stand).
  *
  * ZUSAMMENFÜHREN (pro Eintrag, „letzte Änderung gewinnt“)
- *   Jeder Eintrag hat `{ t: ms, by: Person }`. Schlüssel: plan:<Tag>, lot:<Posten-Id>, bought:<Woche>|<Artikel>,
+ *   Jeder Eintrag hat `{ t: ms, by: Person }`. Schlüssel: plan:<Tag>, bplan:<Tag>|<Rezept-Id>, lot:<Posten-Id>, bought:<Woche>|<Artikel>,
  *   check:<Woche>|<Artikel>, cust:<Woche>|<Id>, waste:<Prüfsumme>, recipe:<Id>, ing:<Name>, price:/staple:/spice:/req:<Name>,
  *   rating:<Tag>, reject:<Datum>|<Id>, pf:<Tag>, bake:<Datum:Id>, baked:<Datum>|<Id>.
  *   Lokale Änderungen erkennt der Abgleich selbst: Wert ≠ Prüfsumme im letzten Abgleich-Stand (`sync.base`) → neu
@@ -37,6 +37,13 @@
  *   Gleichstand: größeres t, dann Person, dann Prüfsumme (überall gleich → alle Geräte landen beim selben Ergebnis).
  *   Erster Abgleich eines Geräts mit vorhandenen Haushaltsdaten: eigene Einträge zählen als „uralt“ (t = 0) → der
  *   Haushalt gewinnt, nur Einträge, die es dort nicht gibt, kommen dazu (nichts wird überschrieben).
+ *
+ * BACKPLAN (bplan:<Tag>|<Rezept-Id>, Wert { amount, status? })
+ *   Ein Eintrag je Tag und Rezept → zwei Geräte, die dasselbe Backen einplanen, ergeben einen Eintrag (kein Doppeltes).
+ *   Verschieben = alter Schlüssel gelöscht (Grabstein) + neuer. „Gebacken?“ beantworten = status 'baked' im selben Dokument
+ *   wie der Vorrat (Ergebnis-Posten + Abzug) → die Frage verschwindet auf beiden Geräten. Wird sie auf beiden Geräten
+ *   gleichzeitig offline mit „Ja“ beantwortet, entstehen zwei Ergebnis-Posten (Grenze, wie beim Vorrat unten).
+ *   Der Backplan fließt über planWeek in Einkaufsliste/Google Tasks; der Kalender zeigt Backen bisher nicht.
  *
  * GEKOCHT / ABZIEHEN (cookDue)
  *   Mit Familien-Abgleich zieht ein Gerät vergangene Abendessen NUR direkt nach einem erfolgreichen Lesen der
@@ -68,6 +75,7 @@ import type { HaApi, RemoteTodo } from './haSync'
 import { listTodo } from './haSync'
 import { HaError } from './homeassistant'
 import { RECIPE_BY_ID } from './data/recipes'
+import type { BakeEntry } from './types'
 import { cookDue, uid } from './kitchen'
 import { type PortionFeedback, portionFactor } from './learning'
 import { type AppState, type HaSettings, sanitize, sharingActive, weekdayName } from './store'
@@ -125,7 +133,7 @@ const split2 = (s: string): [string, string] => {
 }
 const PERSON_KINDS = new Set(['rating', 'reject', 'pf', 'bake', 'baked'])
 const DOC_OF: Record<string, string> = {
-  plan: 'kitchen', lot: 'kitchen', bought: 'kitchen', check: 'kitchen', cust: 'kitchen', waste: 'kitchen',
+  plan: 'kitchen', bplan: 'kitchen', lot: 'kitchen', bought: 'kitchen', check: 'kitchen', cust: 'kitchen', waste: 'kitchen',
   recipe: 'recipes', ing: 'recipes',
   price: 'prefs', staple: 'prefs', spice: 'prefs', req: 'prefs',
 }
@@ -140,6 +148,7 @@ export function docOf(key: string, me: string): string | undefined {
 export function extract(s: AppState): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   for (const [d, e] of Object.entries(s.plan)) if (e) o[`plan:${d}`] = e
+  for (const [d, list] of Object.entries(s.bakePlan)) for (const e of list ?? []) o[`bplan:${d}|${e.recipeId}`] = { amount: e.amount, ...(e.status ? { status: e.status } : {}) }
   for (const l of s.pantry) o[`lot:${l.id}`] = l
   for (const [w, m] of Object.entries(s.bought)) for (const [k, b] of Object.entries(m ?? {})) o[`bought:${w}|${k}`] = b
   for (const [w, ks] of Object.entries(s.checked)) for (const k of ks ?? []) o[`check:${w}|${k}`] = 1
@@ -180,6 +189,14 @@ export function rebuild(s: AppState, live: Record<string, unknown>, kinds: Set<s
   const of = (kind: string) => Object.entries(live).filter(([k]) => kindOf(k) === kind).map(([k, v]) => [restOf(k), v] as [string, unknown])
   const obj = (kind: string) => Object.fromEntries(of(kind))
   if (kinds.has('plan')) next.plan = obj('plan') as AppState['plan']
+  if (kinds.has('bplan')) {
+    const fresh: Record<string, Map<string, BakeEntry>> = {}
+    for (const [r, v] of of('bplan')) {
+      const [d, id] = split2(r)
+      ;(fresh[d] ??= new Map()).set(id, { recipeId: id, ...(v as Omit<BakeEntry, 'recipeId'>) })
+    }
+    next.bakePlan = Object.fromEntries(Object.entries(fresh).map(([d, m]) => [d, byOrder(s.bakePlan[d] ?? [], (e) => e.recipeId, m)]))
+  }
   if (kinds.has('lot')) next.pantry = byOrder(s.pantry, (l) => l.id, new Map(of('lot').map(([id, v]) => [id, v as AppState['pantry'][number]])))
   if (kinds.has('bought')) {
     const b: AppState['bought'] = {}
@@ -650,7 +667,7 @@ export function applyRound(cur: AppState, res: RoundResult): { state: AppState; 
   return {
     state: {
       ...cur,
-      plan: n.plan, pantry: n.pantry, bought: n.bought, checked: n.checked, custom: n.custom, wasted: n.wasted,
+      plan: n.plan, bakePlan: n.bakePlan, pantry: n.pantry, bought: n.bought, checked: n.checked, custom: n.custom, wasted: n.wasted,
       customRecipes: n.customRecipes, customIngredients: n.customIngredients, prices: n.prices, staples: n.staples, spices: n.spices,
       pantryRequests: n.pantryRequests, ratings: n.ratings, rejects: n.rejects, portionFeedback: n.portionFeedback, bakeRatings: n.bakeRatings, baked: n.baked,
       onboarding: cur.onboarding ?? n.onboarding,

@@ -2,11 +2,13 @@ import { RECIPE_BY_ID } from '../data/recipes'
 import { learnedPrepWeekday } from '../breakfast'
 import { pantryWishes, portionNote, summarize } from '../learning'
 import { cookTarget } from '../cookDone'
+import { bakesOn } from '../bakePlan'
 import { portionFor } from '../energy'
 import { defaultReviewMonday } from '../review'
 import { addDays, isoDate, parseIso, sharingActive, weekdayName } from '../store'
 import { syncStatusText } from '../sync'
 import { DayActionsSheet } from '../components/DayActionsSheet'
+import { BakeSheet } from '../components/BakeSheet'
 import { DayPicker } from '../components/DayPicker'
 import { FilterSheet } from '../components/FilterBar'
 import { PantryDaySheet } from '../components/PantryDaySheet'
@@ -41,7 +43,7 @@ export function Sheets({ m }: { m: AppModel }) {
           insight={plan.insights.get(sheet.recipe.id)}
           portion={(() => {
             const day = sheet.day
-            if (sheet.recipe.breakfast || !day) return undefined
+            if (sheet.recipe.breakfast || sheet.recipe.basic || !day) return undefined
             const budget = energy.dinnerBudgetFor(day)
             return budget != null
               ? { ...portionFor(sheet.recipe, budget, state.plan[day]?.servings ?? state.defaultServings), budget, household: portionNote(plan.portion) }
@@ -51,7 +53,7 @@ export function Sheets({ m }: { m: AppModel }) {
             sheet.recipe.breakfast
               ? 1
               : sheet.recipe.basic
-                ? sheet.recipe.servings
+                ? (sheet.day ? bakesOn(state.bakePlan, sheet.day).find((e) => e.recipeId === sheet.recipe.id && !e.status)?.amount ?? 1 : 1) * sheet.recipe.servings
                 : ((sheet.day && state.plan[sheet.day]?.recipeId === sheet.recipe.id ? state.plan[sheet.day]?.servings : undefined) ??
                 state.defaultServings)
           }
@@ -62,7 +64,7 @@ export function Sheets({ m }: { m: AppModel }) {
             sheet.recipe.breakfast
               ? undefined
               : sheet.recipe.basic
-                ? { run: (servings: number) => act.finishBasic(sheet.recipe, servings) }
+                ? { run: (servings: number) => act.finishBasic(sheet.recipe, servings, sheet.day) }
                 : (() => {
                   const t = cookTarget(state.plan, sheet.recipe.id, today, sheet.day)
                   return {
@@ -72,6 +74,18 @@ export function Sheets({ m }: { m: AppModel }) {
                 })()
           }
           onOpenRecipe={(r) => ui.setSheet({ recipe: r, mode: 'view' })}
+          bakePlanner={
+            sheet.recipe.basic && sheet.recipe.yields
+              ? {
+                  today,
+                  plannedDays: Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => e.recipeId === sheet.recipe.id && !e.status)),
+                  onPlan: (day, amount) => {
+                    act.planBake(sheet.recipe, day, amount)
+                    ui.setSheet(null)
+                  },
+                }
+              : undefined
+          }
           showClassic={state.showClassicSteps}
           onShowClassic={(v) => m.setState((s) => ({ ...s, showClassicSteps: v }))}
           onEdit={() => {
@@ -99,7 +113,7 @@ export function Sheets({ m }: { m: AppModel }) {
                     ui.setSheet(null)
                   },
                 }
-              : sheet.mode === 'view' && sheet.day && !state.plan[sheet.day]?.status
+              : sheet.mode === 'view' && sheet.day && !sheet.recipe.basic && !state.plan[sheet.day]?.status
                 ? {
                     label: 'Portionen übernehmen',
                     onClick: (servings) => {
@@ -133,6 +147,39 @@ export function Sheets({ m }: { m: AppModel }) {
           }}
         />
       )}
+
+      {ui.bakeSheet && (() => {
+        const { day, recipeId, move } = ui.bakeSheet
+        const entry = bakesOn(state.bakePlan, day).find((e) => e.recipeId === recipeId)
+        const recipe = RECIPE_BY_ID[recipeId]
+        if (!entry || !recipe) return null
+        return (
+          <BakeSheet
+            key={`${day}|${recipeId}`}
+            day={day}
+            entry={entry}
+            recipe={recipe}
+            today={today}
+            plannedDays={Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => e.recipeId === recipeId && !e.status))}
+            startMove={move}
+            onClose={() => ui.setBakeSheet(null)}
+            onAmount={(n) => act.changeBakeAmount(day, recipeId, n)}
+            onView={() => {
+              ui.setBakeSheet(null)
+              ui.setSheet({ recipe, day, mode: 'view' })
+            }}
+            onBaked={() => act.confirmBaked(day, recipeId)}
+            onMove={(to) => {
+              ui.setBakeSheet(null)
+              act.moveBakeTo(day, recipeId, to)
+            }}
+            onRemove={() => {
+              ui.setBakeSheet(null)
+              act.removeBakeEntry(day, recipeId)
+            }}
+          />
+        )
+      })()}
 
       {ui.pantryChooser && (
         <PantryDaySheet today={today} plan={state.plan} onClose={() => ui.setPantryChooser(false)} onPick={act.startPantrySwipe} />

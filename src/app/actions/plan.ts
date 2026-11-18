@@ -5,6 +5,7 @@ import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
 import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
 import { householdFeedback } from '../../sync'
 import { yieldText } from '../../bake'
+import { markBaked, matchBake } from '../../bakePlan'
 import type { ActionContext } from './context'
 
 /** Abendessen planen: Wischen, Nehmen/Wegwischen, Tage leeren, gekocht/nicht gekocht, Bewertung, Woche wechseln */
@@ -167,16 +168,21 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
    * als Posten (Haltbarkeit aus `yields`) in den Vorrat legen. Kein Planeintrag; Rückgängig über den Toast.
    * Gebackenes zählt fürs Lernen (+ „Wie war’s?“), Grundrezepte nicht.
    */
-  function finishBasic(recipe: Recipe, servings: number) {
+  function finishBasic(recipe: Recipe, servings: number, ctxDay?: string) {
     const y = recipe.yields
     if (!recipe.basic || !y) return
     const snap = snapshot()
     const bake = isBake(recipe)
-    setState((s) => ({
-      ...s,
-      pantry: cookBasic(s.pantry, recipe, servings, today).pantry,
-      baked: bake ? [...s.baked, { date: today, recipeId: recipe.id }].slice(-200) : s.baked,
-    }))
+    setState((s) => {
+      // eingeplantes Backen: dieser Eintrag gilt damit als gebacken (kein zweites Abziehen, keine Nachfrage mehr)
+      const planned = matchBake(s.bakePlan, recipe.id, today, ctxDay)
+      return {
+        ...s,
+        pantry: cookBasic(s.pantry, recipe, servings, today).pantry,
+        baked: bake ? [...s.baked, { date: today, recipeId: recipe.id }].slice(-200) : s.baked,
+        bakePlan: planned ? markBaked(s.bakePlan, planned, recipe.id) : s.bakePlan,
+      }
+    })
     flash(`${yieldText(recipe, servings)} ${y.name} im Vorrat ✓`, snap)
     ui.setCooking(false)
     ui.setSheet(null)

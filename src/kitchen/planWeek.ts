@@ -3,7 +3,8 @@ import { CATALOG } from '../data/catalog'
 import type { Product } from '../data/products'
 import { RECIPE_BY_ID } from '../data/recipes'
 import { substitutesFor } from '../data/substitutes'
-import type { PlanEntry, Recipe, ShopCat, WeekPlan } from '../types'
+import type { BakePlan, PlanEntry, Recipe, ShopCat, WeekPlan } from '../types'
+import { bakeEntriesOf } from '../bakePlan'
 import { type SpiceStatus, isSpice, type StapleMemos, STAPLE_SHOP_CAT, buyName, isQtyStaple, isTrackedStaple, runningLow, stapleKey, useEvents, useRate } from '../staples'
 import { type PantryLot, type PriceOverrides, type BoughtMap, addDaysIso, canonical, productFor, isTracked, needsOf, stapleNeedsOf, allNeedsOf } from './base'
 import { usableOn, lotsFor, consume } from './pantry'
@@ -88,6 +89,8 @@ export function planWeek(
   month?: number,
   /** Grundzutaten: gemerkte Formen und Gewürz-Status */
   staple: StapleContext = {},
+  /** eingeplantes Backen (noch offen): Zutaten zählen wie bei Abendessen für Einkauf, Vorrat und Kosten */
+  bakePlan: BakePlan = {},
 ): WeekResult {
   const memo = staple.memo ?? {}
   // gelernte Haushalts-Portion: noch offene Abendessen brauchen mehr/weniger (schon gekochte sind über „entnommen“ erfasst)
@@ -108,7 +111,8 @@ export function planWeek(
     ...needsOf(r, servings),
     ...stapleNeedsOf(r, servings).filter((n) => trackedKey(stapleKey(n.name))),
   ]
-  const entries = [...activeEntries(plan, days), ...activeEntries(breakfast, days)].sort((a, b) => a[0].localeCompare(b[0]))
+  const bakes = bakeEntriesOf(bakePlan, today)
+  const entries = [...activeEntries(plan, days), ...activeEntries(breakfast, days), ...bakes.filter(([d]) => days.includes(d))].sort((a, b) => a[0].localeCompare(b[0]))
 
   // Bedarf der Woche
   const req = new Map<string, { amount: number; recipes: Set<string>; forDays: Set<string> }>()
@@ -180,10 +184,11 @@ export function planWeek(
 
   // Noch offene Gerichte VOR dieser Woche (z. B. Sa/So, wenn schon die nächste Woche geplant wird)
   // brauchen ihre Zutaten noch – die dürfen für diese Woche nicht als vorhanden zählen.
-  const earlier = [plan, breakfast]
+  const earlier: [string, PlanEntry][] = [plan, breakfast]
     .flatMap((p) => Object.entries(p))
     .filter((x): x is [string, PlanEntry] => !!x[1] && x[0] < days[0] && !x[1].status && !!RECIPE_BY_ID[x[1].recipeId])
-    .sort((a, b) => a[0].localeCompare(b[0]))
+  earlier.push(...bakes.filter(([d]) => d < days[0]))
+  earlier.sort((a, b) => a[0].localeCompare(b[0]))
   for (const [day, e] of earlier) {
     const r = RECIPE_BY_ID[e.recipeId]
     for (const n of needsFor(r, e.servings)) {

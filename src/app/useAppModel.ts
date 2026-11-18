@@ -12,6 +12,7 @@ import { useBalances } from './useBalances'
 import { useStatus } from './useStatus'
 import type { ActionContext } from './actions/context'
 import { planActions } from './actions/plan'
+import { bakeActions } from './actions/bake'
 import { breakfastActions } from './actions/breakfast'
 import { shoppingActions } from './actions/shopping'
 import { pantryActions } from './actions/pantry'
@@ -38,6 +39,7 @@ export function useAppModel() {
   const ctx: ActionContext = { state, setState, cal, ui, flash, setToast, snapshot }
   const act = {
     ...planActions(ctx),
+    ...bakeActions(ctx),
     ...breakfastActions(ctx, bf),
     ...shoppingActions(ctx),
     ...pantryActions(ctx),

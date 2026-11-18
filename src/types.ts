@@ -206,5 +206,17 @@ export interface PlanEntry {
   consumed?: { id: string; name: string; amount: number; unit: string; expires: string }[]
 }
 
+/** Eingeplantes Backen an einem Tag: Rezept (Backen & Desserts, Grundrezept) × Rezeptmenge */
+export interface BakeEntry {
+  recipeId: string
+  /** Rezeptmenge (1 = ein Blech/Laib/Ansatz) */
+  amount: number
+  /** baked = gebacken (Vorrat ist schon gebucht), skipped = nicht gebacken; fehlt = noch offen */
+  status?: 'baked' | 'skipped'
+}
+
+/** Backplan: Tag (ISO) → eingeplante Backwaren (mehrere pro Tag möglich, ein Rezept höchstens einmal je Tag) */
+export type BakePlan = Record<string, BakeEntry[] | undefined>
+
 /** Schlüssel = ISO-Datum (YYYY-MM-DD) */
 export type WeekPlan = Record<string, PlanEntry | undefined>

@@ -5,13 +5,14 @@ import { PRODUCTS } from './data/products'
 import { rememberStaples, sanitizeMemos, sanitizeSpices, type SpiceStatus, type StapleMemos } from './staples'
 import {
   BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, TYPE_LABEL,
-  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type PlanEntry, type ShopCat, type WeekPlan,
+  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type BakePlan, type PlanEntry, type ShopCat, type WeekPlan,
 } from './types'
 import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
 import { DEFAULT_PROFILE, type Profile, type Snack } from './energy'
 import type { WeighIn } from './progress'
 import type { PortionFeedback, Rating, RejectEvent } from './learning'
 import { type SyncLocal, sanitizeSync } from './syncLocal'
+import { type BakeHint, sanitizeBakeHints, sanitizeBakePlan } from './bakePlan'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -202,6 +203,10 @@ export interface AppState {
   baked: { date: string; recipeId: string }[]
   /** Bewertung nach „Fertig gebacken“: Schlüssel `Datum:Rezept-ID` → 👍/🔁/👎 (fürs Lernen) */
   bakeRatings: Record<string, Rating>
+  /** Backen einplanen: Tag → Backwaren (geteilt mit der Familie, siehe src/bakePlan.ts und src/sync.ts) */
+  bakePlan: BakePlan
+  /** Backvorschläge: angenommen/weggeklickt je Art – daraus lernt Yami, wie oft es vorschlagen darf (nur lokal) */
+  bakeHints: BakeHint[]
   /** Familien-Abgleich: Stand des letzten Abgleichs, andere Personen, Hinweise (nur lokal; siehe src/sync.ts) */
   sync?: SyncLocal
 }
@@ -242,6 +247,8 @@ const INITIAL: AppState = {
   snacks: [],
   baked: [],
   bakeRatings: {},
+  bakePlan: {},
+  bakeHints: [],
 }
 
 const hasData = (s: AppState) =>
@@ -505,6 +512,8 @@ export function sanitize(parsed: unknown): AppState {
       .filter(([k, v]) => /^\d{4}-\d{2}-\d{2}:.+/.test(k) && !!RECIPE_BY_ID[k.slice(11)] && (v === 'up' || v === 'again' || v === 'down'))
       .slice(-200),
   )
+  state.bakePlan = sanitizeBakePlan(state.bakePlan)
+  state.bakeHints = sanitizeBakeHints(state.bakeHints)
   // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
   if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'
   return state

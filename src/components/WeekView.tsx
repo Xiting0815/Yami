@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
-import type { Recipe, WeekPlan } from '../types'
+import { Fragment, type ReactNode } from 'react'
+import type { BakeEntry, BakePlan, Recipe, WeekPlan } from '../types'
+import { bakeLine } from '../bakePlan'
 import { RECIPE_BY_ID } from '../data/recipes'
 import { shortDate, weekdayName } from '../store'
 import { formatTime } from '../filter'
@@ -48,6 +49,12 @@ interface Props {
   planBy?: (day: string) => string | undefined
   /** Hinweise zu Änderungen der anderen („Lisa hat Montag geändert …“) */
   syncSlot?: ReactNode
+  /** eingeplantes Backen: Zeile „🍰 Backen: …“ unter dem Abendessen */
+  bakes?: BakePlan
+  /** Backen antippen (Aktionen: Ansehen, Verschieben, Entfernen) */
+  onBake?: (day: string, recipeId: string) => void
+  /** Nachfrage „Gebacken?“ und sanfter Backvorschlag */
+  bakeSlot?: ReactNode
 }
 
 export function NoticeRow({ notice }: { notice: Notice }) {
@@ -66,7 +73,7 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions, planBy, syncSlot } = props
+  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions, planBy, syncSlot, bakes = {}, onBake, bakeSlot } = props
   const planned = days.filter((d) => plan[d]).length
   // nur der nächste freie Tag bekommt die Akzentfarbe – die übrigen leeren Tage bleiben ruhig
   const nextOpen = days.find((d) => d >= today && !plan[d])
@@ -96,13 +103,26 @@ export function WeekView(props: Props) {
 
       {ratingSlot}
 
+      {bakeSlot}
+
       {breakfastSlot}
 
       {hideDays ? (
         <p className="muted small center start-hint">Dein Wochenplan erscheint hier, sobald du das erste Abendessen gewählt hast.</p>
       ) : (
         <ul className="days">
-          {days.map((day) => {
+          {days.map((day) => (
+            <Fragment key={day}>
+              {renderDay(day)}
+              <BakeRow day={day} list={bakes[day]} today={today} onBake={onBake} />
+            </Fragment>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+
+  function renderDay(day: string) {
             const entry = plan[day]
             const recipe = entry ? RECIPE_BY_ID[entry.recipeId] : undefined
             const past = day < today
@@ -183,10 +203,28 @@ export function WeekView(props: Props) {
                 </div>
               </li>
             )
-          })}
-        </ul>
-      )}
-    </div>
+  }
+}
+
+/** „🍰 Backen: Bienenstich · Dinkelbrötchen“ unter dem Abendessen eines Tages (Antippen: Aktionen) */
+function BakeRow({ day, list, today, onBake }: { day: string; list?: BakeEntry[]; today: string; onBake?: (day: string, recipeId: string) => void }) {
+  const items = bakeLine(list ?? [])
+  if (!items.length) return null
+  return (
+    <li className={`day-bakes ${day < today ? 'past' : ''}`}>
+      <span className="bake-lead" aria-hidden>🍰</span>
+      <span className="bake-items">
+        <span className="bake-word">Backen:</span>
+        {items.map(({ entry, recipe }, i) => (
+          <Fragment key={recipe.id}>
+            {i > 0 && <span className="bake-sep" aria-hidden> · </span>}
+            <button className={`bake-item ${entry.status ?? ''} ${!entry.status && day < today ? 'ask' : ''}`} onClick={() => onBake?.(day, recipe.id)}>
+              {entry.status === 'baked' ? '✓ ' : ''}{recipe.title}{entry.amount > 1 ? ` ×${entry.amount}` : ''}
+            </button>
+          </Fragment>
+        ))}
+      </span>
+    </li>
   )
 }
 

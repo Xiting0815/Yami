@@ -1,4 +1,7 @@
+import { useMemo } from 'react'
 import { RECIPE_BY_ID } from '../../data/recipes'
+import { pendingBakes, suggestBake } from '../../bakePlan'
+import { BakeAskCard, BakeHintCard } from '../../components/BakeCards'
 import { pendingRating } from '../../learning'
 import { targetKcal } from '../../energy'
 import { sharingActive, shortDate, weekdayName } from '../../store'
@@ -85,8 +88,31 @@ export function WeekTab({ m }: { m: AppModel }) {
             ? { text: 'Lange nicht gesichert – jetzt Sicherung speichern', icon: 'save', onClick: () => ui.setShowProfile(true) }
             : undefined
 
+  // Backen: Nachfrage zum ersten unbeantworteten Backtag; sonst höchstens ein sanfter Vorschlag (nur ohne anderen Hinweis)
+  const pendingBake = pendingBakes(state.bakePlan, today)[0]
+  const bakeSuggestion = useMemo(
+    () => (onboarding ? undefined : suggestBake({ today, pantry: state.pantry, baked: state.baked, bakeRatings: state.bakeRatings, bakePlan: state.bakePlan, hints: state.bakeHints })),
+    [onboarding, today, state.pantry, state.baked, state.bakeRatings, state.bakePlan, state.bakeHints],
+  )
+  const askRecipe = pendingBake ? RECIPE_BY_ID[pendingBake.entry.recipeId] : undefined
+
   return (
     <WeekView
+      bakes={state.bakePlan}
+      onBake={(day, recipeId) => ui.setBakeSheet({ day, recipeId })}
+      bakeSlot={
+        pendingBake && askRecipe ? (
+          <BakeAskCard
+            recipe={askRecipe}
+            day={pendingBake.day}
+            onYes={() => act.confirmBaked(pendingBake.day, pendingBake.entry.recipeId)}
+            onMove={() => ui.setBakeSheet({ day: pendingBake.day, recipeId: pendingBake.entry.recipeId, move: true })}
+            onNo={() => act.removeBakeEntry(pendingBake.day, pendingBake.entry.recipeId)}
+          />
+        ) : bakeSuggestion && !notice ? (
+          <BakeHintCard s={bakeSuggestion} onAccept={() => act.acceptBakeSuggestion(bakeSuggestion)} onDismiss={() => act.dismissBakeSuggestion(bakeSuggestion)} />
+        ) : undefined
+      }
       ratingSlot={(() => {
         const day = pendingRating(state.plan, state.ratings, today, state.ratingDismissed)
         const r = day ? RECIPE_BY_ID[state.plan[day]!.recipeId] : undefined

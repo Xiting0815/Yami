@@ -38,6 +38,8 @@ export function useUi(days: string[], weekKey: string) {
   const [rateDay, setRateDay] = useState<string | null>(null)
   /** „Wie war’s?“ nach „Fertig gebacken“ (Backen & Desserts) */
   const [rateBake, setRateBake] = useState<{ recipeId: string; date: string } | null>(null)
+  /** Backen-Aktionen (Antippen in der Wochenansicht): Tag + Rezept, `move` = gleich den Tag zum Verschieben wählen */
+  const [bakeSheet, setBakeSheet] = useState<{ day: string; recipeId: string; move?: boolean } | null>(null)
   const [pantryChooser, setPantryChooser] = useState(false)
   const [pantryMode, setPantryMode] = useState(false)
 
@@ -62,6 +64,7 @@ export function useUi(days: string[], weekKey: string) {
     [pantryChooser, () => setPantryChooser(false)],
     [rateDay !== null, () => setRateDay(null)],
     [rateBake !== null, () => setRateBake(null)],
+    [!!bakeSheet, () => setBakeSheet(null)],
   ]
   const open = layers.filter(([on]) => on)
   useBackStack(open.length, (target) => open.slice(target).forEach(([, close]) => close()))
@@ -85,6 +88,7 @@ export function useUi(days: string[], weekKey: string) {
     pantryChooser, setPantryChooser,
     rateDay, setRateDay,
     rateBake, setRateBake,
+    bakeSheet, setBakeSheet,
     pantryMode, setPantryMode,
   }
 }

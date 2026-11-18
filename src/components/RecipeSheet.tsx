@@ -14,6 +14,7 @@ import type { Portion } from '../energy'
 import { CookMode, type CookFinish } from './CookMode'
 import { DeviceChips } from './DeviceChip'
 import { basicFor } from '../data/recipes'
+import { BakeDays } from './BakeDays'
 
 /** kurze Erklärung für Zutaten, die man leicht verwechselt */
 const INGREDIENT_HINT: Record<string, string> = {
@@ -47,9 +48,11 @@ interface Props {
   /** klassische Schritte statt Geräte-Schritte zeigen (gemerkt) */
   showClassic?: boolean
   onShowClassic?: (v: boolean) => void
+  /** Backen & Desserts / Grundrezepte: „Einplanen für“ – Tag wählen legt das Rezept (mit der gewählten Rezeptmenge) in den Backplan */
+  bakePlanner?: { today: string; plannedDays: string[]; onPlan: (day: string, amount: number) => void }
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onFinish, onCooking, onEdit, onDelete, onOpenRecipe, showClassic, onShowClassic }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onFinish, onCooking, onEdit, onDelete, onOpenRecipe, showClassic, onShowClassic, bakePlanner }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
   const hasDevice = !!recipe.deviceSteps && !!recipe.classicSteps
@@ -111,6 +114,16 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                 <button onClick={() => setServings((s) => Math.min(12, s + 1))} aria-label="mehr">+</button>
               </div>
             </div>
+
+            {isBasic && bakePlanner && (
+              <div className="bake-plan">
+                <div className="bake-plan-head">
+                  <b>Einplanen für</b>
+                  <span className="muted small">Zutaten kommen auf die Einkaufsliste</span>
+                </div>
+                <BakeDays today={bakePlanner.today} marked={(d) => bakePlanner.plannedDays.includes(d)} onPick={(d) => bakePlanner.onPlan(d, servings)} />
+              </div>
+            )}
 
             {recipe.breakfast && (
               <p className="muted small bf-portion-hint">
