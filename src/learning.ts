@@ -192,6 +192,8 @@ export interface Preference {
   score: number
   /** kurze Begründung für die Karte (nur bei deutlicher Vorliebe) */
   reason?: string
+  /** deutliche Vorliebe: fürs Gericht selbst ('recipe') oder für ein Muster ('feature') */
+  liked?: 'recipe' | 'feature'
 }
 
 /** Vorliebe für ein Gericht – `day` ist der Tag, für den gewischt wird */
@@ -203,12 +205,53 @@ export function preference(m: TasteModel, r: Recipe, day?: string): Preference {
   // „mittel“: etwa so stark wie Vorrat und Preis zusammen
   const score = Math.max(-2, Math.min(2, raw)) * 3
   let reason: string | undefined
-  if (ar > 0.45) reason = '❤️ magst du'
-  else {
+  let liked: Preference['liked']
+  if (ar > 0.45) {
+    reason = '❤️ magst du'
+    liked = 'recipe'
+  } else {
     const best = fs.filter((x) => x.a > 0.3).sort((a, b) => b.a - a.a)[0]
-    if (best) reason = `👍 ${featureLabel(best.f)} magst du`
+    if (best) {
+      reason = `👍 ${featureLabel(best.f)} magst du`
+      liked = 'feature'
+    }
   }
-  return { score, reason }
+  return { score, reason, liked }
+}
+
+/** Geschmack einer weiteren Person im Haushalt (Familien-Abgleich) */
+export interface PersonModel {
+  name: string
+  model: TasteModel
+}
+
+/** ab diesem Wert (Score −6…6) gilt ein Gericht für eine Person als „mag sie gar nicht“ */
+const STRONG_DISLIKE = -2
+
+/**
+ * Gemeinsame Vorliebe des Haushalts: Mittelwert aller Personen; mag es eine Person deutlich nicht,
+ * zieht das zusätzlich nach unten (damit nicht eine Person ständig etwas bekommt, das die andere nicht mag).
+ * Ohne weitere Personen genau `preference(mine, …)`.
+ */
+export function householdPreference(mine: TasteModel, others: PersonModel[], r: Recipe, day?: string): Preference {
+  const me = preference(mine, r, day)
+  if (!others.length) return me
+  const ps = others.map((o) => ({ name: o.name, p: preference(o.model, r, day) }))
+  const scores = [me.score, ...ps.map((x) => x.p.score)]
+  let score = scores.reduce((a, b) => a + b, 0) / scores.length
+  const min = Math.min(...scores)
+  if (min < STRONG_DISLIKE) score += (min - STRONG_DISLIKE) * 0.7
+  let reason: string | undefined
+  const all = [me, ...ps.map((x) => x.p)]
+  if (all.every((p) => p.liked === 'recipe')) reason = `❤️ mögt ihr ${all.length === 2 ? 'beide' : 'alle'}`
+  else if (all.every((p) => p.liked)) reason = `👍 mögt ihr ${all.length === 2 ? 'beide' : 'alle'}`
+  else if (min < -1) reason = undefined // eine Person mag es eher nicht → nicht noch anpreisen
+  else if (me.liked) reason = me.reason
+  else {
+    const other = ps.find((x) => x.p.liked === 'recipe') ?? ps.find((x) => x.p.liked)
+    if (other) reason = `👍 ${other.name} mag das`
+  }
+  return { score, reason, liked: me.liked }
 }
 
 /** Zutaten, die du oft in den Vorrat legst, für die es aber kaum Rezepte gibt (Name → Zahl der Rezepte) */
@@ -266,8 +309,10 @@ const PORTION_MIN_FEEDBACK = 2
  * (Halbwertszeit 60 Tage), gedämpft (zwei gedachte „passt“-Werte ziehen zur 1,0), in 5-%-Schritten, begrenzt auf 0,85–1,2.
  * Erst ab 2 Rückmeldungen. Das ist die Menge fürs Einkaufen/Planen – nicht deine persönliche Kalorienportion.
  */
-export function portionFactor(feedback: Record<string, PortionFeedback> | undefined, today: string): number {
-  const entries = Object.entries(feedback ?? {}).filter(([d, v]) => d <= today && (v === -1 || v === 0 || v === 1))
+export function portionFactor(feedback: Record<string, PortionFeedback> | (Record<string, PortionFeedback> | undefined)[] | undefined, today: string): number {
+  // mehrere Personen (Familien-Abgleich): alle Rückmeldungen zählen für den gemeinsamen Faktor
+  const list = Array.isArray(feedback) ? feedback : [feedback]
+  const entries = list.flatMap((f) => Object.entries(f ?? {})).filter(([d, v]) => d <= today && (v === -1 || v === 0 || v === 1))
   if (entries.length < PORTION_MIN_FEEDBACK) return 1
   let sum = 0
   let n = 0

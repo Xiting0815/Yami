@@ -3,6 +3,7 @@ import { type PortionFeedback, type Rating, portionFactor } from '../../learning
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
 import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
+import { householdFeedback } from '../../sync'
 import { yieldText } from '../../bake'
 import type { ActionContext } from './context'
 
@@ -107,7 +108,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
       const e = s.plan[day]
       if (!e) return s
       const plan = { ...s.plan, [day]: { ...e, status: undefined } }
-      const r = cookDue(plan, s.pantry, today, portionFactor(s.portionFeedback, today))
+      const r = cookDue(plan, s.pantry, today, portionFactor(householdFeedback(s), today))
       return { ...s, plan: r.plan, pantry: r.pantry }
     })
   }
@@ -148,7 +149,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
     const snap = snapshot()
     if (!(t.kind === 'entry' && t.done)) {
       setState((s) => {
-        const r = cookNow(s.plan, s.pantry, t.day, { recipeId: recipe.id, servings }, portionFactor(s.portionFeedback, today))
+        const r = cookNow(s.plan, s.pantry, t.day, { recipeId: recipe.id, servings }, portionFactor(householdFeedback(s), today))
         // für später geplant, heute gekocht → verschieben statt doppelt
         const moved = futureDuplicate(s.plan, recipe.id, today, ctxDay)
         if (moved && moved !== t.day) delete r.plan[moved]
@@ -193,9 +194,29 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
     })
   }
 
+  /** Hinweis „Lisa hat Montag geändert …“: Rückgängig setzt den alten Eintrag wieder (gilt dann als eigene, neuere Änderung) */
+  function undoSyncNotice(id: string) {
+    const n = state.sync?.notices.find((x) => x.id === id)
+    setState((s) => {
+      if (!s.sync) return s
+      const notices = s.sync.notices.filter((x) => x.id !== id)
+      const u = n?.undo
+      if (!u) return { ...s, sync: { ...s.sync, notices } }
+      const plan = { ...s.plan }
+      if (u.value && typeof u.value === 'object') plan[u.day] = u.value as PlanEntry
+      else delete plan[u.day]
+      return { ...s, plan, sync: { ...s.sync, notices } }
+    })
+    if (n?.undo) flash(`${weekdayName(n.undo.day)} zurückgesetzt ✓`)
+  }
+
+  function dismissSyncNotice(id?: string) {
+    setState((s) => (s.sync ? { ...s, sync: { ...s.sync, notices: id ? s.sync.notices.filter((x) => x.id !== id) : [] } } : s))
+  }
+
   function dismissRating(day: string) {
     setState((s) => ({ ...s, ratingDismissed: [...s.ratingDismissed, day].slice(-60) }))
   }
 
-  return { setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, finishBasic, setBakeRating, dismissRating }
+  return { undoSyncNotice, dismissSyncNotice, setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, finishBasic, setBakeRating, dismissRating }
 }

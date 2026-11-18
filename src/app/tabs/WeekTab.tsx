@@ -1,7 +1,8 @@
 import { RECIPE_BY_ID } from '../../data/recipes'
 import { pendingRating } from '../../learning'
 import { targetKcal } from '../../energy'
-import { shortDate, weekdayName } from '../../store'
+import { sharingActive, shortDate, weekdayName } from '../../store'
+import { plannedBy } from '../../sync'
 import { formatEuro } from '../../kitchen'
 import { BreakfastCard, shortTitle } from '../../components/BreakfastCard'
 import { RatingCard } from '../../components/RatingCard'
@@ -19,7 +20,8 @@ export function WeekTab({ m }: { m: AppModel }) {
   const profile = state.profile
   const { onboarding, plannedCount, openDay, dinnersDone, somethingPlanned, listDone, pendingSuggestion, urgentNames } = status
 
-  const startSteps: StartStep[] = [
+  const shared = sharingActive(state.ha)
+  const allSteps: StartStep[] = [
     {
       title: 'Profil anlegen',
       sub: profile ? `Tagesziel ${targetKcal(profile).toLocaleString('de-DE')} kcal` : 'Alter, Größe, Gewicht – daraus wird dein Kalorienziel',
@@ -65,6 +67,11 @@ export function WeekTab({ m }: { m: AppModel }) {
     },
   ]
 
+  // Familie teilen: Profil (Kalorien) und Frühstück sind persönlich – nicht in die Checkliste drängen
+  const startSteps = shared ? allSteps.slice(2) : allSteps
+  const notices = shared ? (state.sync?.notices ?? []).slice(-3).reverse() : []
+  const askWho = !!state.ha?.share && !state.ha.me
+
   // höchstens ein Hinweis über dem Plan: Vorrat läuft ab > Vorschlag > Wiegetag
   const notice: Notice | undefined = status.justFinished
     ? { text: 'Alles eingerichtet – guten Appetit!', tone: 'ok', icon: 'check' }
@@ -88,6 +95,25 @@ export function WeekTab({ m }: { m: AppModel }) {
       })()}
       days={days}
       plan={state.plan}
+      planBy={(d) => plannedBy(state, d)}
+      syncSlot={
+        notices.length || askWho ? (
+          <div className="sync-notices">
+            {askWho && (
+              <button className="notice" onClick={() => ui.setShowProfile(true, 'ha')}>
+                <span className="notice-text">👨‍👩 Familie teilen: Wer bist du? Bitte einmal auswählen.</span>
+              </button>
+            )}
+            {notices.map((n) => (
+              <div key={n.id} className="notice sync-notice" role="status">
+                <span className="notice-text">{n.text}</span>
+                {n.undo && <button className="link small" onClick={() => act.undoSyncNotice(n.id)}>Rückgängig</button>}
+                <button className="sync-x" aria-label="Hinweis schließen" onClick={() => act.dismissSyncNotice(n.id)}>✕</button>
+              </div>
+            ))}
+          </div>
+        ) : undefined
+      }
       today={today}
       total={plan.week.total}
       prices={state.prices}
@@ -108,6 +134,7 @@ export function WeekTab({ m }: { m: AppModel }) {
         onboarding ? (
           <StartCard
             steps={startSteps}
+            onShare={!state.ha?.share ? () => ui.setShowProfile(true, 'ha') : undefined}
             onDismiss={() => {
               setState((s) => ({ ...s, onboarding: 'dismissed' }))
               flash('Du findest Profil und Wiegen oben rechts.')

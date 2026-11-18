@@ -14,7 +14,7 @@ export interface StartStep {
 }
 
 /** Start-Checkliste beim ersten Öffnen: ein klarer nächster Schritt statt mehrerer Banner */
-export function StartCard({ steps, onDismiss }: { steps: StartStep[]; onDismiss: () => void }) {
+export function StartCard({ steps, onDismiss, onShare }: { steps: StartStep[]; onDismiss: () => void; /** frische Installation: „mit jemandem zusammen“ → Home Assistant */ onShare?: () => void }) {
   const done = steps.filter((s) => s.done).length
   const current = steps.findIndex((s) => !s.done && !s.locked)
   return (
@@ -23,6 +23,11 @@ export function StartCard({ steps, onDismiss }: { steps: StartStep[]; onDismiss:
         <b>So startest du</b>
         <span>{done} von {steps.length} erledigt</span>
       </div>
+      {onShare && (
+        <button className="link small start-share" onClick={onShare}>
+          Ich nutze Yami mit jemandem zusammen → mit Home Assistant verbinden
+        </button>
+      )}
       <div className="start-bar" aria-hidden>
         {steps.map((s, i) => <i key={i} className={s.done ? 'on' : ''} />)}
       </div>

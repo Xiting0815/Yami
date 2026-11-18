@@ -11,6 +11,7 @@ import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, ty
 import { DEFAULT_PROFILE, type Profile, type Snack } from './energy'
 import type { WeighIn } from './progress'
 import type { PortionFeedback, Rating, RejectEvent } from './learning'
+import { type SyncLocal, sanitizeSync } from './syncLocal'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -51,7 +52,22 @@ export interface HaSettings {
   events: Record<string, { uid?: string; sig: string }>
   lastSync?: string
   error?: string
+  /** Familie teilen: Plan, Einkauf, Vorrat … über eine HA-To-do-Liste mit anderen Geräten abgleichen */
+  share?: boolean
+  /** To-do-Liste für den Familien-Abgleich */
+  syncList: string
+  /** wer dieses Gerät benutzt („Wer bist du?“) – nur lokal */
+  me?: string
+  /** zufällige Kennung dieses Geräts (nur lokal, nicht in der Sicherung) */
+  device: string
 }
+
+/** Familien-Abgleich läuft (verbunden, eingeschaltet, Person gewählt) */
+export function sharingActive(h: HaSettings | undefined): h is HaSettings & { me: string } {
+  return !!h && h.enabled && !!h.url && !!h.token && !!h.share && !!h.me
+}
+
+export const SYNC_LIST_DEFAULT = 'todo.yami_sync'
 
 export const HA_DEFAULTS = { todo: 'todo.einkaufen', calendar: 'calendar.familie', reminders: 'calendar.yami_erinnerungen' }
 /** frühere Standardziele – werden beim Laden auf die neuen umgestellt (Google Tasks „Einkaufen“, Google-Kalender „Familie“) */
@@ -74,7 +90,7 @@ export function withHaTargets(h: HaSettings, next: Partial<Pick<HaSettings, 'tod
 }
 
 export function newHa(url = '', token = ''): HaSettings {
-  return { url, token, enabled: false, ...HA_DEFAULTS, items: {}, events: {} }
+  return { url, token, enabled: false, ...HA_DEFAULTS, items: {}, events: {}, syncList: SYNC_LIST_DEFAULT, device: uid() + uid() }
 }
 
 const ENTITY = /^[a-z_]+\.[a-z0-9_]+$/
@@ -105,7 +121,11 @@ function sanitizeHa(x: unknown): HaSettings | undefined {
     events,
     lastSync: typeof h.lastSync === 'string' ? h.lastSync : undefined,
     error: typeof h.error === 'string' ? h.error : undefined,
+    syncList: ent(h.syncList, SYNC_LIST_DEFAULT),
+    device: typeof h.device === 'string' && /^[a-z0-9]{6,32}$/.test(h.device) ? h.device : uid() + uid(),
   }
+  if (h.share === true) base.share = true
+  if (typeof h.me === 'string' && h.me.trim()) base.me = h.me.trim().slice(0, 30)
   // alte Standardziele auf die neuen umstellen (selbst gewählte Ziele bleiben)
   const move: Partial<Pick<HaSettings, 'todo' | 'calendar'>> = {}
   if (base.todo === HA_OLD_DEFAULTS.todo) move.todo = HA_DEFAULTS.todo
@@ -182,6 +202,8 @@ export interface AppState {
   baked: { date: string; recipeId: string }[]
   /** Bewertung nach „Fertig gebacken“: Schlüssel `Datum:Rezept-ID` → 👍/🔁/👎 (fürs Lernen) */
   bakeRatings: Record<string, Rating>
+  /** Familien-Abgleich: Stand des letzten Abgleichs, andere Personen, Hinweise (nur lokal; siehe src/sync.ts) */
+  sync?: SyncLocal
 }
 
 /** höchstens so viele gegessene Stücke werden gespeichert */
@@ -466,6 +488,8 @@ export function sanitize(parsed: unknown): AppState {
   if (typeof state.showClassicSteps !== 'boolean') delete state.showClassicSteps
   state.ha = sanitizeHa(saved.ha)
   if (!state.ha) delete state.ha
+  state.sync = sanitizeSync(saved.sync)
+  if (!state.sync) delete state.sync
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)
   // Backen & Desserts: gegessene Stücke, Gebackenes, Bewertungen
   state.snacks = state.snacks

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { HaClient, haErrorText } from './homeassistant'
-import { type Desired, type LocalItem, plannedDinners, plannedReminders, syncCalendar, syncTodo } from './haSync'
-import type { AppState, HaSettings } from './store'
+import type { LocalItem } from './haSync'
+import { haRound } from './haRun'
+import { type AppState, type HaSettings, sharingActive } from './store'
 
 /** eine Verbindung für die ganze App */
 export const haClient = new HaClient()
@@ -12,7 +13,7 @@ export interface HaInput {
   setState: Dispatch<SetStateAction<AppState>>
   /** Einkaufsliste der Abgleich-Woche */
   local: LocalItem[]
-  state: Pick<AppState, 'plan' | 'breakfastPicks' | 'prepDays' | 'weighIns' | 'pantry' | 'profile'>
+  state: AppState
   /** in HA abgehakt → in Yami als gekauft markieren */
   onBought: (keys: string[]) => void
 }
@@ -32,6 +33,7 @@ export function useHomeAssistant(input: HaInput) {
   const again = useRef(false)
   const timer = useRef<number>()
   const unsub = useRef<(() => void) | null>(null)
+  const unsubSync = useRef<(() => void) | null>(null)
   const connecting = useRef<Promise<void> | null>(null)
 
   const ha = input.ha
@@ -51,6 +53,11 @@ export function useHomeAssistant(input: HaInput) {
         .then(async () => {
           unsub.current?.()
           unsub.current = await haClient.subscribe({ type: 'todo/item/subscribe', entity_id: ref.current.ha!.todo }, () => requestRef.current(500)).catch(() => null)
+          // Familien-Abgleich: Änderungen der anderen kommen live über die Sync-Liste
+          unsubSync.current?.()
+          unsubSync.current = null
+          if (sharingActive(ref.current.ha))
+            unsubSync.current = await haClient.subscribe({ type: 'todo/item/subscribe', entity_id: ref.current.ha.syncList }, () => requestRef.current(500)).catch(() => null)
         })
         .finally(() => {
           connecting.current = null
@@ -70,24 +77,16 @@ export function useHomeAssistant(input: HaInput) {
     setSyncing(true)
     try {
       await ensureConnected()
-      const h = ref.current.ha!
-      const now = new Date()
-      const st = ref.current.state
-      const todo = await syncTodo(haClient, h, ref.current.local, (keys) => ref.current.onBought(keys))
-      const reminders: Desired[] = plannedReminders(
-        { breakfastPicks: st.breakfastPicks, prepDays: st.prepDays, weighIns: st.weighIns, hasProfile: !!st.profile, pantry: st.pantry },
-        now,
-      )
-      const cal = await syncCalendar(haClient, h, plannedDinners(st.plan, isoLocal(now)), reminders, now)
-      const error = todo.error ?? cal.error
-      patch({
-        items: todo.items,
-        done: todo.done,
-        events: cal.events,
-        lastSync: now.toISOString(),
-        error: error ? `Nicht alles ließ sich abgleichen: ${error}` : undefined,
+      // Familien-Abgleich → Schreibstab → Einkaufsliste & Kalender (src/haRun.ts)
+      const r = await haRound({
+        api: haClient,
+        getState: () => ref.current.state,
+        setState: (fn) => ref.current.setState(fn),
+        onBought: (keys) => ref.current.onBought(keys),
+        now: new Date(),
       })
-      setLive(error ? 'error' : 'ok')
+      if (r.again) again.current = true
+      setLive(r.error ? 'error' : 'ok')
     } catch (e) {
       patch({ error: haErrorText(e) })
       setLive('error')
@@ -116,6 +115,8 @@ export function useHomeAssistant(input: HaInput) {
     if (!active) {
       unsub.current?.()
       unsub.current = null
+      unsubSync.current?.()
+      unsubSync.current = null
       haClient.close()
       setLive('off')
       return
@@ -124,6 +125,39 @@ export function useHomeAssistant(input: HaInput) {
     return () => window.clearTimeout(timer.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, ha?.url, ha?.token, ha?.todo])
+
+  // Familien-Abgleich an/aus, Person, Sync-Liste → Abos neu
+  const shareKey = sharingActive(ha) ? `${ha.syncList}|${ha.me}` : ''
+  const firstShare = useRef(true)
+  useEffect(() => {
+    if (firstShare.current) {
+      firstShare.current = false
+      return
+    }
+    if (!active) return
+    unsub.current?.()
+    unsub.current = null
+    unsubSync.current?.()
+    unsubSync.current = null
+    if (haClient.ready) {
+      connecting.current = null
+      haClient.close()
+    }
+    request(300)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shareKey])
+
+  // geteilte Daten geändert → 2 s später abgleichen
+  const st = input.state
+  const firstShared = useRef(true)
+  useEffect(() => {
+    if (firstShared.current) {
+      firstShared.current = false
+      return
+    }
+    if (active && sharingActive(ha)) request(2000)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [st.plan, st.pantry, st.bought, st.checked, st.custom, st.wasted, st.customRecipes, st.customIngredients, st.prices, st.staples, st.spices, st.pantryRequests, st.ratings, st.rejects, st.portionFeedback, st.bakeRatings, st.baked])
 
   // Änderungen an Liste, Plan, Vorrat → abgleichen
   const sig = JSON.stringify([input.local, Object.entries(input.state.plan).map(([d, e]) => [d, e?.recipeId, e?.servings, e?.status]), input.state.breakfastPicks, input.state.prepDays, input.state.weighIns.length, input.state.pantry.map((l) => [l.name, l.expires]), ha?.calendar, ha?.reminders])
@@ -154,9 +188,9 @@ export function useHomeAssistant(input: HaInput) {
     }
   }, [active])
 
-  return { live, syncing, syncNow: () => run() }
-}
-
-function isoLocal(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return {
+    live,
+    syncing,
+    syncNow: () => run(),
+  }
 }

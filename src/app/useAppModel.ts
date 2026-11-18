@@ -49,7 +49,8 @@ export function useAppModel() {
     const u = toast?.undo
     if (!u) return
     // Home-Assistant-Zuordnung bleibt, wie sie ist (sie beschreibt, was dort schon liegt)
-    setState((cur) => ({ ...u.state, ha: cur.ha }))
+    // … und der Familien-Abgleich-Stand auch: das Zurückgenommene gilt dann als eigene Änderung und wird geteilt
+    setState((cur) => ({ ...u.state, ha: cur.ha, sync: cur.sync }))
     ui.setRejected(u.rejected)
     ui.setSwipeDay(u.swipeDay)
     ui.setTab(u.tab)

@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 import type { Recipe } from '../types'
 import { RECIPES, RECIPE_BY_ID } from '../data/recipes'
-import { buildModel, portionFactor, preference } from '../learning'
+import { type PersonModel, buildModel, householdPreference, portionFactor } from '../learning'
+import { householdFeedback } from '../sync'
+import { sharingActive } from '../store'
 import { dayBalance, isProteinLow, isWorkday, proteinBoost } from '../energy'
 import { type AppState, addDays, isoDate, mondayOf, parseIso, weekDays } from '../store'
 import { matches } from '../filter'
@@ -20,7 +22,7 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
   const todayMonth = new Date(today + 'T12:00:00').getMonth() + 1
   const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
   // Lernen: wie groß sind die Portionen wirklich (Rückmeldung nach dem Essen) → Mengen fürs Einkaufen
-  const portion = useMemo(() => portionFactor(state.portionFeedback, today), [state.portionFeedback, today])
+  const portion = useMemo(() => portionFactor(householdFeedback(state), today), [state.portionFeedback, state.sync?.household, state.ha?.share, state.ha?.me, today])
   // ab Samstag ist die Liste die der nächsten Woche: was für Sa/So der laufenden Woche noch fehlt, kommt mit drauf
   const carryFor = (key: string) => today < key && key === defaultMonday(today)
   const week = useMemo(
@@ -71,6 +73,31 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
     [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings],
   )
 
+  // ───── Familie: Geschmack der anderen Personen (eigene Bewertungen/Wischen, gemeinsamer Plan) ─────
+  const household = sharingActive(state.ha) ? state.sync?.household : undefined
+  const others: PersonModel[] = useMemo(
+    () =>
+      Object.entries(household ?? {})
+        .filter(([name]) => name !== state.ha?.me)
+        .map(([name, p]) => ({
+          name,
+          model: buildModel({
+            plan: state.plan,
+            breakfast: {},
+            breakfastPicks: {},
+            rejects: p.rejects,
+            ratings: p.ratings,
+            wasted: state.wasted,
+            today,
+            since: state.tasteSince,
+            customRecipes: state.customRecipes,
+            baked: p.baked,
+            bakeRatings: p.bakeRatings,
+          }),
+        })),
+    [household, state.ha?.me, state.plan, state.wasted, today, state.tasteSince, state.customRecipes],
+  )
+
   // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────
   const proteinHigh = useMemo(() => {
     if (!state.profile) return false
@@ -95,13 +122,13 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
             month: swipeMonth,
             day: swipeDay,
           })
-          const pref = preference(taste, r, swipeDay)
+          const pref = householdPreference(taste, others, r, swipeDay)
           const bonus = proteinHigh ? proteinBoost(r.nutrition.protein) : 0
           // Vorrats-Modus: Vorrat zuerst, gelernte Vorliebe nur als Tie-Breaker (×0,3)
           return [r.id, { ...ins, score: ins.score + pref.score + bonus, modeScore: ins.modeScore + pref.score * 0.3, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
         }),
       ),
-    [week.leftovers, week.pantryLeft, pantryMode, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
+    [week.leftovers, week.pantryLeft, pantryMode, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, others, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 
@@ -129,7 +156,7 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
     return [...fresh, ...later]
   }, [state.filters, perPortion, plannedIds, rejected, insights, pantryMode])
 
-  return { portion, todayMonth, week, hints, haKey, haWeek, haLocal, jitter, taste, insights, perPortion, activeFilters, filteredCount, deck }
+  return { portion, todayMonth, week, hints, haKey, haWeek, haLocal, jitter, taste, others, insights, perPortion, activeFilters, filteredCount, deck }
 }
 
 export type Planning = ReturnType<typeof usePlanning>

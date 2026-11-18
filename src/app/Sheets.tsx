@@ -4,7 +4,8 @@ import { pantryWishes, portionNote, summarize } from '../learning'
 import { cookTarget } from '../cookDone'
 import { portionFor } from '../energy'
 import { defaultReviewMonday } from '../review'
-import { addDays, isoDate, parseIso, weekdayName } from '../store'
+import { addDays, isoDate, parseIso, sharingActive, weekdayName } from '../store'
+import { syncStatusText } from '../sync'
 import { DayActionsSheet } from '../components/DayActionsSheet'
 import { DayPicker } from '../components/DayPicker'
 import { FilterSheet } from '../components/FilterBar'
@@ -234,6 +235,11 @@ export function Sheets({ m }: { m: AppModel }) {
         <ProfileSheet
           profile={profile}
           learned={summarize(plan.taste)}
+          learnedOthers={plan.others.map((o) => ({ name: o.name, learned: summarize(o.model) }))}
+          profileOptional={sharingActive(state.ha)}
+          focusHa={ui.profileFocus === 'ha'}
+          familyStatus={sharingActive(state.ha) ? syncStatusText(state.sync, state.ha.me, Date.now()) : undefined}
+          haMain={state.sync?.main ? { person: state.sync.main.person, mine: state.sync.main.device === state.ha?.device } : undefined}
           portionNote={portionNote(plan.portion)}
           wishes={pantryWishes(state.pantryRequests)}
           prepWeekday={learnedPrepWeekday(state.prepDays, today)}

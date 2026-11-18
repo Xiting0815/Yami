@@ -44,6 +44,10 @@ interface Props {
   /** Tagesbilanz Mo–Fr (nur mit Profil) */
   balances: Record<string, DayBalance | undefined>
   portions: Record<string, Portion | undefined>
+  /** Familie teilen: wer (andere Person) das Gericht des Tages ausgesucht hat */
+  planBy?: (day: string) => string | undefined
+  /** Hinweise zu Änderungen der anderen („Lisa hat Montag geändert …“) */
+  syncSlot?: ReactNode
 }
 
 export function NoticeRow({ notice }: { notice: Notice }) {
@@ -62,7 +66,7 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions } = props
+  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions, planBy, syncSlot } = props
   const planned = days.filter((d) => plan[d]).length
   // nur der nächste freie Tag bekommt die Akzentfarbe – die übrigen leeren Tage bleiben ruhig
   const nextOpen = days.find((d) => d >= today && !plan[d])
@@ -85,6 +89,8 @@ export function WeekView(props: Props) {
           )}
         </div>
       )}
+
+      {syncSlot}
 
       {notice && <NoticeRow notice={notice} />}
 
@@ -125,6 +131,7 @@ export function WeekView(props: Props) {
               )
             }
 
+            const by = planBy?.(day)
             const portion = portions[day]
             const cooked = entry.status === 'cooked'
             const skipped = entry.status === 'skipped'
@@ -152,6 +159,7 @@ export function WeekView(props: Props) {
                     </span>
                     <span className="day-text">
                       <span className={`day-title ${b ? '' : 'two'}`}>{recipe.title}</span>
+                      {by && <span className="day-by">von {by}</span>}
                       {l2}
                       {b && (
                         <span className={`day-l3 ${over > 50 ? 'over' : ''}`}>

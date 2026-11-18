@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { defaultReviewMonday, weekReview } from '../review'
 import { suggestion as weightSuggestion, weighedThisWeek } from '../progress'
-import { type AppState, addDays, isoDate, parseIso, weekDays } from '../store'
+import { type AppState, addDays, isoDate, parseIso, sharingActive, weekDays } from '../store'
 import { daysUntil } from '../kitchen'
 import type { SetAppState } from './types'
 import type { Calendar } from './useCalendar'
@@ -28,7 +28,8 @@ export function useStatus(
   const dinnersDone = plannedCount > 0 && !openDay
   const somethingPlanned = plannedCount > 0 || picks.length > 0
   const listDone = !!state.onboardingListSeen
-  const allDone = !!profile && picks.length > 0 && dinnersDone && listDone
+  // Familie teilen: Profil und Frühstück sind persönlich und optional – die Checkliste verlangt sie nicht
+  const allDone = (sharingActive(state.ha) || (!!profile && picks.length > 0)) && dinnersDone && listDone
   /** Start-Checkliste gerade abgeschlossen → einmal „Alles eingerichtet“ zeigen */
   const [justFinished, setJustFinished] = useState(false)
   const finishShown = useRef(false)

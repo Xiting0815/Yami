@@ -21,7 +21,13 @@ export function useUi(days: string[], weekKey: string) {
   const [bPantryOnly, setBPantryOnly] = useState(false)
   const [editor, setEditor] = useState<EditorState | null>(null)
   const [showPrep, setShowPrep] = useState(false)
-  const [showProfile, setShowProfile] = useState(false)
+  const [showProfile, setShowProfileRaw] = useState(false)
+  /** Profil-Sheet direkt beim Home-Assistant-Abschnitt öffnen */
+  const [profileFocus, setProfileFocus] = useState<'ha' | null>(null)
+  const setShowProfile = (v: boolean, focus: 'ha' | null = null) => {
+    setProfileFocus(v ? focus : null)
+    setShowProfileRaw(v)
+  }
   const [showProgress, setShowProgress] = useState(false)
   /** Wochenrückblick-Sheet: Montag der gezeigten Woche (null = zu) */
   const [reviewMonday, setReviewMonday] = useState<string | null>(null)
@@ -72,7 +78,7 @@ export function useUi(days: string[], weekKey: string) {
     bPantryOnly, setBPantryOnly,
     editor, setEditor,
     showPrep, setShowPrep,
-    showProfile, setShowProfile,
+    showProfile, setShowProfile, profileFocus,
     showProgress, setShowProgress,
     reviewMonday, setReviewMonday,
     actionsDay, setActionsDay,

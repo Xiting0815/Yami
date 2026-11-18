@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { HaClient, haErrorText } from '../homeassistant'
-import { type HaSettings, HA_DEFAULTS, newHa, withHaTargets } from '../store'
+import { type HaSettings, HA_DEFAULTS, SYNC_LIST_DEFAULT, newHa, withHaTargets } from '../store'
 
 interface Props {
   ha?: HaSettings
@@ -8,7 +8,13 @@ interface Props {
   /** gleich jetzt abgleichen */
   onSyncNow: () => void
   syncing: boolean
+  /** Familien-Abgleich: „Synchronisiert vor 1 Min. · mit Lisa“ */
+  familyStatus?: string
+  /** Haupt-Gerät laut Sync-Liste (pflegt Einkaufsliste/Kalender in HA) */
+  main?: { person: string; mine: boolean }
 }
+
+const PEOPLE = ['Marc', 'Lisa']
 
 function when(iso?: string): string {
   if (!iso) return 'noch nie'
@@ -19,7 +25,7 @@ function when(iso?: string): string {
   return same ? `heute, ${t} Uhr` : `${d.toLocaleDateString('de-DE')}, ${t} Uhr`
 }
 
-export function HaSection({ ha, onChange, onSyncNow, syncing }: Props) {
+export function HaSection({ ha, onChange, onSyncNow, syncing, familyStatus, main }: Props) {
   const [url, setUrl] = useState(ha?.url ?? '')
   const [token, setToken] = useState(ha?.token ?? '')
   const [show, setShow] = useState(false)
@@ -30,6 +36,9 @@ export function HaSection({ ha, onChange, onSyncNow, syncing }: Props) {
     calendar: ha?.calendar ?? HA_DEFAULTS.calendar,
     reminders: ha?.reminders ?? HA_DEFAULTS.reminders,
   })
+  const [syncList, setSyncList] = useState(ha?.syncList ?? SYNC_LIST_DEFAULT)
+  const [otherName, setOtherName] = useState(ha?.me && !PEOPLE.includes(ha.me) ? ha.me : '')
+  const [otherOpen, setOtherOpen] = useState(!!ha?.me && !PEOPLE.includes(ha.me))
   const connected = !!ha?.token && !!ha.url
 
   async function test() {
@@ -58,7 +67,7 @@ export function HaSection({ ha, onChange, onSyncNow, syncing }: Props) {
   }
 
   return (
-    <section className="backup ha">
+    <section className="backup ha" id="ha">
       <h3>🏠 Home Assistant</h3>
       <p className="muted small">
         Einkaufsliste, Erinnerungen und Plan mit deinem Home Assistant abgleichen. Alles läuft direkt zwischen diesem Gerät und deinem Home Assistant; der Token bleibt nur hier und kommt nicht in die Sicherung.
@@ -118,6 +127,48 @@ export function HaSection({ ha, onChange, onSyncNow, syncing }: Props) {
           </div>
         </>
       )}
+      {connected && ha && (
+        <div className="ha-family" id="ha-family">
+          <h4>👨‍👩 Familie teilen</h4>
+          <p className="muted small">
+            Wochenplan, Einkaufsliste, Vorrat, eigene Rezepte und Bewertungen mit den anderen im Haushalt teilen – jede Person mit eigenem Handy und eigenem Token. Profil, Kalorien, Wiegen und Frühstück bleiben auf deinem Gerät.
+          </p>
+          <label className="ha-switch">
+            <input type="checkbox" checked={!!ha.share} disabled={!ha.enabled} onChange={(e) => onChange({ ...ha, share: e.target.checked, error: undefined })} />
+            <span>{ha.share ? 'Familie teilen ist an' : ha.enabled ? 'Familie teilen ist aus' : 'Erst den Abgleich einschalten'}</span>
+          </label>
+          {ha.share && (
+            <>
+              <p className="small"><b>Wer bist du?</b>{!ha.me && <span className="bf-note"> Bitte wählen – erst dann wird geteilt.</span>}</p>
+              <div className="seg2 ha-who" role="radiogroup" aria-label="Wer bist du?">
+                {PEOPLE.map((p) => (
+                  <button key={p} role="radio" aria-checked={ha.me === p} className={ha.me === p ? 'on' : ''} onClick={() => { setOtherOpen(false); onChange({ ...ha, me: p }) }}>{p}</button>
+                ))}
+                <button role="radio" aria-checked={otherOpen} className={otherOpen ? 'on' : ''} onClick={() => setOtherOpen(true)}>Andere …</button>
+              </div>
+              {otherOpen && (
+                <div className="ha-fields">
+                  <label>
+                    Dein Name
+                    <input
+                      value={otherName}
+                      maxLength={30}
+                      onChange={(e) => setOtherName(e.target.value)}
+                      onBlur={(e) => e.target.value.trim() && onChange({ ...ha, me: e.target.value.trim() })}
+                    />
+                  </label>
+                </div>
+              )}
+              {ha.me && familyStatus && <p className="small ha-family-status" role="status">{familyStatus}</p>}
+              {ha.me && main && (
+                <p className="small muted">
+                  Einkaufsliste und Kalender in Home Assistant pflegt immer das Gerät, das gerade abgleicht – zuletzt {main.mine ? 'dieses Gerät' : `${main.person}s Gerät`}. Es gibt nichts doppelt.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
       <details className="ha-adv">
         <summary>Erweitert</summary>
         <div className="ha-fields">
@@ -132,6 +183,23 @@ export function HaSection({ ha, onChange, onSyncNow, syncing }: Props) {
           <label>
             Kalender für Erinnerungen
             <input value={entities.reminders} onChange={(e) => setEntities({ ...entities, reminders: e.target.value })} onBlur={(e) => saveEntity('reminders', e.target.value)} autoCapitalize="off" spellCheck={false} />
+          </label>
+        </div>
+        <div className="ha-fields">
+          <label>
+            Liste für „Familie teilen“
+            <input
+              value={syncList}
+              onChange={(e) => setSyncList(e.target.value)}
+              onBlur={(e) => {
+                const v = e.target.value.trim()
+                const val = /^todo\.[a-z0-9_]+$/.test(v) ? v : SYNC_LIST_DEFAULT
+                setSyncList(val)
+                if (ha && val !== ha.syncList) onChange({ ...ha, syncList: val })
+              }}
+              autoCapitalize="off"
+              spellCheck={false}
+            />
           </label>
         </div>
         <p className="muted small">Nur eigene Einträge (Beschreibung „Yami“) werden geändert oder gelöscht – alles andere in deinen Listen bleibt unberührt.</p>

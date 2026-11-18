@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { RecipeBrowser } from '../../components/RecipeBrowser'
-import { preference } from '../../learning'
+import { householdPreference } from '../../learning'
 import type { Recipe } from '../../types'
 import type { AppModel } from '../useAppModel'
 
@@ -8,7 +8,8 @@ import type { AppModel } from '../useAppModel'
 export function RecipesTab({ m }: { m: AppModel }) {
   const { state, ui, plan, act } = m
   const taste = plan.taste
-  const bakePref = useCallback((r: Recipe) => preference(taste, r), [taste])
+  const others = plan.others
+  const bakePref = useCallback((r: Recipe) => householdPreference(taste, others, r), [taste, others])
   return (
     <RecipeBrowser
       filters={state.filters}

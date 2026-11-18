@@ -28,11 +28,20 @@ interface Props {
   onHaChange: (ha: HaSettings | undefined) => void
   onHaSyncNow: () => void
   haSyncing: boolean
+  /** Familien-Abgleich (Status, Haupt-Gerät) */
+  familyStatus?: string
+  haMain?: { person: string; mine: boolean }
+  /** gelernte Vorlieben der anderen Personen im Haushalt */
+  learnedOthers?: { name: string; learned: LearnedSummary }[]
+  /** Profil ist optional (Familie teilen, kein eigenes Kalorienziel nötig) */
+  profileOptional?: boolean
+  /** gleich zum Home-Assistant-Abschnitt springen */
+  focusHa?: boolean
 }
 
 const fmt = (n: number) => Math.round(n).toLocaleString('de-DE')
 
-export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, wishes = [], prepWeekday = 0, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing }: Props) {
+export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, wishes = [], prepWeekday = 0, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing, familyStatus, haMain, learnedOthers = [], profileOptional, focusHa }: Props) {
   const [p, setP] = useState<Profile>(profile ?? DEFAULT_PROFILE)
   const fileInput = useRef<HTMLInputElement>(null)
   const [backupError, setBackupError] = useState<string | null>(null)
@@ -49,6 +58,9 @@ export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, w
     if (!window.confirm('Aktuelle Daten durch die Sicherung ersetzen?')) return
     onImport(next)
   }
+  useEffect(() => {
+    if (focusHa) window.setTimeout(() => document.getElementById('ha')?.scrollIntoView({ block: 'start' }), 50)
+  }, [focusHa])
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => {
@@ -78,6 +90,7 @@ export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, w
         <button className="sheet-close dark" onClick={onClose} aria-label="Schließen">✕</button>
         <div className="sheet-body">
           <h2>👤 Dein Profil</h2>
+          {profileOptional && !profile && <p className="small profile-optional"><b>Optional: eigenes Kalorienziel.</b> Für den gemeinsamen Plan brauchst du kein Profil.</p>}
           <p className="muted small">Bleibt nur auf diesem Handy. Daraus berechnet die App dein Kalorienziel für Mo–Fr.</p>
 
           <div className="seg2">
@@ -187,6 +200,14 @@ export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, w
                   <p className="muted small">Aus {learned.signals} Signalen; ältere zählen weniger, damit sich dein Geschmack ändern darf.</p>
                 </>
               )}
+              {learnedOthers.map(({ name, learned: o }) => (
+                <div key={name} className="learned-other">
+                  <p><b>{name}:</b> {o.signals < 5
+                    ? 'noch zu wenig Daten.'
+                    : [o.favorites.length ? `liebt ${o.favorites.slice(0, 3).map((f) => f.title).join(', ')}` : '', o.liked.length ? `mag ${o.liked.slice(0, 3).map((f) => f.label).join(', ')}` : '', o.disliked.length ? `eher nicht: ${o.disliked.slice(0, 2).map((f) => f.label).join(', ')}` : ''].filter(Boolean).join(' · ') || 'noch keine klaren Vorlieben.'}</p>
+                </div>
+              ))}
+              {learnedOthers.length > 0 && <p className="muted small">Vorschläge berücksichtigen euch alle: was eine Person gar nicht mag, rutscht nach hinten.</p>}
               {portionNote && <p><b>Portionen:</b> {portionNote}.</p>}
               {wishes.map((w) => (
                 <p key={w.name}>
@@ -222,16 +243,23 @@ export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, w
             {backupError && <p className="bf-note" role="alert">⚠ {backupError}</p>}
           </section>
 
-          <HaSection ha={ha} onChange={onHaChange} onSyncNow={onHaSyncNow} syncing={haSyncing} />
+          <HaSection ha={ha} onChange={onHaChange} onSyncNow={onHaSyncNow} syncing={haSyncing} familyStatus={familyStatus} main={haMain} />
 
           <p className="muted small">
             Richtwerte, keine ärztliche Beratung. Bei Vorerkrankungen das Ziel bitte mit dem Hausarzt abstimmen.
           </p>
         </div>
         <div className="sheet-footer">
-          <button className="btn primary wide" disabled={!valid} onClick={() => onSave(p)}>
-            Speichern
-          </button>
+          {profileOptional && !profile ? (
+            <>
+              <button className="btn ghost" disabled={!valid} onClick={() => onSave(p)}>Kalorienziel speichern</button>
+              <button className="btn primary wide" onClick={onClose}>Schließen</button>
+            </>
+          ) : (
+            <button className="btn primary wide" disabled={!valid} onClick={() => onSave(p)}>
+              Speichern
+            </button>
+          )}
         </div>
       </div>
     </div>

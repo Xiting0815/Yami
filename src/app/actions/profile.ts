@@ -81,7 +81,9 @@ export function profileActions({ state, setState, cal, ui, flash, snapshot }: Ac
     const d = settleDue(s, today)
     // der Token steht nie in der Sicherung: bei gleicher Adresse den vorhandenen behalten
     const keepHa = s.ha && state.ha && s.ha.url === state.ha.url && !s.ha.token ? { ...s.ha, token: state.ha.token } : s.ha
-    setState({ ...s, ha: keepHa, plan: d.plan, breakfast: d.breakfast, pantry: d.pantry, wasted: d.wasted, lastBackup: s.lastBackup ?? today })
+    // Familien-Abgleich: Gerät und Stand bleiben; der Abgleich-Stand beginnt neu → die Sicherung ergänzt den Haushalt nur, überschreibt nichts
+    const ha = keepHa && state.ha ? { ...keepHa, device: state.ha.device, me: keepHa.me ?? state.ha.me } : keepHa
+    setState({ ...s, ha, sync: undefined, plan: d.plan, breakfast: d.breakfast, pantry: d.pantry, wasted: d.wasted, lastBackup: s.lastBackup ?? today })
     ui.setShowProfile(false)
     flash('Sicherung geladen ✓', snap)
   }

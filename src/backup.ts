@@ -8,14 +8,15 @@ const VERSION = 1
  * Ergibt `true`, wenn gesichert wurde – `false`, wenn der Nutzer das Teilen abgebrochen hat.
  * Aufruf direkt aus dem Klick (vor dem ersten await), sonst erlaubt der Browser das Teilen nicht.
  */
-/** Inhalt der Sicherungsdatei – der Home-Assistant-Token bleibt draußen, die Adresse nicht */
+/** Inhalt der Sicherungsdatei – der Home-Assistant-Token und die Gerätekennung bleiben draußen, die Adresse nicht */
 export function backupBody(state: AppState) {
   const { ha, ...rest } = state
+  const haOut = ha ? (({ device: _device, ...h }) => ({ ...h, token: '', error: undefined }))(ha) : undefined
   return {
     app: APP,
     version: VERSION,
     exportedAt: new Date().toISOString(),
-    state: ha ? { ...rest, ha: { ...ha, token: '', error: undefined } } : rest,
+    state: haOut ? { ...rest, ha: haOut } : rest,
   }
 }
 
