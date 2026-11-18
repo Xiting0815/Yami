@@ -13,7 +13,7 @@
 ## Projekt
 
 - Vite + React + TypeScript, kein UI-Framework, Styles in `src/styles.css`, Zustand lokal in `localStorage` (`src/store.ts`).
-- Vor jedem Commit: `npx tsc -b`, `npm run check-data`, `npx vite-node scripts/test-*.ts` (kitchen, breakfast, leftovers, energy, progress, learning, season, backup, protein, cook, review, custom, ha, pantry, staples, scenario, devices, done, basic, backen), `npx vite build`.
+- Vor jedem Commit: `npx tsc -b`, `npm run check-data`, `npx vite-node scripts/test-*.ts` (kitchen, breakfast, leftovers, energy, progress, learning, season, backup, protein, cook, review, custom, ha, pantry, staples, scenario, devices, done, basic, backen, sync), `npx vite build`.
 - Lernen: `src/learning.ts` (Signale: Wischen, gekocht, Bewertung; Muster nach Küche/Art/Hauptzutat/Zeit). Neue Funktionen dort anbinden, wenn sie etwas über Vorlieben verraten.
 - Ein Push auf `main` veröffentlicht automatisch auf GitHub Pages (https://xiting0815.github.io/Yami/) – nur geprüften Stand pushen.
 - Rezepte/Zutaten: jede Zutat braucht Kategorie (`catalog.ts`), Produkt mit Packung/Preis/Haltbarkeit (`products.ts`) und Nährwerte (`nutrition.ts`).

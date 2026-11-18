@@ -460,6 +460,48 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   ok(leaseDecision(rem, 'y', 101).claim === true && leaseDecision(rem, 'x', 60).holder === true && leaseDecision(rem, 'x', 60).renew, 'Stab abgelaufen → übernehmen; eigener Stab → verlängern')
 }
 
+// ───── 13b) Erinnerungen pro Person – unabhängig vom Schreibstab ─────
+{
+  const h7 = new FakeHa()
+  const api = h7.api()
+  let t = Date.parse('2026-11-16T09:00:00') // Montag
+  const devs: Record<string, AppState> = {
+    // Marc: Profil, wiegt dienstags → „Heute wiegen“ morgen 7:30; Ei läuft morgen ab → „Läuft morgen ab“ (geteilt)
+    Marc: dev('Marc', { onboarding: 'done', profile: { sex: 'm', age: 40, heightCm: 180, weightKg: 92, activity: 1.3, deficit: 500, lunchKcal: 600 } as AppState['profile'], weighIns: [{ date: '2026-11-10', weight: 92 }], pantry: [{ id: 'ex1', name: 'Ei', amount: 4, unit: 'Stk', expires: '2026-11-17' }] }),
+    Lisa: dev('Lisa'),
+  }
+  const run = async (who: string, plus = 1000) => {
+    t += plus
+    for (let i = 0; i < 3; i++) {
+      const r = await haRound({ api, getState: () => devs[who], setState: (fn) => (devs[who] = fn(devs[who])), onBought: () => {}, now: new Date(t) })
+      if (!r.again) return r
+      t += 1000
+    }
+  }
+  const rem = () => h7.events['calendar.yami_erinnerungen'] ?? []
+  await run('Marc')
+  await run('Lisa', 10 * 60_000) // Stab abgelaufen → Lisa hält ihn jetzt
+  ok(devs.Lisa.sync?.main?.person === 'Lisa', 'Erinnerungen: Lisa hält den Schreibstab')
+  await run('Marc', 30_000) // Marc gleicht ab, ohne Stab
+  const weigh = rem().filter((e) => e.summary.includes('wiegen'))
+  const exp = rem().filter((e) => e.summary.includes('Läuft morgen ab'))
+  ok(weigh.length === 1, 'Erinnerungen: Marcs „Heute wiegen“ genau einmal (auch ohne Stab angelegt)')
+  ok(exp.length === 1, 'Erinnerungen: „Läuft morgen ab“ (geteilter Vorrat) genau einmal')
+  ok(Object.keys(devs.Lisa.ha!.events).every((k) => !k.startsWith('rem:Marc:')) && Object.keys(devs.Marc.ha!.events).some((k) => k.startsWith('rem:Marc:weigh:')), 'Erinnerungen: Marcs Zuordnung nur bei Marc (nicht im Stab, nicht bei Lisa)')
+  ok(!Object.keys(devs.Lisa.ha!.events).some((k) => k.startsWith('rem:Lisa:')), 'Erinnerungen: Lisa ohne Profil/Frühstück legt keine persönlichen an')
+  for (let i = 0; i < 4; i++) {
+    await run('Lisa', 20_000)
+    await run('Marc', 20_000)
+  }
+  ok(rem().filter((e) => e.uid === weigh[0].uid).length === 1 && rem().filter((e) => e.summary.includes('wiegen')).length === 1, 'Lisa mit Stab entfernt oder ersetzt Marcs Erinnerung nie')
+  ok(rem().length === 2, `keine doppelten Erinnerungen (${rem().length})`)
+  // Stab wechselt mehrfach – Ablauf-Erinnerung bleibt einmalig (Zuordnung im Stab)
+  await run('Marc', 10 * 60_000)
+  await run('Lisa', 10 * 60_000)
+  await run('Marc', 10 * 60_000)
+  ok(rem().filter((e) => e.summary.includes('Läuft morgen ab')).length === 1 && rem().filter((e) => e.summary.includes('wiegen')).length === 1, 'Stabwechsel: weiterhin jede Erinnerung genau einmal')
+}
+
 // ───── 14) Ruhe: ohne Änderungen wird nichts geschrieben ─────
 {
   marc = await sync(hass, marc)

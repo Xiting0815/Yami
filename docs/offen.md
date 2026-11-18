@@ -2,7 +2,7 @@
 
 Diese Datei hält fest, was gerade in Arbeit ist, falls eine Sitzung abbricht.
 
-1. **Familien-Sync über Home Assistant** (in Arbeit, WIP-Commit auf `ccr-6dc9e961-0v6pve`, NICHT auf main):
+1. ~~Familien-Sync über Home Assistant~~ – **erledigt** (18.11., auf main):
    - Transport: Local To-do `todo.yami_sync` (in HA angelegt, getestet).
    - Geteilt: Abendessen-Plan, Vorrat, Einkauf (Haken), eigene Rezepte, Bewertungen/Wischen pro Person. Persönlich: Profil, Kalorien, Wiegen, Frühstück.
    - Lernen pro Person + gemeinsam („mögt ihr beide“, „Lisa mag das“); Konflikte: zuletzt gewinnt + Hinweis mit Rückgängig.

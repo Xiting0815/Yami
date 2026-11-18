@@ -403,6 +403,36 @@ export async function listEvents(api: HaApi, entity: string, from: string, to: s
   }
 }
 
+/**
+ * Erinnerungen anlegen (nur neue; gelöscht wird nie etwas). Gibt die Zuordnung der `rem:`-Schlüssel zurück –
+ * alte (Datum am Schlüsselende vor über 3 Tagen) werden nur vergessen.
+ */
+export async function syncReminders(
+  api: HaApi,
+  entity: string,
+  tracked: HaSettings['events'],
+  reminders: Desired[],
+  now: Date,
+): Promise<{ events: HaSettings['events']; error?: string; changed: number }> {
+  const events: HaSettings['events'] = Object.fromEntries(Object.entries(tracked).filter(([k]) => k.startsWith('rem:')))
+  let error: string | undefined
+  let changed = 0
+  for (const r of reminders) {
+    if (events[r.key]) continue
+    try {
+      await api.callService('calendar', 'create_event', { summary: r.summary, description: r.description, start_date_time: r.start, end_date_time: r.end }, { entity_id: entity })
+      events[r.key] = { sig: r.sig }
+      changed++
+    } catch (e) {
+      if (e instanceof HaError && e.kind === 'network') throw e
+      error ??= e instanceof Error ? e.message : String(e)
+    }
+  }
+  const cutoff = addDaysIso(isoDate(now), -3)
+  for (const k of Object.keys(events)) if (k.slice(-10) < cutoff) delete events[k]
+  return { events, error, changed }
+}
+
 export interface CalendarSyncResult {
   events: HaSettings['events']
   error?: string
@@ -434,14 +464,12 @@ export async function syncCalendar(
   const create = (entity: string, d: Desired) =>
     api.callService('calendar', 'create_event', { summary: d.summary, description: d.description, start_date_time: d.start, end_date_time: d.end }, { entity_id: entity })
 
-  // Erinnerungen: nur neue, die in den nächsten 48 h beginnen
-  for (const r of reminders) {
-    if (events[r.key]) continue
-    if (await attempt(() => create(ha.reminders, r))) events[r.key] = { sig: r.sig }
-  }
-  // alte Erinnerungen vergessen
-  const cutoff = addDaysIso(today, -3)
-  for (const k of Object.keys(events)) if (k.startsWith('rem:') && k.slice(-10) < cutoff) delete events[k]
+  // Erinnerungen: nur neue, die in den nächsten 48 h beginnen (Yami löscht nie Erinnerungen)
+  const rem = await syncReminders(api, ha.reminders, events, reminders, now)
+  Object.keys(events).forEach((k) => k.startsWith('rem:') && delete events[k])
+  Object.assign(events, rem.events)
+  error ??= rem.error
+  changed += rem.changed
 
   // Plan
   const from = today

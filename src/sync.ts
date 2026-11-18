@@ -60,7 +60,9 @@
  *   `main`. Hält ein anderes Gerät den Stab, übernimmt es das (es gleicht ja gerade selbst ab). Was Lisa plant, kommt
  *   so sofort von ihrem Gerät in HA – spätestens, wenn Marc die App öffnet; doppelte Einträge entstehen nicht, weil
  *   beide dieselben Zuordnungen benutzen. In Google Tasks abgehakt → der Stab-Halter markiert gekauft → wandert zu allen.
- *   Erinnerungen (Meal-Prep, Wiegen, Auftauen) stammen aus den persönlichen Daten des jeweiligen Stab-Halters.
+ *   ERINNERUNGEN: Meal-Prep, Auftauen, Wiegen sind persönlich – jedes Gerät legt sie für SEINE Person an
+ *   (Schlüssel `rem:<Person>:…`, Zuordnung nur lokal), unabhängig vom Stab; Yami löscht nie Erinnerungen, fremde schon gar
+ *   nicht. „Läuft morgen ab“ betrifft den geteilten Vorrat → nur der Stab-Halter (Zuordnung `rem:exp:…` im Stab).
  */
 import type { HaApi, RemoteTodo } from './haSync'
 import { listTodo } from './haSync'
