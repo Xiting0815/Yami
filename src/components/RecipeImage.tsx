@@ -6,6 +6,7 @@ const EMOJI: Record<Recipe['type'], string> = {
   eintopf: '🍲',
   suppe: '🥣',
   auflauf: '🧀',
+  brotzeit: '🥨',
 }
 
 const HUE: Record<Recipe['cuisine'], number> = { de: 28, it: 4, as: 340, gr: 205 }

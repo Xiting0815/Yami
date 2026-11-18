@@ -8,7 +8,7 @@ import { BREAKFAST_LABEL } from '../types'
 import { NutritionRow } from './NutritionRow'
 import type { Filters } from '../store'
 import { matches, formatTime } from '../filter'
-import { formatEuro, recipeCost } from '../kitchen'
+import { festiveOf, formatEuro, recipeCost } from '../kitchen'
 import { formatAmount } from '../shopping'
 import { FilterBar } from './FilterBar'
 import { RecipeImage } from './RecipeImage'
@@ -29,7 +29,15 @@ interface Props {
   bakePref?: (r: Recipe) => { score: number; reason?: string }
 }
 
-const BAKE_KINDS: BasicKind[] = ['dessert', 'kuchen', 'brot']
+const BAKE_KINDS: BasicKind[] = ['dessert', 'kuchen', 'brot', 'gebaeck']
+
+/** Saison-Vorrang in der Backen-Liste (Plätzchenzeit 15. Nov. – 26. Dez.): größer als jede gelernte Vorliebe */
+const SEASON_BOOST = 1000
+
+const todayIso = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
 
 function norm(s: string) {
   return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -60,7 +68,9 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
     })()
     const byTitle = (a: Recipe, b: Recipe) => a.title.localeCompare(b.title, 'de')
     // Backen: was du gern bäckst und isst, kommt nach vorn (gelernt)
-    const score = new Map(bake && bakePref ? base.map((r) => [r.id, bakePref(r).score]) : [])
+    // Saisongebäck (Plätzchen) steht in seiner Zeit ganz oben, danach folgt die gelernte Vorliebe
+    const day = todayIso()
+    const score = new Map(bake ? base.map((r) => [r.id, (bakePref?.(r).score ?? 0) + (festiveOf(r, day)?.active ? SEASON_BOOST : 0)]) : [])
     return (exact.length ? exact : fuzzy).sort((a, b) => (score.get(b.id) ?? 0) - (score.get(a.id) ?? 0) || byTitle(a, b))
   }, [q, filters, perPortion, meal, mine, custom, basics, bake, bakePref])
   // Wortvorschläge beim Tippen (Zutaten, auch bei Tippfehlern)
@@ -131,6 +141,7 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
               </div>
               {isBake(r) && r.yields ? (
                 <div className="muted small">
+                  {festiveOf(r, todayIso())?.active && <span className="badge eco">{festiveOf(r, todayIso())?.label}</span>}{' '}
                   {bakePref?.(r).reason ? '❤️ ' : ''}
                   {KIND_LABEL[r.kind!]} · {formatTime(r.time)} · {yieldText(r, r.servings)}
                   {r.yields.perPiece ? ` · ${r.yields.perPiece.kcal.toLocaleString('de-DE')} kcal/${pieceName(yieldStock(r.kind, r.yields).unit)}` : ''}

@@ -23,6 +23,7 @@ export const SEASON: Record<string, number[]> = {
   'Chili rot': [7, 8, 9],
   'Chinakohl': [9, 10, 11, 12],
   'Datteltomaten': [7, 8, 9],
+  'Radieschen': [4, 5, 6, 7, 8, 9, 10],
   'Feldsalat': [10, 11, 12, 1, 2, 3],
   'Frühlingszwiebel': [4, 5, 6, 7, 8, 9, 10],
   'Grüne Bohnen': [6, 7, 8, 9, 10],

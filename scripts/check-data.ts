@@ -57,7 +57,7 @@ for (const n of Object.keys(CATALOG)) if (CATALOG[n] === 'vorrat' && !PRODUCTS[c
 // Grundrezepte: Ergebnis (z. B. „Rinderfond selbstgemacht“) braucht Katalog, Produkt in derselben Einheit und Nährwerte;
 // sie dürfen nicht unter den Abendessen landen
 const yieldNames = new Set<string>()
-const KINDS = ['grundrezept', 'dessert', 'kuchen', 'brot']
+const KINDS = ['grundrezept', 'dessert', 'kuchen', 'brot', 'gebaeck']
 for (const r of RAW_BASICS) {
   const y = r.yields
   if (!r.basic || !y) { console.error(`Grundrezept ${r.id} ohne basic/yields`); errors++; continue }
@@ -74,6 +74,9 @@ for (const r of RAW_BASICS) {
   // Backen & Desserts: Einheit, Leichter-Tipp, Nährwerte je Stück
   if (r.kind && r.kind !== 'grundrezept') {
     if (!['Stk', 'Portion', 'g', 'ml'].includes(y.unit)) { console.error(`${r.id}: Ergebnis-Einheit "${y.unit}" (erlaubt: Stk, Portion, g, ml)`); errors++ }
+    if (r.kind === 'gebaeck' && y.unit !== 'Stk') { console.error(`${r.id}: Plätzchen/Cookies zählen in Stk`); errors++ }
+    if (r.kind === 'gebaeck' && !/dose|luftdicht|trocken/i.test(y.store ?? '')) { console.error(`${r.id}: Plätzchen in Blechdose/luftdicht lagern (store)`); errors++ }
+    if (r.kind === 'gebaeck' && !r.festive?.length && /plätzchen|kipferl|zimtstern|makrone|spritzgebäck|spitzbuben|heidesand|nussecken/i.test(r.title)) console.warn(`${r.id}: Weihnachtsplätzchen ohne festive: ['plaetzchen']`)
     if (y.unit === 'g' && r.kind !== 'brot') { console.error(`${r.id}: Ergebnis in g nur bei Brot (Laib → Scheiben), sonst Stk/Portion`); errors++ }
     if (!r.lighter || r.lighter.trim().length < 15) { console.error(`${r.id}: „lighter“-Tipp fehlt`); errors++ }
     if (y.shelf > 14 && !/kühl|tief|einfrier|dose|luftdicht|trocken/i.test(y.store ?? '')) console.warn(`${r.id}: ${y.shelf} Tage haltbar – Lagerung (store) angeben?`)
@@ -95,7 +98,7 @@ for (const [file, g] of Object.entries(EXTRA_GROUPS)) {
     if (!r.basic || !r.kind) { console.error(`extra/${file}: ${r.id} nicht mit backen() angelegt`); errors++ }
     // Kuchen und Brot brauchen Geräte-Schritte (Ofen); Desserts/Grundrezepte ohne Hitze dürfen ohne auskommen
     if (!g.deviceSteps[r.id]?.length) {
-      if (r.kind === 'kuchen' || r.kind === 'brot') { console.error(`extra/${file}: ${r.id} ohne Geräte-Schritte (deviceSteps)`); errors++ }
+      if (r.kind === 'kuchen' || r.kind === 'brot' || r.kind === 'gebaeck') { console.error(`extra/${file}: ${r.id} ohne Geräte-Schritte (deviceSteps)`); errors++ }
       else console.warn(`extra/${file}: ${r.id} ohne Geräte-Schritte`)
     }
     if (!g.imageQueries[r.id]) { console.error(`extra/${file}: ${r.id} ohne Bild-Suchbegriff (imageQueries)`); errors++ }
@@ -132,7 +135,7 @@ for (const r of BREAKFASTS) {
   }
 }
 const byKind = (k: string) => RAW_BASICS.filter((r) => (r.kind ?? 'grundrezept') === k).length
-console.log(`${BREAKFASTS.length} Frühstücke, ${byKind('grundrezept')} Grundrezepte · Backen: ${byKind('dessert')} Desserts, ${byKind('kuchen')} Kuchen, ${byKind('brot')} Brot (${extraIds.size} aus src/data/extra)`)
+console.log(`${BREAKFASTS.length} Frühstücke, ${byKind('grundrezept')} Grundrezepte · Backen: ${byKind('dessert')} Desserts, ${byKind('kuchen')} Kuchen, ${byKind('brot')} Brot, ${byKind('gebaeck')} Plätzchen & Cookies (${extraIds.size} aus src/data/extra)`)
 // Geräte-Schritte: bekannte Rezepte, Texte, Einstellungen im gültigen Bereich
 for (const [id, steps] of Object.entries(DEVICE_STEPS)) {
   if (!ids.has(id)) { console.error(`Geräte-Schritte für unbekanntes Rezept: ${id}`); errors++; continue }

@@ -626,4 +626,41 @@ export const recipesIt = [
       'Fond, Rosmarin und Lorbeer zugeben und zugedeckt 90 Minuten schmoren.',
       'Kartoffelwürfel zugeben und weitere 30 Minuten garen.',
     ], 'Spezzatino'),
+
+  // ───────────── Leicht & sättigend (Abnehm-Abendessen) ─────────────
+  r('cacciatora-leggera', 'Pollo alla Cacciatora leggero mit Polenta', 'it', 'haupt', 45,
+    '350 g Hähnchenschenkelfilet | 2 Stk Paprika rot | 1 Stk Zwiebel | 200 g Champignons | 2 Zehe Knoblauch | 1 Dose Geschälte Tomaten | 80 ml Weißwein | 30 g Oliven schwarz | 1 EL Kapern | 1 Zweig Rosmarin | 1 EL Olivenöl | 60 g Polenta | Salz | Pfeffer',
+    [
+      'Hähnchen in große Stücke schneiden, salzen, pfeffern und im Olivenöl rundum goldbraun braten, herausnehmen.',
+      'Zwiebel, Paprika und Champignons zugeben und 5 Minuten braten, Knoblauch mitbraten und mit Weißwein ablöschen.',
+      'Tomaten, Rosmarin, Oliven und Kapern zugeben, das Hähnchen zurücklegen und zugedeckt 25 Minuten schmoren.',
+      'Polenta nach Packungsanweisung in ca. 400 ml Salzwasser zu einem weichen Brei kochen und mit dem Hähnchen servieren.',
+    ], 'chicken cacciatore polenta'),
+
+  r('puten-saltimbocca', 'Puten-Saltimbocca mit Zucchini und Rosmarinkartoffeln', 'it', 'haupt', 35,
+    '300 g Putenbrust | 4 Scheibe Parmaschinken | 4 Blatt Salbei | 1 EL Weizenmehl | 80 ml Weißwein | 1 EL Butter | 2 Stk Zucchini | 1 Zehe Knoblauch | 300 g Kartoffeln festkochend | 2 Zweig Rosmarin | 1 EL Olivenöl | Salz | Pfeffer',
+    [
+      'Kartoffeln in 2 cm große Würfel schneiden, mit der Hälfte des Olivenöls, Rosmarin und Salz mischen und im Airfryer knusprig garen.',
+      'Putenbrust in vier dünne Schnitzel schneiden und flach klopfen, pfeffern. Jeweils mit Salbei und Parmaschinken belegen, mit einem Zahnstocher feststecken und auf der Unterseite leicht mehlieren.',
+      'Zucchini in Scheiben mit Knoblauch im restlichen Olivenöl 5 Minuten braten und salzen, warm halten.',
+      'Saltimbocca in Butter zuerst auf der Schinkenseite, dann auf der anderen je 2 Minuten braten. Mit Weißwein ablöschen, kurz einkochen und die Sauce über das Fleisch geben.',
+    ], 'turkey saltimbocca zucchini'),
+
+  r('merluzzo-livornese', 'Kabeljau alla Livornese mit Toskanischem Brot', 'it', 'haupt', 30,
+    '320 g Kabeljaufilet | 250 g Kirschtomaten | 1 Stk Zwiebel | 2 Zehe Knoblauch | 30 g Oliven schwarz | 1 EL Kapern | 80 ml Weißwein | 1 EL Olivenöl | 0.5 Bund Petersilie | 4 Scheibe Toskanisches Brot | Salz | Pfeffer',
+    [
+      'Zwiebel und Knoblauch fein würfeln und im Olivenöl 3 Minuten andünsten. Kirschtomaten halbieren, zugeben und mit Weißwein ablöschen.',
+      'Oliven und Kapern zugeben und die Sauce 8 Minuten einköcheln lassen.',
+      'Kabeljau salzen, pfeffern, in die Sauce legen und zugedeckt 8 bis 10 Minuten garen.',
+      'Mit Petersilie bestreuen und mit dem Brot servieren.',
+    ], 'cod livornese tomatoes olives capers'),
+
+  r('straccetti-rucola', 'Straccetti di Manzo mit Rucola und Kirschtomaten', 'it', 'haupt', 25,
+    '300 g Rinderhüfte | 100 g Rucola | 200 g Kirschtomaten | 2 Zehe Knoblauch | 1 Zweig Rosmarin | 1 EL Olivenöl | 1 EL Rotweinessig | 20 g Parmigiano Reggiano | 4 Scheibe Toskanisches Brot | Salz | Pfeffer',
+    [
+      'Rinderhüfte quer zur Faser in dünne Streifen schneiden, mit Salz, Pfeffer und gehacktem Rosmarin würzen.',
+      'Kirschtomaten halbieren. Olivenöl in einer sehr heißen Pfanne erhitzen und das Fleisch mit dem Knoblauch in zwei Portionen je 2 Minuten scharf anbraten.',
+      'Tomaten kurz mit anbraten und mit Essig ablöschen.',
+      'Rucola auf zwei Tellern verteilen, das Fleisch darauf anrichten und mit gehobeltem Parmigiano Reggiano und dem Brot servieren.',
+    ], 'straccetti di manzo rucola'),
 ]

@@ -5,7 +5,7 @@ import { CATALOG } from '../src/data/catalog'
 import { substitutesFor } from '../src/data/substitutes'
 import { DEVICE_STEPS } from '../src/data/device-steps'
 import { EXTRA_GROUPS } from '../src/data/extra'
-import { addDaysIso, cookBasic, cookNow, lotsFor, planWeek, type PantryLot } from '../src/kitchen'
+import { addDaysIso, cookBasic, cookNow, festiveOf, lotsFor, planWeek, type PantryLot } from '../src/kitchen'
 import { eatInfo, eatOne, yieldText } from '../src/bake'
 import { DEFAULT_PROFILE, dayBalance } from '../src/energy'
 import { weekReview } from '../src/review'
@@ -13,7 +13,7 @@ import { buildModel, features, preference, summarize } from '../src/learning'
 import { sanitize } from '../src/store'
 import { backupBody, parseBackup } from '../src/backup'
 import { formatAmount } from '../src/shopping'
-import { isBake, type WeekPlan } from '../src/types'
+import { KIND_ICON, KIND_LABEL, isBake, type WeekPlan } from '../src/types'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -114,6 +114,20 @@ const m1 = buildModel({ plan: {}, breakfast: {}, breakfastPicks: {}, rejects: []
 ok(preference(m1, bienenstich).score > preference(m0, bienenstich).score, 'Lernen: gebacken + gegessen + 👍 → Bienenstich steigt')
 ok(preference(m1, RECIPES[0], days[0]).score === preference(m0, RECIPES[0], days[0]).score, 'Lernen: Abendessen bleiben vom Backen unberührt')
 ok(summarize(m1).liked.some((l) => l.label === 'Kuchen') || summarize(m1).favorites.some((f) => f.title === 'Bienenstich'), 'Lernen: „Kuchen“/Bienenstich taucht in der Übersicht auf')
+
+// ───── Plätzchen & Cookies (gebaeck) ─────
+{
+  const geb = BASICS.filter((r) => r.kind === 'gebaeck')
+  const kip = RECIPE_BY_ID['vanillekipferl']
+  const cookie = RECIPE_BY_ID['chocolate-chip-cookies']
+  ok(geb.length >= 17 && geb.every((r) => isBake(r) && r.yields?.unit === 'Stk' && !!r.lighter && !!DEVICE_STEPS[r.id]?.length), `Plätzchen & Cookies: ${geb.length} Rezepte mit Stk, Leichter-Tipp und Geräte-Schritten`)
+  ok(KIND_LABEL.gebaeck === 'Plätzchen & Cookies' && KIND_ICON.gebaeck === '🍪' && features(kip).join() === 'bake:gebaeck', 'Art „gebaeck“: Label, Icon, Lernmuster bake:gebaeck')
+  ok(kip.yields!.amount === 40 && kip.yields!.shelf >= 14 && /Blechdose/.test(kip.yields!.store ?? ''), 'Vanillekipferl: 40 Stk, Blechdose, mindestens 14 Tage')
+  ok(festiveOf(kip, '2026-11-14')?.active === false && festiveOf(kip, '2026-11-15')?.active === true && festiveOf(kip, '2026-12-26')?.active === true && festiveOf(kip, '2026-12-27')?.active === false, 'Plätzchenzeit: 15. Nov. bis 26. Dez.')
+  ok(festiveOf(kip, '2026-11-20')?.label === '🎄 Plätzchenzeit' && festiveOf(cookie, '2026-11-20') === undefined, 'Badge nur bei Weihnachtsplätzchen, nicht bei Cookies')
+  const cg = cookBasic([{ id: 'x', name: 'Butter', amount: 500, unit: 'g', expires: '2027-06-01' }], kip, 1, today, 'k')
+  ok(cg.lot?.unit === 'Stk' && cg.lot.amount === 40 && cg.lot.expires === addDaysIso(today, 28), 'cookBasic: 40 Vanillekipferl, halten 28 Tage')
+}
 
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }
 console.log('Alle Tests OK')

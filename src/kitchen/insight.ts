@@ -56,8 +56,9 @@ const WASTE_EXEMPT = new Set(['Milch', 'Vollkornbrot', 'Toastbrot', 'Weißbrot',
 const FESTIVE_WINDOW: Record<Festive, [string, string]> = {
   martini: ['11-01', '11-30'],
   weihnachten: ['12-01', '12-26'],
+  plaetzchen: ['11-15', '12-26'],
 }
-const FESTIVE_BADGE: Record<Festive, string> = { martini: '🪿 Martinsgans-Zeit', weihnachten: '🎄 Passt zur Weihnachtszeit' }
+const FESTIVE_BADGE: Record<Festive, string> = { martini: '🪿 Martinsgans-Zeit', weihnachten: '🎄 Passt zur Weihnachtszeit', plaetzchen: '🎄 Plätzchenzeit' }
 /** Bonus im Festtags-Fenster / Abzug außerhalb */
 export const FESTIVE_BOOST = 11
 export const FESTIVE_PENALTY = 4

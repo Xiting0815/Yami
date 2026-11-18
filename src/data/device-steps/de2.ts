@@ -462,4 +462,65 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Rosmarin, Thymian, Lorbeer und Pfefferkörner zugeben und ohne Deckel sanft simmern lassen, dabei Fett abschöpfen.', settings: [b('2', 180, 'ohne Deckel')] },
     { text: 'Durch ein mit einem Tuch ausgelegtes Sieb gießen und auf 1 l einkochen. Abkühlen lassen, entfetten und portionsweise einfrieren (hält ca. 3 Monate).', settings: [b('8', 20, 'einkochen')] },
   ],
+  // ───────────── Leicht & sättigend / Brotzeit ─────────────
+  'haehnchen-paprika-pfanne': [
+    { text: 'Die Kartoffeln mit Schale in Spalten schneiden, mit 1 EL Öl, Salz und dem Paprikapulver mischen und im Airfryer knusprig garen. Den Korb nur halb füllen und 1- bis 2-mal schütteln.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 200, minutes: 20, note: 'Korb halb voll' }] },
+    { text: 'Das Hähnchen in mundgerechte Streifen schneiden, salzen und pfeffern. Paprika und Zwiebeln in Streifen, Champignons in Scheiben schneiden.' },
+    { text: 'Das restliche Öl in einer großen Pfanne erhitzen und das Hähnchen 5 Minuten kräftig anbraten, dann herausnehmen.', settings: [b('8', 2, 'Pfanne vorheizen'), b('7', 5, 'Hähnchen')] },
+    { text: 'Zwiebeln, Paprika und Champignons im Bratfett 6 Minuten braten. Das Tomatenmark kurz mitrösten und mit der Hühnerbrühe ablöschen.', settings: [b('6', 6), b('5', 1, 'Tomatenmark')] },
+    { text: 'Das Hähnchen zurück in die Pfanne geben, 5 Minuten köcheln lassen, abschmecken und mit Petersilie bestreut zu den Kartoffelspalten servieren.', settings: [b('3', 5, 'köcheln')] },
+  ],
+  'puten-champignon-geschnetzeltes': [
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Den Langkornreis gründlich waschen, mit 180 ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.', settings: [cs('Dämpfen', 100, 22, 'Ebene 2')] },
+    { text: 'Die Putenbrust in dünne Streifen schneiden, salzen, pfeffern und mit dem Mehl bestäuben. Champignons in Scheiben, Zwiebel und Knoblauch fein würfeln.' },
+    { text: 'Das Öl in einer großen Pfanne erhitzen und die Putenstreifen portionsweise 3 Minuten anbraten, dann herausnehmen.', settings: [b('8', 2, 'Pfanne vorheizen'), b('7', 3, 'portionsweise')] },
+    { text: 'Zwiebel, Knoblauch und Champignons im Bratfett 6 Minuten braten, mit der Hühnerbrühe ablöschen und 5 Minuten einköcheln lassen.', settings: [b('6', 6), b('4', 5, 'einköcheln')] },
+    { text: 'Die Crème fraîche einrühren, die Putenstreifen zurück in die Sauce geben, kurz erwärmen und mit Petersilie über dem Reis servieren.', settings: [b('2', 2, 'erwärmen')] },
+  ],
+  'senf-haehnchen-ofengemuese': [
+    { text: 'Den Combair vorheizen. Kartoffeln, Möhren, Zucchini, Paprika und rote Zwiebel in mundgerechte Stücke schneiden, mit Öl, Thymian, Salz und Pfeffer mischen und auf dem Kuchenblech verteilen.', settings: [ca('Heißluft', 200, undefined, 'vorheizen, Ebene 2, Kuchenblech')] },
+    { text: 'Den Senf mit dem Joghurt, Salz und Pfeffer verrühren und das Hähnchen damit rundum bestreichen.' },
+    { text: 'Das Gemüse im Combair 15 Minuten garen, das Hähnchen daraufsetzen, den Kerntemperaturfühler einstecken und weitere 20 Minuten garen, bis die Kerntemperatur erreicht ist.', settings: [ca('Heißluft', 200, 15, 'Gemüse'), ca('Heißluft', 200, 20, 'Hähnchen auf das Gemüse', 72)] },
+  ],
+  'seelachs-gemuesebett': [
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, salzen, auf den gelochten Garbehälter legen und dämpfen. Lauch in Ringe, Möhren in dünne Scheiben und Zwiebel in feine Würfel schneiden.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
+    { text: 'Die Butter in einer weiten Pfanne erhitzen, Zwiebel, Lauch und Möhren 5 Minuten dünsten. Mit dem Weißwein ablöschen, den Senf einrühren und salzen.', settings: [b('4', 5, 'dünsten'), b('5', 1, 'ablöschen')] },
+    { text: 'Den Seelachs mit Zitronensaft, Salz und Pfeffer würzen, auf das Gemüse legen und zugedeckt 10 Minuten sanft garen.', settings: [b('3', 10, 'Deckel drauf')] },
+    { text: 'Die Crème fraîche unter das Gemüse rühren. Die Kartoffeln mit dem Dill mischen und zum Fisch servieren.' },
+  ],
+  'zander-gurkengemuese': [
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, salzen, auf den gelochten Garbehälter legen und dämpfen. Die Gurke schälen, entkernen und in Stücke schneiden, die Zwiebel fein würfeln.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
+    { text: 'Die Hälfte der Butter erhitzen, Zwiebel und Gurke 3 Minuten dünsten, mit dem Mehl bestäuben, mit der Gemüsebrühe aufgießen und 5 Minuten köcheln lassen. Crème fraîche und die Hälfte des Dills einrühren, salzen und pfeffern.', settings: [b('4', 3, 'dünsten'), b('3', 5, 'köcheln')] },
+    { text: 'Den Zander salzen, pfeffern, mit Zitronensaft beträufeln und in der restlichen Butter 3 bis 4 Minuten je Seite braten.', settings: [b('6', 8, 'Pfanne vorheizen')] },
+    { text: 'Die Kartoffeln mit dem restlichen Dill mischen und alles zusammen anrichten.' },
+  ],
+  'schweinefilet-bohnen': [
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, salzen, auf den gelochten Garbehälter legen und 15 Minuten dämpfen. Die Bohnen putzen, dazulegen und die letzten 10 Minuten mitgaren.', settings: [cs('Dämpfen', 100, 15, 'Wasserbehälter füllen'), cs('Dämpfen', 100, 10, 'Bohnen dazu')] },
+    { text: 'Das Schweinefilet in 2 cm dicke Medaillons schneiden, leicht flach drücken, salzen und pfeffern.' },
+    { text: 'Den Bacon in Streifen im heißen Öl auslassen und herausnehmen. Die Medaillons im Speckfett 3 Minuten je Seite braten und herausnehmen.', settings: [b('5', 3, 'Bacon'), b('6', 6, 'Medaillons')] },
+    { text: 'Die Zwiebel im Bratfett anschwitzen, mit der Rinderbrühe ablöschen, den Senf einrühren und kurz einköcheln lassen.', settings: [b('4', 4)] },
+    { text: 'Die Bohnen mit Butter, Bohnenkraut und Bacon schwenken und mit den Medaillons, der Sauce und den Kartoffeln servieren.' },
+  ],
+  'bauernsalat-speck': [
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Eier auf den gelochten Garbehälter legen, hart dämpfen, abschrecken und pellen.', settings: [cs('Dämpfen', 100, 11, 'Wasserbehälter füllen')] },
+    { text: 'Die Speckwürfel ohne Fett knusprig auslassen und auf Küchenpapier abtropfen lassen.', settings: [b('5', 5, 'ohne Fett')] },
+    { text: 'Tomaten, Gurke und Paprika in Stücke, die rote Zwiebel in feine Ringe schneiden. Essig, Öl, Senf, Salz und Pfeffer verrühren und mit dem Gemüse mischen.' },
+    { text: 'Die Eier vierteln, mit Speck und Schnittlauch auf den Salat geben und mit dem Vollkornbrot servieren.' },
+  ],
+  'strammer-max': [
+    { text: 'Den Senf mit Essig, Öl, Salz und Pfeffer verrühren. Salat, Tomate und Gurke klein schneiden und mit der Vinaigrette mischen.' },
+    { text: 'Das Vollkornbrot mit Katenschinken belegen.' },
+    { text: 'Die Butter in einer Pfanne erhitzen und die Eier als Spiegeleier braten, salzen und pfeffern.', settings: [b('4', 4, 'Spiegeleier')] },
+    { text: 'Je zwei Spiegeleier auf das Brot legen, mit Schnittlauch bestreuen und mit Gewürzgurken und Salat servieren.' },
+  ],
+  'wurstsalat-schweizer-art': [
+    { text: 'Die Fleischwurst pellen und in dünne Streifen schneiden, den Emmentaler in Streifen, Gewürzgurken und Radieschen in Scheiben, die Zwiebel in feine Ringe schneiden.' },
+    { text: 'Essig, Öl, Senf, 3 EL Wasser, Salz und Pfeffer verrühren, mit allem mischen und 15 Minuten durchziehen lassen.' },
+    { text: 'Die Brötchen vom Vortag im Airfryer kurz aufbacken, den Wurstsalat mit Schnittlauch bestreuen und dazu servieren.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 170, minutes: 4, note: 'Brötchen aufbacken' }] },
+  ],
+  'brotzeitbrett': [
+    { text: 'Den Camembert mit einer Gabel zerdrücken, mit Frischkäse, Paprikapulver, Bier, fein gewürfelter Zwiebel, Salz und Pfeffer zu Obazda verkneten und mit Schnittlauch bestreuen.' },
+    { text: 'Radieschen putzen, die Gurke in Scheiben, die Tomate in Spalten schneiden.' },
+    { text: 'Vollkornbrot, Katenschinken, Kochschinken, Obazda und das Gemüse auf einem Brett anrichten. Kein Gerät nötig.' },
+  ],
 }

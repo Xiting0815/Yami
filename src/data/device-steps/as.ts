@@ -897,4 +897,39 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Die Entenstücke auf dem Reis anrichten und die Soße darübergeben.',
     },
   ],
+  // ───────────── Leicht & sättigend ─────────────
+  'haehnchen-brokkoli-kanton': [
+    { text: 'Das Hähnchen in dünne Scheiben schneiden und mit Reiswein, 1 EL Sojasauce und der Hälfte der Speisestärke marinieren.' },
+    rice('Jasminreis', 180),
+    { text: 'Den Brokkoli in Röschen teilen, auf den gelochten Garbehälter legen und zum Reis in den CombiSteamer geben. Knoblauch und Ingwer fein hacken.', settings: [steamer('Dämpfen', 100, 6, 'Ebene 3, Brokkoli')] },
+    { text: 'Das Sonnenblumenöl im Wok stark erhitzen, das Hähnchen 3 Minuten anbraten, Knoblauch und Ingwer kurz mitbraten.', settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 3, 'Abzug höher')] },
+    { text: 'Den Brokkoli zugeben. Hühnerbrühe, restliche Sojasauce, Austernsauce und restliche Speisestärke verrühren, in den Wok gießen und 2 Minuten eindicken lassen. Mit Sesamöl abschmecken und mit dem Reis servieren.', settings: [bora('6', 2, 'eindicken')] },
+  ],
+  'rind-gemuese-wok': [
+    { text: 'Das Rindfleisch quer zur Faser in dünne Scheiben schneiden und mit Sojasauce, Reiswein, Speisestärke und Pfeffer marinieren.' },
+    rice('Jasminreis', 180),
+    { text: 'Paprika in Streifen, Möhre in dünne Scheiben schneiden, Zuckerschoten putzen, Knoblauch und Ingwer hacken.' },
+    { text: 'Das Sonnenblumenöl im Wok stark erhitzen und das Rindfleisch in zwei Portionen je 1 Minute anbraten, dann herausnehmen. Beim scharfen Anbraten den Abzug eine Stufe höher stellen.', settings: [bora('9', 2, 'Wok vorheizen, Abzug höher'), bora('9', 2, 'zwei Portionen')] },
+    { text: 'Möhre, Paprika und Zuckerschoten mit Knoblauch und Ingwer 3 Minuten unter Rühren braten. Fleisch und Austernsauce zugeben, 1 Minute schwenken und mit Sesamöl abschmecken. Mit dem Reis servieren.', settings: [bora('9', 3), bora('8', 1, 'schwenken')] },
+  ],
+  'seelachs-shiitake-pakchoi': [
+    { text: 'Ingwer und Frühlingszwiebeln in feine Streifen schneiden. Shiitake in Scheiben, Pak Choi in Viertel schneiden.' },
+    rice('Jasminreis', 180),
+    { text: 'Den Seelachs auf einen tiefen Teller legen, mit den Shiitake und der Hälfte des Ingwers belegen und mit dem Reiswein beträufeln. Den Teller auf Ebene 3 zum Reis in den CombiSteamer stellen und dämpfen. Den Pak Choi daneben auf den gelochten Garbehälter legen und die letzten 5 Minuten mitdämpfen.', settings: [steamer('Dämpfen', 90, 10, 'Ebene 3, Fisch'), steamer('Dämpfen', 90, 5, 'Pak Choi dazu')] },
+    { text: 'Sojasauce, Sesamöl und Zucker verrühren, über den Fisch geben und mit Frühlingszwiebeln, restlichem Ingwer und Koriander servieren. Dazu den Reis.' },
+  ],
+  'haehnchen-chop-suey': [
+    { text: 'Das Hähnchen in dünne Streifen schneiden und mit 1 EL Sojasauce und der Hälfte der Speisestärke marinieren.' },
+    { text: 'Die Mie-Nudeln nach Packungsanweisung garen und abgießen.', settings: [bora('Power', undefined, 'aufkochen'), bora('7', 4, 'Nudeln')] },
+    { text: 'Chinakohl in Streifen, Möhre in Stifte, Champignons in Scheiben schneiden. Frühlingszwiebeln in Ringe, Knoblauch fein hacken.' },
+    { text: 'Das Sonnenblumenöl im Wok stark erhitzen, das Hähnchen 3 Minuten anbraten und herausnehmen. Möhre, Champignons und Knoblauch 3 Minuten braten, Chinakohl und Sojasprossen 2 Minuten mitbraten.', settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 3, 'Hähnchen'), bora('9', 5, 'Gemüse')] },
+    { text: 'Hühnerbrühe, restliche Sojasauce, Austernsauce und restliche Speisestärke verrühren, zugeben und kurz binden. Hähnchen und Nudeln unterheben und mit Frühlingszwiebeln servieren.', settings: [bora('6', 2, 'binden')] },
+  ],
+  'pute-paprika-cashew': [
+    { text: 'Die Putenbrust in Würfel schneiden und mit 1 EL Sojasauce und der Speisestärke marinieren.' },
+    rice('Jasminreis', 180),
+    { text: 'Paprika, Zucchini und Zwiebel in Stücke schneiden, Knoblauch hacken. Die Cashewkerne in einer trockenen Pfanne rösten.', settings: [bora('4', 3, 'Cashewkerne ohne Fett')] },
+    { text: 'Das Sonnenblumenöl im Wok stark erhitzen, die Pute 3 Minuten anbraten und herausnehmen. Das Gemüse mit dem Knoblauch 4 Minuten braten.', settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 3, 'Pute'), bora('9', 4, 'Gemüse')] },
+    { text: 'Die Pute, restliche Sojasauce, Hoisinsauce und 3 EL Wasser zugeben, 1 Minute schwenken, die Cashewkerne unterheben und mit dem Reis servieren.', settings: [bora('8', 1, 'schwenken')] },
+  ],
 }

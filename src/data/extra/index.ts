@@ -9,10 +9,11 @@ import type { ExtraGroup, ExtraProduct, Nutri } from './types'
 import { desserts } from './desserts'
 import { kuchen } from './kuchen'
 import { brot } from './brot'
+import { gebaeck } from './gebaeck'
 
 export type { ExtraGroup } from './types'
 
-export const EXTRA_GROUPS: Record<string, ExtraGroup> = { desserts, kuchen, brot }
+export const EXTRA_GROUPS: Record<string, ExtraGroup> = { desserts, kuchen, brot, gebaeck }
 const groups = Object.values(EXTRA_GROUPS)
 
 const merge = <T,>(pick: (g: ExtraGroup) => Record<string, T> | undefined): Record<string, T> =>

@@ -437,4 +437,29 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Rinderfond, Rosmarin und Lorbeerblatt zugeben und im geschlossenen Bräter im CombiSteamer 90 Minuten schmoren. Den CombiSteamer vorheizen.', settings: [dev('steamer', 'Heißluft feucht', 150, { minutes: 90, note: 'vorheizen, Ebene 2' })] },
     { text: 'Kartoffelwürfel zugeben und weitere 30 Minuten garen.', settings: [dev('steamer', 'Heißluft feucht', 150, { minutes: 30 })] },
   ],
+  // ───────────── Leicht & sättigend ─────────────
+  'cacciatora-leggera': [
+    { text: 'Das Hähnchen in große Stücke schneiden, salzen, pfeffern und im Olivenöl rundum goldbraun braten, dann herausnehmen.', settings: [bora('8', { minutes: 2, note: 'Pfanne vorheizen' }), bora('7', { minutes: 8 })] },
+    { text: 'Zwiebel, Paprika und Champignons zugeben und 5 Minuten braten, den Knoblauch mitbraten und mit dem Weißwein ablöschen.', settings: [bora('6', { minutes: 5 })] },
+    { text: 'Geschälte Tomaten, Rosmarin, Oliven und Kapern zugeben, das Hähnchen zurücklegen und zugedeckt 25 Minuten schmoren.', settings: [bora('9', { note: 'aufkochen' }), bora('3', { minutes: 25, note: 'Deckel drauf' })] },
+    { text: 'Die Polenta nach Packungsanweisung in ca. 400 ml Salzwasser zu einem weichen Brei kochen und mit dem Hähnchen servieren.', settings: [bora('Power', { note: 'aufkochen' }), bora('2', { minutes: 10, note: 'Polenta rühren' })] },
+  ],
+  'puten-saltimbocca': [
+    { text: 'Die Kartoffeln in 2 cm große Würfel schneiden, mit der Hälfte des Olivenöls, Rosmarin und Salz mischen und im Airfryer knusprig garen. Den Korb halb füllen und 1- bis 2-mal schütteln.', settings: [dev('airfryer', 'Heissluft', 200, { minutes: 20, note: 'Korb halb voll' })] },
+    { text: 'Die Putenbrust in vier dünne Schnitzel schneiden und flach klopfen, pfeffern. Jeweils mit Salbei und Parmaschinken belegen, mit einem Zahnstocher feststecken und auf der Unterseite leicht mehlieren.' },
+    { text: 'Die Zucchini in Scheiben mit Knoblauch im restlichen Olivenöl 5 Minuten braten und salzen, dann warm halten.', settings: [bora('6', { minutes: 5 })] },
+    { text: 'Die Saltimbocca in Butter zuerst auf der Schinkenseite, dann auf der anderen je 2 Minuten braten. Mit dem Weißwein ablöschen, kurz einkochen und die Sauce über das Fleisch geben.', settings: [bora('6', { minutes: 4, note: 'Pfanne vorheizen' }), bora('7', { minutes: 2, note: 'einkochen' })] },
+  ],
+  'merluzzo-livornese': [
+    { text: 'Zwiebel und Knoblauch fein würfeln und im Olivenöl 3 Minuten andünsten. Kirschtomaten halbieren, zugeben und mit dem Weißwein ablöschen.', settings: [bora('4', { minutes: 3 }), bora('6', { minutes: 2, note: 'ablöschen' })] },
+    { text: 'Oliven und Kapern zugeben und die Sauce 8 Minuten einköcheln lassen.', settings: [bora('4', { minutes: 8 })] },
+    { text: 'Den Kabeljau salzen, pfeffern, in die Sauce legen und zugedeckt 8 bis 10 Minuten garen.', settings: [bora('3', { minutes: 9, note: 'Deckel drauf' })] },
+    { text: 'Mit Petersilie bestreuen und mit dem Toskanischen Brot servieren.' },
+  ],
+  'straccetti-rucola': [
+    { text: 'Die Rinderhüfte quer zur Faser in dünne Streifen schneiden, mit Salz, Pfeffer und gehacktem Rosmarin würzen.' },
+    { text: 'Die Kirschtomaten halbieren. Das Olivenöl in einer sehr heißen Pfanne erhitzen und das Fleisch mit dem Knoblauch in zwei Portionen je 2 Minuten scharf anbraten. Beim scharfen Anbraten den Abzug eine Stufe höher stellen.', settings: [bora('9', { minutes: 2, note: 'Pfanne vorheizen, Abzug höher' }), bora('9', { minutes: 4, note: 'zwei Portionen' })] },
+    { text: 'Die Tomaten kurz mitbraten und mit dem Rotweinessig ablöschen.', settings: [bora('7', { minutes: 2 })] },
+    { text: 'Den Rucola auf zwei Tellern verteilen, das Fleisch darauf anrichten und mit gehobeltem Parmigiano Reggiano und dem Toskanischen Brot servieren.' },
+  ],
 }

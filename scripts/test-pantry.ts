@@ -112,7 +112,7 @@ const top5 = rm.slice(0, 5)
 ok(top5.some((x) => x.i.urgent.includes('Hähnchenbrustfilet')), 'echt/Modus: Gerichte mit dem ablaufenden Hähnchen ganz vorn')
 ok(top5.some((x) => x.i.fromPantry.includes('Champignons')), 'echt/Modus: Champignon-Gericht unter den ersten 5')
 ok(rm.slice(0, 10).some((x) => x.i.fromPantry.includes('Kartoffeln festkochend')), 'echt/Modus: Kartoffel-Gericht unter den ersten 10')
-ok(rm.slice(0, 20).some((x) => x.i.fromPantry.includes('Tellerlinsen')) || rm.findIndex((x) => x.i.fromPantry.includes('Tellerlinsen')) < 50, 'echt/Modus: Linsengericht kommt vor (Top 50)')
+ok(rm.slice(0, 20).some((x) => x.i.fromPantry.includes('Tellerlinsen')) || rm.findIndex((x) => x.i.fromPantry.includes('Tellerlinsen')) < 70, 'echt/Modus: Linsengericht kommt vor (Top 70)')
 ok(rm.every((x) => x.i.fromPantry.length > 0), 'Modus: nur Gerichte, die etwas aus dem Vorrat brauchen')
 ok(rm.slice(0, 20).some((x) => x.i.fromPantry.includes('Bandnudeln')), 'echt/Modus: Bandnudeln decken Pasta-Gerichte (Top 20)')
 

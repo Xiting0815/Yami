@@ -394,4 +394,50 @@ export const recipesAs = [
       'Gemüse im Wok in wenig Öl 2 Minuten anbraten, Soße zugeben und aufkochen. Mit etwas angerührter Stärke leicht binden.',
       'Entenstücke auf Reis anrichten und die Soße darübergeben.',
     ], 'crispy duck sweet and sour'),
+
+  // ───────────── Leicht & sättigend (Abnehm-Abendessen) ─────────────
+  r('haehnchen-brokkoli-kanton', 'Hähnchen mit Brokkoli nach Kantoner Art', 'as', 'haupt', 25,
+    '300 g Hähnchenbrustfilet | 400 g Brokkoli | 2 Zehe Knoblauch | 15 g Ingwer | 1 EL Shaoxing-Reiswein | 2 EL Sojasauce | 1 EL Austernsauce | 1 EL Speisestärke | 100 ml Hühnerbrühe | 1 TL Sesamöl | 1 EL Sonnenblumenöl | 120 g Jasminreis',
+    [
+      'Hähnchen in dünne Scheiben schneiden und mit Reiswein, 1 EL Sojasauce und der Hälfte der Stärke marinieren. Reis kochen.',
+      'Brokkoli in Röschen teilen und 3 Minuten blanchieren. Knoblauch und Ingwer fein hacken.',
+      'Öl im Wok stark erhitzen, Hähnchen 3 Minuten anbraten, Knoblauch und Ingwer kurz mitbraten.',
+      'Brokkoli zugeben. Brühe, restliche Sojasauce, Austernsauce und restliche Stärke verrühren, in den Wok gießen und 2 Minuten eindicken lassen. Mit Sesamöl abschmecken und mit dem Reis servieren.',
+    ], 'chicken broccoli stir fry'),
+
+  r('rind-gemuese-wok', 'Rindfleisch mit Paprika und Zuckerschoten aus dem Wok', 'as', 'haupt', 25,
+    '280 g Rinderhüfte | 1 Stk Paprika rot | 150 g Zuckerschoten | 1 Stk Möhre | 2 Zehe Knoblauch | 15 g Ingwer | 1 EL Austernsauce | 2 EL Sojasauce | 1 EL Shaoxing-Reiswein | 1 EL Speisestärke | 1 EL Sonnenblumenöl | 1 TL Sesamöl | 120 g Jasminreis | Pfeffer',
+    [
+      'Rindfleisch quer zur Faser in dünne Scheiben schneiden und mit Sojasauce, Reiswein, Stärke und Pfeffer marinieren. Reis kochen.',
+      'Paprika in Streifen, Möhre in dünne Scheiben schneiden, Zuckerschoten putzen, Knoblauch und Ingwer hacken.',
+      'Öl im Wok stark erhitzen und das Rindfleisch in zwei Portionen je 1 Minute anbraten, herausnehmen.',
+      'Möhre, Paprika und Zuckerschoten mit Knoblauch und Ingwer 3 Minuten unter Rühren braten. Fleisch und Austernsauce zugeben, 1 Minute schwenken und mit Sesamöl abschmecken. Mit dem Reis servieren.',
+    ], 'beef stir fry vegetables snow peas'),
+
+  r('seelachs-shiitake-pakchoi', 'Gedämpfter Seelachs mit Shiitake und Pak Choi', 'as', 'haupt', 25,
+    '320 g Seelachsfilet | 150 g Shiitake | 300 g Pak Choi | 20 g Ingwer | 2 Stk Frühlingszwiebel | 2 EL Sojasauce | 1 EL Shaoxing-Reiswein | 1 TL Sesamöl | 1 TL Zucker | 0.5 Bund Koriander | 120 g Jasminreis',
+    [
+      'Ingwer und Frühlingszwiebeln in feine Streifen schneiden. Shiitake in Scheiben, Pak Choi in Viertel schneiden. Reis kochen.',
+      'Seelachs auf einen tiefen Teller legen, mit Shiitake und der Hälfte des Ingwers belegen und mit Reiswein beträufeln.',
+      'Fisch mit Pilzen über Wasserdampf 10 Minuten dämpfen, Pak Choi die letzten 5 Minuten mitdämpfen.',
+      'Sojasauce, Sesamöl und Zucker verrühren, über den Fisch geben und mit Frühlingszwiebeln, restlichem Ingwer und Koriander servieren. Dazu den Reis.',
+    ], 'steamed fish shiitake bok choy'),
+
+  r('haehnchen-chop-suey', 'Hähnchen-Chop-Suey mit Sojasprossen und Mie-Nudeln', 'as', 'haupt', 30,
+    '300 g Hähnchenbrustfilet | 150 g Sojasprossen | 200 g Chinakohl | 1 Stk Möhre | 150 g Champignons | 2 Stk Frühlingszwiebel | 2 Zehe Knoblauch | 2 EL Sojasauce | 1 EL Austernsauce | 1 EL Speisestärke | 150 ml Hühnerbrühe | 1 EL Sonnenblumenöl | 100 g Mie-Nudeln',
+    [
+      'Hähnchen in dünne Streifen schneiden und mit 1 EL Sojasauce und der Hälfte der Stärke marinieren. Mie-Nudeln nach Packungsanweisung garen und abgießen.',
+      'Chinakohl in Streifen, Möhre in Stifte, Champignons in Scheiben schneiden. Frühlingszwiebeln in Ringe, Knoblauch fein hacken.',
+      'Öl im Wok stark erhitzen, Hähnchen 3 Minuten anbraten und herausnehmen. Möhre, Champignons und Knoblauch 3 Minuten braten, Chinakohl und Sojasprossen 2 Minuten mitbraten.',
+      'Brühe, restliche Sojasauce, Austernsauce und restliche Stärke verrühren, zugeben und kurz binden. Hähnchen und Nudeln unterheben und mit Frühlingszwiebeln servieren.',
+    ], 'chicken chop suey bean sprouts noodles'),
+
+  r('pute-paprika-cashew', 'Pute mit Paprika und Cashewkernen', 'as', 'haupt', 25,
+    '300 g Putenbrust | 1 Stk Paprika rot | 1 Stk Paprika gelb | 1 Stk Zucchini | 25 g Cashewkerne | 1 Stk Zwiebel | 2 Zehe Knoblauch | 2 EL Sojasauce | 1 EL Hoisinsauce | 1 EL Speisestärke | 1 EL Sonnenblumenöl | 120 g Jasminreis',
+    [
+      'Putenbrust in Würfel schneiden und mit 1 EL Sojasauce und der Stärke marinieren. Reis kochen.',
+      'Paprika, Zucchini und Zwiebel in Stücke schneiden, Knoblauch hacken. Cashewkerne in einer trockenen Pfanne rösten.',
+      'Öl im Wok stark erhitzen, Pute 3 Minuten anbraten, herausnehmen. Gemüse mit Knoblauch 4 Minuten braten.',
+      'Pute, restliche Sojasauce, Hoisinsauce und 3 EL Wasser zugeben, 1 Minute schwenken, Cashewkerne unterheben und mit dem Reis servieren.',
+    ], 'turkey cashew bell pepper stir fry'),
 ]

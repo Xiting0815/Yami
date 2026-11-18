@@ -140,6 +140,8 @@ export interface BackOptions {
   yields: BackYield
   /** „💡 Leichter:“-Tipp, ein Satz (Pflicht bei Dessert/Kuchen/Brot) */
   lighter?: string
+  /** Festtags-Fenster (z. B. ['plaetzchen'] für Weihnachtsplätzchen: Backen-Liste sortiert sie in der Saison nach vorn) */
+  festive?: Festive[]
 }
 
 /**
@@ -163,6 +165,7 @@ export function backen(kind: BasicKind, id: string, title: string, o: BackOption
     yields: { ...o.yields },
     kind,
     lighter: o.lighter,
+    ...(o.festive ? { festive: o.festive } : {}),
   }
 }
 

@@ -61,6 +61,7 @@ export const NUTRI: Record<string, N> = {
   Rosmarin: [130, 3, 6, 15, 14],
   'Rote Bete gekocht': [44, 1.7, 0.2, 8, 2],
   Rotkohl: [29, 1.4, 0.2, 5, 2.5],
+  Radieschen: [15, 1, 0.1, 2, 1.6],
   Rucola: [25, 2.6, 0.7, 2, 1.6],
   Salatgurke: [15, 0.6, 0.1, 2, 0.5],
   Salbei: [60, 3.5, 3, 6, 10],
@@ -336,6 +337,9 @@ export const NUTRI: Record<string, N> = {
   'Rinderbraten aus der Keule': [130, 21, 5, 0, 0],
   Rindergulasch: [140, 20, 6.5, 0, 0],
   Rinderhackfleisch: [250, 18, 20, 0, 0],
+  Putenbrust: [105, 24, 1, 0, 0],
+  Zanderfilet: [85, 19, 0.8, 0, 0],
+  Camembert: [300, 20, 24, 0.5, 0],
   Rinderhüfte: [120, 22, 3.5, 0, 0],
   Rinderleber: [135, 20, 3.6, 4, 0],
   Rinderroulade: [130, 21, 5, 0, 0],
@@ -438,7 +442,7 @@ for (const b of ['Gemüsebrühe', 'Hühnerbrühe', 'Rinderbrühe']) for (const f
 /** Gramm pro Einheit, zutatenspezifisch (sonst gelten die Standardwerte unten) */
 export const GRAMS: Record<string, Record<string, number>> = {
   Ananas: {}, Apfel: { Stk: 180 }, 'Apfel säuerlich': { Stk: 180 }, Aubergine: { Stk: 300 }, Banane: { Stk: 120 },
-  Birne: { Stk: 180 }, Blumenkohl: { Stk: 800 }, Chicorée: { Stk: 120 }, 'Chili rot': { Stk: 15 },
+  Birne: { Stk: 180 }, Radieschen: { Bund: 100 }, Blumenkohl: { Stk: 800 }, Chicorée: { Stk: 120 }, 'Chili rot': { Stk: 15 },
   Frühlingszwiebel: { Stk: 20 }, Kohlrabi: { Stk: 250 }, Kopfsalat: { Stk: 300 },
   Lauch: { Stk: 200 }, Limette: { Stk: 60 }, Möhre: { Stk: 100 }, 'Paprika gelb': { Stk: 160 }, 'Paprika grün': { Stk: 160 },
   'Paprika rot': { Stk: 160 }, Salatgurke: { Stk: 400 }, Schalotte: { Stk: 30 }, 'Spitzpaprika grün': { Stk: 80 },

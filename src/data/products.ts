@@ -71,6 +71,7 @@ export const PRODUCTS: Record<string, Product> = {
   'Majoran frisch': p(10, 'Zweig', 1.29, 5, 5, 'Pck'),
   Möhre: p(10, 'Stk', 0.99, 21, 21, 'Beutel'),
   'Pak Choi': p(300, 'g', 1.49, 5, 3, 'Pck'),
+  Radieschen: p(1, 'Bund', 0.89, 6, 4),
   'Paprika gelb': p(1, 'Stk', 0.79, 7),
   'Paprika grün': p(1, 'Stk', 0.69, 7),
   'Paprika rot': p(1, 'Stk', 0.79, 7),
@@ -218,6 +219,7 @@ export const PRODUCTS: Record<string, Product> = {
   Weißbrot: p(20, 'Scheibe', 1.29, 4, 4, 'Pck'),
 
   // ───── Käse, Nudeln & Molkerei ─────
+  Camembert: p(250, 'g', 1.79, 14, 5, 'Pck'),
   Skyr: p(450, 'g', 1.49, 21, 5, 'Becher'),
   Magerquark: p(500, 'g', 0.89, 14, 4, 'Becher'),
   Hüttenkäse: p(200, 'g', 0.89, 14, 4, 'Becher'),
@@ -353,6 +355,8 @@ export const PRODUCTS: Record<string, Product> = {
   Schweineschnitzel: p(4, 'Stk', 4.49, 3, 1, 'Pck'),
   'Schweineschulter mit Schwarte': p(1000, 'g', 6.99, 3, 1, 'Stück'),
   'Schweinshaxe hinten': p(1, 'Stk', 4.49, 3, 1, 'Stk'),
+  Putenbrust: p(400, 'g', 4.99, 2, 1, 'Pck'),
+  Zanderfilet: p(300, 'g', 7.99, 2, 1, 'Pck'),
   Seelachsfilet: p(400, 'g', 4.99, 2, 1, 'Pck'),
   Speckwürfel: p(100, 'g', 1.19, 30, 7, 'Pck'),
   'Suppenfleisch Rind': p(500, 'g', 5.49, 2, 1, 'Pck'),

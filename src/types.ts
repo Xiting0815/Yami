@@ -1,7 +1,7 @@
 export type Cuisine = 'de' | 'it' | 'as' | 'gr'
 /** Festtags-Fenster: Martinsgans-Zeit (1.–15. Nov.) und Weihnachtszeit (15. Nov.–31. Dez.) */
-export type Festive = 'martini' | 'weihnachten'
-export type DishType = 'haupt' | 'pasta' | 'eintopf' | 'suppe' | 'auflauf'
+export type Festive = 'martini' | 'weihnachten' | 'plaetzchen'
+export type DishType = 'haupt' | 'pasta' | 'eintopf' | 'suppe' | 'auflauf' | 'brotzeit'
 
 /** Einkaufslisten-Abschnitte – Reihenfolge = Reihenfolge im Laden */
 export type ShopCat = 'gemuese' | 'konserven' | 'backwaren' | 'molkerei' | 'fleisch' | 'tk' | 'vorrat'
@@ -35,6 +35,7 @@ export const TYPE_LABEL: Record<DishType, string> = {
   eintopf: 'Eintopf',
   suppe: 'Suppe',
   auflauf: 'Auflauf & Gratin',
+  brotzeit: 'Brotzeit',
 }
 
 export interface Ingredient {
@@ -62,10 +63,10 @@ export interface Nutrition {
  * Alle diese Rezepte haben `basic: true` – sie sind nie im Wischstapel, nie planbar und zählen nicht für Abwechslung,
  * Veggie-Quote oder Abendessen-Geschmack. „Fertig gekocht/gebacken“ legt `yields` in den Vorrat.
  */
-export type BasicKind = 'grundrezept' | 'dessert' | 'kuchen' | 'brot'
+export type BasicKind = 'grundrezept' | 'dessert' | 'kuchen' | 'brot' | 'gebaeck'
 
-export const KIND_LABEL: Record<BasicKind, string> = { grundrezept: 'Grundrezepte', dessert: 'Desserts', kuchen: 'Kuchen', brot: 'Brot & Brötchen' }
-export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', dessert: '🍮', kuchen: '🍰', brot: '🍞' }
+export const KIND_LABEL: Record<BasicKind, string> = { grundrezept: 'Grundrezepte', dessert: 'Desserts', kuchen: 'Kuchen', brot: 'Brot & Brötchen', gebaeck: 'Plätzchen & Cookies' }
+export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', dessert: '🍮', kuchen: '🍰', brot: '🍞', gebaeck: '🍪' }
 
 /** Backen & Desserts (alles außer Grundrezept): Stücke davon zählen beim Essen in die Tagesbilanz */
 export const isBake = (r: { kind?: BasicKind } | undefined): boolean => !!r?.kind && r.kind !== 'grundrezept'

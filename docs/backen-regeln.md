@@ -7,8 +7,9 @@ Ziel: je Gruppe ca. 10 Rezepte. Jede Gruppe bearbeitet **nur ihre eigene Datei**
 | Desserts | `src/data/extra/desserts.ts` | Desserts für Gäste (Tiramisu, Panna cotta, Mousse, Crème brûlée, Rote Grütze, Germknödel …) |
 | Kuchen | `src/data/extra/kuchen.ts` | Blechkuchen & Hefeteig, nicht zu schwierig (Bienenstich ist das Schwierigste) |
 | Brot & Brötchen | `src/data/extra/brot.ts` | Brot mit Dampf im CombiSteamer inkl. Sauerteig, italienische Brötchen, Focaccia |
+| Plätzchen & Cookies | `src/data/extra/gebaeck.ts` | Weihnachtsplätzchen, Cookies, italienisches Kleingebäck (Cantuccini, Amaretti …) |
 
-Vorbilder: `tiramisu` (desserts.ts), `bienenstich` (kuchen.ts), `sauerteig-anstellgut` + `bauernbrot-sauerteig` (brot.ts). Geräte-Regeln zusätzlich: `docs/geraete/regeln.md`, `docs/geraete/vzug.md`.
+Vorbilder: `vanillekipferl` + `chocolate-chip-cookies` (gebaeck.ts), `tiramisu` (desserts.ts), `bienenstich` (kuchen.ts), `sauerteig-anstellgut` + `bauernbrot-sauerteig` (brot.ts). Geräte-Regeln zusätzlich: `docs/geraete/regeln.md`, `docs/geraete/vzug.md`.
 
 ## 1. Dateiformat
 
@@ -39,7 +40,7 @@ export const kuchen: ExtraGroup = {
 }
 ```
 
-`backen(kind, id, title, options, zutaten, schritte)` – `kind`: `'dessert' | 'kuchen' | 'brot' | 'grundrezept'`. IDs klein, mit Bindestrich, eindeutig.
+`backen(kind, id, title, options, zutaten, schritte)` – `kind`: `'dessert' | 'kuchen' | 'brot' | 'gebaeck' | 'grundrezept'`. Weihnachtsplätzchen bekommen in den Optionen `festive: ['plaetzchen']` (Fenster 15. Nov.–26. Dez.: in der Backen-Liste ganz oben, Badge „🎄 Plätzchenzeit“). IDs klein, mit Bindestrich, eindeutig.
 
 ## 2. Ergebnis (`yields`) – kommt bei „Fertig gebacken“ in den Vorrat
 
@@ -48,11 +49,12 @@ export const kuchen: ExtraGroup = {
   - Kuchen → `Stk` (Blech 20–24, Springform 12–16, Kastenform 12–15, Muffins 12).
   - Desserts → `Portion` (meist 4–8). Germknödel/Dampfnudeln → `Stk`.
   - Brot-Laib → `g` (Laibgewicht nach dem Backen, z. B. 1000); liegt im Vorrat in **Scheiben à 50 g**, „1 Scheibe gegessen“.
+  - Plätzchen, Cookies, Kleingebäck (`gebaeck`) → `Stk` (Vanillekipferl 40, Ausstechplätzchen 50, Cookies 16–20; Doppelkekse wie Spitzbuben/Baci di dama zählen als 1 Stk).
   - Brötchen, Ciabatta, Focaccia-Stücke → `Stk` (Brötchen 8–12, Ciabatta 2, Focaccia 12 Stücke).
   - `g` gibt es nur bei Brot; `ml` nur bei flüssigen Grundrezepten.
-- **shelf** (Tage, so gelagert wie `store`): Sahne-/Cremetorten und Desserts 2–3 (Kühlschrank), Hefe-/Blechkuchen ohne Creme 2–3, Rührkuchen 4–5, Brot 4–6, Brötchen/Focaccia 1–2.
+- **shelf** (Tage, so gelagert wie `store`): Sahne-/Cremetorten und Desserts 2–3 (Kühlschrank), Hefe-/Blechkuchen ohne Creme 2–3, Rührkuchen 4–5, Brot 4–6, Brötchen/Focaccia 1–2, Plätzchen 14–28 (Blechdose, gefüllte/weiche Sorten 14–21, Cookies 7–10, Cookies mit Skyr 4 im Kühlschrank).
 - **store**: kurz, beginnt mit Präposition: „im Kühlschrank“, „luftdicht bei Raumtemperatur“, „in Papier oder im Brotkasten“.
-- **frozen** (optional, Tage eingefroren): Brot/Brötchen/Hefekuchen ohne Creme 90, Rührkuchen 60. Bei Sahne/Creme/Gelatine weglassen.
+- **frozen** (optional, Tage eingefroren): Brot/Brötchen/Hefekuchen ohne Creme 90, Rührkuchen 60, Plätzchen 60–90 (besser den Teig einfrieren: in Folie bis 3 Monate, im Kühlschrank auftauen – als Hinweis im Schritt „Teig kühlen“). Bei Sahne/Creme/Gelatine weglassen.
 - **Nährwerte je Stück** werden aus den Zutaten berechnet (Summe ÷ Stückzahl). `perPiece` nur angeben, wenn das nicht passt (z. B. Frittiertes).
 - Zutatenmengen gelten für **ein Rezept** (Stepper „Rezeptmenge ×2“ verdoppelt alles).
 
@@ -62,7 +64,7 @@ Klassische Rezepte (nicht abspecken). Jedes Dessert/Kuchen/Brot hat `lighter`: *
 
 ## 4. Geräte (Werte werden von `npm run check-data` geprüft)
 
-Betriebsarten **exakt** wie in `docs/geraete/regeln.md` („Heißluft“ mit ß). Kuchen und Brot **brauchen** `deviceSteps`; Desserts ohne Hitze und Grundrezepte dürfen ohne.
+Betriebsarten **exakt** wie in `docs/geraete/regeln.md` („Heißluft“ mit ß). Kuchen, Brot und Plätzchen/Cookies **brauchen** `deviceSteps`; Desserts ohne Hitze und Grundrezepte dürfen ohne.
 
 | Was | Gerät · Betriebsart | °C | Min. | Hinweis (`note`) |
 |---|---|---|---|---|
@@ -70,10 +72,12 @@ Betriebsarten **exakt** wie in `docs/geraete/regeln.md` („Heißluft“ mit ß)
 | Brötchen, Ciabatta, Hefezopf | CombiSteamer · Heißluft mit Beschwaden | 200–220 (Zopf 170–180) | 15–25 | Kuchenblech nur über 150 °C; Alternative `Profi-Backen bemehlt/bestrichen` |
 | Teig gehen lassen | CombiSteamer · Profi-Backen Aufgehen lassen | 35 | 30–60 | Schüssel abgedeckt auf den Gitterrost; danach erst den Backofen vorheizen |
 | Rührkuchen, Blechkuchen, Biskuit, Hefekuchen | Combair · Ober-/Unterhitze (eine Ebene) oder Heißluft (zwei Ebenen) | 160–180 (Heißluft 20 °C weniger) | 20–60 | „vorheizen“, Ebene 2; Stäbchenprobe im Text |
+| Plätzchen, Cookies (zwei Bleche) | Combair · Heißluft, Ebene 1+3 (20 °C weniger als Ober-/Unterhitze) | 130–160 | 8–16 | „vorheizen“, „zwei Bleche, Ebene 1+3“; ein Blech: Ober-/Unterhitze 150–180, Ebene 2; mehr Stücke als zwei Bleche → in Runden backen |
 | Focaccia, Pizza bianca | Combair · PizzaPlus | 220–250 | 15–25 | dunkles Blech mit Öl, **ohne** Backpapier, Ebene 2, vorheizen |
 | Dampfnudeln, Germknödel | CombiSteamer · Dämpfen | 100 | 20–25 | kein Vorheizen; „Wasserbehälter füllen“; gelochter Garbehälter mit Backpapier |
 | Crème brûlée, Flan, Pudding im Glas | CombiSteamer · Dämpfen | 85–90 | 20–35 | Förmchen mit Folie abdecken |
 | Cremes, Pudding, Vanillesoße, Karamell, Wasserbad | BORA · `Kochzone` + `level` | | | Milch aufkochen `6`, Pudding `3`, Wasserbad/Schokolade `Schmelzen` oder `3` |
+| Schokolade/Kuvertüre für Plätzchen, Eiweiß-Zucker-Masse (Makronen), Butter bräunen | BORA · `Kochzone` + `Schmelzen` (Wasserbad), Eiweißmasse `3`, Butter bräunen `4` | | | note „im Wasserbad“ |
 | Kühlen, Schlagen, Schichten | – (Schritt ohne `settings`) | | | |
 
 - Ein Gebäck bleibt beim Backen in einem Ofen (nicht für die Kruste umziehen). Nur das Gehenlassen im CombiSteamer ist vor dem Backen im Combair erlaubt.

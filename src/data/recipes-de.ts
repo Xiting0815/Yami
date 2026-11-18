@@ -1075,4 +1075,96 @@ export const recipesDe = [
       'Tomaten, Brühe und Paprika zugeben und 30 Minuten bei kleiner Hitze köcheln. Bohnen und Mais zufügen und 10 Minuten mitkochen.',
       'Abschmecken und mit Schmand servieren, dazu passt Brot oder Reis.',
     ], 'chili con carne bowl'),
+
+  // ───────────── Leicht & sättigend (Abnehm-Abendessen, ca. 500–650 kcal pro Portion) ─────────────
+  r('haehnchen-paprika-pfanne', 'Hähnchen-Paprika-Pfanne mit Kartoffelspalten', 'de', 'haupt', 35,
+    '300 g Hähnchenbrustfilet | 2 Stk Paprika rot | 1 Stk Paprika gelb | 2 Stk Zwiebel | 200 g Champignons | 1 TL Paprikapulver edelsüß | 1 EL Tomatenmark | 150 ml Hühnerbrühe | 2 EL Sonnenblumenöl | 300 g Kartoffeln festkochend | 0.5 Bund Petersilie | Salz | Pfeffer',
+    [
+      'Kartoffeln mit Schale in Spalten schneiden, mit 1 EL Öl, Salz und Paprikapulver mischen und im Airfryer knusprig garen.',
+      'Hähnchen in mundgerechte Streifen schneiden, salzen und pfeffern. Paprika und Zwiebeln in Streifen, Champignons in Scheiben schneiden.',
+      'Restliches Öl in einer großen Pfanne erhitzen und das Hähnchen 5 Minuten kräftig anbraten, herausnehmen.',
+      'Zwiebeln, Paprika und Champignons im Bratfett 6 Minuten braten. Tomatenmark kurz mitrösten und mit der Brühe ablöschen.',
+      'Hähnchen zurück in die Pfanne geben, 5 Minuten köcheln lassen, abschmecken und mit Petersilie bestreut zu den Kartoffelspalten servieren.',
+    ], 'chicken bell pepper skillet'),
+
+  r('puten-champignon-geschnetzeltes', 'Putengeschnetzeltes in leichter Champignonsauce mit Reis', 'de', 'haupt', 30,
+    '300 g Putenbrust | 300 g Champignons | 1 Stk Zwiebel | 1 Zehe Knoblauch | 1 EL Weizenmehl | 200 ml Hühnerbrühe | 60 g Crème fraîche | 1 EL Sonnenblumenöl | 0.5 Bund Petersilie | 100 g Langkornreis | Salz | Pfeffer',
+    [
+      'Reis nach Packungsanweisung garen.',
+      'Putenbrust in dünne Streifen schneiden, salzen, pfeffern und mit dem Mehl bestäuben. Champignons in Scheiben, Zwiebel und Knoblauch fein würfeln.',
+      'Öl in einer großen Pfanne erhitzen und das Fleisch portionsweise 3 Minuten anbraten, herausnehmen.',
+      'Zwiebel, Knoblauch und Champignons im Bratfett 6 Minuten braten, mit der Brühe ablöschen und 5 Minuten einköcheln lassen.',
+      'Crème fraîche einrühren, das Fleisch zurück in die Sauce geben, kurz erwärmen und mit Petersilie über dem Reis servieren.',
+    ], 'turkey geschnetzeltes mushroom'),
+
+  r('senf-haehnchen-ofengemuese', 'Senf-Hähnchen mit Ofengemüse und Kartoffeln', 'de', 'haupt', 45,
+    '320 g Hähnchenbrustfilet | 2 EL Senf mittelscharf | 2 EL Joghurt natur | 2 Stk Möhre | 1 Stk Zucchini | 1 Stk Paprika rot | 1 Stk Zwiebel rot | 300 g Kartoffeln festkochend | 2 Zweig Thymian | 1 EL Sonnenblumenöl | Salz | Pfeffer',
+    [
+      'Kartoffeln, Möhren, Zucchini, Paprika und Zwiebel in mundgerechte Stücke schneiden, mit Öl, Thymian, Salz und Pfeffer mischen und auf einem Blech verteilen.',
+      'Senf mit Joghurt, Salz und Pfeffer verrühren und das Hähnchen damit rundum bestreichen.',
+      'Das Gemüse im vorgeheizten Ofen 15 Minuten garen, das Hähnchen daraufsetzen und weitere 20 Minuten garen, bis es durch ist.',
+    ], 'mustard chicken roasted vegetables'),
+
+  r('seelachs-gemuesebett', 'Seelachs auf Lauch-Möhren-Gemüsebett mit Dillkartoffeln', 'de', 'haupt', 35,
+    '320 g Seelachsfilet | 1 Stk Lauch | 2 Stk Möhre | 1 Stk Zwiebel | 300 g Kartoffeln festkochend | 100 ml Weißwein | 1 EL Senf mittelscharf | 1 EL Crème fraîche | 1 EL Butter | 0.5 Bund Dill | 1 Stk Zitrone | Salz | Pfeffer',
+    [
+      'Kartoffeln schälen, halbieren, salzen und garen. Lauch in Ringe, Möhren in dünne Scheiben, Zwiebel in feine Würfel schneiden.',
+      'Butter in einer weiten Pfanne erhitzen, Zwiebel, Lauch und Möhren 5 Minuten dünsten. Mit Weißwein ablöschen, Senf einrühren und salzen.',
+      'Seelachs mit Zitronensaft, Salz und Pfeffer würzen, auf das Gemüse legen und zugedeckt 10 Minuten sanft garen.',
+      'Crème fraîche unter das Gemüse rühren. Kartoffeln mit Dill mischen und zum Fisch servieren.',
+    ], 'steamed fish leek carrots potatoes dill'),
+
+  r('zander-gurkengemuese', 'Zanderfilet mit Gurkengemüse und Dillkartoffeln', 'de', 'haupt', 35,
+    '320 g Zanderfilet | 1 Stk Salatgurke | 1 Stk Zwiebel | 300 g Kartoffeln festkochend | 100 ml Gemüsebrühe | 50 g Crème fraîche | 1 EL Weizenmehl | 1 EL Butter | 0.5 Bund Dill | 1 Stk Zitrone | Salz | Pfeffer',
+    [
+      'Kartoffeln schälen, halbieren und in Salzwasser garen. Gurke schälen, entkernen und in Stücke schneiden, Zwiebel fein würfeln.',
+      'Die Hälfte der Butter erhitzen, Zwiebel und Gurke 3 Minuten dünsten, mit Mehl bestäuben, mit Brühe aufgießen und 5 Minuten köcheln. Crème fraîche und die Hälfte des Dills einrühren, salzen und pfeffern.',
+      'Den Zander salzen, pfeffern, mit Zitronensaft beträufeln und in der restlichen Butter 3 bis 4 Minuten je Seite braten.',
+      'Kartoffeln mit dem restlichen Dill mischen und alles zusammen anrichten.',
+    ], 'pikeperch cucumber vegetables dill potatoes'),
+
+  r('schweinefilet-bohnen', 'Schweinefilet-Medaillons mit grünen Bohnen und Kartoffeln', 'de', 'haupt', 35,
+    '350 g Schweinefilet | 2 Scheibe Bacon | 300 g Grüne Bohnen | 300 g Kartoffeln festkochend | 1 Stk Zwiebel | 100 ml Rinderbrühe | 1 TL Senf mittelscharf | 0.5 Bund Bohnenkraut | 1 EL Sonnenblumenöl | 1 EL Butter | Salz | Pfeffer',
+    [
+      'Kartoffeln schälen, halbieren, salzen und garen. Bohnen putzen und die letzten 10 Minuten mitgaren.',
+      'Schweinefilet in 2 cm dicke Medaillons schneiden, leicht flach drücken, salzen und pfeffern.',
+      'Bacon in Streifen im heißen Öl auslassen, herausnehmen. Medaillons im Speckfett 3 Minuten je Seite braten und herausnehmen.',
+      'Zwiebel im Bratfett anschwitzen, mit Brühe ablöschen, Senf einrühren und kurz einköcheln lassen.',
+      'Bohnen mit Butter, Bohnenkraut und Bacon schwenken und mit den Medaillons, Sauce und Kartoffeln servieren.',
+    ], 'pork tenderloin medallions green beans'),
+
+  // ───────────── Brotzeit / Abendbrot (kalte, leichte Abendessen) ─────────────
+  r('brotzeitbrett', 'Brotzeitbrett mit Aufschnitt, Obazda und Radieschen', 'de', 'brotzeit', 15,
+    '5 Scheibe Vollkornbrot | 80 g Katenschinken | 100 g Kochschinken | 100 g Camembert | 40 g Frischkäse | 1 Stk Zwiebel | 1 TL Paprikapulver edelsüß | 2 EL Bier hell | 1 Bund Radieschen | 0.5 Stk Salatgurke | 1 Stk Tomate | 0.5 Bund Schnittlauch | Salz | Pfeffer',
+    [
+      'Camembert mit einer Gabel zerdrücken, mit Frischkäse, Paprikapulver, Bier, fein gewürfelter Zwiebel, Salz und Pfeffer zu Obazda verkneten und mit Schnittlauch bestreuen.',
+      'Radieschen putzen, Gurke in Scheiben, Tomate in Spalten schneiden.',
+      'Brot, Schinken, Obazda und das Gemüse auf einem Brett anrichten.',
+    ], 'Brotzeit Obazda Radieschen board'),
+
+  r('strammer-max', 'Strammer Max mit Salat', 'de', 'brotzeit', 15,
+    '4 Scheibe Vollkornbrot | 120 g Katenschinken | 4 Stk Ei | 1 EL Butter | 2 Stk Gewürzgurke | 0.5 Stk Kopfsalat | 1 Stk Tomate | 0.5 Stk Salatgurke | 1 EL Weißweinessig | 1 EL Sonnenblumenöl | 1 TL Senf mittelscharf | 0.5 Bund Schnittlauch | Salz | Pfeffer',
+    [
+      'Senf mit Essig, Öl, Salz und Pfeffer verrühren. Salat, Tomate und Gurke klein schneiden und mit der Vinaigrette mischen.',
+      'Brot mit Schinken belegen.',
+      'Butter in einer Pfanne erhitzen und die Eier als Spiegeleier braten, salzen und pfeffern.',
+      'Je zwei Spiegeleier auf das Brot legen, mit Schnittlauch bestreuen und mit Gewürzgurken und Salat servieren.',
+    ], 'Strammer Max ham fried egg bread'),
+
+  r('bauernsalat-speck', 'Deftiger Bauernsalat mit Speck, Ei und Vollkornbrot', 'de', 'brotzeit', 20,
+    '60 g Speckwürfel | 3 Stk Tomate | 1 Stk Salatgurke | 1 Stk Paprika rot | 1 Stk Zwiebel rot | 2 Stk Ei | 4 Scheibe Vollkornbrot | 2 EL Rotweinessig | 2 EL Sonnenblumenöl | 1 TL Senf mittelscharf | 0.5 Bund Schnittlauch | Salz | Pfeffer',
+    [
+      'Eier hart kochen, abschrecken und pellen.',
+      'Speckwürfel ohne Fett knusprig auslassen und auf Küchenpapier abtropfen lassen.',
+      'Tomaten, Gurke, Paprika in Stücke, Zwiebel in feine Ringe schneiden. Essig, Öl, Senf, Salz und Pfeffer verrühren und mit dem Gemüse mischen.',
+      'Eier vierteln, mit Speck und Schnittlauch auf den Salat geben und mit dem Vollkornbrot servieren.',
+    ], 'farmer salad bacon egg bread'),
+
+  r('wurstsalat-schweizer-art', 'Schweizer Wurstsalat mit Emmentaler und Brötchen', 'de', 'brotzeit', 20,
+    '200 g Fleischwurst | 3 Scheibe Emmentaler | 2 Stk Gewürzgurke | 1 Stk Zwiebel | 0.5 Bund Radieschen | 2 EL Weißweinessig | 2 EL Sonnenblumenöl | 1 TL Senf mittelscharf | 0.5 Bund Schnittlauch | 2 Stk Brötchen vom Vortag | Salz | Pfeffer',
+    [
+      'Fleischwurst pellen und in dünne Streifen schneiden, Emmentaler in Streifen, Gewürzgurken und Radieschen in Scheiben, Zwiebel in feine Ringe schneiden.',
+      'Essig, Öl, Senf, 3 EL Wasser, Salz und Pfeffer verrühren, mit allem mischen und 15 Minuten durchziehen lassen.',
+      'Mit Schnittlauch bestreuen und mit den Brötchen servieren.',
+    ], 'Swiss sausage salad Wurstsalat'),
 ]

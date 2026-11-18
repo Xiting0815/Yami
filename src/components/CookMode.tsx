@@ -29,7 +29,7 @@ function keepText(recipe: Recipe): string {
 
 /** Beschriftung des Fertig-Knopfs: Kuchen/Brot „Fertig gebacken“, Dessert „Fertig“, sonst „Fertig gekocht“ */
 function finishLabel(recipe: Recipe): string {
-  if (recipe.kind === 'kuchen' || recipe.kind === 'brot') return 'Fertig gebacken ✓'
+  if (recipe.kind === 'kuchen' || recipe.kind === 'brot' || recipe.kind === 'gebaeck') return 'Fertig gebacken ✓'
   if (recipe.kind === 'dessert') return 'Fertig ✓'
   return 'Fertig gekocht ✓'
 }
