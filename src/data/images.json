@@ -1474,9 +1474,21 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pichelsteiner_Eintopf.jpg"
  },
+ "pinsa-romana": {
+  "author": "Gemini",
+  "file": "img/pinsa-romana.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pittule-salentine": {
   "author": "Gemini",
   "file": "img/pittule-salentine.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pizza-bianca-mortadella": {
+  "author": "Gemini",
+  "file": "img/pizza-bianca-mortadella.webp",
   "license": "KI",
   "source": ""
  },
@@ -1493,6 +1505,18 @@
   "file": "img/pizza-margherita.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Margherita_Originale.JPG"
+ },
+ "pizza-napoletana": {
+  "author": "Gemini",
+  "file": "img/pizza-napoletana.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pizza-teglia-romana": {
+  "author": "Gemini",
+  "file": "img/pizza-teglia-romana.webp",
+  "license": "KI",
+  "source": ""
  },
  "pizzaiola": {
   "author": "Aaron045",
