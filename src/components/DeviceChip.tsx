@@ -5,7 +5,7 @@ import { Icon } from './Icon'
 /** Geräte-Einstellung als kompakter Chip mit Geräte-Symbol */
 export function DeviceChip({ s }: { s: DeviceSetting }) {
   return (
-    <span className={`dev-chip dev-${s.device}`}>
+    <span className={`dev-chip dev-${s.device}${s.alt ? ' dev-alt' : ''}`}>
       <Icon name={s.device} size={16} />
       <span>
         {settingText(s)}

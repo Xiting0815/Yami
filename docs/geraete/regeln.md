@@ -10,7 +10,7 @@ Ziel: `src/data/device-steps/<gruppe>.ts` (de, it, as, gr = Abendessen, bf = Fr�
 { text: 'Satz im Stil des Rezepts.', settings: [{ device, mode, temp?, level?, minutes?, humidity?, core?, note? }] }
 ```
 
-- `device`: `steamer` (CombiSteamer), `combair`, `bora`, `airfryer`. `mode` immer deutsch **wie in der Anleitung** (Schreibweise „Heißluft“ mit ß): CombiSteamer: Dämpfen, Heißluft, Heißluft feucht, Heißluft mit Beschwaden, Regenerieren, Vacuisine; Combair: Heißluft, Ober-/Unterhitze, Heißluft feucht, PizzaPlus, Grill, Grill-Umluft (vollständige Liste unten bei „Erlaubte Betriebsarten“); BORA: `Kochzone` + `level` (`'1'`–`'9'`, `'Power'`, `'Schmelzen'`, `'Warmhalten'`, `'Simmern'`); Airfryer: `Heissluft` + `temp`.
+- `device`: `steamer` (CombiSteamer), `combair`, `bora`, `airfryer`, `kneter` (Famag, Spiralkneter – `famag.md`), `pizzaofen` (Witt Rotante – `witt.md`). `mode` immer deutsch **wie in der Anleitung** (Schreibweise „Heißluft“ mit ß): CombiSteamer: Dämpfen, Heißluft, Heißluft feucht, Heißluft mit Beschwaden, Regenerieren, Vacuisine; Combair: Heißluft, Ober-/Unterhitze, Heißluft feucht, PizzaPlus, Grill, Grill-Umluft (vollständige Liste unten bei „Erlaubte Betriebsarten“); BORA: `Kochzone` + `level` (`'1'`–`'9'`, `'Power'`, `'Schmelzen'`, `'Warmhalten'`, `'Simmern'`); Airfryer: `Heissluft` + `temp`.
 - `minutes` nur setzen, wenn die Dauer am Gerät eingestellt wird oder man sie abwartet. `core` (40–95 °C) nur mit Kerntemperaturfühler. `note` kurz („vorheizen“, „Ebene 2“, „aufkochen“).
 - Mehrere Einstellungen pro Schritt sind erlaubt (z. B. Power zum Aufkochen, dann Stufe 6).
 - Wertebereiche (werden von `npm run check-data` über `validateSetting` geprüft, Quelle Anleitungen): CombiSteamer Dämpfen 30–100 °C, Heißluft/Heißluft feucht/eco 30–230, Heißluft mit Beschwaden 80–230, Regenerieren 80–200, Vacuisine 30–95, Dörren 40–85. Combair Heißluft/Ober-/Unterhitze/PizzaPlus/Grill-Umluft 30–280, die „feucht“- und eco-Varianten 30–250. **Ohne Temperaturwert:** Warmhalten (5–90 Min.), Tellerwärmen, Zartgaren, Grill und Unterhitze (4 Stufen, als `note: 'Stufe 3 (stark)'`). Airfryer 80–200 °C; Minuten 1–600; Kern 40–95 °C, **nur bei Garraumtemperatur ≤ 230 °C**; bei Vacuisine ist Kern nicht einstellbar; keine `humidity` bei V-ZUG.
@@ -31,7 +31,9 @@ Ziel: `src/data/device-steps/<gruppe>.ts` (de, it, as, gr = Abendessen, bf = Fr�
 - Reste und Meal-Prep aufwärmen, ohne auszutrocknen: **CombiSteamer, Regenerieren**.
 - Braten mit Kruste (Schwein, Ente, Gans): CombiSteamer Heißluft mit Beschwaden (saftig), letzte Phase trocken im selben Gerät (Heißluft 210–230 °C, Fühler nur bis 230 °C).
 - Niedertemperatur (Rind, Kalb): CombiSteamer **Zartgaren** (Fühler, Zielwerte aus `vzug.md` 4.3) oder bei vakuumierten Stücken **Vacuisine** (30–95 °C); danach Combair Grill kurz. Den Namen „Lebensmittel vorbereiten“ gibt es nicht.
-- Pizza, Flammkuchen, Brötchen, Gratin, Lasagne, Aufläufe: **Combair**.
+- Pizza (auch Pinsa, Pizza Bianca, Calzone): **Witt Rotante**, darunter als Ausweichweg „oder Combair · PizzaPlus“ (siehe Abschnitt 8). Pizza in Teglia (Blech) passt nicht auf den runden Stein → Combair.
+- Flammkuchen, Brötchen, Gratin, Lasagne, Aufläufe: **Combair**.
+- Hefe- und Brotteige kneten: **Famag** (siehe Abschnitt 8).
 - Schnitzel, Panieres: BORA-Pfanne oder Airfryer. Frittiertes, Pommes, Ofengemüse knusprig: **Airfryer**. Alles, was Wasser verlieren soll, nicht dämpfen.
 - Nudeln: **bleiben auf dem BORA** (Powerstufe zum Aufkochen, dann Stufe 7). Anbraten, Soßen, Suppen, Wok: BORA.
 
@@ -102,3 +104,23 @@ Automatik „A“ an lassen, der Lüfter folgt dem Kochfeld. Beim scharfen Anbra
 - BORA X Pure: Pfannen/Töpfe frei auf der Fläche platzieren; für große Bräter/Pfannen die Brückenfunktion erwähnen (note: 'Brücke'). Abzug: Automatik „A“ – nur bei sehr starkem Anbraten note: 'Abzug Power'.
 - Nicht jedes Gericht braucht einen Ofen: Pfannen-, Wok- und Nudelgerichte bleiben auf dem BORA. Den CombiSteamer nur nehmen, wo er klar besser ist (Dämpfen, Braten saftig, Aufläufe, Regenerieren, Klöße/Kartoffeln/Reis/Gemüse ohne Topf).
 - Meal-Prep-Frühstück: Zubereitung zu Hause mit den Geräten; das Aufwärmen auf der Arbeit bleibt Mikrowelle (dort steht kein V-ZUG).
+
+## 8. Famag (Spiralkneter) und Witt Rotante (Pizzaofen)
+
+Gerätedaten und Unsicherheiten: `famag.md`, `witt.md`. Bausteine: `src/data/device-helpers.ts` (`famag()`, `mitFamag()`, `wittVorheizen()`, `wittBacken()`).
+
+**Famag – wann:** Pizza, Pinsa, Focaccia, Brot, Brötchen, Grissini, Hefeteige auch für Kuchen (Butterkuchen, Datschi, Bienenstich, Hefezopf), Brioche, Pittule, Dampfnudeln, Germknödel.
+**Famag – nicht:** Mürbeteig, Plätzchen, Rührteig, Cookies, Biskuit, Nudelteig (zu fest, nicht belegt), Spätzle (Rührteig), Kartoffelteig (Gnocchi, Klöße).
+
+- Format: `{ device: 'kneter', mode: 'Kneten' | 'Mischen' | 'Kneten langsam' | 'Kneten schnell', minutes: 1–30, level?: '1'–'10', note? }`. Chip: „Famag · Kneten 8 Min.“. Eine Stufe nur, wenn das Modell sie hat (die Rezepte nennen bisher nur die Dauer).
+- Der Text nennt den Famag und dieselbe Dauer wie die Einstellung („… im Famag 8 Minuten zu einem glatten Teig kneten“). Zwei Phasen (Mischen, dann Kneten) = zwei Einstellungen.
+- Richtwerte: Pizza 2 Min. mischen + 10 Min. kneten (Salz nach dem Mischen), sehr weiche Teige (Teglia, Pinsa, Ciabatta) Wasser schluckweise in den letzten Minuten, Weizenbrot/Brötchen 8–10, Roggen 6–8 langsam, Dinkel 6 langsam, Kuchen-Hefeteig 7, Hefezopf/Dampfnudeln/Germknödel 8–10, Brioche 5 + 7 (Butter nach und nach).
+- **Mindestmenge 0,3 kg Teig** (Händlerangabe, unsicher). Liegt ein Teig darunter: im Text „für kleine Mengen von Hand kneten“ oder doppelte Menge kneten und die Hälfte als Teigkugel einfrieren. Lange kalte Gare: kaltes Wasser.
+
+**Witt Rotante – nur Pizza.** Vorheizen 25 Min. (`mode: 'Vorheizen'`, `temp` = Ziel-Steintemperatur, `minutes: 25`), backen auf dem drehenden Stein (`mode: 'Pizzastein'`, `temp` 250–500, `seconds` 30–600). Neapolitana 430–450 °C · 60–90 Sek., Pizza Bianca ca. 420 °C, Pinsa und Calzone ca. 380 °C mit kleiner Flamme · 2–3 Min.
+- **Ausweichweg:** Direkt nach jeder Witt-Einstellung folgt im selben Schritt die Combair-Einstellung mit `alt: true` (PizzaPlus 280 °C, Calzone 250 °C, Minuten je Pizza). Sie wird gedämpft als „oder Combair · …“ angezeigt. Das ist die einzige erlaubte Ausnahme von „ein Gericht bleibt in einem Gerät“; `check-data` prüft, dass vor einer `alt`-Einstellung eine Haupteinstellung steht.
+- Der Text nennt beides kurz: „Den Witt Rotante 25 Minuten vorheizen, bis der Stein etwa 450 °C hat … Bei Regen oder im Winter stattdessen den Combair … auf 280 °C PizzaPlus vorheizen.“
+
+## 9. Text und Einstellung müssen zusammenpassen
+
+`npx vite-node scripts/check-device-text.ts` (läuft auch in `npm run check-data` als Fehler) meldet Schritte, deren Text etwas anderes sagt als die Einstellung: Temperaturen (Text „180 °C“, Einstellung 160 °C), Betriebsarten (Text „Ober-/Unterhitze“, Einstellung Heißluft), allgemeines „Ofen“/„Backofen“ statt Gerätename, Gerätenamen ohne passende Einstellung, Minuten bzw. Sekunden, die nicht zur eingestellten Dauer passen, und „in zwei Runden“ backen, obwohl zwei Bleche gleichzeitig (Ebene 1+3) eingestellt sind. Bei den Back-Gruppen schreibt `fitText()` den klassischen Satz „Den Ofen auf 180 °C Ober-/Unterhitze vorheizen“ automatisch auf die Einstellung um (z. B. „Den Combair auf 160 °C Heißluft vorheizen (2 Bleche: Ebene 1 + 3)“).

@@ -3,6 +3,7 @@ import { backen, prod } from '../define'
 import type { DeviceStep } from '../../types'
 import type { RawRecipe } from '../define'
 import type { ExtraGroup } from './types'
+import { famag, mitFamag } from '../device-helpers'
 
 const recipes: RawRecipe[] = [
     backen('kuchen', 'bienenstich', 'Bienenstich',
@@ -170,13 +171,29 @@ const recipes: RawRecipe[] = [
 type Settings = NonNullable<DeviceStep['settings']>
 const withDevices = (id: string, settings: Record<number, Settings>, texts: Record<number, string> = {}): DeviceStep[] =>
   recipes.find((r) => r.id === id)!.steps.map((t, i) => {
-    const text = texts[i] ?? t
+    const text = texts[i] ?? fitText(t, settings[i])
     return settings[i] ? { text, settings: settings[i] } : { text }
   })
 
 const lauwarm: Settings = [{ device: 'bora', mode: 'Kochzone', level: '2', note: 'nur lauwarm' }]
+/** Hefeteig mit Butter und Ei: Milch lauwarm, dann im Famag kneten (Spiralkneter, docs/geraete/famag.md) */
+const lauwarmKneten = (minutes: number): Settings => [...lauwarm, famag(minutes)]
 const gehen: Settings = [{ device: 'steamer', mode: 'Profi-Backen Aufgehen lassen', temp: 35, minutes: 45, note: 'Schüssel auf den Gitterrost' }]
 const gehenText = 'Den Teig in der Schüssel abdecken und im CombiSteamer 45 Minuten gehen lassen, bis er sich etwa verdoppelt hat.'
+/**
+ * Klassischer Text → Text für die Geräte: „Den Ofen auf 180 °C Ober-/Unterhitze vorheizen“ wird zur Einstellung des Schritts
+ * (z. B. „Den Combair auf 160 °C Heißluft vorheizen (2 Bleche: Ebene 1 + 3)“); scripts/check-device-text.ts prüft das Ergebnis.
+ */
+function fitText(text: string, s?: Settings): string {
+  const knead = s?.find((x) => x.device === 'kneter' && x.minutes != null)
+  if (knead) text = mitFamag(text, knead.minutes!)
+  const ov = s?.find((x) => x.device === 'combair' && x.temp != null)
+  if (!ov) return text
+  const twoTrays = ov.mode === 'Heißluft'
+  let out = text.replace(/([Dd]en) (?:Back)?[Oo]fen auf \d+ °C Ober-\/Unterhitze vorheizen/, `$1 Combair auf ${ov.temp} °C ${ov.mode} vorheizen${twoTrays ? ' (2 Bleche: Ebene 1 + 3)' : ''}`)
+  return out
+}
+
 const ouVorheizen = (temp: number): Settings => [{ device: 'combair', mode: 'Ober-/Unterhitze', temp, note: 'vorheizen' }]
 const ouBacken = (temp: number, minutes: number): Settings => [{ device: 'combair', mode: 'Ober-/Unterhitze', temp, minutes, note: 'Ebene 2, Stäbchenprobe' }]
 const schmelzen: Settings = [{ device: 'bora', mode: 'Kochzone', level: 'Schmelzen', note: 'Butter schmelzen' }]
@@ -210,8 +227,8 @@ export const kuchen: ExtraGroup = {
   deviceSteps: {
     bienenstich: [
       {
-        text: 'Für den Hefeteig 175 ml von der Milch lauwarm erwärmen und die Hefe frisch mit 1 TL vom Zucker darin auflösen. Mit dem Weizenmehl, 50 g Zucker, 60 g weicher Butter, dem Ei und der Prise Salz 5 Minuten zu einem glatten Teig kneten.',
-        settings: [{ device: 'bora', mode: 'Kochzone', level: '2', note: 'nur lauwarm' }],
+        text: 'Für den Hefeteig 175 ml von der Milch lauwarm erwärmen und die Hefe frisch mit 1 TL vom Zucker darin auflösen. Mit dem Weizenmehl, 50 g Zucker, 60 g weicher Butter, dem Ei und der Prise Salz im Famag 7 Minuten zu einem glatten Teig kneten.',
+        settings: lauwarmKneten(7),
       },
       {
         text: 'Den Teig in der Schüssel abdecken und im CombiSteamer 45 Minuten gehen lassen, bis er sich etwa verdoppelt hat.',
@@ -242,13 +259,15 @@ export const kuchen: ExtraGroup = {
       { text: 'Den Kuchen waagerecht halbieren und den Mandeldeckel in 12 Stücke schneiden. 200 ml Sahne steif schlagen, den kalten Pudding glatt rühren und die Sahne unterheben.' },
       { text: 'Die Creme auf den Boden streichen, die Mandelstücke darauflegen und den Bienenstich mindestens 1 Stunde kühlen.' },
     ],
-    butterkuchen: withDevices('butterkuchen', { 0: lauwarm, 1: gehen, 2: ouVorheizen(180), 4: ouBacken(180, 22) }, { 1: gehenText }),
-    zwetschgendatschi: withDevices('zwetschgendatschi', { 0: lauwarm, 1: gehen, 3: ouVorheizen(180), 4: ouBacken(180, 32) }, { 1: gehenText }),
-    'streuselkuchen-apfel': withDevices('streuselkuchen-apfel', { 0: lauwarm, 1: gehen, 4: ouVorheizen(180), 5: ouBacken(180, 32) }, { 1: gehenText }),
+    butterkuchen: withDevices('butterkuchen', { 0: lauwarmKneten(7), 1: gehen, 2: ouVorheizen(180), 4: ouBacken(180, 22) }, { 1: gehenText }),
+    zwetschgendatschi: withDevices('zwetschgendatschi', { 0: lauwarmKneten(7), 1: gehen, 3: ouVorheizen(180), 4: ouBacken(180, 32) }, { 1: gehenText }),
+    'streuselkuchen-apfel': withDevices('streuselkuchen-apfel', { 0: lauwarmKneten(7), 1: gehen, 4: ouVorheizen(180), 5: ouBacken(180, 32) }, { 1: gehenText }),
     marmorkuchen: withDevices('marmorkuchen', { 0: ouVorheizen(175), 4: ouBacken(175, 58) }),
-    'kaesekuchen-ohne-boden': withDevices('kaesekuchen-ohne-boden', { 0: [...schmelzen, ...ouVorheizen(170)], 3: ouBacken(170, 60) }),
+    'kaesekuchen-ohne-boden': withDevices('kaesekuchen-ohne-boden', { 0: [...schmelzen, ...ouVorheizen(170)], 3: ouBacken(170, 60) }, {
+      3: 'Den Käsekuchen 60 Minuten backen, bis die Oberfläche goldgelb ist und die Mitte noch leicht wackelt. Den Combair ausschalten und den Kuchen bei leicht geöffneter Tür 15 Minuten darin ruhen lassen.',
+    }),
     hefezopf: withDevices('hefezopf', {
-      0: lauwarm,
+      0: lauwarmKneten(10),
       1: gehen,
       3: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 170, note: 'vorheizen, Wasserbehälter füllen' }],
       5: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 170, minutes: 32, note: 'Kuchenblech Ebene 2, Tür zu' }],

@@ -6,6 +6,8 @@ export const DEVICE_NAME: Record<Device, string> = {
   combair: 'Combair',
   bora: 'BORA',
   airfryer: 'Airfryer',
+  kneter: 'Famag',
+  pizzaofen: 'Witt Rotante',
 }
 
 /**
@@ -61,7 +63,13 @@ export const DEVICE_MODES: Record<Device, string[]> = {
   combair: Object.keys(COMBAIR_SPECS),
   bora: ['Kochzone'],
   airfryer: ['Heissluft'],
+  // Famag Grilletta IM5 (Spiralkneter, docs/geraete/famag.md): Dauer 1–30 Min., optional Stufe 1–10 (nur Modelle mit Drehregler)
+  kneter: ['Kneten', 'Mischen', 'Kneten langsam', 'Kneten schnell'],
+  // Witt Rotante (Gas-Pizzaofen mit Drehstein, docs/geraete/witt.md): Steintemperatur 250–500 °C
+  pizzaofen: ['Pizzastein', 'Vorheizen'],
 }
+
+export const KNETER_LEVELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 /** frühere Schreibweisen (Schweizer ss, „Grill mit Umluft“) werden beim Prüfen akzeptiert */
 export function normalizeMode(device: Device, mode: string): string {
@@ -78,9 +86,28 @@ function boraLevel(level: string): string {
   return level
 }
 
-/** Kompakter Text, z. B. „CombiSteamer · Dämpfen 100 °C · 25 Min.“ */
+/** Kompakter Text, z. B. „CombiSteamer · Dämpfen 100 °C · 25 Min.“; Ausweichweg mit „oder …“ */
 export function settingText(s: DeviceSetting): string {
+  const text = mainText(s)
+  return s.alt ? `oder ${text}` : text
+}
+
+function mainText(s: DeviceSetting): string {
   const parts: string[] = []
+  if (s.device === 'kneter') {
+    // „Famag · Kneten 8 Min.“ bzw. „Famag · Stufe 3 · 6 Min.“
+    if (s.level) parts.push(`Stufe ${s.level}`, ...(s.minutes != null ? [`${s.minutes} Min.`] : []))
+    else parts.push(s.minutes != null ? `${s.mode} ${s.minutes} Min.` : s.mode)
+    return `${DEVICE_NAME[s.device]} · ${parts.join(' · ')}`
+  }
+  if (s.device === 'pizzaofen') {
+    // „Witt Rotante · Stein 430 °C · 90 Sek.“
+    const label = s.mode === 'Pizzastein' ? 'Stein' : s.mode
+    parts.push(s.temp != null ? `${label} ${s.temp} °C` : label)
+    if (s.minutes != null) parts.push(`${s.minutes} Min.`)
+    if (s.seconds != null) parts.push(`${s.seconds} Sek.`)
+    return `${DEVICE_NAME[s.device]} · ${parts.join(' · ')}`
+  }
   if (s.device === 'bora') {
     parts.push(s.level ? boraLevel(s.level) : s.mode)
   } else if (s.device === 'airfryer') {
@@ -122,6 +149,17 @@ export function validateSetting(s: DeviceSetting): string[] {
     if (s.temp == null || !inRange(s.temp, 80, 200)) err.push(`Airfryer ${s.temp} °C außerhalb 80–200`)
   } else if (s.device === 'bora') {
     if (!s.level || !BORA_LEVELS.includes(s.level)) err.push(`BORA-Stufe "${s.level}" ungültig`)
+  } else if (s.device === 'kneter') {
+    if (s.temp != null) err.push('Famag: keine Temperatur')
+    if (s.minutes != null && !inRange(s.minutes, 1, 30)) err.push(`Famag: Minuten ${s.minutes} außerhalb 1–30`)
+    if (s.level != null && !KNETER_LEVELS.includes(s.level)) err.push(`Famag-Stufe "${s.level}" ungültig (1–10)`)
+    if (s.core != null || s.seconds != null) err.push('Famag: nur Dauer und Stufe einstellbar')
+  } else if (s.device === 'pizzaofen') {
+    if (s.temp == null || !inRange(s.temp, 250, 500)) err.push(`Witt Rotante: Steintemperatur ${s.temp} °C außerhalb 250–500`)
+    if (s.minutes != null && !inRange(s.minutes, 1, 60)) err.push(`Witt Rotante: Minuten ${s.minutes} außerhalb 1–60`)
+    if (s.seconds != null && !inRange(s.seconds, 30, 600)) err.push(`Witt Rotante: Sekunden ${s.seconds} außerhalb 30–600`)
+    if (s.core != null || s.level != null) err.push('Witt Rotante: keine Kerntemperatur/Stufe')
   }
+  if (s.seconds != null && s.device !== 'pizzaofen') err.push(`${name}: Sekunden nur beim Pizzaofen`)
   return err
 }

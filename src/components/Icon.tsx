@@ -25,6 +25,8 @@ const PATHS = {
   combair: <><rect x="3.5" y="4" width="17" height="16" rx="2.5" /><path d="M3.5 8.5h17M7 6.3h.1M10 6.3h.1M7 12.5h10v5H7z" /></>,
   bora: <><rect x="3.5" y="6" width="17" height="12" rx="2.5" /><circle cx="8.5" cy="12" r="2.2" /><circle cx="15.5" cy="12" r="2.2" /><path d="M12 9.5v5" /></>,
   airfryer: <><path d="M6 4.5h12l1.5 9h-15zM4.5 13.5h15v4a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2zM9 8.5h6" /></>,
+  kneter: <><path d="M5 11h14l-1.4 7.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 11zM12 3v4M12 7c2.2 0 2.6 2.4.8 3.2-1.6.7-1.2 2.8.6 2.8" /><path d="M8 3h8" /></>,
+  pizzaofen: <><path d="M3 18.5h18M4.5 18.5a7.5 7.5 0 0 1 15 0M9 18.5a3 3 0 0 1 6 0" /><path d="M12 8.5V6.5M10.5 5.5c0-1.2 1.5-1.4 1.5-2.5.9.6 1.5 1.4 1.5 2.5" /></>,
   trend: <path d="M4 16.5l5-5 4 4 7-7M15 8.5h5v5" />,
 } as const
 

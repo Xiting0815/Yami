@@ -38,3 +38,7 @@
 | skyr-haferflocken-cookies | Helle, weiche und dicke Haferflocken-Cookies mit Rosinen und kleinen Schokostückchen, ein Cookie durchgebrochen, auf einem hellen Teller, daneben eine Schale Skyr |
 | baci-di-dama | Kleine Doppelkekse aus Haselnuss-Mürbeteig, zusammengehalten von dunkler Schokolade, die in der Mitte herausschaut, aufgereiht auf einem Teller, daneben ein paar Haselnüsse |
 | biscotti-al-limone | Ovale, hellgelbe Zitronenkekse mit weißer Zitronenglasur und feiner Zitronenschale darauf, auf einem Teller neben halbierten Zitronen und Zitronenblättern, sizilianische Atmosphäre |
+| pizza-napoletana | Neapolitanische Pizza Margherita mit luftigem, aufgegangenem Rand mit dunklen Leopardenflecken, zerdrückten Tomaten, zerlaufenen Mozzarella-Stücken, frischen Basilikumblättern und einem Faden Olivenöl auf einem Holzbrett |
+| pizza-teglia-romana | Rechteckige Stücke römische Blechpizza (Pizza in Teglia) mit knusprigem, luftigem Boden, belegt mit hauchdünnen goldbraunen Kartoffelscheiben, Rosmarin, Salsiccia-Stücken und zerlaufenem Mozzarella auf einem dunklen Blech |
+| pinsa-romana | Ovale Pinsa Romana mit knusprigem, großporigem Rand, Tomatensauce und Mozzarella, belegt mit Parmaschinken und frischem Rucola, auf einem Holzbrett |
+| pizza-bianca-mortadella | Goldbraune Pizza Bianca mit Rosmarin und grobem Salz, belegt mit hauchdünn gefalteter Mortadella, zerzupfter cremiger Burrata und gehackten grünen Pistazien, mit Olivenöl beträufelt |

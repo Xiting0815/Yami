@@ -382,6 +382,51 @@ export const recipesIt = [
       '7 bis 9 Minuten backen und mit Olivenöl beträufeln.',
     ], 'Pizza diavola'),
 
+  // Pizza mit langer Teigführung: Teig im Famag (Spiralkneter), gebacken im Witt Rotante (Ausweichweg Combair PizzaPlus)
+  r('pizza-napoletana', 'Pizza Napoletana Margherita mit 24–48 h kalter Gare', 'it', 'haupt', 1740,
+    '330 g Weizenmehl Tipo 00 | 1 g Hefe frisch | 0.5 Dose Geschälte Tomaten | 160 g Mozzarella | 1 Bund Basilikum | 2 EL Olivenöl | 20 g Parmigiano Reggiano | Salz',
+    [
+      'Am Vortag starten: Mehl, 215 ml kaltes Wasser und die Hefe 2 Minuten mischen, 9 g Salz zugeben und 10–12 Minuten zu einem glatten, elastischen Teig kneten. Abgedeckt 2 Stunden bei Raumtemperatur ruhen lassen.',
+      'Den Teig in 2 Kugeln (je ca. 275 g) teilen, straff rund formen und in geölten Dosen 24–48 Stunden im Kühlschrank reifen lassen.',
+      'Die Teigkugeln 3–4 Stunden vor dem Backen aus dem Kühlschrank nehmen und abgedeckt bei Raumtemperatur akklimatisieren lassen.',
+      'Den Backofen mit Pizzastein mindestens 45 Minuten auf höchster Stufe vorheizen. Die Geschälten Tomaten mit den Händen zerdrücken und leicht salzen.',
+      'Die Kugeln auf einer bemehlten Fläche von der Mitte nach außen flach drücken, den Rand (Cornicione) nicht plattdrücken. Mit den Tomaten bestreichen und mit dem Mozzarella in Stücken, etwas Parmigiano Reggiano und Basilikum belegen.',
+      'Die Pizzen nacheinander auf dem heißen Stein 6–8 Minuten backen, mit Olivenöl beträufeln und sofort servieren.',
+    ], 'Pizza Napoletana Margherita'),
+
+  r('pizza-teglia-romana', 'Pizza in Teglia alla Romana mit Kartoffeln, Rosmarin und Salsiccia', 'it', 'haupt', 1380,
+    '250 g Weizenmehl Tipo 00 | 2 g Hefe frisch | 3 EL Olivenöl | 250 g Kartoffeln festkochend | 1 Stk Salsiccia | 100 g Mozzarella | 2 Zweig Rosmarin | Salz | Pfeffer',
+    [
+      'Am Vortag starten: Mehl, Hefe und 160 ml kaltes Wasser 5 Minuten kneten. 6 g Salz zugeben, dann die restlichen 40 ml Wasser und 1 EL vom Olivenöl schluckweise einarbeiten und weitere 6–8 Minuten kneten, bis der sehr weiche Teig glänzt.',
+      'Den Teig in einer geölten Dose 1 Stunde bei Raumtemperatur ruhen lassen, dabei einmal dehnen und falten. Dann über Nacht 18–24 Stunden im Kühlschrank reifen lassen.',
+      'Den Teig 3 Stunden vor dem Backen aus dem Kühlschrank nehmen. Ein dunkles Blech mit 1 EL vom Olivenöl einfetten, den Teig daraufgleiten lassen und mit geölten Fingerspitzen behutsam auf ca. 30 × 25 cm drücken. 1 Stunde gehen lassen.',
+      'Die Kartoffeln hauchdünn hobeln und mit dem restlichen Olivenöl, den Nadeln vom Rosmarin, Salz und Pfeffer mischen. Die Salsiccia aus der Haut drücken und in kleine Stücke zupfen.',
+      'Den Backofen auf 250 °C vorheizen. Den Teig mit dem Mozzarella in Stücken, den Kartoffeln und der Salsiccia belegen.',
+      'Auf der untersten Schiene 18–22 Minuten backen, bis der Boden knusprig ist und die Kartoffeln goldbraun sind. In Rechtecke schneiden.',
+    ], 'Pizza in teglia patate rosmarino'),
+
+  r('pinsa-romana', 'Pinsa Romana mit Parmaschinken, Rucola und Mozzarella', 'it', 'haupt', 1740,
+    '200 g Weizenmehl Tipo 00 | 35 g Reismehl | 15 g Sojamehl | 2 g Hefe frisch | 2 EL Olivenöl | 150 g Passierte Tomaten | 125 g Mozzarella | 4 Scheibe Parmaschinken | 50 g Rucola | Salz',
+    [
+      'Am Vortag starten: Weizenmehl Tipo 00, Reismehl und Sojamehl mischen (die klassische Pinsa-Mischung). Mit der Hefe und 150 ml kaltem Wasser 5 Minuten kneten, dann 6 g Salz, 1 EL vom Olivenöl und schluckweise die restlichen 50 ml Wasser einarbeiten und weitere 7 Minuten kneten, bis der Teig glatt und glänzend ist.',
+      'Den Teig abgedeckt 1 Stunde bei Raumtemperatur ruhen lassen, dann in einer geölten Dose 24–48 Stunden im Kühlschrank reifen lassen.',
+      'Den Teig 3 Stunden vor dem Backen in 2 Stücke teilen, zu länglichen Laiben formen und abgedeckt bei Raumtemperatur gehen lassen.',
+      'Den Backofen mit Pizzastein oder Blech auf höchster Stufe vorheizen. Die Teiglinge auf einer bemehlten Fläche mit den Fingerspitzen zu ovalen Fladen (ca. 30 × 20 cm) drücken, die Luftblasen sollen bleiben. Mit den Passierten Tomaten bestreichen, leicht salzen und mit dem Mozzarella in Stücken belegen.',
+      'Die Pinse nacheinander 8–10 Minuten backen, bis der Rand goldbraun und knusprig ist.',
+      'Mit Parmaschinken und Rucola belegen, mit dem restlichen Olivenöl beträufeln und sofort servieren.',
+    ], 'Pinsa romana'),
+
+  r('pizza-bianca-mortadella', 'Pizza Bianca mit Mortadella, Burrata und Pistazien', 'it', 'haupt', 1500,
+    '250 g Weizenmehl Tipo 00 | 1 g Hefe frisch | 2 EL Olivenöl | 1 Zweig Rosmarin | 100 g Mortadella | 125 g Burrata | 20 g Pistazien | Salz',
+    [
+      'Am Vortag starten: Mehl, Hefe und 175 ml kaltes Wasser 2 Minuten mischen, 6 g Salz zugeben und weitere 10 Minuten zu einem glatten Teig kneten. Abgedeckt 1 Stunde bei Raumtemperatur ruhen lassen.',
+      'Den Teig in 2 Kugeln teilen und in geölten Dosen 18–24 Stunden im Kühlschrank reifen lassen. 3 Stunden vor dem Backen herausnehmen und abgedeckt bei Raumtemperatur akklimatisieren lassen.',
+      'Den Backofen mit Pizzastein auf höchster Stufe vorheizen. Die Pistazien grob hacken und die Nadeln vom Rosmarin abzupfen.',
+      'Die Kugeln zu dünnen Fladen ausziehen, mit den Fingerspitzen Mulden hineindrücken, mit 1 EL vom Olivenöl bestreichen und mit Rosmarin und etwas grobem Salz bestreuen.',
+      'Die Fladen nacheinander 6–8 Minuten backen, bis sie goldbraun sind.',
+      'Die heißen Fladen mit der Mortadella in hauchdünnen Scheiben belegen, die Burrata darauf zerzupfen, mit den Pistazien bestreuen und mit dem restlichen Olivenöl beträufeln. Sofort servieren.',
+    ], 'Pizza bianca mortadella'),
+
   r('piccata', 'Piccata Milanese mit Tomatenspaghetti', 'it', 'haupt', 35,
     '4 Stk Schweineschnitzel klein | 2 Stk Ei | 50 g Parmigiano Reggiano | 2 EL Weizenmehl | 2 EL Olivenöl | 200 g Spaghetti | 1 Dose Geschälte Tomaten | 1 Zehe Knoblauch | 0.5 Bund Basilikum | Salz | Pfeffer',
     [

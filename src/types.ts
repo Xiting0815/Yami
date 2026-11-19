@@ -139,7 +139,7 @@ export interface Recipe {
 }
 
 /** Küchengeräte im Haushalt */
-export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer'
+export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer' | 'kneter' | 'pizzaofen'
 
 /** Eine Geräte-Einstellung zu einem Rezeptschritt */
 export interface DeviceSetting {
@@ -148,9 +148,13 @@ export interface DeviceSetting {
   mode: string
   /** °C */
   temp?: number
-  /** nur BORA: „1“–„9“, „Power“, „Schmelzen“, „Warmhalten“, „Simmern“ */
+  /** BORA: „1“–„9“, „Power“, „Schmelzen“, „Warmhalten“, „Simmern“; Famag (Kneter): Geschwindigkeitsstufe „1“–„10“ */
   level?: string
   minutes?: number
+  /** Sekunden (nur Pizzaofen: Backzeit 30–600 s) */
+  seconds?: number
+  /** Ausweichweg (z. B. Combair statt Pizzaofen bei Regen/Winter) – wird als „oder …“ gedämpft angezeigt */
+  alt?: boolean
   /** Feuchte in % (nur wo das Gerät sie einstellen lässt) */
   humidity?: number
   /** Kerntemperatur °C (Fühler) */

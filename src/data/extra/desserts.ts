@@ -2,10 +2,16 @@
 import { backen, prod } from '../define'
 import type { DeviceStep, DeviceSetting } from '../../types'
 import type { ExtraGroup } from './types'
+import { famag, mitFamag } from '../device-helpers'
 
 /** Geräte-Schritte aus denselben Texten wie die Rezeptschritte: `at` ordnet Einstellungen dem Schritt (Index ab 0) zu */
 const ds = (steps: string[], at: Record<number, DeviceSetting[]> = {}): DeviceStep[] =>
-  steps.map((text, i) => (at[i] ? { text, settings: at[i] } : { text }))
+  steps.map((text, i) => {
+    // Knet-Schritt mit Famag: Text nennt den Kneter und die eingestellte Dauer
+    const knead = at[i]?.find((x) => x.device === 'kneter' && x.minutes != null)
+    const t = knead ? mitFamag(text, knead.minutes!) : text
+    return at[i] ? { text: t, settings: at[i] } : { text: t }
+  })
 
 
 const pannaSteps = [
@@ -212,10 +218,12 @@ export const desserts: ExtraGroup = {
       2: [{ device: 'steamer', mode: 'Dämpfen', temp: 90, minutes: 30, note: 'Wasserbehälter füllen, Förmchen mit Folie abdecken, gelocht' }],
     }),
     germknoedel: ds(germSteps, {
+      0: [{ device: 'bora', mode: 'Kochzone', level: '2', note: 'Milch nur lauwarm' }, famag(8)],
       1: [{ device: 'steamer', mode: 'Profi-Backen Aufgehen lassen', temp: 35, minutes: 45, note: 'Schüssel auf den Gitterrost' }],
       3: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 20, note: 'Wasserbehälter füllen, gelocht mit Backpapier' }],
     }),
     'dampfnudeln-vanillesauce': ds(dampfSteps, {
+      0: [{ device: 'bora', mode: 'Kochzone', level: '2', note: 'Milch nur lauwarm' }, famag(8)],
       1: [{ device: 'steamer', mode: 'Profi-Backen Aufgehen lassen', temp: 35, minutes: 45, note: 'Schüssel auf den Gitterrost' }],
       3: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 22, note: 'Wasserbehälter füllen, gelocht mit Backpapier' }],
       4: [{ device: 'bora', mode: 'Kochzone', level: '5', note: 'Milch erhitzen' }, { device: 'bora', mode: 'Kochzone', level: '2', minutes: 5, note: 'binden, nicht kochen' }],

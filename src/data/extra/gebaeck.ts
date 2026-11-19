@@ -288,9 +288,22 @@ const recipes: RawRecipe[] = [
 type Settings = NonNullable<DeviceStep['settings']>
 const withDevices = (id: string, settings: Record<number, Settings>, texts: Record<number, string> = {}): DeviceStep[] =>
   recipes.find((r) => r.id === id)!.steps.map((t, i) => {
-    const text = texts[i] ?? t
+    const text = texts[i] ?? fitText(t, settings[i])
     return settings[i] ? { text, settings: settings[i] } : { text }
   })
+
+/**
+ * Klassischer Text → Text für die Geräte: „Den Ofen auf 180 °C Ober-/Unterhitze vorheizen“ wird zur Einstellung des Schritts
+ * (z. B. „Den Combair auf 160 °C Heißluft vorheizen (2 Bleche: Ebene 1 + 3)“); scripts/check-device-text.ts prüft das Ergebnis.
+ */
+function fitText(text: string, s?: Settings): string {
+  const ov = s?.find((x) => x.device === 'combair' && x.temp != null)
+  if (!ov) return text
+  const twoTrays = ov.mode === 'Heißluft'
+  let out = text.replace(/([Dd]en) (?:Back)?[Oo]fen auf \d+ °C Ober-\/Unterhitze vorheizen/, `$1 Combair auf ${ov.temp} °C ${ov.mode} vorheizen${twoTrays ? ' (2 Bleche: Ebene 1 + 3)' : ''}`)
+  if (twoTrays && ov.minutes != null) out = out.replace(/ in zwei Runden je /, ' auf beiden Blechen gleichzeitig ')
+  return out
+}
 
 const ouVorheizen = (temp: number): Settings => [{ device: 'combair', mode: 'Ober-/Unterhitze', temp, note: 'vorheizen' }]
 /** Ein Blech, Ebene 2 */

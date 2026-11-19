@@ -244,6 +244,8 @@ button:focus:not(:focus-visible) { outline: none; }
   border-radius: 20px 20px 0 0; font-weight: 700; font-size: 14px;
 }
 .daypicker-days { margin-top: 8px; }
+/* die feste Leiste „Einplanen für“ darf den letzten Schritt (und seine Geräte-Chips) nicht verdecken */
+body:has(.daypicker) .sheet-body { padding-bottom: 130px; }
 
 /* ───── Einkaufsliste ───── */
 .shop-section { background: var(--surface); border-radius: var(--radius); margin: 12px 0; padding: 4px 0; box-shadow: var(--shadow-card); }
@@ -879,6 +881,9 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 }
 .dev-chip .icon { flex: none; color: var(--accent-text); }
 .dev-note { font-weight: 400; color: var(--muted); }
+/* Ausweichweg („oder Combair …“): gedämpft, ohne Füllung */
+.dev-chip.dev-alt { background: transparent; border-style: dashed; color: var(--muted); font-weight: 500; }
+.dev-chip.dev-alt .icon { color: var(--muted); }
 .cook-step .dev-chip { font-size: 15px; padding: 6px 12px 6px 10px; }
 .dev-toggle { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 10px; }
 .dev-toggle button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 13px; color: var(--accent-text); text-decoration: underline; cursor: pointer; }

@@ -3,9 +3,13 @@
 import { backen, prod } from '../define'
 import type { DeviceSetting, DeviceStep } from '../../types'
 import type { ExtraGroup } from './types'
+import { famag, mitFamag } from '../device-helpers'
 
 /** Geräte-Schritt: Text + optionale Einstellungen */
 const st = (text: string, ...settings: DeviceSetting[]): DeviceStep => (settings.length ? { text, settings } : { text })
+/** Knet-Schritt im Famag (Spiralkneter): Text nennt Kneter und Dauer, dazu weitere Einstellungen (z. B. Milch lauwarm) */
+const kn = (text: string, minutes: number, o: Parameters<typeof famag>[1] = {}, ...more: DeviceSetting[]): DeviceStep =>
+  st(mitFamag(text, minutes), ...more, famag(minutes, o))
 const steamer = (mode: string, temp: number, minutes?: number, note?: string): DeviceSetting => ({ device: 'steamer', mode, temp, ...(minutes ? { minutes } : {}), ...(note ? { note } : {}) }) as DeviceSetting
 const gare = (minutes: number, note = 'Schüssel auf den Gitterrost'): DeviceSetting => steamer('Profi-Backen Aufgehen lassen', 35, minutes, note)
 const preheat = (temp = 230): DeviceSetting => steamer('Heißluft mit Beschwaden', temp, undefined, 'vorheizen, Kuchenblech Ebene 2')
@@ -275,7 +279,7 @@ export const brot: ExtraGroup = {
     // Anstellgut braucht kein Gerät (nur Wärme) – daher keine Geräte-Schritte
     'bauernbrot-sauerteig': [
       { text: 'Am Vorabend für den Sauerteig das Anstellgut mit 250 g vom Roggenmehl und 250 ml lauwarmem Wasser (ca. 35 °C) verrühren und abgedeckt 12–16 Stunden bei Raumtemperatur reifen lassen.' },
-      { text: 'Am Backtag den Sauerteig mit dem restlichen Roggenmehl, dem Weizenmehl (am besten Type 1050), Salz, Kümmel, der zerbröselten Hefe frisch und 220 ml lauwarmem Wasser 8–10 Minuten langsam zu einem weichen, klebrigen Teig kneten.' },
+      kn('Am Backtag den Sauerteig mit dem restlichen Roggenmehl, dem Weizenmehl (am besten Type 1050), Salz, Kümmel, der zerbröselten Hefe frisch und 220 ml lauwarmem Wasser 8–10 Minuten langsam zu einem weichen, klebrigen Teig kneten.', 8, { mode: 'Kneten langsam', note: 'Roggen nur gut vermischen' }),
       { text: 'Den Teig abgedeckt 30 Minuten ruhen lassen, dann mit nassen Händen rund formen, mit der Naht nach oben in ein bemehltes Gärkörbchen legen und 60–75 Minuten bei Raumtemperatur gehen lassen, bis die Oberfläche feine Risse zeigt.' },
       {
         text: 'Den Wasserbehälter füllen und den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen. Den Laib auf Backpapier stürzen und mit Mehl bestäuben.',
@@ -292,7 +296,7 @@ export const brot: ExtraGroup = {
       { text: 'Auf einem Gitter mindestens 3 Stunden auskühlen lassen, erst dann anschneiden.' },
     ],
     'dinkelvollkornbrot': [
-      st('Dinkelvollkornmehl, Dinkelmehl, Salz und Leinsamen in einer Schüssel mischen. Die Hefe frisch mit dem Honig in 520 ml lauwarmem Wasser auflösen, zum Mehl geben und 8 Minuten zu einem weichen Teig kneten.'),
+      kn('Dinkelvollkornmehl, Dinkelmehl, Salz und Leinsamen in der Schüssel des Famag mischen. Die Hefe frisch mit dem Honig in 520 ml lauwarmem Wasser auflösen, zum Mehl geben und 8 Minuten zu einem weichen Teig kneten (Dinkel nicht überkneten).', 6, { mode: 'Kneten langsam', note: 'Dinkel nicht überkneten' }),
       st('Den Teig abgedeckt 20 Minuten quellen lassen, kurz durchkneten und mit einer nassen Hand in eine mit Backpapier ausgelegte Kastenform (30 cm) streichen. Die Oberfläche glatt verstreichen.'),
       st('Die Form abgedeckt im CombiSteamer 40 Minuten gehen lassen, bis der Teig fast bis zum Rand steigt.', gare(40, 'Form auf den Gitterrost')),
       st('Den Wasserbehälter füllen und den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen.', preheat()),
@@ -302,7 +306,7 @@ export const brot: ExtraGroup = {
     ],
     'roggenmischbrot-sauerteig': [
       st('Am Vorabend für den Sauerteig das Anstellgut mit 250 g vom Roggenmehl und 250 ml lauwarmem Wasser (ca. 35 °C) verrühren und abgedeckt 12–16 Stunden bei Raumtemperatur reifen lassen.'),
-      st('Am Backtag den Sauerteig mit dem restlichen Roggenmehl, dem Weizenmehl, Salz, Kümmel, der zerbröselten Hefe frisch und 300 ml lauwarmem Wasser 8 Minuten zu einem weichen, leicht klebrigen Teig kneten.'),
+      kn('Am Backtag den Sauerteig mit dem restlichen Roggenmehl, dem Weizenmehl, Salz, Kümmel, der zerbröselten Hefe frisch und 300 ml lauwarmem Wasser 8 Minuten zu einem weichen, leicht klebrigen Teig kneten.', 8, { mode: 'Kneten langsam', note: 'Roggen nur gut vermischen' }),
       st('Den Teig 20 Minuten abgedeckt ruhen lassen. Eine Kastenform (30 cm) mit Backpapier auslegen, den Teig mit nasser Hand einfüllen, glatt streichen und mit etwas Mehl bestäuben.'),
       st('Die Form abgedeckt im CombiSteamer 60 Minuten gehen lassen, bis der Teig deutlich steigt und die Oberfläche feine Risse zeigt.', gare(60, 'Form auf den Gitterrost')),
       st('Den Wasserbehälter füllen und den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen.', preheat()),
@@ -311,7 +315,7 @@ export const brot: ExtraGroup = {
       st('Auf einem Gitter mindestens 3 Stunden auskühlen lassen, erst dann anschneiden.'),
     ],
     'dinkelbroetchen-ueber-nacht': [
-      st('Am Abend die Hefe frisch mit dem Honig in 400 ml kaltem Wasser auflösen, mit Dinkelmehl und Salz 6 Minuten kurz zu einem weichen Teig kneten (Dinkel nicht überkneten). Eine Stunde bei Raumtemperatur ruhen lassen.'),
+      kn('Am Abend die Hefe frisch mit dem Honig in 400 ml kaltem Wasser auflösen, mit Dinkelmehl und Salz 6 Minuten kurz zu einem weichen Teig kneten (Dinkel nicht überkneten). Eine Stunde bei Raumtemperatur ruhen lassen.', 6, { mode: 'Kneten langsam', note: 'Dinkel nicht überkneten' }),
       st('Die Schüssel abdecken und den Teig über Nacht 10–14 Stunden im Kühlschrank reifen lassen (kalte Gare).'),
       st('Am Morgen den kalten Teig auf eine bemehlte Fläche stürzen, in 10 Stücke (je ca. 90 g) teilen und rund wirken. Mit Abstand auf Backpapier setzen und bemehlen.'),
       st('Die Brötchen auf dem Kuchenblech im CombiSteamer 20 Minuten akklimatisieren lassen.', gare(20, 'Kuchenblech Ebene 2')),
@@ -320,7 +324,7 @@ export const brot: ExtraGroup = {
       st('Auf Heißluft ohne Dampf umschalten und weitere 8–10 Minuten backen, bis sie goldbraun sind und hohl klingen. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 190, 9, 'trocken, für die Kruste')),
     ],
     'sonntagsbroetchen-kaiser': [
-      st('Die Hefe frisch mit dem Zucker in der lauwarmen Milch und 50 ml lauwarmem Wasser auflösen. Mit Weizenmehl, Salz und der weichen Butter 8 Minuten zu einem glatten, geschmeidigen Teig kneten.', { device: 'bora', mode: 'Kochzone', level: '2', note: 'Milch nur lauwarm' }),
+      kn('Die Hefe frisch mit dem Zucker in der lauwarmen Milch und 50 ml lauwarmem Wasser auflösen. Mit Weizenmehl, Salz und der weichen Butter 8 Minuten zu einem glatten, geschmeidigen Teig kneten.', 8, {}, { device: 'bora', mode: 'Kochzone', level: '2', note: 'Milch nur lauwarm' }),
       st('Den Teig in der Schüssel abdecken und im CombiSteamer 30 Minuten gehen lassen, bis er sich fast verdoppelt hat.', gare(30)),
       st('Den Teig in 10 Stücke (je ca. 80 g) teilen, rund formen und zu Scheiben flach drücken. Für das Kaiser-Muster die Ränder fünfmal reihum zur Mitte einschlagen und jeweils mit dem Daumen festdrücken. Mit der Naht nach unten auf Backpapier setzen.'),
       st('Die Brötchen mit Wasser bepinseln, mit dem Sesam bestreuen und auf dem Kuchenblech 20 Minuten abgedeckt bei Raumtemperatur gehen lassen. Inzwischen den Wasserbehälter füllen und den CombiSteamer auf Ebene 2 mit dem Blech vorheizen.', preheat(220)),
@@ -328,14 +332,14 @@ export const brot: ExtraGroup = {
       st('Auf Heißluft ohne Dampf umschalten und weitere 8 Minuten backen, bis sie goldbraun sind. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 190, 8, 'trocken, für die Kruste')),
     ],
     'brioche-burger-buns': [
-      st('Die Hefe frisch mit dem Zucker in der lauwarmen Milch auflösen. Mit Weizenmehl, Salz, einem Ei und der weichen Butter 10 Minuten zu einem weichen, glänzenden Teig kneten, der sich vom Schüsselrand löst.'),
+      st('Die Hefe frisch mit dem Zucker in der lauwarmen Milch auflösen. Mit Weizenmehl, Salz und einem Ei in den Famag geben und 5 Minuten kneten. Dann die weiche Butter in Stückchen nach und nach zugeben und weitere 7 Minuten kneten, bis der Teig glänzt und sich vom Schüsselrand löst.', famag(5), famag(7, { note: 'Butter nach und nach' })),
       st('Den Teig in der Schüssel abdecken und im CombiSteamer 60 Minuten gehen lassen, bis er sich verdoppelt hat.', gare(60)),
       st('Den Teig in 8 Stücke (je ca. 90 g) teilen, rund wirken und mit Abstand auf Backpapier auf das Kuchenblech setzen. Mit der Handfläche auf ca. 8 cm flach drücken und abgedeckt im CombiSteamer 40 Minuten gehen lassen.', gare(40, 'Kuchenblech Ebene 2')),
       st('Den Wasserbehälter füllen und den CombiSteamer auf Ebene 2 mit dem Blech vorheizen. Das zweite Ei verquirlen, die Buns damit bestreichen und mit Sesam bestreuen.', preheat(180)),
       st('Die Buns 16 Minuten mit Dampf backen, bis sie goldbraun sind – die Tür dabei geschlossen lassen. Auf einem Gitter auskühlen lassen und vor dem Belegen waagerecht aufschneiden.', steamer('Heißluft mit Beschwaden', 180, 16, 'Ebene 2')),
     ],
     'laugenbroetchen': [
-      st('Die Hefe frisch mit dem Zucker in 270 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 10 g vom Salz und der weichen Butter 8 Minuten zu einem festen, glatten Teig kneten.'),
+      kn('Die Hefe frisch mit dem Zucker in 270 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 10 g vom Salz und der weichen Butter 8 Minuten zu einem festen, glatten Teig kneten.', 8),
       st('Den Teig in der Schüssel abdecken und im CombiSteamer 40 Minuten gehen lassen, bis er sich fast verdoppelt hat.', gare(40)),
       st('Den Teig in 8 Stücke (je ca. 105 g) teilen und rund formen (für Brezeln zu 50 cm langen Strängen rollen und schlingen). Die Teiglinge auf Backpapier 20 Minuten im Kühlschrank oder Tiefkühlfach anziehen lassen, damit sie in der Lauge nicht zusammenfallen. Inzwischen den Combair vorheizen.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 210, note: 'vorheizen, Ebene 2' }),
       st('Sicherheit: Lauge ist ätzend. Gummihandschuhe und Schutzbrille tragen, Kinder fernhalten, nur einen Edelstahl- oder Emailletopf verwenden (nie Aluminium, das wird angegriffen). Als milde Haushaltsvariante statt Natronlauge 1 Liter Wasser aufkochen und 40 g Backnatron vorsichtig einrühren – es schäumt kräftig auf.', { device: 'bora', mode: 'Kochzone', level: '6', note: 'aufkochen' }),
@@ -344,7 +348,7 @@ export const brot: ExtraGroup = {
     ],
     'ciabatta': [
       st('Am Vorabend einen Vorteig (Poolish) ansetzen: 100 g vom Mehl, 100 ml kaltes Wasser und 1 g von der Hefe frisch verrühren und abgedeckt 12–16 Stunden bei Raumtemperatur stehen lassen, bis er blasig ist.'),
-      st('Am Backtag den Vorteig mit dem restlichen Mehl, der restlichen Hefe, dem Salz, dem Olivenöl und 300 ml Wasser 10 Minuten zu einem sehr weichen, klebrigen Teig kneten.'),
+      st('Am Backtag den Vorteig mit dem restlichen Mehl, der restlichen Hefe, dem Salz, dem Olivenöl und 250 ml vom Wasser (300 ml) in den Famag geben und 12 Minuten kneten. Die übrigen 50 ml Wasser in den letzten 4 Minuten schluckweise zugießen, bis ein sehr weicher, klebriger Teig entsteht, der sich vom Schüsselrand löst.', famag(12, { note: 'letztes Wasser schluckweise' })),
       st('Den Teig 90 Minuten in der Schüssel gehen lassen und dabei dreimal im Abstand von 30 Minuten dehnen und falten: Den Teig mit nasser Hand seitlich hochziehen und über sich falten.'),
       st('Den Teig vorsichtig auf eine stark bemehlte Fläche gleiten lassen (nicht kneten, die Luft soll bleiben), in 3 Rechtecke (ca. 10 × 25 cm) teilen und auf bemehltes Backpapier legen.'),
       st('Die Ciabatta auf dem Kuchenblech im CombiSteamer 30 Minuten ruhen lassen.', gare(30, 'Kuchenblech Ebene 2')),
@@ -353,7 +357,7 @@ export const brot: ExtraGroup = {
       st('Auf Heißluft ohne Dampf umschalten und weitere 15 Minuten backen, bis die Kruste goldbraun ist. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 210, 15, 'trocken, für die Kruste')),
     ],
     'focaccia-genovese': [
-      st('Die Hefe frisch mit dem Honig in 300 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 10 g vom Salz und 60 ml vom Olivenöl 8 Minuten zu einem weichen, glänzenden Teig kneten.'),
+      kn('Die Hefe frisch mit dem Honig in 300 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 10 g vom Salz und 60 ml vom Olivenöl 8 Minuten zu einem weichen, glänzenden Teig kneten.', 8),
       st('Den Teig in der Schüssel abdecken und im CombiSteamer 45 Minuten gehen lassen, bis er sich verdoppelt hat.', gare(45)),
       st('Ein dunkles Blech (ca. 30 × 40 cm) mit 30 ml vom Olivenöl einfetten, den Teig daraufgeben und mit geölten Händen bis in die Ecken ziehen. Abgedeckt 30 Minuten gehen lassen. Inzwischen den Combair vorheizen.', { device: 'combair', mode: 'PizzaPlus', temp: 230, note: 'vorheizen, Ebene 2' }),
       st('Mit den Fingerspitzen tiefe Mulden in den Teig drücken. Aus den restlichen 20 ml Olivenöl, 50 ml Wasser und den restlichen 2 g Salz eine Lake rühren, über den Teig gießen und die Nadeln der Rosmarinzweige darüberstreuen.'),
@@ -361,7 +365,7 @@ export const brot: ExtraGroup = {
     ],
     'pane-pugliese': [
       st('Am Vorabend einen Vorteig ansetzen: das Anstellgut mit 100 g vom Weizenmehl und 100 ml lauwarmem Wasser verrühren und abgedeckt 12 Stunden bei Raumtemperatur reifen lassen.'),
-      st('Am Backtag den Vorteig mit 350 g vom Hartweizengrieß, dem restlichen Weizenmehl, Salz, der zerbröselten Hefe frisch und 380 ml lauwarmem Wasser 10 Minuten zu einem geschmeidigen, leicht klebrigen Teig kneten.'),
+      kn('Am Backtag den Vorteig mit 350 g vom Hartweizengrieß, dem restlichen Weizenmehl, Salz, der zerbröselten Hefe frisch und 380 ml lauwarmem Wasser 10 Minuten zu einem geschmeidigen, leicht klebrigen Teig kneten.', 10),
       st('Den Teig 30 Minuten abgedeckt ruhen lassen, dann rund formen und mit der Naht nach oben in ein mit dem restlichen Hartweizengrieß bestäubtes Gärkörbchen legen.'),
       st('Das Gärkörbchen abgedeckt im CombiSteamer 45 Minuten gehen lassen.', gare(45, 'Körbchen auf den Gitterrost')),
       st('Den Wasserbehälter füllen und den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen. Den Laib auf Backpapier stürzen und kreuzweise einschneiden.', preheat()),
@@ -370,17 +374,17 @@ export const brot: ExtraGroup = {
       st('Auf einem Gitter mindestens 2 Stunden auskühlen lassen, erst dann anschneiden.'),
     ],
     'pittule-salentine': [
-      st('Die Hefe frisch in 420 ml lauwarmem Wasser auflösen. Weizenmehl in eine große Schüssel geben, das Hefewasser nach und nach einrühren und zum Schluss das Salz zugeben. 10 Minuten kräftig schlagen, bis ein sehr weicher, klebriger, glatter Teig entsteht.'),
+      st('Die Hefe frisch in 420 ml lauwarmem Wasser auflösen. Weizenmehl in die Schüssel des Famag geben, das Hefewasser bei laufendem Kneter nach und nach zugießen und nach 3 Minuten das Salz zugeben. Insgesamt 10 Minuten kneten, bis ein sehr weicher, klebriger, glatter Teig entsteht.', famag(10, { note: 'Wasser nach und nach' })),
       st('Die Schüssel abdecken und den Teig im CombiSteamer gehen lassen, bis er sich mindestens verdoppelt hat und viele Blasen wirft.', gare(90)),
       st('Die Kirschtomaten klein würfeln und abtropfen lassen, die Oliven schwarz hacken, die Kapern abspülen. Ein Drittel des Teigs vorsichtig mit Kirschtomaten, Oliven und Kapern vermengen, der Rest bleibt pur.'),
       st('Das Frittieröl in einem hohen Topf auf 175 °C erhitzen (Thermometer). Mit einem in Wasser getauchten Esslöffel walnussgroße Teigstücke abstechen, portionsweise ins Öl gleiten lassen und 3–4 Minuten rundum goldbraun ausbacken. Auf Küchenpapier abtropfen lassen.', { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'Öl aufheizen' } as DeviceSetting, { device: 'bora', mode: 'Kochzone', level: '7', minutes: 4, note: '175 °C halten, Abzug Power' } as DeviceSetting),
       st('Die herzhaften Pittule pur servieren, die puren nach Wunsch mit Honig beträufeln oder mit Puderzucker bestäuben. Sofort warm essen.'),
     ],
     'grissini': [
-      st('Die Hefe frisch in 160 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 30 g vom Hartweizengrieß, Salz und Olivenöl 6 Minuten zu einem glatten Teig kneten.'),
+      kn('Die Hefe frisch in 160 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 30 g vom Hartweizengrieß, Salz und Olivenöl 6 Minuten zu einem glatten Teig kneten.', 6),
       st('Den Teig in der Schüssel abdecken und im CombiSteamer 30 Minuten gehen lassen.', gare(30)),
       st('Den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen. Den Teig zu einem Rechteck (ca. 24 × 30 cm) ausrollen und in 24 Streifen schneiden. Jeden Streifen zu einer 30 cm langen Stange rollen und im restlichen Hartweizengrieß wälzen. Mit Abstand auf Backpapier legen.', steamer('Heißluft', 200, undefined, 'vorheizen, Kuchenblech Ebene 2')),
-      st('Die Grissini mit dem Backpapier auf das heiße Blech ziehen und 15–18 Minuten backen, bis sie goldbraun sind. Danach den Ofen ausschalten, die Tür einen Spalt öffnen und die Stangen 10 Minuten nachtrocknen lassen.', steamer('Heißluft', 200, 16, 'Ebene 2, ohne Dampf')),
+      st('Die Grissini mit dem Backpapier auf das heiße Blech ziehen und 15–18 Minuten backen, bis sie goldbraun sind. Danach den CombiSteamer ausschalten, die Tür einen Spalt öffnen und die Stangen 10 Minuten nachtrocknen lassen.', steamer('Heißluft', 200, 16, 'Ebene 2, ohne Dampf')),
     ],
   },
   imageQueries: {

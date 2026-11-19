@@ -13,6 +13,7 @@ import { canonical, toBase } from '../src/kitchen'
 import { isSpice } from '../src/staples'
 import { DEVICE_STEPS } from '../src/data/device-steps'
 import { validateSetting } from '../src/deviceText'
+import { deviceTextFindings } from './device-text-rules'
 
 let errors = 0
 const ids = new Set<string>()
@@ -145,6 +146,13 @@ for (const [id, steps] of Object.entries(DEVICE_STEPS)) {
     for (const se of st.settings ?? []) for (const e of validateSetting(se)) { console.error(`Gerät in ${id}, Schritt ${i + 1}: ${e}`); errors++ }
   })
 }
+// Text und Einstellung müssen zusammenpassen (Temperatur, Betriebsart, Gerät, Minuten) – Details: scripts/check-device-text.ts
+for (const x of deviceTextFindings(DEVICE_STEPS)) { console.error(`Geräte-Text in ${x.id}, Schritt ${x.step}: ${x.msg}`); errors++ }
+// Ausweichweg (alt: true, z. B. „oder Combair“) nur direkt nach einer Haupteinstellung im selben Schritt
+for (const [id, steps] of Object.entries(DEVICE_STEPS)) steps.forEach((st, i) => {
+  const s = st.settings ?? []
+  s.forEach((x, j) => { if (x.alt && (j === 0 || s.slice(0, j).every((y) => y.alt))) { console.error(`Geräte in ${id}, Schritt ${i + 1}: „oder …“ ohne Haupteinstellung davor`); errors++ } })
+})
 const withDev = [...ids].filter((id) => DEVICE_STEPS[id]?.length).length
 const cov = Math.round((withDev / ids.size) * 100)
 console.log(`Geräte-Schritte: ${withDev} von ${ids.size} Rezepten (${cov} %)`)

@@ -1,4 +1,5 @@
 import type { Device, DeviceSetting, DeviceStep } from '../../types'
+import { famag, wittBacken, wittVorheizen } from '../device-helpers'
 
 type Opts = { minutes?: number; note?: string; temp?: number; core?: number }
 
@@ -257,17 +258,51 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'In reichlich Butter bei mittlerer Hitze je Seite 4 bis 5 Minuten goldbraun braten und salzen.', settings: [bora('6', { minutes: 10, note: 'Pfanne vorheizen' })] },
     { text: 'Rucola und halbierte Kirschtomaten mit Olivenöl, Zitrone und Salz anmachen und dazu servieren.' },
   ],
+  // ───────────── Pizza: Teig im Famag (Spiralkneter), backen im Witt Rotante; „oder Combair“ für Regen/Winter ─────────────
   'pizza-margherita': [
-    { text: 'Mehl, 190 ml lauwarmes Wasser, Hefe und 7 g Salz 10 Minuten zu einem glatten Teig kneten. Zugedeckt 2 Stunden gehen lassen.' },
-    { text: 'Den Combair mit dem Blech auf Ebene 2 vorheizen.', settings: [dev('combair', 'PizzaPlus', 280, { note: 'vorheizen, Ebene 2' })] },
-    { text: 'Teig in 2 Kugeln teilen und von innen nach außen dünn ausziehen. Mit gesalzenen Passierten Tomaten bestreichen und mit zerzupftem, abgetropftem Mozzarella belegen.' },
-    { text: 'Die Pizzen nacheinander auf dem heißen Blech 7 bis 9 Minuten backen. Mit Basilikum und Olivenöl servieren.', settings: [dev('combair', 'PizzaPlus', 280, { minutes: 8, note: 'je Pizza' })] },
+    { text: 'Mehl, 190 ml lauwarmes Wasser und die Hefe in den Famag geben und 2 Minuten mischen. 7 g Salz zugeben und weitere 10 Minuten kneten, bis der Teig glatt ist und sich vom Haken löst. Zugedeckt 2 Stunden gehen lassen.', settings: [famag(2, { mode: 'Mischen' }), famag(10, { note: 'nach dem Salz' })] },
+    { text: 'Den Witt Rotante 25 Minuten vorheizen, bis der Stein etwa 450 °C hat (mit dem Infrarot-Thermometer prüfen). Bei Regen oder im Winter stattdessen den Combair mit dem dunklen Blech auf Ebene 2 auf 280 °C PizzaPlus vorheizen.', settings: wittVorheizen(450) },
+    { text: 'Teig in 2 Kugeln teilen und von innen nach außen dünn ausziehen, den Rand dicker lassen. Auf eine bemehlte Pizzaschaufel legen, mit gesalzenen Passierten Tomaten bestreichen und mit zerzupftem, abgetropftem Mozzarella belegen.' },
+    { text: 'Die Pizza auf den drehenden Stein schieben und 60–90 Sekunden backen, bis der Rand aufgeht und dunkle Flecken hat. Im Combair jede Pizza auf dem heißen Blech 7 bis 9 Minuten backen. Mit Basilikum und Olivenöl servieren.', settings: wittBacken(450, 90, 8) },
   ],
   'pizza-diavola': [
-    { text: 'Teig wie für Pizza Margherita zubereiten und 2 Stunden gehen lassen.' },
-    { text: 'Den Combair mit dem Blech auf Ebene 2 vorheizen.', settings: [dev('combair', 'PizzaPlus', 280, { note: 'vorheizen, Ebene 2' })] },
-    { text: 'Teig dünn ausziehen, mit gewürzten Passierten Tomaten bestreichen und mit Mozzarella, Salami piccante, Chiliringen und Oregano belegen.' },
-    { text: 'Die Pizzen nacheinander 7 bis 9 Minuten backen und mit Olivenöl beträufeln.', settings: [dev('combair', 'PizzaPlus', 280, { minutes: 8, note: 'je Pizza' })] },
+    { text: 'Den Teig wie für Pizza Margherita zubereiten: Mehl, 190 ml lauwarmes Wasser und die Hefe im Famag 2 Minuten mischen, 7 g Salz zugeben und weitere 10 Minuten kneten. Zugedeckt 2 Stunden gehen lassen.', settings: [famag(2, { mode: 'Mischen' }), famag(10, { note: 'nach dem Salz' })] },
+    { text: 'Den Witt Rotante 25 Minuten vorheizen, bis der Stein etwa 450 °C hat. Bei Regen oder im Winter stattdessen den Combair mit dem dunklen Blech auf Ebene 2 auf 280 °C PizzaPlus vorheizen.', settings: wittVorheizen(450) },
+    { text: 'Teig dünn ausziehen, auf die bemehlte Pizzaschaufel legen, mit gewürzten Passierten Tomaten bestreichen und mit Mozzarella, Salami piccante, Chiliringen und Oregano belegen.' },
+    { text: 'Die Pizza auf den drehenden Stein schieben und 60–90 Sekunden backen. Im Combair jede Pizza 7 bis 9 Minuten backen. Mit Olivenöl beträufeln.', settings: wittBacken(450, 90, 8) },
+  ],
+  'pizza-napoletana': [
+    { text: 'Am Vortag starten: Mehl, 215 ml kaltes Wasser und die Hefe in den Famag geben und 2 Minuten mischen. 9 g Salz zugeben und weitere 10 Minuten kneten, bis der Teig glatt ist und sich vom Haken löst. Abgedeckt 2 Stunden bei Raumtemperatur ruhen lassen.', settings: [famag(2, { mode: 'Mischen' }), famag(10, { note: 'nach dem Salz' })] },
+    { text: 'Den Teig in 2 Kugeln (je ca. 275 g) teilen, straff rund formen und in geölten Dosen 24–48 Stunden im Kühlschrank reifen lassen.' },
+    { text: 'Die Teigkugeln 3–4 Stunden vor dem Backen aus dem Kühlschrank nehmen und abgedeckt bei Raumtemperatur akklimatisieren lassen.' },
+    { text: 'Den Witt Rotante 25 Minuten vorheizen, bis der Stein etwa 450 °C hat (mit dem Infrarot-Thermometer prüfen). Bei Regen oder im Winter stattdessen den Combair mit dem dunklen Blech auf Ebene 2 auf 280 °C PizzaPlus vorheizen. Die Geschälten Tomaten mit den Händen zerdrücken und leicht salzen.', settings: wittVorheizen(450) },
+    { text: 'Die Kugeln auf einer bemehlten Fläche von der Mitte nach außen flach drücken, den Rand (Cornicione) nicht plattdrücken. Auf die bemehlte Pizzaschaufel legen, mit den Tomaten bestreichen und mit dem Mozzarella in Stücken, etwas Parmigiano Reggiano und Basilikum belegen.' },
+    { text: 'Die Pizza auf den drehenden Stein schieben und 60–90 Sekunden backen, bis der Rand aufgeht und dunkle Flecken hat. Im Combair jede Pizza auf dem heißen Blech 6–8 Minuten backen. Mit Olivenöl beträufeln und sofort servieren.', settings: wittBacken(450, 90, 7) },
+  ],
+  'pizza-teglia-romana': [
+    { text: 'Am Vortag starten: Mehl, Hefe und 160 ml kaltes Wasser in den Famag geben und 5 Minuten kneten. 6 g Salz zugeben, dann die restlichen 40 ml Wasser und 1 EL vom Olivenöl schluckweise zugießen und weitere 7 Minuten kneten, bis der sehr weiche Teig glänzt und sich vom Schüsselrand löst.', settings: [famag(5), famag(7, { note: 'Wasser schluckweise' })] },
+    { text: 'Den Teig in einer geölten Dose 1 Stunde bei Raumtemperatur ruhen lassen, dabei einmal dehnen und falten. Dann über Nacht 18–24 Stunden im Kühlschrank reifen lassen.' },
+    { text: 'Den Teig 3 Stunden vor dem Backen aus dem Kühlschrank nehmen. Ein dunkles Blech mit 1 EL vom Olivenöl einfetten, den Teig daraufgleiten lassen und mit geölten Fingerspitzen behutsam auf ca. 30 × 25 cm drücken. 1 Stunde gehen lassen.' },
+    { text: 'Die Kartoffeln hauchdünn hobeln und mit dem restlichen Olivenöl, den Nadeln vom Rosmarin, Salz und Pfeffer mischen. Die Salsiccia aus der Haut drücken und in kleine Stücke zupfen.' },
+    { text: 'Den Combair auf 250 °C PizzaPlus vorheizen – die Teglia ist ein Blech und passt nicht auf den runden Stein des Witt Rotante. Den Teig mit dem Mozzarella in Stücken, den Kartoffeln und der Salsiccia belegen.', settings: [dev('combair', 'PizzaPlus', 250, { note: 'vorheizen, Ebene 2' })] },
+    { text: 'Die Teglia auf Ebene 2 18–22 Minuten backen, bis der Boden knusprig ist und die Kartoffeln goldbraun sind. In Rechtecke schneiden.', settings: [dev('combair', 'PizzaPlus', 250, { minutes: 20, note: 'dunkles Blech, ohne Backpapier' })] },
+  ],
+  'pinsa-romana': [
+    { text: 'Am Vortag starten: Weizenmehl Tipo 00, Reismehl und Sojamehl in der Schüssel des Famag mischen. Hefe und 150 ml kaltes Wasser zugeben und 5 Minuten kneten. Dann 6 g Salz, 1 EL vom Olivenöl und schluckweise die restlichen 50 ml Wasser zugeben und weitere 7 Minuten kneten, bis der Teig glatt und glänzend ist.', settings: [famag(5), famag(7, { note: 'Wasser schluckweise' })] },
+    { text: 'Den Teig abgedeckt 1 Stunde bei Raumtemperatur ruhen lassen, dann in einer geölten Dose 24–48 Stunden im Kühlschrank reifen lassen.' },
+    { text: 'Den Teig 3 Stunden vor dem Backen in 2 Stücke teilen, zu länglichen Laiben formen und abgedeckt bei Raumtemperatur gehen lassen.' },
+    { text: 'Den Witt Rotante 25 Minuten vorheizen, dann die Flamme klein stellen, bis der Stein etwa 380 °C hat – die dickere Pinsa braucht weniger Hitze als eine Neapolitana. Bei Regen oder im Winter stattdessen den Combair mit dem dunklen Blech auf Ebene 2 auf 280 °C PizzaPlus vorheizen.', settings: wittVorheizen(380) },
+    { text: 'Die Teiglinge auf einer bemehlten Fläche mit den Fingerspitzen zu ovalen Fladen (ca. 30 × 20 cm) drücken, die Luftblasen sollen bleiben. Auf die bemehlte Pizzaschaufel legen, mit den Passierten Tomaten bestreichen, leicht salzen und mit dem Mozzarella in Stücken belegen.' },
+    { text: 'Die Pinsa auf den drehenden Stein schieben und 2–3 Minuten (ca. 150 Sekunden) backen, bis der Rand goldbraun und knusprig ist. Im Combair jede Pinsa 8–10 Minuten auf dem heißen Blech backen.', settings: wittBacken(380, 150, 9, 280, 'Flamme klein, je Pinsa') },
+    { text: 'Mit Parmaschinken und Rucola belegen, mit dem restlichen Olivenöl beträufeln und sofort servieren.' },
+  ],
+  'pizza-bianca-mortadella': [
+    { text: 'Am Vortag starten: Mehl, Hefe und 175 ml kaltes Wasser in den Famag geben und 2 Minuten mischen. 6 g Salz zugeben und weitere 10 Minuten kneten, bis der Teig glatt ist. Abgedeckt 1 Stunde bei Raumtemperatur ruhen lassen.', settings: [famag(2, { mode: 'Mischen' }), famag(10, { note: 'nach dem Salz' })] },
+    { text: 'Den Teig in 2 Kugeln teilen und in geölten Dosen 18–24 Stunden im Kühlschrank reifen lassen. 3 Stunden vor dem Backen herausnehmen und abgedeckt bei Raumtemperatur akklimatisieren lassen.' },
+    { text: 'Den Witt Rotante 25 Minuten vorheizen, bis der Stein etwa 420 °C hat. Bei Regen oder im Winter stattdessen den Combair mit dem dunklen Blech auf Ebene 2 auf 280 °C PizzaPlus vorheizen. Die Pistazien grob hacken und die Nadeln vom Rosmarin abzupfen.', settings: wittVorheizen(420) },
+    { text: 'Die Kugeln zu dünnen Fladen ausziehen, auf die bemehlte Pizzaschaufel legen, mit den Fingerspitzen Mulden hineindrücken, mit 1 EL vom Olivenöl bestreichen und mit Rosmarin und etwas grobem Salz bestreuen.' },
+    { text: 'Den Fladen auf den drehenden Stein schieben und 60–90 Sekunden backen, bis er aufgeht und goldbraun ist. Im Combair jeden Fladen 6–8 Minuten auf dem heißen Blech backen.', settings: wittBacken(420, 75, 7) },
+    { text: 'Die heißen Fladen mit der Mortadella in hauchdünnen Scheiben belegen, die Burrata darauf zerzupfen, mit den Pistazien bestreuen und mit dem restlichen Olivenöl beträufeln. Sofort servieren.' },
   ],
   piccata: [
     { text: 'Tomatensauce aus Knoblauch, Olivenöl und Geschälten Tomaten 15 Minuten köcheln lassen und mit Basilikum abschmecken.', settings: [bora('4', { minutes: 15 })] },
@@ -318,11 +353,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Die Sauce mit Rigatoni als Primo und die Involtini als Secondo servieren. Rigatoni in Salzwasser kochen.', settings: pasta(11) },
   ],
   calzone: [
-    { text: 'Pizzateig aus Mehl, Hefe, Wasser und Salz zubereiten und 2 Stunden gehen lassen.' },
-    { text: 'Den Combair mit dem Blech auf Ebene 2 vorheizen.', settings: [dev('combair', 'PizzaPlus', 250, { note: 'vorheizen, Ebene 2' })] },
+    { text: 'Für den Pizzateig Mehl, 190 ml lauwarmes Wasser und die Hefe im Famag 2 Minuten mischen, 7 g Salz zugeben und weitere 10 Minuten kneten. Zugedeckt 2 Stunden gehen lassen.', settings: [famag(2, { mode: 'Mischen' }), famag(10, { note: 'nach dem Salz' })] },
+    { text: 'Den Witt Rotante 25 Minuten vorheizen, dann die Flamme klein stellen, bis der Stein etwa 380 °C hat – die gefüllte Calzone braucht weniger Hitze, damit die Füllung heiß wird, bevor der Teig verbrennt. Bei Regen oder im Winter stattdessen den Combair mit dem dunklen Blech auf Ebene 2 auf 250 °C PizzaPlus vorheizen.', settings: wittVorheizen(380, 250) },
     { text: 'Ricotta mit Parmigiano Reggiano, Pfeffer und gewürfeltem Kochschinken und Mozzarella mischen.' },
     { text: 'Teig in 2 Kreise ausziehen, eine Hälfte mit Passierten Tomaten und der Füllung belegen, zuklappen und die Ränder fest andrücken. Mit Olivenöl bestreichen.' },
-    { text: 'Die Calzone auf dem heißen Blech 12 bis 15 Minuten backen.', settings: [dev('combair', 'PizzaPlus', 250, { minutes: 13 })] },
+    { text: 'Die Calzone auf den drehenden Stein schieben und etwa 3 Minuten (ca. 180 Sekunden) backen, bis sie rundum goldbraun ist. Im Combair jede Calzone auf dem heißen Blech 12 bis 15 Minuten backen.', settings: wittBacken(380, 180, 13, 250, 'Flamme klein, je Calzone') },
   ],
   pizzaiola: [
     { text: 'Rumpsteaks flach drücken und im heißen Olivenöl kurz von beiden Seiten anbraten. Herausnehmen. Beim scharfen Anbraten den Abzug eine Stufe höher stellen.', settings: [bora('9', { minutes: 4, note: 'Pfanne vorheizen' })] },

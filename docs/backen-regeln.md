@@ -70,6 +70,7 @@ Betriebsarten **exakt** wie in `docs/geraete/regeln.md` („Heißluft“ mit ß)
 |---|---|---|---|---|
 | Brot (Laib), Sauerteig | CombiSteamer · Heißluft mit Beschwaden, dann Heißluft | 230 → 200 | 10 + 40–50 | „vorheizen, Kuchenblech Ebene 2“; Wasserbehälter füllen; Beschwaden-Phase Tür zu |
 | Brötchen, Ciabatta, Hefezopf | CombiSteamer · Heißluft mit Beschwaden | 200–220 (Zopf 170–180) | 15–25 | Kuchenblech nur über 150 °C; Alternative `Profi-Backen bemehlt/bestrichen` |
+| Hefe-, Brot-, Pizzateig kneten | Famag · Kneten (bzw. Mischen / Kneten langsam) | | 6–12 | nicht für Mürbeteig, Plätzchen, Rührteig, Cookies; Details `docs/geraete/famag.md` |
 | Teig gehen lassen | CombiSteamer · Profi-Backen Aufgehen lassen | 35 | 30–60 | Schüssel abgedeckt auf den Gitterrost; danach erst den Backofen vorheizen |
 | Rührkuchen, Blechkuchen, Biskuit, Hefekuchen | Combair · Ober-/Unterhitze (eine Ebene) oder Heißluft (zwei Ebenen) | 160–180 (Heißluft 20 °C weniger) | 20–60 | „vorheizen“, Ebene 2; Stäbchenprobe im Text |
 | Plätzchen, Cookies (zwei Bleche) | Combair · Heißluft, Ebene 1+3 (20 °C weniger als Ober-/Unterhitze) | 130–160 | 8–16 | „vorheizen“, „zwei Bleche, Ebene 1+3“; ein Blech: Ober-/Unterhitze 150–180, Ebene 2; mehr Stücke als zwei Bleche → in Runden backen |
