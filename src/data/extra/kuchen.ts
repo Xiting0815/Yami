@@ -50,7 +50,7 @@ const recipes: RawRecipe[] = [
         'Die Milch lauwarm erwärmen und die Hefe frisch mit 1 TL vom Zucker darin auflösen. Mit dem Weizenmehl, 40 g Zucker, 60 g weicher Butter, dem Ei und der Prise Salz 5 Minuten zu einem glatten Teig kneten.',
         'Den Teig zugedeckt an einem warmen Ort 45 Minuten gehen lassen, bis er sich etwa verdoppelt hat.',
         'Die Zwetschgen waschen, entsteinen und je nach Größe halbieren oder vierteln, dabei jeweils fast durchschneiden, damit sie wie Fächer aufstehen.',
-        'Den Teig auf einem mit Backpapier belegten Blech (ca. 30 x 40 cm) ausrollen, mit dem Paniermehl bestreuen und die Zwetschgen dicht an dicht mit der Schnittseite nach oben darauflegen. Weitere 20 Minuten gehen lassen. Inzwischen den Ofen auf 180 °C Ober-/Unterhitze vorheizen.',
+        'Den Teig auf einem mit Backpapier belegten Blech (ca. 30 x 40 cm) ausrollen, mit dem Paniermehl bestreuen (es saugt den Fruchtsaft auf, damit der Boden nicht durchweicht) und die Zwetschgen dicht an dicht mit der Schnittseite nach oben darauflegen. Weitere 20 Minuten gehen lassen. Inzwischen den Ofen auf 180 °C Ober-/Unterhitze vorheizen.',
         'Den Zimt mit 60 g Zucker mischen und über die Früchte streuen. Den Datschi 30–35 Minuten backen, bis der Rand goldbraun ist, und in 16 Stücke schneiden.',
       ]),
 
@@ -79,10 +79,10 @@ const recipes: RawRecipe[] = [
       '300 g Weizenmehl | 250 g Butter | 200 g Zucker | 1 Pck Vanillezucker | 4 Stk Ei | 2 TL Backpulver | 150 ml Milch | 1 Prise Salz | 3 EL Backkakao',
       [
         'Die Kastenform (ca. 28 cm) fetten und mit Mehl ausstäuben. Den Ofen auf 175 °C Ober-/Unterhitze vorheizen.',
-        'Die weiche Butter mit Zucker, Vanillezucker und der Prise Salz cremig rühren. Die Eier einzeln unterrühren.',
-        'Das Weizenmehl mit dem Backpulver mischen und abwechselnd mit 100 ml von der Milch unter den Teig rühren, bis er schwer vom Löffel reißt.',
+        'Die weiche Butter mit Zucker, Vanillezucker und der Prise Salz mit dem Handrührgerät 3–4 Minuten hell und cremig rühren. Die Eier einzeln unterrühren, jedes etwa eine halbe Minute.',
+        'Das Weizenmehl mit dem Backpulver mischen und abwechselnd mit 100 ml von der Milch kurz unter den Teig rühren, bis er schwer vom Löffel reißt (er fällt zäh in Klecksen herunter, statt zu fließen).',
         'Die Hälfte des Teigs in die Form füllen. Unter die andere Hälfte den Backkakao und die restlichen 50 ml Milch rühren und den dunklen Teig daraufgeben. Mit einer Gabel spiralförmig durch beide Teige ziehen, damit ein Marmormuster entsteht.',
-        'Den Kuchen 55–60 Minuten backen, bis ein Holzstäbchen ohne Teig herauskommt. 10 Minuten in der Form ruhen lassen, stürzen und auskühlen lassen.',
+        'Den Kuchen 55–60 Minuten backen, bis ein Holzstäbchen ohne Teig herauskommt. 10 Minuten in der Form ruhen lassen, dann stürzen (ein Gitter auf die Form legen, beides umdrehen und die Form abheben) und auskühlen lassen.',
       ]),
 
     backen('kuchen', 'kaesekuchen-ohne-boden', 'Käsekuchen ohne Boden',
@@ -110,7 +110,7 @@ const recipes: RawRecipe[] = [
       [
         'Die Milch bis auf 20 ml lauwarm erwärmen und die Hefe frisch mit 1 TL vom Zucker darin auflösen. Mit Weizenmehl, restlichem Zucker, Butter in Stückchen, Ei, Salz, Vanillezucker und der abgeriebenen Zitronenschale 8 Minuten zu einem glatten, weichen Teig kneten.',
         'Den Teig abgedeckt 45 Minuten gehen lassen, bis er sich etwa verdoppelt hat.',
-        'Den Teig in drei gleich große Stücke teilen, jedes zu einem etwa 45 cm langen Strang rollen und die Stränge zu einem Zopf flechten. Die Enden unterschlagen.',
+        'Den Teig in drei gleich große Stücke teilen und jedes zu einem etwa 45 cm langen Strang rollen. Die Stränge oben zusammendrücken und flechten: abwechselnd den rechten und den linken äußeren Strang über den mittleren legen. Die Enden zusammendrücken und unter den Zopf klappen.',
         'Den Zopf auf ein mit Backpapier belegtes Kuchenblech legen und 20 Minuten gehen lassen. Inzwischen den Ofen auf 180 °C Ober-/Unterhitze vorheizen.',
         'Das Eigelb mit den 20 ml Milch verquirlen, den Zopf damit bestreichen und die Mandelblättchen darüberstreuen.',
         'Den Zopf auf dem Blech 30–35 Minuten goldbraun backen. Er klingt beim Klopfen auf die Unterseite hohl. Auf einem Gitter auskühlen lassen und in 12 Scheiben schneiden.',
@@ -143,9 +143,9 @@ const recipes: RawRecipe[] = [
       '200 g Zartbitterschokolade | 200 g Butter | 200 g Mandeln gemahlen | 150 g Zucker | 4 Stk Ei | 1 Prise Salz | 2 EL Puderzucker',
       [
         'Eine Springform (24 cm) fetten und mit Backpapier auslegen. Den Ofen auf 170 °C Ober-/Unterhitze vorheizen.',
-        'Die Schokolade grob hacken und mit der Butter in einem Topf bei kleinster Hitze schmelzen. Etwas abkühlen lassen.',
+        'Die Zartbitterschokolade grob hacken und mit der Butter in einem Topf bei kleinster Hitze schmelzen. Etwas abkühlen lassen.',
         'Die Eier trennen. Die Eigelbe mit 100 g Zucker 5 Minuten hell und schaumig schlagen, die Schokoladen-Butter und die gemahlenen Mandeln unterrühren.',
-        'Die Eiweiße mit der Prise Salz steif schlagen, dabei die restlichen 50 g Zucker einrieseln lassen. Den Eischnee in zwei Portionen vorsichtig unter die Schokomasse heben.',
+        'Die Eiweiße mit der Prise Salz steif schlagen, dabei die restlichen 50 g Zucker einrieseln lassen. Den Eischnee in zwei Portionen vorsichtig mit dem Teigschaber unter die Schokomasse heben: von unten nach oben locker umschlagen statt rühren, damit die Luft im Teig bleibt.',
         'Den Teig in die Form füllen und 35–40 Minuten backen. Die Oberfläche soll fest sein, ein Holzstäbchen darf mit feuchten Krümeln herauskommen.',
         'Den Kuchen in der Form auskühlen lassen, vorsichtig herauslösen und mit dem Puderzucker bestäuben.',
       ]),

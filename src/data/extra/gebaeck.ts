@@ -35,7 +35,7 @@ const recipes: RawRecipe[] = [
     },
     '300 g Weizenmehl | 200 g Butter | 100 g Zucker | 1 Stk Ei | 1 Stk Eigelb | 1 Pck Vanillezucker | 1 Prise Salz | 1 Stk Zitrone unbehandelt | 100 g Puderzucker',
     [
-      'Weizenmehl, Zucker, Vanillezucker, Salz und die abgeriebene Schale der Zitrone mischen. Die kalte Butter in Stückchen und das Ei zugeben und rasch zu einem glatten Teig kneten.',
+      'Weizenmehl, Zucker, Vanillezucker, Salz und die abgeriebene Schale der Zitrone mischen. Die kalte Butter in Stückchen und das Ei zugeben und mit den Händen rasch zu einem glatten Teig kneten – nicht zu lange, sonst wird die Butter warm und die Plätzchen werden hart.',
       'Den Teig in Folie wickeln und 1 Stunde kühlen (oder bis 3 Monate einfrieren und im Kühlschrank auftauen).',
       'Den Ofen auf 180 °C Ober-/Unterhitze vorheizen. Bleche mit Backpapier belegen.',
       'Den Teig portionsweise auf wenig Mehl 3–4 mm dünn ausrollen, Plätzchen ausstechen und auf die Bleche legen. Mit dem verquirlten Eigelb bestreichen. Die Teigreste erneut verkneten und ausrollen.',
@@ -84,7 +84,7 @@ const recipes: RawRecipe[] = [
     },
     '100 g Eiklar | 150 g Zucker | 1 Pck Vanillezucker | 1 Prise Salz | 200 g Kokosraspeln | 50 g Zartbitterschokolade',
     [
-      'Das Eiklar, den Zucker, Vanillezucker und das Salz in einer Metallschüssel über einem Topf mit knapp siedendem Wasser 5 Minuten warm aufschlagen, bis sich der Zucker gelöst hat.',
+      'Das Eiklar, den Zucker, Vanillezucker und das Salz in einer Metallschüssel über einem Topf mit knapp siedendem Wasser (Wasserbad, die Schüssel darf das Wasser nicht berühren) 5 Minuten warm aufschlagen, bis sich der Zucker gelöst hat.',
       'Die Schüssel vom Wasserbad nehmen und die Kokosraspeln unterheben. Die Masse 10 Minuten ruhen lassen, damit sie bindet.',
       'Den Ofen auf 160 °C Ober-/Unterhitze vorheizen. Bleche mit Backpapier belegen.',
       'Mit zwei Teelöffeln oder nassen Händen 30 kleine Häufchen (ca. 15 g) formen und mit Abstand auf die Bleche setzen.',
@@ -388,6 +388,8 @@ export const gebaeck: ExtraGroup = {
       2: ouVorheizen(180),
       4: ouBacken(180, 20, 'Ebene 2, Rollen'),
       5: hlBacken(140, 14),
+    }, {
+      5: 'Den Combair auf 140 °C Heißluft umstellen. Die Rollen schräg in 1,5 cm dicke Scheiben schneiden (ergibt ca. 40), flach auf zwei Bleche legen und auf Ebene 1 + 3 noch einmal 12–15 Minuten rösten, bis sie trocken und goldbraun sind. Auf einem Gitter auskühlen lassen; sie werden dabei knusprig-hart.',
     }),
     'amaretti-morbidi': withDevices('amaretti-morbidi', { 1: hlVorheizen(150), 3: hlBacken(150, 13) }),
     'baci-di-dama': withDevices('baci-di-dama', { 2: hlVorheizen(150), 4: hlBacken(150, 13), 5: wasserbad() }),

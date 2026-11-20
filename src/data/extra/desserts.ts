@@ -21,22 +21,22 @@ const pannaSteps = [
   'Für die Beerensauce die Beerenmischung TK mit dem Puderzucker 5 Minuten köcheln lassen, kurz pürieren und abkühlen lassen. Zum Servieren über die Panna cotta geben.',
 ]
 const mousseSteps = [
-  'Die Zartbitterschokolade grob hacken und in einer Metallschüssel über einem Topf mit knapp siedendem Wasser schmelzen. Etwas abkühlen lassen.',
+  'Die Zartbitterschokolade grob hacken und in einer Metallschüssel über einem Topf mit knapp siedendem Wasser schmelzen (Wasserbad, die Schüssel darf das Wasser nicht berühren). Etwas abkühlen lassen.',
   'Die Eier trennen. Die Eigelbe mit der Hälfte des Zuckers cremig aufschlagen und die lauwarme Schokolade unterrühren.',
-  'Die Sahne steif schlagen. Das Eiweiß mit der Prise Salz steif schlagen, den restlichen Zucker einrieseln lassen und weiterschlagen, bis die Masse glänzt.',
-  'Erst die Sahne, dann das Eiweiß mit einem Teigschaber vorsichtig unter die Schokoladenmasse heben. In Gläser füllen und mindestens 4 Stunden, besser über Nacht, kalt stellen. Wegen der rohen Eier nur ganz frische Eier nehmen und innerhalb von 2 Tagen essen.',
+  'Die Sahne steif schlagen (bis sie fest ist und Spitzen stehen bleiben). In einer sauberen, fettfreien Schüssel das Eiweiß mit der Prise Salz steif schlagen, den restlichen Zucker einrieseln lassen und weiterschlagen, bis die Masse glänzt und beim Umdrehen der Schüssel nicht herausrutscht.',
+  'Erst die Sahne, dann das Eiweiß mit einem Teigschaber vorsichtig unter die Schokoladenmasse heben: von unten nach oben locker umschlagen statt rühren, damit die Luft in der Masse bleibt. In Gläser füllen und mindestens 4 Stunden, besser über Nacht, kalt stellen. Wegen der rohen Eier nur ganz frische Eier nehmen und innerhalb von 2 Tagen essen.',
 ]
 const gruetzeSteps = [
   'Beerenmischung TK, Himbeeren TK, 100 g Zucker und Rotwein in einen Topf geben, aufkochen und 5 Minuten köcheln lassen.',
   'Die Speisestärke bis auf 1 TL (für die Vanillesauce) mit 5 EL kaltem Wasser glatt rühren, in die kochenden Früchte rühren und 1 Minute unter Rühren aufkochen. In eine Schüssel füllen, abkühlen lassen und kalt stellen.',
   'Für die Vanillesauce 400 ml von der Milch mit dem Vanillezucker erhitzen. Die Eigelbe mit den restlichen 50 g Zucker, 1 TL Speisestärke und der übrigen Milch verrühren.',
-  'Die heiße Milch unter Rühren in die Eigelbmasse gießen, zurück in den Topf geben und bei niedriger Hitze rühren, bis die Sauce cremig bindet (nicht kochen, sie gerinnt sonst). Kalt oder lauwarm zur gut gekühlten Roten Grütze servieren.',
+  'Die heiße Milch unter Rühren in die Eigelbmasse gießen, zurück in den Topf geben und bei niedriger Hitze ständig rühren, bis die Sauce cremig bindet (nicht kochen, sie gerinnt sonst). Probe („zur Rose abziehen“): einen Kochlöffel eintauchen und kräftig darauf pusten – bilden sich Wellen wie Rosenblätter, ist die Sauce fertig. Kalt oder lauwarm zur gut gekühlten Roten Grütze servieren.',
 ]
 const semiSteps = [
   'Die Himbeeren TK auftauen lassen, 200 g davon pürieren und durch ein Sieb streichen. Die übrigen 100 g Himbeeren beiseitestellen.',
-  'Die Eigelbe mit Zucker und Vanillezucker in einer Metallschüssel über einem Topf mit knapp siedendem Wasser 5 Minuten aufschlagen, bis die Masse dick ist und etwa 70 °C hat, dann kalt weiterschlagen, bis sie abgekühlt ist.',
+  'Die Eigelbe mit Zucker und Vanillezucker in einer Metallschüssel über einem Topf mit knapp siedendem Wasser (Wasserbad, die Schüssel darf das Wasser nicht berühren) mit dem Handrührgerät 5 Minuten aufschlagen, bis die Masse dick ist und etwa 70 °C hat. Dann die Schüssel herausnehmen und weiterschlagen, bis die Masse abgekühlt ist.',
   'Die Mandeln in einer trockenen Pfanne goldbraun rösten, abkühlen lassen und grob hacken.',
-  'Die Sahne steif schlagen und mit den Mandeln vorsichtig unter die Eigelbmasse heben. Das Himbeerpüree nur grob unterziehen, sodass Marmorstreifen entstehen.',
+  'Die Sahne steif schlagen und mit den Mandeln vorsichtig unter die Eigelbmasse heben (mit dem Teigschaber locker umschlagen, nicht rühren, damit die Luft bleibt). Das Himbeerpüree mit zwei, drei Bewegungen nur grob unterziehen, sodass Marmorstreifen entstehen.',
   'Eine Kastenform (ca. 25 cm) mit Frischhaltefolie auslegen, die Masse einfüllen, die ganzen Himbeeren darauf verteilen und mindestens 6 Stunden, besser über Nacht, einfrieren. Zum Servieren 10 Minuten vorher aus dem Gefrierfach nehmen, stürzen und in Scheiben schneiden.',
 ]
 const zabaioneSteps = [
@@ -52,21 +52,21 @@ const gebranntSteps = [
 ]
 const germSteps = [
   'Die Milch lauwarm erwärmen, die Hefe frisch hineinbröckeln und mit 1 TL vom Zucker auflösen. Mit Weizenmehl, dem übrigen Zucker, Ei, Salz und 50 g weicher Butter 8 Minuten zu einem glatten, weichen Teig kneten.',
-  'Den Teig in der Schüssel abdecken und im CombiSteamer gehen lassen, bis er sich etwa verdoppelt hat.',
-  'Den Teig in 8 gleich große Stücke teilen, flach drücken und je 1 EL Pflaumenmus (20 g) in die Mitte setzen. Den Teig darüber schließen und zu glatten Kugeln formen, mit der Naht nach unten 15 Minuten ruhen lassen.',
-  'Den Wasserbehälter des CombiSteamers füllen. Die Knödel mit Abstand auf Backpapier in den gelochten Garbehälter legen und dämpfen, bis sie aufgegangen und fest sind.',
+  'Den Teig in der Schüssel abdecken und im CombiSteamer 45 Minuten gehen lassen, bis er sich etwa verdoppelt hat.',
+  'Den Teig in 8 gleich große Stücke teilen, flach drücken und je 1 EL Pflaumenmus (20 g) in die Mitte setzen. Den Teig darüber zusammenziehen, gut zusammendrücken und zu glatten Kugeln formen. Mit der Naht (der zusammengedrückten Stelle) nach unten abgedeckt 15 Minuten ruhen lassen.',
+  'Den Wasserbehälter des CombiSteamers füllen. Die Knödel mit Abstand auf Backpapier in den gelochten Garbehälter legen und 20 Minuten dämpfen, bis sie aufgegangen und fest sind.',
   'Die übrigen 60 g Butter zerlassen, Mohn und Puderzucker mischen. Die Germknödel mit der Butter übergießen und mit dem Mohnzucker bestreuen. Sofort servieren.',
 ]
 const dampfSteps = [
   '200 ml von der Milch lauwarm erwärmen, die Hefe frisch hineinbröckeln und mit 1 TL vom Zucker auflösen. Mit Weizenmehl, 30 g Zucker, Ei, Salz und 50 g weicher Butter 8 Minuten zu einem glatten Teig kneten.',
-  'Den Teig in der Schüssel abdecken und im CombiSteamer gehen lassen, bis er sich etwa verdoppelt hat.',
+  'Den Teig in der Schüssel abdecken und im CombiSteamer 45 Minuten gehen lassen, bis er sich etwa verdoppelt hat.',
   'Den Teig in 8 Stücke teilen, zu Kugeln formen, mit etwas von der zerlassenen Butter (40 g) bestreichen und abgedeckt weitere 15 Minuten gehen lassen.',
-  'Den Wasserbehälter des CombiSteamers füllen. Die Dampfnudeln mit Abstand auf Backpapier in den gelochten Garbehälter legen und dämpfen, bis sie aufgegangen und fest sind. Tür während des Garens nicht öffnen und mit der restlichen Butter bepinseln.',
-  'Für die Vanillesauce die übrigen 400 ml Milch mit dem Vanillezucker erhitzen. Eigelbe, den restlichen Zucker (20 g) und die Speisestärke verrühren, die heiße Milch einrühren, zurück in den Topf geben und bei niedriger Hitze rühren, bis die Sauce bindet. Zu den warmen Dampfnudeln reichen.',
+  'Den Wasserbehälter des CombiSteamers füllen. Die Dampfnudeln mit Abstand auf Backpapier in den gelochten Garbehälter legen und 22 Minuten dämpfen, bis sie aufgegangen und fest sind – die Tür dabei nicht öffnen, sonst fallen sie zusammen. Danach mit der restlichen Butter bepinseln.',
+  'Für die Vanillesauce die übrigen 400 ml Milch mit dem Vanillezucker erhitzen. Eigelbe, den restlichen Zucker (20 g) und die Speisestärke verrühren, die heiße Milch einrühren, zurück in den Topf geben und bei niedriger Hitze ständig rühren, bis die Sauce cremig bindet (nicht kochen, sonst gerinnt sie). Zu den warmen Dampfnudeln reichen.',
 ]
 const cannoliSteps = [
   'Den Ricotta in einem Sieb mit Küchenpapier mindestens 1 Stunde im Kühlschrank abtropfen lassen.',
-  'Ricotta, Mascarpone und Puderzucker glatt rühren. Von der Orange die Schale fein abreiben, den Saft auspressen und mit 1 EL Saft und der Schale unterrühren. Die Zartbitterschokolade fein hacken und die Hälfte unterheben.',
+  'Ricotta, Mascarpone und Puderzucker glatt rühren. Die Orange heiß waschen, die Schale fein abreiben und den Saft auspressen. Die Schale und 1 EL vom Saft unterrühren. Die Zartbitterschokolade fein hacken und die Hälfte locker unterheben.',
   'Die Löffelbiskuits grob zerbröseln, die Mandeln grob hacken und mischen.',
   'In 6 Gläser abwechselnd Brösel und Creme schichten, mit Creme abschließen. Mit der restlichen Schokolade bestreuen und mindestens 1 Stunde kalt stellen.',
 ]
