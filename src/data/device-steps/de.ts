@@ -12,18 +12,18 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 170, minutes: 30, note: 'vorheizen, Ebene 2' }],
     },
     {
-      text: 'Den Braten umdrehen, grob geschnittene Zwiebeln und Möhre zugeben und den Kerntemperaturfühler in die dickste Stelle stecken. Weitere 90 Minuten garen und dabei immer wieder mit Bier übergießen.',
+      text: 'Den Braten umdrehen, grob geschnittene Zwiebeln und Möhre zugeben und den Kerntemperaturfühler in die dickste Stelle stecken. Weitere 90 Minuten garen und dabei alle 20 bis 30 Minuten mit etwas Dunkelbier übergießen.',
       settings: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 170, minutes: 90, core: 78, note: 'Fühler nicht am Knochen' }],
     },
     {
-      text: 'Für die Kruste auf trockene Hitze umstellen und weitergaren, bis die Schwarte aufpoppt.',
+      text: 'Für die Kruste auf trockene Hitze umstellen und weitergaren, bis die Schwarte überall kleine Blasen wirft (aufpoppt) und knusprig ist.',
       settings: [{ device: 'steamer', mode: 'Heißluft', temp: 220, minutes: 15, note: 'ohne Dampf' }],
     },
     {
-      text: 'Für die Semmelknödel die Brötchen würfeln, mit warmer Milch übergießen und 15 Minuten ziehen lassen. Eier, Petersilie und Salz untermischen und Knödel formen.',
+      text: 'Während der Braten gart, für die Semmelknödel die Brötchen in etwa 1 cm große Würfel schneiden, mit warmer Milch übergießen und 15 Minuten ziehen lassen. Eier, gehackte Petersilie und Salz zugeben, mit den Händen gut verkneten und mit nassen Händen 6 feste Knödel formen.',
     },
     {
-      text: 'Reichlich Salzwasser mit Deckel aufkochen, die Knödel einlegen und 20 Minuten sanft ziehen lassen.',
+      text: 'Reichlich Salzwasser mit Deckel aufkochen, die Knödel einlegen, die Hitze reduzieren und 20 Minuten sanft ziehen lassen. Das Wasser soll sich nur leicht bewegen, nicht sprudeln, sonst zerfallen die Knödel.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: '3', minutes: 20, note: 'ziehen lassen' },
@@ -37,7 +37,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   // Beispiel 2: Suppe – alles auf dem BORA, Stufen aus der Phrase-Tabelle
   kartoffelsuppe: [
     {
-      text: 'Zwiebel und Gemüse würfeln und in etwas Fett im Topf andünsten.',
+      text: 'Zwiebel, Möhre und Sellerie würfeln, den Lauch in Ringe schneiden und alles in etwas Fett im Topf andünsten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '4', minutes: 5 }],
     },
     {
@@ -59,14 +59,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   rinderrouladen: [
     {
-      text: 'Rouladen flach klopfen, salzen, pfeffern und mit Senf bestreichen. Mit je 2 Scheiben Bacon, einer längs geviertelten Gewürzgurke und einer halben Zwiebel in Streifen belegen, aufrollen und mit Rouladennadeln oder Küchengarn fixieren.',
+      text: 'Die Rinderrouladen flach klopfen, salzen, pfeffern und mit Senf bestreichen. Mit je 2 Scheiben Bacon, einer längs geviertelten Gewürzgurke und einer halben Zwiebel in Streifen belegen, aufrollen und mit Rouladennadeln oder Küchengarn fixieren.',
     },
     {
       text: 'Butterschmalz im Bräter erhitzen und die Rouladen rundum kräftig anbraten. Dabei den Abzug eine Stufe höher stellen. Rouladen herausnehmen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '8', minutes: 8, note: 'Brücke' }],
     },
     {
-      text: 'Restliche Zwiebel, Möhre und Sellerie gewürfelt anrösten, Tomatenmark kurz mitrösten, mit Rotwein ablöschen und einkochen lassen.',
+      text: 'Restliche Zwiebel, Möhre und Sellerie würfeln und im Bratfett anrösten. Tomatenmark kurz mitrösten, mit Rotwein ablöschen (angießen und den Bratensatz mit einem Holzlöffel vom Boden lösen) und fast ganz einkochen lassen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 8 }],
     },
     {
@@ -74,32 +74,32 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 150, minutes: 90, note: 'vorheizen, Deckel drauf' }],
     },
     {
-      text: 'Die Sauce durch ein Sieb passieren, abschmecken und nach Wunsch mit etwas angerührter Stärke binden.',
-      settings: [{ device: 'bora', mode: 'Kochzone', level: '4', minutes: 3 }],
-    },
-    {
-      text: 'Rotkohl fein hobeln, mit gewürfeltem Apfel, Essig, Zucker, Lorbeer, Nelken und 100 ml Wasser mit Deckel 45 Minuten weich schmoren, mit Salz abschmecken.',
+      text: 'Während die Rouladen schmoren, den Rotkohl fein hobeln und mit gewürfeltem Apfel, Essig, Zucker, Lorbeer, Nelken und 100 ml Wasser mit Deckel 45 Minuten weich schmoren, ab und zu umrühren und mit Salz abschmecken.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '8', minutes: 3, note: 'ankochen' },
         { device: 'bora', mode: 'Kochzone', level: '3', minutes: 45, note: 'Deckel drauf' },
       ],
     },
     {
-      text: 'Für die Klöße die Kartoffeln im CombiSteamer dämpfen, pellen, durchpressen und abkühlen lassen.',
+      text: 'Gleichzeitig für die Klöße den Wasserbehälter des CombiSteamers füllen und die Kartoffeln mit Schale auf dem gelochten Garbehälter dämpfen. Noch heiß pellen, durch die Kartoffelpresse drücken und ausdampfen und abkühlen lassen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Die Kartoffelmasse mit 30 g Stärke, Salz und etwas Muskat verkneten, Klöße formen und 20 Minuten in siedendem Salzwasser ziehen lassen.',
+      text: 'Die Kartoffelmasse mit 30 g Stärke, Salz und etwas Muskat zu einem glatten Teig verkneten und mit nassen Händen 4 Klöße formen. Reichlich Salzwasser aufkochen, die Klöße einlegen und bei kleiner Hitze 20 Minuten ziehen lassen, bis sie oben schwimmen. Das Wasser darf nicht sprudeln, sonst zerfallen sie.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 20, note: 'ziehen lassen' },
       ],
     },
+    {
+      text: 'Die Rouladen aus dem Bräter nehmen und das Garn bzw. die Nadeln entfernen. Die Sauce durch ein Sieb passieren, abschmecken und nach Wunsch mit den restlichen 10 g Stärke, in etwas kaltem Wasser angerührt, binden. Rouladen mit Sauce, Rotkohl und Klößen servieren.',
+      settings: [{ device: 'bora', mode: 'Kochzone', level: '4', minutes: 3 }],
+    },
   ],
 
   sauerbraten: [
     {
-      text: 'Wein, Essig, 250 ml Wasser, grob geschnittenes Gemüse und Gewürze mit Deckel aufkochen und abkühlen lassen.',
+      text: 'Zwiebeln, Möhre und Sellerie grob schneiden. Mit Rotwein, Essig, 250 ml Wasser, Lorbeerblättern, Wacholderbeeren, Nelken und Pfefferkörnern mit Deckel aufkochen und vollständig abkühlen lassen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' }],
     },
     {
@@ -110,19 +110,19 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '8', minutes: 10, note: 'Brücke' }],
     },
     {
-      text: 'Mit 500 ml Marinade ablöschen und den zugedeckten Bräter in den vorgeheizten Combair schieben. Etwa 2 Stunden schmoren, bis das Fleisch zart ist.',
+      text: 'Mit 500 ml Marinade ablöschen und den zugedeckten Bräter in den vorgeheizten Combair schieben. Etwa 2 Stunden schmoren, bis das Fleisch zart ist und eine Fleischgabel leicht hineingleitet.',
       settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 150, minutes: 120, core: 85, note: 'vorheizen, Deckel drauf' }],
     },
     {
-      text: 'Fleisch herausnehmen. Die Sauce passieren, zerbröselte Printen, Rosinen und Sirup einrühren und sämig einköcheln. Mit Salz und Zucker süß-sauer abschmecken.',
+      text: 'Fleisch herausnehmen. Die Sauce passieren, zerbröselte Printen, Rosinen und Zuckerrübensirup einrühren und sämig einköcheln. Mit Salz abschmecken, die Sauce soll angenehm süß-sauer schmecken.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 10 }],
     },
     {
-      text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
+      text: 'Etwa 30 Minuten vor Ende der Schmorzeit die Salzkartoffeln zubereiten: den Wasserbehälter des CombiSteamers füllen, die Kartoffeln schälen, in gleich große Stücke (ca. 4 cm) schneiden, auf den gelochten Garbehälter legen, salzen und dämpfen, bis ein Messer leicht hineingleitet.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 30, note: 'gelocht' }],
     },
     {
-      text: 'Den Rotkohl mit Deckel und wenig Wasser weich schmoren.',
+      text: 'Gleichzeitig den Rotkohl fein hobeln und mit etwa 100 ml Wasser und einer Prise Salz mit Deckel weich schmoren, dabei ab und zu umrühren.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 25, note: 'Deckel drauf' }],
     },
     {
@@ -132,7 +132,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'wiener-schnitzel': [
     {
-      text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen, pellen und noch warm in Scheiben schneiden.',
+      text: 'Die Kartoffeln mit Schale im CombiSteamer als Pellkartoffeln dämpfen (Wasserbehälter vorher füllen), pellen und noch warm in Scheiben schneiden.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
@@ -143,10 +143,10 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Gurke fein hobeln, leicht salzen, ausdrücken und mit Öl und Schnittlauch unter den Salat heben.',
     },
     {
-      text: 'Schnitzel zwischen Frischhaltefolie dünn klopfen (ca. 4 mm), salzen und pfeffern. Nacheinander in Mehl, verquirltem Ei und Paniermehl wenden. Die Panade nicht andrücken.',
+      text: 'Die Kalbsschnitzel zwischen Frischhaltefolie dünn klopfen (ca. 4 mm), salzen und pfeffern. Nacheinander in Mehl, verquirltem Ei und Paniermehl wenden. Die Panade nicht andrücken.',
     },
     {
-      text: 'Butterschmalz in einer großen Pfanne fingerhoch erhitzen. Die Schnitzel schwimmend 2 bis 3 Minuten je Seite goldbraun ausbacken, dabei die Pfanne schwenken, damit die Panade souffliert.',
+      text: 'Butterschmalz in einer großen Pfanne fingerhoch erhitzen. Die Schnitzel schwimmend 2 bis 3 Minuten je Seite goldbraun ausbacken, dabei die Pfanne schwenken, damit heißes Fett über die Schnitzel schwappt und die Panade souffliert (sich wellig vom Fleisch abhebt).',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '7', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
@@ -156,7 +156,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   jaegerschnitzel: [
     {
-      text: 'Schnitzel flach klopfen, mit Salz, Pfeffer und Paprika würzen und leicht mehlieren. Im heißen Butterschmalz 3 Minuten je Seite braten.',
+      text: 'Die Schweineschnitzel flach klopfen, mit Salz, Pfeffer und Paprika würzen und mehlieren (dünn in Mehl wenden und überschüssiges Mehl abklopfen). Im heißen Butterschmalz 3 Minuten je Seite braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
@@ -175,23 +175,23 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 5 }],
     },
     {
-      text: 'Spätzle in Butter schwenken und mit Schnitzel und Pilzsauce servieren.',
+      text: 'Die Spätzle in einer zweiten Pfanne in der Butter schwenken, bis sie heiß und leicht gebräunt sind, und mit Schnitzel und Pilzsauce servieren.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 4 }],
     },
   ],
 
   paprikaschnitzel: [
     {
-      text: 'Die Pommes in den vorgeheizten Airfryer geben und knusprig backen. Korb höchstens halb füllen und zwischendurch schütteln.',
-      settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 190, minutes: 18, note: 'vorheizen, schütteln' }],
-    },
-    {
-      text: 'Schnitzel flach klopfen, würzen, mehlieren und im Butterschmalz 3 Minuten je Seite braten.',
+      text: 'Die Schweineschnitzel flach klopfen, mit Salz und Pfeffer würzen, mehlieren (dünn in Mehl wenden und überschüssiges Mehl abklopfen) und im Butterschmalz 3 Minuten je Seite braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
       text: 'Die Schnitzel im Combair mit „Warmhalten“ warm halten.',
       settings: [{ device: 'combair', mode: 'Warmhalten' }],
+    },
+    {
+      text: 'Jetzt die Pommes in den vorgeheizten Airfryer geben und knusprig backen, während die Sauce entsteht. Korb höchstens halb füllen und zwischendurch schütteln.',
+      settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 190, minutes: 18, note: 'vorheizen, schütteln' }],
     },
     {
       text: 'Paprika und Zwiebel in Streifen schneiden und im Bratfett andünsten. Tomatenmark und Paprikapulver kurz mitrösten.',
@@ -208,7 +208,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   rahmschnitzel: [
     {
-      text: 'Schnitzel dünn klopfen, salzen, pfeffern, mehlieren und in Butterschmalz goldbraun braten. Herausnehmen.',
+      text: 'Die Schweineschnitzel dünn klopfen, salzen, pfeffern, mehlieren (dünn in Mehl wenden und überschüssiges Mehl abklopfen) und in Butterschmalz etwa 3 Minuten je Seite goldbraun braten. Herausnehmen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'Pfanne vorheizen' }],
     },
     {
@@ -227,25 +227,25 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Spätzle in Butter goldgelb anbraten und dazu servieren.',
+      text: 'Die Spätzle in einer zweiten Pfanne in der Butter goldgelb anbraten und dazu servieren.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6 }],
     },
   ],
 
   'cordon-bleu': [
     {
-      text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen, pellen, abkühlen lassen und in Scheiben schneiden. Am besten schon am Vortag.',
+      text: 'Die Kartoffeln mit Schale im CombiSteamer als Pellkartoffeln dämpfen (Wasserbehälter vorher füllen), pellen, abkühlen lassen und in Scheiben schneiden. Am besten schon am Vortag.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Schnitzel seitlich zu einer Tasche einschneiden oder dünn klopfen. Mit Schinken und Käse füllen, zuklappen und die Ränder andrücken. Salzen und pfeffern.',
+      text: 'Die Schweineschnitzel seitlich zu einer Tasche einschneiden oder dünn klopfen. Mit Schinken und Käse füllen, zuklappen und die Ränder andrücken. Salzen und pfeffern.',
     },
     {
-      text: 'In Mehl, Ei und Paniermehl panieren und in reichlich Butterschmalz bei mittlerer Hitze je Seite 4 bis 5 Minuten goldbraun braten.',
+      text: 'Nacheinander in Mehl, verquirltem Ei und Paniermehl wenden (panieren) und in reichlich Butterschmalz bei mittlerer Hitze je Seite 4 bis 5 Minuten goldbraun braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 10, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Kartoffeln in einer zweiten Pfanne mit etwas Fett knusprig braten, Speck und Zwiebel zugeben und mit Salz und Pfeffer würzen. Mit Zitrone servieren.',
+      text: 'Die Kartoffelscheiben in einer zweiten Pfanne mit etwas Butterschmalz knusprig braten, Speck und gewürfelte Zwiebel zugeben und mit Salz und Pfeffer würzen. Mit Zitrone servieren.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '6', minutes: 8, note: 'zweite Zone' },
         { device: 'bora', mode: 'Kochzone', level: '4', minutes: 5, note: 'Speck, Zwiebel' },
@@ -258,7 +258,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Brötchen einweichen und gut ausdrücken. Mit Hack, Ei, fein gewürfelter Zwiebel, gehackten Sardellen, Salz und Pfeffer verkneten und 8 Klopse formen.',
     },
     {
-      text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
+      text: 'Für die Salzkartoffeln den Wasserbehälter des CombiSteamers füllen, die Kartoffeln schälen, halbieren, auf den gelochten Garbehälter legen, salzen und dämpfen, bis ein Messer leicht hineingleitet.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
@@ -269,7 +269,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Butter schmelzen, Mehl darin anschwitzen und nach und nach 400 ml Brühe einrühren. 5 Minuten köcheln lassen, dann Sahne und Kapern zugeben.',
+      text: 'Butter schmelzen, Mehl einrühren und unter Rühren hell anschwitzen, ohne dass es braun wird. Nach und nach 400 ml Brühe mit dem Schneebesen einrühren. 5 Minuten köcheln lassen, dann Sahne und Kapern zugeben.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '4', minutes: 2, note: 'anschwitzen' },
         { device: 'bora', mode: 'Kochzone', level: '4', minutes: 5, note: 'köcheln' },
@@ -283,7 +283,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   frikadellen: [
     {
-      text: 'Brötchen einweichen und ausdrücken. Zwiebel fein würfeln und glasig dünsten.',
+      text: 'Brötchen einweichen und gut ausdrücken. Zwiebel fein würfeln, in wenig Butterschmalz glasig dünsten und kurz abkühlen lassen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '4', minutes: 4 }],
     },
     {
@@ -294,15 +294,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Frikadellen im Butterschmalz bei mittlerer Hitze 5 bis 6 Minuten je Seite braten.',
+      text: 'Frikadellen im Butterschmalz bei mittlerer Hitze 5 bis 6 Minuten je Seite braten, bis sie innen nicht mehr rosa sind.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 12, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Erbsen und Möhren mit etwas Butter und wenig Wasser in einer Schale in den CombiSteamer zu den Kartoffeln stellen, salzen und dämpfen.',
+      text: 'Für die letzten 8 Minuten Erbsen und Möhren mit etwas Butter und wenig Wasser in einer Schale in den CombiSteamer zu den Kartoffeln stellen, salzen und dämpfen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 8, note: 'Ebene 3' }],
     },
     {
-      text: 'Die Kartoffeln abgießen und mit heißer Milch und Butter stampfen. Mit Muskat und Salz abschmecken.',
+      text: 'Milch und restliche Butter in einem Topf erhitzen, die Kartoffeln zugeben und mit dem Kartoffelstampfer zu Püree stampfen. Mit Muskat und Salz abschmecken.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' }],
     },
   ],
@@ -332,7 +332,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 150, minutes: 20 }],
     },
     {
-      text: 'Die Bandnudeln in reichlich Salzwasser bissfest kochen und mit dem Gulasch servieren.',
+      text: 'Etwa 20 Minuten vor Ende der Schmorzeit reichlich Salzwasser mit Deckel aufkochen, die Bandnudeln darin bissfest kochen, abgießen und mit dem Gulasch servieren.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: '7', minutes: 9 },
@@ -361,7 +361,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 30, note: 'Deckel drauf' }],
     },
     {
-      text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
+      text: 'Während das Sauerkraut gart, den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, auf den gelochten Garbehälter legen, salzen und als Salzkartoffeln dämpfen, bis ein Messer leicht hineingleitet.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
@@ -371,7 +371,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'kassler-sauerkraut': [
     {
-      text: 'Zwiebel würfeln und in Butterschmalz andünsten. Sauerkraut, gewürfelten Apfel, Wein, Lorbeer, Wacholder und 100 ml Wasser zugeben.',
+      text: 'Zwiebel würfeln und in Butterschmalz andünsten. Sauerkraut, gewürfelten Apfel, Wein, Lorbeer, Wacholderbeeren und 100 ml Wasser zugeben.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '4', minutes: 4 }],
     },
     {
@@ -382,11 +382,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen.',
+      text: 'Während das Kraut gart, die Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen (Wasserbehälter vorher füllen).',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Die Kartoffeln mit heißer Milch und Butter zu Püree stampfen. Mit Muskat und Salz würzen.',
+      text: 'Milch und Butter in einem Topf erhitzen, die Kartoffeln zugeben und zu Püree stampfen. Mit Muskat und Salz würzen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' }],
     },
     {
@@ -396,11 +396,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   leberkaese: [
     {
-      text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen, pellen und in Scheiben schneiden.',
+      text: 'Die Kartoffeln mit Schale im CombiSteamer als Pellkartoffeln dämpfen, pellen und in Scheiben schneiden.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'In 2 EL Butterschmalz ohne zu wenden 5 Minuten anbraten, dann wenden und knusprig braten. Zwiebelwürfel zugeben und mit Salz, Pfeffer und etwas Kümmel würzen.',
+      text: 'Die Kartoffelscheiben in einer großen Pfanne in 2 EL Butterschmalz ohne zu wenden 5 Minuten anbraten, dann wenden und knusprig braten. Zwiebelwürfel zugeben und mit Salz, Pfeffer und etwas Kümmel würzen.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '6', minutes: 5, note: 'nicht wenden' },
         { device: 'bora', mode: 'Kochzone', level: '5', minutes: 6, note: 'wenden, Zwiebeln' },
@@ -411,7 +411,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 180, minutes: 10, note: 'vorheizen, wenden' }],
     },
     {
-      text: 'Daneben die Spiegeleier in einer Pfanne braten.',
+      text: 'Daneben in einer zweiten Pfanne im restlichen Butterschmalz die Eier als Spiegeleier braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 4, note: 'zweite Zone' }],
     },
     {
@@ -428,15 +428,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen.',
+      text: 'Während das Kraut schmort, die Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen (Wasserbehälter vorher füllen).',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Die Kartoffeln mit heißer Milch und Butter zu Püree stampfen. Mit Muskat und Salz würzen.',
+      text: 'Milch und Butter in einem Topf erhitzen, die Kartoffeln zugeben und zu Püree stampfen. Mit Muskat und Salz würzen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' }],
     },
     {
-      text: 'Würstchen im Butterschmalz rundum braun braten.',
+      text: 'Die Rostbratwürstchen im Butterschmalz rundum braun braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 8, note: 'Pfanne vorheizen' }],
     },
     {
@@ -446,11 +446,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   currywurst: [
     {
-      text: 'Die Pommes in den vorgeheizten Airfryer geben und knusprig backen. Korb höchstens halb füllen und zwischendurch schütteln.',
-      settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 190, minutes: 18, note: 'vorheizen, schütteln' }],
-    },
-    {
-      text: 'Für die Sauce die Zwiebel fein würfeln und in Öl anschwitzen. Tomatenmark, Curry und Paprika kurz mitrösten.',
+      text: 'Für die Sauce die Zwiebel fein würfeln und in Öl anschwitzen. Tomatenmark, die Hälfte des Currypulvers und das Paprikapulver kurz mitrösten.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '4', minutes: 3 },
         { device: 'bora', mode: 'Kochzone', level: '5', minutes: 1, note: 'Pulver nicht verbrennen' },
@@ -461,7 +457,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '4', minutes: 10 }],
     },
     {
-      text: 'Würste in einer Pfanne braten, in Scheiben schneiden, mit Sauce übergießen und mit Currypulver bestäuben.',
+      text: 'Während die Sauce köchelt, die Pommes in den vorgeheizten Airfryer geben und knusprig backen. Korb höchstens halb füllen und zwischendurch schütteln.',
+      settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 190, minutes: 18, note: 'vorheizen, schütteln' }],
+    },
+    {
+      text: 'Die Bratwürste in einer Pfanne rundum braun braten, in Scheiben schneiden, mit Sauce übergießen und mit dem restlichen Currypulver bestäuben.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 8, note: 'Pfanne vorheizen' }],
     },
   ],
@@ -475,14 +475,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 15, note: 'öfter rühren' }],
     },
     {
-      text: 'Reichlich Salzwasser mit Deckel aufkochen. Den Teig portionsweise ins siedende Wasser schaben oder pressen. Sobald die Spätzle oben schwimmen, abschöpfen.',
+      text: 'Den Combair vorheizen. Reichlich Salzwasser mit Deckel aufkochen. Den Teig portionsweise mit dem Spätzlehobel oder der Spätzlepresse ins siedende Wasser drücken (oder vom nassen Brett mit einem Messer in dünnen Streifen schaben). Sobald die Spätzle oben schwimmen, mit dem Schaumlöffel abschöpfen und abtropfen lassen.',
       settings: [
+        { device: 'combair', mode: 'Ober-/Unterhitze', temp: 180, note: 'vorheizen' },
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: '6', minutes: 10, note: 'siedend halten' },
       ],
     },
     {
-      text: 'Spätzle und geriebenen Käse lagenweise in eine Form schichten, mit Pfeffer und Muskat würzen und in den vorgeheizten Combair schieben, bis der Käse schmilzt.',
+      text: 'Spätzle und geriebenen Bergkäse lagenweise in eine Form schichten, mit Pfeffer und Muskat würzen und in den vorgeheizten Combair schieben, bis der Käse schmilzt.',
       settings: [{ device: 'combair', mode: 'Ober-/Unterhitze', temp: 180, minutes: 8, note: 'vorheizen, Form wärmen' }],
     },
     {
@@ -554,7 +555,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Die Kartoffeln mit Milch und Butter stampfen. Mit Salz und Muskat würzen.',
+      text: 'Milch und Butter in einem Topf erhitzen, die Kartoffeln zugeben und stampfen. Mit Salz und Muskat würzen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' }],
     },
     {
@@ -585,7 +586,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 4, note: 'durchrühren' }],
     },
     {
-      text: 'Die Spiegeleier in einer Pfanne braten.',
+      text: 'Die Eier in einer zweiten Pfanne im restlichen Butterschmalz als Spiegeleier braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 4, note: 'zweite Zone' }],
     },
     {
@@ -599,8 +600,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Die Eier 7 Minuten mitdämpfen, abschrecken und pellen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 7, note: 'wachsweich' }],
+      text: 'Für die letzten 10 Minuten die Eier zu den Kartoffeln legen und hart dämpfen, dann kalt abschrecken und pellen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 10, note: 'hart' }],
     },
     {
       text: 'Butter schmelzen, Mehl anschwitzen, mit Brühe und Sahne aufgießen und 5 Minuten köcheln lassen. Beide Senfsorten einrühren und mit Salz und einer Prise Zucker abschmecken.',
@@ -611,7 +612,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Die Kartoffeln mit Milch und Butter zu Püree stampfen.',
+      text: 'Die Milch erhitzen, die Kartoffeln darin zu Püree stampfen und mit Salz und Muskat abschmecken.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' }],
     },
     {
@@ -622,7 +623,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'spinat-spiegelei': [
     {
-      text: 'Kartoffeln schälen, halbieren und im CombiSteamer als Salzkartoffeln gar dämpfen.',
+      text: 'Kartoffeln schälen, halbieren, auf den gelochten Garbehälter legen, salzen und im CombiSteamer als Salzkartoffeln gar dämpfen (Wasserbehälter vorher füllen).',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
@@ -648,7 +649,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 22, note: 'Ebene 2' }],
     },
     {
-      text: 'Spargel in Stücke schneiden und mit den geviertelten Champignons in Butter andünsten. Mehl darüber stäuben und anschwitzen.',
+      text: 'Den Spargel schälen, die holzigen Enden abschneiden und in Stücke schneiden. Mit den geviertelten Champignons in Butter andünsten. Mehl darüber stäuben und unter Rühren kurz anschwitzen, ohne dass es braun wird.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 8 }],
     },
     {
@@ -662,7 +663,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'haehnchen-rahm-bandnudeln': [
     {
-      text: 'Bandnudeln in reichlich Salzwasser mit Deckel aufkochen und bissfest kochen.',
+      text: 'Reichlich Salzwasser mit Deckel aufkochen. Die Bandnudeln einlegen, sobald die Champignons in der Pfanne braten, bissfest kochen und abgießen.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: '7', minutes: 9 },
@@ -688,15 +689,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'zuercher-geschnetzeltes': [
     {
-      text: 'Die Kartoffeln vorab im CombiSteamer als Pellkartoffeln dämpfen, auskühlen lassen und grob raspeln.',
+      text: 'Die Kartoffeln vorab (am besten am Vortag) mit Schale im CombiSteamer als Pellkartoffeln dämpfen, pellen, vollständig auskühlen lassen und grob raspeln.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Die Kartoffelraspel salzen, in Butterschmalz zu 2 Rösti formen und von jeder Seite 8 Minuten knusprig braten.',
+      text: 'Die Kartoffelraspel salzen. Butterschmalz in der Pfanne erhitzen, die Raspel darin zu 2 flachen Fladen (Rösti) andrücken und braten, bis die Unterseite goldbraun und knusprig ist. Mit Hilfe eines Tellers wenden und die zweite Seite ebenso lange braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 16, note: 'nach 8 Min. wenden' }],
     },
     {
-      text: 'Fleisch in feine Streifen schneiden, leicht mehlieren und portionsweise scharf anbraten. Herausnehmen. Dabei den Abzug eine Stufe höher stellen.',
+      text: 'Das Kalbfleisch in feine Streifen schneiden, leicht mehlieren (in Mehl wenden, überschüssiges abklopfen) und portionsweise scharf anbraten. Herausnehmen. Dabei den Abzug eine Stufe höher stellen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '9', minutes: 6, note: 'zweite Zone' }],
     },
     {
@@ -711,7 +712,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'schweinemedaillons-pfefferrahm': [
     {
-      text: 'Filet in 3 cm dicke Medaillons schneiden und leicht flach drücken.',
+      text: 'Das Schweinefilet in 3 cm dicke Medaillons schneiden und leicht flach drücken.',
     },
     {
       text: 'Im heißen Butterschmalz 3 Minuten je Seite braten und salzen.',
@@ -726,7 +727,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 8 }],
     },
     {
-      text: 'Spätzle in Butter schwenken und mit den Medaillons und der Sauce servieren.',
+      text: 'Die Spätzle in einer zweiten Pfanne in der Butter schwenken, bis sie heiß sind, und mit den Medaillons und der Sauce servieren.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 4 }],
     },
   ],
@@ -768,22 +769,25 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'gefuellte-paprika': [
     {
-      text: 'Den Reis mit Wasser in einer flachen Schale auf dem gelochten Garbehälter im CombiSteamer halb gar dämpfen. Paprika köpfen und entkernen.',
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Den Reis mit 120 ml Wasser und einer Prise Salz in einer flachen Schale auf dem gelochten Garbehälter halb gar dämpfen. Die Paprika köpfen (den Deckel abschneiden und aufheben) und entkernen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 12, note: 'halb gar' }],
     },
     {
-      text: 'Hack, Reis, Ei, Zwiebelwürfel, Salz, Pfeffer und Paprikapulver vermengen und in die Schoten füllen. Deckel aufsetzen.',
+      text: 'Die Hälfte des Reises abnehmen, die andere Hälfte in der Schale lassen. Die Zwiebel fein würfeln. Hack, den abgenommenen Reis, Ei, Zwiebel, Salz, Pfeffer und Paprikapulver vermengen, in die Schoten füllen und die Deckel aufsetzen.',
     },
     {
-      text: 'Passierte Tomaten, Tomatenmark und Brühe in einem Topf aufkochen und würzen.',
-      settings: [{ device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' }],
+      text: 'Den Combair vorheizen. Passierte Tomaten, Tomatenmark und Brühe in einem ofenfesten Topf aufkochen und mit Salz, Pfeffer und einer Prise Zucker würzen.',
+      settings: [
+        { device: 'combair', mode: 'Heißluft feucht', temp: 170, note: 'vorheizen' },
+        { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
+      ],
     },
     {
       text: 'Die Paprika in die Sauce setzen und den zugedeckten Topf in den vorgeheizten Combair schieben. 40 Minuten schmoren lassen.',
       settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 170, minutes: 40, note: 'vorheizen, Deckel drauf' }],
     },
     {
-      text: 'Den restlichen Reis im CombiSteamer fertig garen.',
+      text: 'Etwa 15 Minuten vor Ende der Schmorzeit den restlichen Reis mit 2 EL Wasser im CombiSteamer fertig garen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 10, note: 'fertig garen' }],
     },
     {
@@ -793,7 +797,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   hackbraten: [
     {
-      text: 'Hack mit eingeweichtem Brötchen, rohem Ei, Zwiebelwürfeln, Senf, Salz und Pfeffer verkneten.',
+      text: 'Den Combair vorheizen. Das Brötchen in Wasser einweichen und gut ausdrücken, die Zwiebel fein würfeln. Hack mit Brötchen, rohem Ei, Zwiebel, Senf, Salz und Pfeffer verkneten.',
+      settings: [{ device: 'combair', mode: 'Heißluft', temp: 160, note: 'vorheizen' }],
     },
     {
       text: 'Die harten Eier 12 Minuten im CombiSteamer dämpfen, abschrecken und pellen.',
@@ -807,7 +812,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'combair', mode: 'Heißluft', temp: 160, minutes: 50, core: 75, note: 'vorheizen' }],
     },
     {
-      text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen. Mit heißer Milch und Butter zu Püree stampfen und mit Muskat abschmecken.',
+      text: 'Etwa 30 Minuten vor Ende der Backzeit die Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen. Milch und Butter erhitzen, die Kartoffeln darin zu Püree stampfen und mit Salz und Muskat abschmecken.',
       settings: [
         { device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' },
         { device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' },
@@ -844,7 +849,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'combair', mode: 'PizzaPlus', temp: 250, minutes: 15, note: 'vorheizen, Ebene 2' }],
     },
     {
-      text: 'Teig ausrollen und mit gewürztem Schmand (Salz, Pfeffer, Muskat) dünn bestreichen.',
+      text: 'Den Flammkuchenteig ausrollen und mit gewürztem Schmand (Salz, Pfeffer, Muskat) dünn bestreichen.',
     },
     {
       text: 'Zwiebel in hauchdünne Ringe schneiden und mit dem Speck auf dem Teig verteilen.',
@@ -861,7 +866,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Im Butterschmalz knusprig braten, dann Speck und Zwiebel zugeben.',
+      text: 'Die Kartoffelscheiben im Butterschmalz knusprig braten, dann Speck und gewürfelte Zwiebel zugeben.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '6', minutes: 8, note: 'Pfanne vorheizen' },
         { device: 'bora', mode: 'Kochzone', level: '5', minutes: 5, note: 'Speck, Zwiebel' },
@@ -894,32 +899,32 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   backfisch: [
     {
-      text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen und in Scheiben schneiden.',
+      text: 'Die Kartoffeln mit Schale im CombiSteamer als Pellkartoffeln dämpfen, noch warm pellen und in Scheiben schneiden.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Die Brühe erhitzen und mit Zwiebelwürfeln, Essig, Salz und Pfeffer zu Kartoffelsalat anmachen.',
+      text: 'Die Brühe erhitzen und mit Zwiebelwürfeln, Essig, Salz und Pfeffer zu Kartoffelsalat anmachen. Mindestens 20 Minuten durchziehen lassen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '8', minutes: 3, note: 'Brühe erhitzen' }],
     },
     {
       text: 'Für die Remoulade die Mayonnaise mit fein gehackter Gurke, Kapern und Petersilie verrühren.',
     },
     {
-      text: 'Mehl, Bier, Ei und Salz zu einem dickflüssigen Bierteig verrühren. Fisch in Stücke schneiden, salzen und mit Zitrone beträufeln.',
+      text: 'Mehl, Bier, Ei und Salz zu einem dickflüssigen Bierteig verrühren. Den Kabeljau in Stücke schneiden, salzen und mit Zitrone beträufeln.',
     },
     {
-      text: 'Das Frittieröl im Topf auf 175 °C erhitzen. Den Fisch durch den Teig ziehen und 4 bis 5 Minuten goldbraun ausbacken. Mit Remoulade und Salat servieren.',
+      text: 'Das Frittieröl im Topf auf 175 °C erhitzen (Thermometer, oder: an einem eingetauchten Holzlöffelstiel steigen kleine Bläschen auf). Den Fisch durch den Teig ziehen, abtropfen lassen und portionsweise 4 bis 5 Minuten goldbraun ausbacken, dann auf Küchenpapier abtropfen lassen. Mit Remoulade und Salat servieren.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '7', minutes: 5, note: 'Öl 175 °C' }],
     },
   ],
 
   'lachs-senf-dill': [
     {
-      text: 'Kartoffeln schälen und im CombiSteamer gar dämpfen. In Butter mit gehackter Petersilie schwenken.',
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, auf den gelochten Garbehälter legen, salzen und gar dämpfen. In Butter mit gehackter Petersilie schwenken und zugedeckt warm halten.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Den Lachs salzen, pfeffern und mit Öl bestreichen. Auf dem gelochten Garbehälter im CombiSteamer garen.',
+      text: 'Den Lachs salzen, pfeffern und mit Öl bestreichen. Den CombiSteamer auf 85 °C umstellen, den Lachs auf den gelochten Garbehälter legen, den Kerntemperaturfühler in die dickste Stelle stecken und garen, bis der Kern 58 °C erreicht (innen saftig und noch leicht glasig).',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 85, minutes: 10, core: 58, note: 'nach den Kartoffeln' }],
     },
     {
@@ -936,11 +941,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'pellkartoffeln-kraeuterquark': [
     {
-      text: 'Die Kartoffeln mit Schale im CombiSteamer garen.',
+      text: 'Die Kartoffeln gründlich waschen und mit Schale auf dem gelochten Garbehälter im CombiSteamer garen (Wasserbehälter vorher füllen).',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Quark mit Milch glatt rühren. Kräuter fein hacken, Zwiebel fein würfeln und beides unterrühren. Mit Salz und Pfeffer würzen.',
+      text: 'Den Speisequark mit Milch glatt rühren. Schnittlauch, Petersilie und Dill fein hacken, Zwiebel fein würfeln und beides unterrühren. Mit Salz und Pfeffer würzen.',
     },
     {
       text: 'Quark mit einer Mulde anrichten und Leinöl hineingießen, wie in der Lausitz.',
@@ -956,38 +961,38 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Nach 24 Minuten 4 Eier dazulegen und hart dämpfen. Dann abschrecken und pellen.',
+      text: 'Nach 24 Minuten alle 6 Eier dazulegen und hart dämpfen. Dann kalt abschrecken und pellen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 11, note: 'Eier hart' }],
     },
     {
       text: 'Die sieben Kräuter (Borretsch, Kerbel, Kresse, Petersilie, Pimpinelle, Sauerampfer, Schnittlauch) waschen, grob schneiden und sehr fein pürieren oder wiegen.',
     },
     {
-      text: 'Schmand, saure Sahne, Joghurt und Senf unterrühren. 2 hart gekochte Eigelbe zerdrücken und einrühren. Mit Salz, Pfeffer und einer Prise Zucker abschmecken und 30 Minuten ziehen lassen.',
+      text: 'Schmand, saure Sahne, Joghurt und Senf unterrühren. 2 Eier halbieren, die Eigelbe zerdrücken und einrühren, das Eiweiß fein hacken und ebenfalls unterheben. Mit Salz, Pfeffer und einer Prise Zucker abschmecken und 30 Minuten ziehen lassen.',
     },
     {
-      text: 'Mit halbierten Eiern und Kartoffeln servieren.',
+      text: 'Mit den 4 übrigen, halbierten Eiern und den Kartoffeln servieren.',
     },
   ],
 
   tafelspitz: [
     {
-      text: 'Zwiebel halbieren und in einem Topf ohne Fett dunkel anrösten. Mit 2,5 l Wasser aufgießen, Fleisch, Lorbeer und Pfefferkörner zugeben, mit Deckel aufkochen.',
+      text: 'Zwiebel halbieren und in einem Topf ohne Fett dunkel anrösten. Mit 2,5 l Wasser aufgießen, den Tafelspitz, Lorbeer und Pfefferkörner zugeben, mit Deckel aufkochen.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'ohne Fett' },
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
       ],
     },
     {
-      text: 'Den Schaum abschöpfen und das Fleisch bei kleinster Hitze 2,5 Stunden simmern lassen.',
-      settings: [{ device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 150, note: 'Fleisch gart' }],
+      text: 'Den Schaum abschöpfen und das Fleisch bei kleinster Hitze 2 Stunden simmern lassen. Das Wasser soll sich kaum bewegen, sonst wird das Fleisch trocken.',
+      settings: [{ device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 120, note: 'Fleisch gart' }],
     },
     {
-      text: 'In den letzten 30 Minuten Möhren, Sellerie und Lauch in Stücken mitgaren und salzen.',
+      text: 'Dann Möhren, Sellerie und Lauch in groben Stücken zugeben, salzen und weitere 30 Minuten mitgaren, bis das Fleisch weich ist (Gabelprobe: eine Fleischgabel gleitet leicht hinein).',
       settings: [{ device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 30 }],
     },
     {
-      text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
+      text: 'Während das Gemüse gart, den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, auf den gelochten Garbehälter legen, salzen und als Salzkartoffeln dämpfen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
@@ -1004,10 +1009,10 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   schweinshaxe: [
     {
-      text: 'Haxen mit Salz, Pfeffer, Kümmel und Knoblauch einreiben. Mit grob geschnittenem Gemüse und 300 ml Bier in einen Bräter geben.',
+      text: 'Die Schweinshaxen mit Salz, Pfeffer, Kümmel und gehacktem Knoblauch einreiben. Zwiebeln und Möhre grob schneiden und mit den Haxen und 300 ml Dunkelbier in einen Bräter geben.',
     },
     {
-      text: 'Den Bräter auf Ebene 2 in den vorgeheizten CombiSteamer schieben und die Haxen garen. Den Kerntemperaturfühler in die dickste Stelle stecken, regelmäßig wenden und mit Bier übergießen.',
+      text: 'Den Bräter auf Ebene 2 in den vorgeheizten CombiSteamer schieben und die Haxen garen. Den Kerntemperaturfühler in die dickste Stelle stecken, regelmäßig wenden und mit dem restlichen Dunkelbier übergießen.',
       settings: [{ device: 'steamer', mode: 'Heißluft mit Beschwaden', temp: 160, minutes: 150, core: 88, note: 'vorheizen, Ebene 2' }],
     },
     {
@@ -1015,37 +1020,37 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'steamer', mode: 'Heißluft', temp: 220, minutes: 15, note: 'ohne Dampf' }],
     },
     {
-      text: 'Kohl fein hobeln, mit Salz kräftig durchkneten und mit Essig, Öl, Zucker und Kümmel zu Krautsalat anmachen.',
+      text: 'Den Weißkohl fein hobeln, mit Salz kräftig durchkneten und mit Essig, Öl, Zucker und Kümmel zu Krautsalat anmachen. Mindestens 30 Minuten durchziehen lassen.',
     },
     {
-      text: 'Die Knödel mit Deckel in reichlich Salzwasser aufkochen und gar ziehen lassen.',
+      text: 'Etwa 40 Minuten vor Ende der Garzeit die Kartoffelknödel halb und halb nach Packungsanweisung mit kaltem Wasser anrühren, kurz quellen lassen und mit nassen Händen Knödel formen. Reichlich Salzwasser mit Deckel aufkochen, die Knödel einlegen und bei kleiner Hitze ziehen lassen, bis sie oben schwimmen. Das Wasser darf nicht sprudeln.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 20 },
       ],
     },
     {
-      text: 'Bratensaft passieren und dazu reichen.',
+      text: 'Den Bratensaft durch ein Sieb gießen, abschmecken und zu Haxen, Knödeln und Krautsalat reichen.',
     },
   ],
 
   'leber-berliner-art': [
     {
-      text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen. Mit Milch und Butter zu Püree stampfen.',
+      text: 'Kartoffeln schälen, in Stücke schneiden und im CombiSteamer weich dämpfen (Wasserbehälter vorher füllen). Milch mit der Hälfte der Butter erhitzen, die Kartoffeln darin zu Püree stampfen und mit Salz und Muskat abschmecken.',
       settings: [
         { device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' },
         { device: 'bora', mode: 'Kochzone', level: '3', minutes: 3, note: 'Milch erhitzen' },
       ],
     },
     {
-      text: 'Zwiebeln in Ringe schneiden und goldbraun braten. Äpfel in Ringe schneiden und in Butter kurz von beiden Seiten braten.',
+      text: 'Zwiebeln in Ringe schneiden und in etwas Butterschmalz goldbraun braten. Äpfel entkernen, in Ringe schneiden und in der restlichen Butter kurz von beiden Seiten braten.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '4', minutes: 8, note: 'Zwiebeln' },
         { device: 'bora', mode: 'Kochzone', level: '5', minutes: 4, note: 'Äpfel, zweite Zone' },
       ],
     },
     {
-      text: 'Leber in Scheiben schneiden, mehlieren und in heißem Butterschmalz 2 Minuten je Seite braten. Erst danach salzen und pfeffern.',
+      text: 'Die Kalbsleber in Scheiben schneiden, mehlieren (in Mehl wenden, überschüssiges abklopfen) und in heißem Butterschmalz 2 Minuten je Seite braten, innen darf sie noch leicht rosa sein. Erst danach salzen und pfeffern, sonst wird sie zäh.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '7', minutes: 4, note: 'Pfanne vorheizen' }],
     },
     {
@@ -1055,23 +1060,23 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'spargel-hollandaise': [
     {
-      text: 'Spargel schälen und die Enden abschneiden. Mit Zucker, Salz und einem Stück Butter in eine Schale geben und im CombiSteamer garen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'Ebene 2' }],
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, auf den gelochten Garbehälter legen, salzen und auf Ebene 1 dämpfen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht, Ebene 1' }],
     },
     {
-      text: 'Kartoffeln schälen, halbieren und auf Ebene 1 mitdämpfen.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht, Ebene 1' }],
+      text: 'Inzwischen den Spargel vom Kopf zum Ende hin schälen und die holzigen Enden abschneiden. Mit Zucker, Salz und einem Stück Butter in eine Schale geben und nach 10 Minuten auf Ebene 2 zu den Kartoffeln in den CombiSteamer stellen.',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'Ebene 2' }],
     },
     {
       text: 'Für die Hollandaise die Butter schmelzen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: 'Schmelzen', note: 'Butter' }],
     },
     {
-      text: 'Eigelbe mit Weißwein über einem warmen Wasserbad cremig aufschlagen, dann die Butter langsam einlaufen lassen. Mit Zitrone, Salz und Pfeffer abschmecken.',
+      text: 'Eigelbe mit Weißwein in einer Metallschüssel über einem Topf mit leise siedendem Wasser (die Schüssel darf das Wasser nicht berühren) dick-cremig aufschlagen, bis der Schneebesen Spuren hinterlässt. Die Schüssel abnehmen und die warme, flüssige Butter erst tropfenweise, dann in dünnem Strahl unterschlagen. Mit Zitronensaft, Salz und Pfeffer abschmecken. Wird die Sauce zu heiß, gerinnt sie.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 6, note: 'Wasserbad' }],
     },
     {
-      text: 'Spargel mit Sauce, Schinken und Kartoffeln anrichten.',
+      text: 'Spargel mit Sauce, Katenschinken und Kartoffeln anrichten.',
     },
   ],
 
@@ -1084,14 +1089,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Eier, die Hälfte der Petersilie, Salz und Muskat zugeben, gut verkneten und 6 Knödel formen.',
     },
     {
-      text: 'Die Knödel in siedendem Salzwasser mit Deckel aufkochen und 20 Minuten ziehen lassen.',
+      text: 'Reichlich Salzwasser mit Deckel aufkochen, die Knödel einlegen, die Hitze reduzieren und 20 Minuten ziehen lassen. Das Wasser soll nur leise sieden, nicht sprudeln, sonst zerfallen die Knödel.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: 'Power', note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 20, note: 'ziehen lassen' },
       ],
     },
     {
-      text: 'Pilze in Scheiben schneiden, mit der restlichen Zwiebel in Butter kräftig anbraten, mit Brühe und Sahne ablöschen und cremig einkochen.',
+      text: 'Champignons und Kräuterseitlinge in Scheiben schneiden, mit der restlichen Zwiebel in Butter kräftig anbraten, mit Brühe und Sahne ablöschen und cremig einkochen.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '8', minutes: 6, note: 'Pfanne vorheizen' },
         { device: 'bora', mode: 'Kochzone', level: '5', minutes: 6, note: 'einkochen' },
@@ -1111,7 +1116,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Linsen, Brühe und Lorbeer zugeben, mit Deckel aufkochen und 35 bis 40 Minuten weich köcheln lassen.',
+      text: 'Die Alblinsen, Brühe und Lorbeer zugeben, mit Deckel aufkochen und 35 bis 40 Minuten weich köcheln lassen.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '8', minutes: 3, note: 'aufkochen' },
         { device: 'bora', mode: 'Kochzone', level: '3', minutes: 38, note: 'Deckel drauf' },
@@ -1122,18 +1127,18 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: 'Simmern', minutes: 6, note: 'Würstchen' }],
     },
     {
-      text: 'Spätzle in Butter schwenken und alles zusammen servieren.',
+      text: 'Die Spätzle in einer zweiten Pfanne in der Butter schwenken, bis sie heiß sind, und alles zusammen servieren.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 4, note: 'zweite Zone' }],
     },
   ],
 
   zwiebelrostbraten: [
     {
-      text: 'Zwiebeln in feine Ringe schneiden, in Mehl mit Paprika wenden und im Butterschmalz portionsweise knusprig frittieren. Abtropfen lassen.',
+      text: 'Zwiebeln in feine Ringe schneiden, in Mehl mit Paprikapulver wenden und im Butterschmalz portionsweise knusprig frittieren. Abtropfen lassen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '7', minutes: 6, note: 'portionsweise' }],
     },
     {
-      text: 'Den Fettrand der Steaks einschneiden. Steaks pfeffern und im heißen Fett je Seite 2 bis 3 Minuten braten. Dabei den Abzug eine Stufe höher stellen. Salzen.',
+      text: 'Den Fettrand der Rumpsteaks mehrmals einschneiden, damit sie sich beim Braten nicht wölben. Steaks pfeffern und im heißen Fett je Seite 2 bis 3 Minuten braten. Dabei den Abzug eine Stufe höher stellen. Salzen.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '8', minutes: 5, note: 'Pfanne vorheizen' }],
     },
     {
@@ -1145,7 +1150,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '7', minutes: 5, note: 'einkochen' }],
     },
     {
-      text: 'Spätzle in Butter schwenken. Steaks mit Sauce und Röstzwiebeln anrichten und mit Butterspätzle servieren.',
+      text: 'Die Spätzle in einer zweiten Pfanne in der Butter schwenken, bis sie heiß sind. Steaks mit Sauce und Röstzwiebeln anrichten und mit Butterspätzle servieren.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '5', minutes: 4, note: 'Spätzle' }],
     },
   ],
@@ -1172,15 +1177,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   pannfisch: [
     {
-      text: 'Die Kartoffeln im CombiSteamer als Pellkartoffeln dämpfen und in Scheiben schneiden.',
+      text: 'Die Kartoffeln mit Schale im CombiSteamer als Pellkartoffeln dämpfen, pellen und in Scheiben schneiden.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 35, note: 'gelocht' }],
     },
     {
-      text: 'Die Kartoffelscheiben mit Zwiebeln im Butterschmalz zu Bratkartoffeln braten.',
+      text: 'Die Zwiebel würfeln. Die Kartoffelscheiben im Butterschmalz goldbraun braten, dabei nur ab und zu wenden, und die Zwiebel die letzten Minuten mitbraten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 12, note: 'Pfanne vorheizen' }],
     },
     {
-      text: 'Fisch in Stücke schneiden, mit Zitrone beträufeln, salzen, mehlieren und in einer zweiten Pfanne in Butterschmalz goldbraun braten.',
+      text: 'Den Seelachs in Stücke schneiden, mit Zitrone beträufeln, salzen, mehlieren (in Mehl wenden, überschüssiges abklopfen) und in einer zweiten Pfanne in Butterschmalz goldbraun braten.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '6', minutes: 6, note: 'zweite Zone' }],
     },
     {
@@ -1194,11 +1199,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   gruenkohl: [
     {
-      text: 'Grünkohl von den Strünken zupfen, waschen, im CombiSteamer kurz blanchieren und grob hacken.',
+      text: 'Grünkohl von den Strünken zupfen, gründlich waschen, im CombiSteamer kurz vorgaren (blanchieren), bis er zusammenfällt, und grob hacken.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 5, note: 'gelocht' }],
     },
     {
-      text: 'Zwiebeln im Schmalz andünsten, Grünkohl und Brühe zugeben, aufkochen und 1 Stunde zugedeckt schmoren.',
+      text: 'Zwiebeln würfeln und im Schweineschmalz andünsten, Grünkohl und Brühe zugeben, aufkochen und 1 Stunde zugedeckt schmoren.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '4', minutes: 4, note: 'Zwiebeln' },
         { device: 'bora', mode: 'Kochzone', level: '8', minutes: 3, note: 'aufkochen' },
@@ -1206,11 +1211,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Kasseler und Pinkel auf den Kohl legen und weitere 45 Minuten mitgaren. Mit Haferflocken binden und mit Senf, Salz, Pfeffer und Zucker abschmecken.',
+      text: 'Kasseler und Pinkel auf den Kohl legen und weitere 45 Minuten mitgaren. Mit Haferflocken binden und mit Senf, Salz, Pfeffer und einer Prise Zucker abschmecken.',
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 45, note: 'Deckel drauf' }],
     },
     {
-      text: 'Kartoffeln im CombiSteamer dämpfen, dann mit Zucker karamellisieren und dazu servieren.',
+      text: 'In den letzten 30 Minuten die Kartoffeln schälen (kleine ganz lassen, große halbieren) und im CombiSteamer dämpfen. Den restlichen Zucker in einer Pfanne hellbraun schmelzen lassen, die gut abgetropften Kartoffeln darin schwenken, bis sie rundum glänzend überzogen sind, und dazu servieren.',
       settings: [
         { device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' },
         { device: 'bora', mode: 'Kochzone', level: '5', minutes: 5, note: 'karamellisieren' },
@@ -1230,14 +1235,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Tomatenmark und Paprika anrösten, dann passierte Tomaten, Brühe, Ketchup und Worcestersauce zugeben. Mit Deckel 30 Minuten schmoren lassen.',
+      text: 'Tomatenmark und Paprikapulver kurz anrösten, dann passierte Tomaten, Brühe, Tomatenketchup und Worcestersauce zugeben. Mit Deckel 30 Minuten schmoren lassen.',
       settings: [
         { device: 'bora', mode: 'Kochzone', level: '6', minutes: 1, note: 'anrösten' },
         { device: 'bora', mode: 'Kochzone', level: '3', minutes: 30, note: 'Deckel drauf' },
       ],
     },
     {
-      text: 'Den Reis mit der 1,5-fachen Menge Wasser und Salz in einer flachen Schale auf dem gelochten Garbehälter im CombiSteamer dämpfen.',
+      text: 'Während es schmort, den Wasserbehälter des CombiSteamers füllen. Den Reis mit der 1,5-fachen Menge Wasser und Salz in einer flachen Schale auf dem gelochten Garbehälter dämpfen.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 22, note: 'Schale' }],
     },
     {
@@ -1258,10 +1263,10 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       ],
     },
     {
-      text: 'Den Topf von der Zone nehmen, Eigelb einrühren und mit Zitrone, Worcestersauce, Salz und Pfeffer abschmecken. Fleisch zugeben.',
+      text: 'Den Topf von der Zone nehmen und das Eigelb einrühren, danach darf die Sauce nicht mehr kochen, sonst gerinnt es. Mit Zitrone, Worcestersauce, Salz und Pfeffer abschmecken. Fleisch zugeben.',
     },
     {
-      text: 'In ofenfeste Förmchen füllen, mit Käse bestreuen und im Combair kurz gratinieren. Mit Toast und Zitronenspalten servieren.',
+      text: 'In ofenfeste Förmchen füllen, mit Käse bestreuen und im Combair kurz gratinieren, bis der Käse goldbraun ist. Das Toastbrot toasten und mit Zitronenspalten dazu servieren.',
       settings: [{ device: 'combair', mode: 'Grill', minutes: 4, note: 'Stufe 3 (stark), Ebene 3, 3 Min. vorheizen' }],
     },
   ],

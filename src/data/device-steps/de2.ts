@@ -18,27 +18,27 @@ const ca = (mode: string, temp: number, minutes?: number, note?: string, core?: 
 export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   // ───────────── Pfanne + Dampf ─────────────
   'kotelett-rahmkohlrabi': [
-    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, mit Salz bestreuen, auf das gelochten Garbehälter legen und dämpfen.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren, mit Salz bestreuen, auf den gelochten Garbehälter legen und dämpfen.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
     { text: 'Den Kohlrabi schälen, in Stifte schneiden und in Butter andünsten. Mehl darüber stäuben, mit Brühe und Sahne aufgießen und 10 Minuten garen. Mit Muskat und Petersilie abschmecken.', settings: [b('4', 3, 'andünsten'), b('3', 10, 'garen')] },
-    { text: 'Die Koteletts pfeffern, im heißen Butterschmalz 4 Minuten je Seite braten und danach salzen.', settings: [b('6', 8, 'Pfanne vorheizen')] },
+    { text: 'Die Schweinekoteletts pfeffern, im heißen Butterschmalz 4 Minuten je Seite braten, bis sie innen nur noch zart rosa sind, und erst danach salzen.', settings: [b('6', 8, 'Pfanne vorheizen')] },
     { text: 'Alles zusammen anrichten.' },
   ],
   'scholle-finkenwerder': [
-    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln ungeschält auf das gelochten Garbehälter legen und garen. Pellen, in Scheiben schneiden und mit Brühe, Zwiebel, Essig, Salz und Pfeffer zu lauwarmem Kartoffelsalat anmachen.', settings: [cs('Dämpfen', 100, 30, 'Wasserbehälter füllen')] },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln ungeschält auf den gelochten Garbehälter legen und garen. Pellen, in Scheiben schneiden und mit heißer Brühe, fein gewürfelter Zwiebel, Essig, Salz und Pfeffer zu lauwarmem Kartoffelsalat anmachen.', settings: [cs('Dämpfen', 100, 30, 'Wasserbehälter füllen')] },
     { text: 'Den Speck in einer großen Pfanne knusprig auslassen und herausnehmen.', settings: [b('5', 6, 'Pfanne')] },
-    { text: 'Die Schollen salzen, im Mehl wenden und im Speckfett mit Butter 4 bis 5 Minuten je Seite braten.', settings: [b('5', 9, 'Pfanne, Brücke')] },
-    { text: 'Speck und Krabben kurz in der Pfanne erwärmen, über die Schollen geben und mit Petersilie und Zitrone servieren.', settings: [b('Warmhalten', 2)] },
+    { text: 'Die Schollen salzen, im Mehl wenden und im Speckfett mit Butter 4 bis 5 Minuten je Seite braten, bis sich das Fleisch an der Mittelgräte leicht lösen lässt.', settings: [b('5', 9, 'Pfanne, Brücke')] },
+    { text: 'Speck und Nordseekrabben kurz in der Pfanne erwärmen, über die Schollen geben und mit Petersilie und Zitrone servieren.', settings: [b('Warmhalten', 2)] },
   ],
 
   // ───────────── Eintöpfe (alles auf dem BORA) ─────────────
   linseneintopf: [
     { text: 'Den Speck im Topf auslassen, Zwiebel und gewürfeltes Gemüse (Möhren, Sellerie, Lauch) darin anschwitzen.', settings: [b('5', 3, 'Speck'), b('4', 5, 'Gemüse')] },
-    { text: 'Linsen, Kartoffelwürfel, Lorbeer und Brühe zugeben, mit Deckel aufkochen und 35 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('4', 35)] },
+    { text: 'Tellerlinsen, Kartoffelwürfel, Lorbeer und Brühe zugeben, mit Deckel aufkochen und 35 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('4', 35)] },
     { text: 'Die Mettenden in Scheiben schneiden und 10 Minuten mitziehen lassen.', settings: [b('3', 10)] },
     { text: 'Mit Essig, Salz, Pfeffer und einer Prise Zucker abschmecken und mit Petersilie servieren.' },
   ],
   erbseneintopf: [
-    { text: 'Die Erbsen abspülen und mit Brühe und Kasseler aufkochen. Dann 45 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('3', 45)] },
+    { text: 'Die Schälerbsen abspülen und mit Brühe und Kasseler aufkochen. Dann 45 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('3', 45)] },
     { text: 'Zwiebel, Möhren, Sellerie, Lauch und Kartoffeln würfeln, zugeben und weitere 30 Minuten garen, bis die Erbsen zerfallen.', settings: [b('4', 30)] },
     { text: 'Das Kasseler herausnehmen, würfeln und zurückgeben. Die Bockwurst in Scheiben im Eintopf erhitzen.', settings: [b('3', 5)] },
     { text: 'Mit Majoran, Salz und Pfeffer abschmecken.' },
@@ -87,7 +87,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
   graupeneintopf: [
     { text: 'Den Schweinebauch würfeln, im Topf auslassen und die Zwiebel zugeben.', settings: [b('6', 5, 'auslassen'), b('4', 2, 'Zwiebel')] },
-    { text: 'Die Graupen kurz mitrösten und mit Brühe aufgießen. Aufkochen und 30 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('4', 30)] },
+    { text: 'Die Perlgraupen kurz mitrösten und mit Brühe aufgießen. Aufkochen und 30 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('4', 30)] },
     { text: 'Möhren, Sellerie, Lauch und Kartoffeln würfeln, zugeben und weitere 25 Minuten garen.', settings: [b('4', 25)] },
     { text: 'Mit Majoran, Salz, Pfeffer und Petersilie abschmecken.' },
   ],
@@ -134,7 +134,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Die Kürbiskerne ohne Fett in einer Pfanne rösten und mit Kürbiskernöl über die Suppe geben.', settings: [b('5', 3, 'Pfanne, ohne Fett')] },
   ],
   tomatensuppe: [
-    { text: 'Den Reis nach Packungsangabe separat garen.', settings: [b('Power', undefined, 'aufkochen'), b('3', 15, 'Deckel drauf')] },
+    { text: 'Den Reis in einem zweiten Topf in reichlich Salzwasser aufkochen, bei kleiner Hitze mit Deckel 15 Minuten garen und abgießen.', settings: [b('Power', undefined, 'aufkochen'), b('3', 15, 'Deckel drauf')] },
     { text: 'Zwiebel und Knoblauch in Butter andünsten und das Tomatenmark kurz mitrösten.', settings: [b('4', 4)] },
     { text: 'Tomaten und Brühe zugeben, 20 Minuten köcheln lassen und fein pürieren.', settings: [b('4', 20)] },
     { text: 'Mit Sahne, Salz, Pfeffer und etwas Zucker abschmecken. Den Reis einrühren und mit Basilikum servieren.', settings: [b('Warmhalten')] },
@@ -165,19 +165,19 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
   leberknoedelsuppe: [
     { text: 'Die Brötchen in warmer Milch einweichen und ausdrücken.' },
-    { text: 'Die Leber fein hacken oder wolfen. Mit Brötchen, Ei, angedünsteter Zwiebel, Petersilie, Majoran, Paniermehl, Salz und Pfeffer zu einer formbaren Masse mischen.', settings: [b('4', 3, 'Zwiebel andünsten')] },
+    { text: 'Die Rinderleber fein hacken oder wolfen. Mit Brötchen, Ei, angedünsteter Zwiebel, Petersilie, Majoran, Paniermehl, Salz und Pfeffer zu einer formbaren Masse mischen.', settings: [b('4', 3, 'Zwiebel andünsten')] },
     { text: 'Mit nassen Händen 4 Knödel formen und in leicht siedender Brühe 20 Minuten ziehen lassen.', settings: [b('Power', undefined, 'aufkochen'), b('Simmern', 20, 'nicht kochen')] },
     { text: 'Mit Schnittlauch in der Brühe servieren.' },
   ],
   hochzeitssuppe: [
     { text: 'Für den Eierstich Eier mit Milch, Salz und Muskat verquirlen, in eine gefettete Tasse füllen und mit Folie abdecken. Den Wasserbehälter des CombiSteamers füllen, die Tasse hineinstellen und stocken lassen. Abkühlen lassen und würfeln.', settings: [cs('Dämpfen', 80, 25, 'Wasserbehälter füllen')] },
-    { text: 'Das Brät mit nassen Händen zu kleinen Klößchen formen und in siedender Brühe 8 Minuten ziehen lassen.', settings: [b('Power', undefined, 'aufkochen'), b('Simmern', 8)] },
-    { text: 'Spargel und Möhre in Stücke schneiden und in der Brühe gar ziehen lassen.', settings: [b('3', 10)] },
+    { text: 'Das Kalbsbrät mit nassen Händen zu kleinen Klößchen formen und in siedender Brühe 8 Minuten ziehen lassen.', settings: [b('Power', undefined, 'aufkochen'), b('Simmern', 8)] },
+    { text: 'Den Spargel schälen und die holzigen Enden abschneiden. Spargel und Möhre in Stücke schneiden und in der Brühe gar ziehen lassen.', settings: [b('3', 10)] },
     { text: 'Den Eierstich zugeben und mit Schnittlauch servieren.' },
   ],
   soljanka: [
-    { text: 'Wurst, Schinken, Paprika, Gurken und Zwiebel in Streifen schneiden.' },
-    { text: 'Zwiebel und Wurst anbraten, Tomatenmark und Paprikapulver mitrösten.', settings: [b('6', 6, 'anbraten'), b('5', 2, 'mitrösten')] },
+    { text: 'Fleischwurst, Salami, Schinken, Paprika, Gurken und Zwiebel in Streifen schneiden.' },
+    { text: 'Zwiebel, Fleischwurst und Salami anbraten, Tomatenmark und Paprikapulver mitrösten.', settings: [b('6', 6, 'anbraten'), b('5', 2, 'mitrösten')] },
     { text: 'Tomaten, Fond, Paprika, Gurken und einen Schuss Gurkenwasser zugeben, aufkochen und 20 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('4', 20)] },
     { text: 'Kräftig abschmecken. Mit einer Zitronenscheibe, einem Klecks saurer Sahne und Dill servieren.' },
   ],
@@ -186,12 +186,12 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   kartoffelgratin: [
     { text: 'Die Kartoffeln schälen und in 3 mm dünne Scheiben hobeln (nicht waschen).' },
     { text: 'Sahne und Milch mit zerdrücktem Knoblauch, Salz, Pfeffer und Muskat aufkochen.', settings: [b('Power', undefined, 'aufkochen')] },
-    { text: 'Die Kartoffeln dachziegelartig in eine gebutterte Form schichten, mit der Sahnemilch übergießen und mit Gruyère bestreuen. Den Combair vorheizen, die Form auf Ebene 2 schieben und goldbraun backen.', settings: [ca('Heißluft', 170, 50, 'vorheizen, Ebene 2')] },
-    { text: 'Den Feldsalat mit Essig, Öl, Salz und gerösteten Walnüssen anmachen und dazu servieren.' },
+    { text: 'Die Kartoffeln dachziegelartig in eine mit der Butter ausgestrichene Form schichten, mit der Sahnemilch übergießen und mit Gruyère bestreuen. Den Combair vorheizen, die Form auf Ebene 2 schieben und goldbraun backen, bis ein Messer leicht durch die Kartoffeln gleitet.', settings: [ca('Heißluft', 170, 50, 'vorheizen, Ebene 2')] },
+    { text: 'Die Walnusskerne grob hacken und in einer Pfanne ohne Fett rösten, bis sie duften. Den Feldsalat mit Essig, Öl, Salz und den Walnüssen anmachen und dazu servieren.', settings: [b('5', 3, 'ohne Fett')] },
   ],
   'kartoffel-hack-auflauf': [
-    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, in Scheiben schneiden, auf das gelochten Garbehälter legen und vorgaren.', settings: [cs('Dämpfen', 100, 8, 'Wasserbehälter füllen')] },
-    { text: 'Das Hackfleisch mit der Zwiebel anbraten, Tomatenmark mitrösten und Tomaten zugeben. Mit Oregano, Paprika, Salz und Pfeffer würzen.', settings: [b('8', 6, 'Hack anbraten'), b('4', 5, 'Sauce')] },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, in Scheiben schneiden, auf den gelochten Garbehälter legen und vorgaren.', settings: [cs('Dämpfen', 100, 8, 'Wasserbehälter füllen')] },
+    { text: 'Die Zwiebel würfeln. Das Hackfleisch im Öl krümelig anbraten, die Zwiebel zugeben, Tomatenmark mitrösten und Tomaten zugeben. Mit Oregano, Paprika, Salz und Pfeffer würzen.', settings: [b('8', 6, 'Hack anbraten'), b('4', 5, 'Sauce')] },
     { text: 'Kartoffeln und Hacksauce in eine Form schichten, mit gewürzter Sahne übergießen und mit Gouda bestreuen.' },
     { text: 'Im vorgeheizten Combair backen.', settings: [ca('Heißluft', 180, 30, 'vorheizen, Ebene 2')] },
   ],
@@ -202,7 +202,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Mit Käse bestreuen, in den vorgeheizten Combair schieben und goldbraun backen.', settings: [ca('Heißluft', 180, 25, 'vorheizen, Ebene 2')] },
   ],
   'brokkoli-kartoffel-auflauf': [
-    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln in Scheiben auf das gelochten Garbehälter legen und vorgaren. Den Brokkoli in Röschen teilen und kurz mitdämpfen.', settings: [cs('Dämpfen', 100, 8, 'Kartoffeln'), cs('Dämpfen', 100, 3, 'Brokkoli später dazu')] },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln in Scheiben auf den gelochten Garbehälter legen und vorgaren. Den Brokkoli in Röschen teilen und kurz mitdämpfen.', settings: [cs('Dämpfen', 100, 8, 'Kartoffeln'), cs('Dämpfen', 100, 3, 'Brokkoli später dazu')] },
     { text: 'Beides in eine gefettete Form schichten.' },
     { text: 'Sahne mit Eiern, Salz, Pfeffer und Muskat verquirlen und darüber gießen.' },
     { text: 'Mit Käse bestreuen, in den vorgeheizten Combair schieben und backen.', settings: [ca('Heißluft', 180, 30, 'vorheizen, Ebene 2')] },
@@ -220,13 +220,13 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Im vorgeheizten Combair backen.', settings: [ca('Heißluft', 180, 30, 'vorheizen, Ebene 2')] },
   ],
   'spaetzle-auflauf': [
-    { text: 'Das Hähnchen in Streifen schneiden, würzen und im Öl anbraten. Zwiebel und Pilze zugeben und kurz mitbraten.', settings: [b('7', 5, 'Hähnchen'), b('5', 4, 'Zwiebel, Pilze')] },
+    { text: 'Das Hähnchen in Streifen schneiden, würzen und im Öl anbraten. Gewürfelte Zwiebel und die in Scheiben geschnittenen Champignons zugeben und kurz mitbraten.', settings: [b('7', 5, 'Hähnchen'), b('5', 4, 'Zwiebel, Pilze')] },
     { text: 'Mit Sahne ablöschen und abschmecken.', settings: [b('4', 2)] },
     { text: 'Mit den Spätzle mischen, in eine Form füllen und mit Käse bestreuen.' },
     { text: 'Im vorgeheizten Combair überbacken und mit Schnittlauch servieren.', settings: [ca('Heißluft', 180, 20, 'vorheizen, Ebene 2')] },
   ],
   fischauflauf: [
-    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln in Scheiben schneiden, auf das gelochten Garbehälter legen und vorgaren. Den Spinat auftauen und ausdrücken.', settings: [cs('Dämpfen', 100, 8, 'Wasserbehälter füllen')] },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln in Scheiben schneiden, auf den gelochten Garbehälter legen und vorgaren. Den Spinat auftauen und ausdrücken.', settings: [cs('Dämpfen', 100, 8, 'Wasserbehälter füllen')] },
     { text: 'Die Zwiebel andünsten, den Spinat zugeben und mit Muskat, Salz und Pfeffer würzen.', settings: [b('4', 5)] },
     { text: 'Kartoffeln, Spinat und den mit Zitrone beträufelten, gesalzenen Fisch (Seelachs) in eine Form schichten. Die Sahne darüber gießen.' },
     { text: 'Mit Käse bestreuen, in den vorgeheizten Combair schieben und backen.', settings: [ca('Heißluft', 180, 25, 'vorheizen, Ebene 2')] },
@@ -238,7 +238,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Im vorgeheizten Combair goldbraun backen.', settings: [ca('Heißluft', 180, 25, 'vorheizen, Ebene 2')] },
   ],
   'rosenkohl-gratin': [
-    { text: 'Den Wasserbehälter des CombiSteamers füllen. Den Rosenkohl putzen, halbieren und auf das gelochten Garbehälter legen. Die Kartoffeln in Scheiben schneiden und auf ein zweites Blech legen. Beides vorgaren.', settings: [cs('Dämpfen', 100, 10, 'Rosenkohl + Kartoffeln')] },
+    { text: 'Den Wasserbehälter des CombiSteamers füllen. Den Rosenkohl putzen, halbieren und auf den gelochten Garbehälter legen. Die Kartoffeln in Scheiben schneiden und auf ein zweites Blech legen. Beides vorgaren.', settings: [cs('Dämpfen', 100, 10, 'Rosenkohl + Kartoffeln')] },
     { text: 'Den Speck knusprig anbraten.', settings: [b('6', 5, 'Pfanne')] },
     { text: 'Alles in eine Form geben, gewürzte Sahne darüber gießen und mit Bergkäse bestreuen.' },
     { text: 'Im vorgeheizten Combair gratinieren.', settings: [ca('Heißluft', 180, 25, 'vorheizen, Ebene 2')] },
@@ -263,21 +263,21 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Den Fond angießen und die Keulen mit der Haut nach oben einlegen. Den Combair vorheizen, den Bräter zugedeckt auf Ebene 2 schieben und 2 Stunden schmoren.', settings: [ca('Heißluft feucht', 150, 120, 'vorheizen, Ebene 2', 90)] },
     { text: 'Den Deckel abnehmen und die Keulen trocken kross braten.', settings: [ca('Heißluft', 210, 22, 'ohne Deckel')] },
     { text: 'Den Rotkohl fein hobeln und mit gewürfeltem Apfel, Essig, Zucker, Lorbeer, Nelken und 100 ml Wasser ca. 45 Minuten weich schmoren und abschmecken.', settings: [b('Power', undefined, 'aufkochen'), b('3', 45, 'Deckel drauf')] },
-    { text: 'Den Wasserbehälter des CombiSteamers füllen und die Klöße nach Packungsanweisung dämpfen. Den Bratensatz durch ein Sieb passieren, entfetten und mit angerührter Stärke zur Soße binden. Alles zusammen servieren.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen'), b('4', 4, 'Soße binden')] },
+    { text: 'Etwa 30 Minuten vor dem Servieren den Wasserbehälter des CombiSteamers füllen. Die Kartoffelknödel halb und halb nach Packungsanweisung mit kaltem Wasser anrühren, kurz quellen lassen, mit nassen Händen Klöße formen, auf den leicht gefetteten gelochten Garbehälter setzen und dämpfen. Den Bratensatz durch ein Sieb passieren, entfetten und mit der Stärke, in wenig kaltem Wasser angerührt, zur Soße binden. Alles zusammen servieren.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen'), b('4', 4, 'Soße binden')] },
   ],
   'entenbrust-orangensauce': [
     { text: 'Die Kartoffeln in dünne Scheiben hobeln, in eine gebutterte Form schichten, mit Sahne, Knoblauch, Salz, Pfeffer und Muskat übergießen und mit Gruyère bestreuen. Den Combair vorheizen und das Gratin backen.', settings: [ca('Heißluft', 170, 45, 'vorheizen, Ebene 2')] },
     { text: 'Den Rotkohl fein hobeln und mit gewürfeltem Apfel, Essig, Zucker, Salz und 80 ml Wasser 35 Minuten weich schmoren.', settings: [b('Power', undefined, 'aufkochen'), b('3', 35, 'Deckel drauf')] },
-    { text: 'Die Haut der Entenbrust rautenförmig einritzen, salzen und pfeffern. Mit der Hautseite nach unten in eine kalte Pfanne legen, langsam erhitzen und knusprig auslassen.', settings: [b('4', 10, 'Pfanne kalt starten')] },
-    { text: 'Die Entenbrust wenden, 4 Minuten braten und dann zum Fertiggaren in den CombiSteamer schieben. Anschließend ruhen lassen.', settings: [b('6', 4, 'wenden'), cs('Heißluft', 160, 6, 'Fühler in die Brust', 58)] },
-    { text: 'Für die Soße den Saft von 1 Orange mit Honig und Fond einkochen, mit kalter Butter aufschlagen. Die zweite Orange filetieren und kurz in der Soße erwärmen.', settings: [b('7', 8, 'einkochen'), b('Warmhalten', 2, 'Orangenfilets')] },
+    { text: 'Die Haut der Entenbrust rautenförmig einritzen, salzen und pfeffern. Mit der Hautseite nach unten in eine kalte Pfanne legen, langsam erhitzen und das Fett auslassen, bis die Haut goldbraun und knusprig ist. Währenddessen den CombiSteamer vorheizen.', settings: [b('4', 10, 'Pfanne kalt starten')] },
+    { text: 'Die Entenbrust wenden, 4 Minuten braten, mit der Haut nach oben auf den Gitterrost legen und im vorgeheizten CombiSteamer fertig garen, bis der Kern 58 °C erreicht (rosa). Anschließend 5 Minuten ruhen lassen.', settings: [b('6', 4, 'wenden'), cs('Heißluft', 160, 6, 'vorheizen, Fühler in die Brust', 58)] },
+    { text: 'Für die Soße den Saft von 1 Orange mit Honig und Fond einkochen, vom Herd nehmen und die kalte Butter in Stücken unterrühren, bis die Soße leicht bindet. Die zweite Orange filetieren (Schale samt weißer Haut abschneiden und die Fruchtspalten zwischen den Trennhäuten herausschneiden) und kurz in der Soße erwärmen.', settings: [b('7', 8, 'einkochen'), b('Warmhalten', 2, 'Orangenfilets')] },
     { text: 'Die Entenbrust aufschneiden und mit Soße, Rotkohl und Gratin servieren.' },
   ],
   'entenkeulen-rotkohl': [
     { text: 'Die Entenkeulen salzen, pfeffern und mit Majoran einreiben. Die Haut mehrfach einstechen.' },
     { text: 'Die Keulen mit Zwiebelspalten und Apfelstücken in einen Bräter legen, Rotwein und Fond angießen. Den Combair vorheizen, den Bräter zugedeckt auf Ebene 2 schieben und schmoren.', settings: [ca('Heißluft feucht', 160, 75, 'vorheizen, Ebene 2', 85)] },
     { text: 'Den Deckel abnehmen und die Keulen trocken braten, bis die Haut knusprig ist.', settings: [ca('Heißluft', 200, 25, 'ohne Deckel')] },
-    { text: 'Den Rotkohl fein hobeln und mit Apfel, Essig, Zucker, Lorbeer und 100 ml Wasser ca. 45 Minuten schmoren. Die Klöße nach Packungsanweisung im CombiSteamer dämpfen.', settings: [b('Power', undefined, 'aufkochen'), b('3', 45, 'Deckel drauf'), cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
+    { text: 'Während die Keulen schmoren, den Rotkohl fein hobeln und mit dem säuerlichen Apfel, Essig, Zucker, Lorbeer und 100 ml Wasser ca. 45 Minuten zugedeckt schmoren. Etwa 30 Minuten vor dem Servieren die Kartoffelknödel halb und halb nach Packungsanweisung mit kaltem Wasser anrühren, kurz quellen lassen, mit nassen Händen Klöße formen und auf dem leicht gefetteten gelochten Garbehälter im CombiSteamer dämpfen.', settings: [b('Power', undefined, 'aufkochen'), b('3', 45, 'Deckel drauf'), cs('Dämpfen', 100, 25, 'Wasserbehälter füllen')] },
     { text: 'Den Bratensud passieren, entfetten, mit angerührter Stärke binden und abschmecken. Alles zusammen anrichten.', settings: [b('4', 4, 'Soße binden')] },
   ],
   'kalbsbraten-rahmsauce': [
@@ -291,7 +291,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'bud-spencer-eintopf': [
     { text: 'Zwiebel, Knoblauch und Paprika würfeln. Das Hackfleisch in Öl im großen Topf krümelig und kräftig anbraten. Dabei die Abzugs-Lüfterstufe eine Stufe höher stellen.', settings: [b('8', 6, 'Hack anbraten')] },
     { text: 'Zwiebel, Knoblauch und Paprika zugeben, Tomatenmark und Gewürze (Paprikapulver, Kreuzkümmel, Chiliflocken) 2 Minuten mitrösten.', settings: [b('5', 2)] },
-    { text: 'Passierte Tomaten und Brühe angießen. Die abgetropften Bohnen und den Mais zugeben, aufkochen und 25 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('4', 25)] },
+    { text: 'Passierte Tomaten und Brühe angießen. Die Kidneybohnen und weißen Bohnen in einem Sieb abspülen und abtropfen lassen und mit dem abgetropften Mais zugeben, aufkochen und 25 Minuten köcheln lassen.', settings: [b('Power', undefined, 'aufkochen'), b('4', 25)] },
     { text: 'Kräftig mit Salz, Pfeffer und Chili abschmecken. Dazu passt Brot.' },
   ],
   schnippelbohneneintopf: [
@@ -302,7 +302,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
   'sauerkrauteintopf-kasseler': [
     { text: 'Die Zwiebel würfeln und in Butterschmalz glasig dünsten, Paprikapulver kurz mitrösten.', settings: [b('4', 4)] },
-    { text: 'Das Sauerkraut zugeben und kurz anschwitzen. Kartoffeln würfeln und mit Brühe, Wacholder und Lorbeer dazugeben.', settings: [b('5', 3)] },
+    { text: 'Das Sauerkraut zugeben und kurz anschwitzen. Kartoffeln würfeln und mit Brühe, Wacholderbeeren und Lorbeer dazugeben.', settings: [b('5', 3)] },
     { text: 'Den Kasseler in Würfel schneiden, zufügen, aufkochen und 30 Minuten bei kleiner Hitze köcheln.', settings: [b('Power', undefined, 'aufkochen'), b('3', 30)] },
     { text: 'Mit Salz und Pfeffer abschmecken und mit einem Klecks Schmand servieren.' },
   ],
@@ -357,7 +357,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Die Bäckchen herausnehmen, die Sauce passieren und sämig einkochen. Die Bäckchen darin glasieren und mit Püree und Möhren anrichten.', settings: [b('8', 10, 'einkochen'), b('Warmhalten', 5, 'glasieren')] },
   ],
   'rinderfilet-rotweinjus': [
-    { text: 'Das Rinderfilet 1 Stunde vorher aus dem Kühlschrank nehmen, parieren und mit Küchengarn in Form binden. Die Pfanne vorheizen, das Filet direkt vor dem Anbraten salzen und im Butterschmalz rundum höchstens 5 Minuten anbraten, den Thymian kurz mitbraten.', settings: [b('9', 5, 'Pfanne vorheizen, max. 5 Min.')] },
+    { text: 'Das Rinderfilet 1 Stunde vorher aus dem Kühlschrank nehmen, parieren (Sehnen, Fett und die silbrige Haut mit einem scharfen Messer abschneiden) und mit Küchengarn in Form binden. Die Pfanne vorheizen, das Filet direkt vor dem Anbraten salzen und im Butterschmalz rundum höchstens 5 Minuten anbraten, den Thymian kurz mitbraten.', settings: [b('9', 5, 'Pfanne vorheizen, max. 5 Min.')] },
     { text: 'Am Combair Zartgaren wählen und als Zieltemperatur 54 °C einstellen (rosa, etwas über „medium rare“). Das Filet auf den Gitterrost (Ebene 2) legen, darunter das Kuchenblech mit Alufolie (Ebene 1), den Gargutsensor mittig in die dickste Stelle stecken und die Tür geschlossen lassen. Das Gerät schaltet bei 54 °C ab (ca. 1,5 Stunden). Pfeffern.', settings: [{ device: 'combair', mode: 'Zartgaren', core: 54, note: 'Gargutsensor, Rost Ebene 2, Blech Ebene 1' }] },
     { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren und auf dem gelochten Garbehälter dämpfen. Die Bohnen putzen und für die letzten 7 Minuten auf einer zweiten Ebene mitdämpfen, dann kalt abschrecken.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen, gelocht'), cs('Dämpfen', 100, 7, 'Bohnen dazu')] },
     { text: 'Die Kartoffeln ausdampfen lassen, durchpressen und mit Eigelb, 30 g Butter, Salz und Muskat glatt rühren. Mit einem Spritzbeutel Rosetten auf das Kuchenblech mit Backpapier spritzen und im vorgeheizten CombiSteamer goldbraun backen.', settings: [cs('Heißluft', 200, 15, 'vorheizen, Ebene 2')] },
@@ -377,7 +377,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Das Schäufele umdrehen, Zwiebeln, Möhre und Sellerie grob geschnitten zugeben, das Dunkelbier angießen und weitergaren. Dabei immer wieder mit dem Sud übergießen.', settings: [ca('Heißluft feucht', 170, 120, 'Schwarte oben')] },
     { text: 'Für die Kruste auf trockene Hitze umstellen und weiterbraten, bis die Schwarte knusprig aufpoppt.', settings: [ca('Heißluft', 220, 20, 'Kruste')] },
     { text: 'Den Wasserbehälter des CombiSteamers füllen. Für die Klöße 300 g Kartoffeln mit Schale auf dem gelochten Garbehälter dämpfen, pellen und fein stampfen.', settings: [cs('Dämpfen', 100, 30, 'Wasserbehälter füllen, gelocht')] },
-    { text: 'Die übrigen Kartoffeln schälen, fein reiben und in einem Tuch kräftig ausdrücken, die abgesetzte Stärke aus dem Saft wieder zugeben. Alles mit Salz zu einem Teig verkneten. Das Brötchen würfeln und in Butter rösten, 6 Klöße formen und je einige Croutons in die Mitte drücken.', settings: [b('5', 4, 'Croutons, Pfanne')] },
+    { text: 'Die übrigen Kartoffeln schälen, fein reiben und in einem Tuch über einer Schüssel kräftig ausdrücken. Den Saft 10 Minuten stehen lassen, vorsichtig abgießen und die weiße Stärke vom Boden wieder zu den Kartoffeln geben. Alles mit Salz zu einem Teig verkneten. Das Brötchen würfeln und in Butter rösten, 6 Klöße formen und je einige Croutons in die Mitte drücken.', settings: [b('5', 4, 'Croutons, Pfanne')] },
     { text: 'Die Klöße auf den leicht gefetteten gelochten Garbehälter setzen und dämpfen.', settings: [cs('Dämpfen', 100, 25, 'gelocht, Ebene 2')] },
     { text: 'Für den Krautsalat den Weißkohl fein hobeln und mit Salz kräftig durchkneten. Die Speckwürfel knusprig auslassen und mit Essig, Öl und Zucker unter den Kohl mischen.', settings: [b('5', 5, 'Speck auslassen')] },
     { text: 'Den Bratensud durch ein Sieb gießen, entfetten, mit Rinderfond aufgießen und etwas einkochen. Mit angerührter Speisestärke binden und abschmecken.', settings: [b('8', 8, 'einkochen'), b('4', 2, 'binden')] },
@@ -392,7 +392,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Den Bratensud durch ein Sieb gießen, entfetten, mit Rinderfond aufgießen, etwas einkochen und mit angerührter Speisestärke binden. Den Braten in Scheiben schneiden und mit Knödeln, Rosenkohl und Sauce servieren.', settings: [b('8', 6, 'einkochen'), b('4', 2, 'binden')] },
   ],
   'schweinefilet-speckmantel': [
-    { text: 'Das Schweinefilet parieren, pfeffern und dünn mit Senf bestreichen. Thymian, Rosmarin und Petersilie fein hacken, das Filet darin wälzen und mit den Baconscheiben überlappend umwickeln.' },
+    { text: 'Das Schweinefilet parieren (Sehnen und die silbrige Haut abschneiden), pfeffern und dünn mit Senf bestreichen. Thymian, Rosmarin und Petersilie fein hacken, das Filet darin wälzen und mit den Baconscheiben überlappend umwickeln.' },
     { text: 'Den Combair vorheizen. Das Filet im Butterschmalz rundum 4 Minuten anbraten, in eine Form legen, den Gargutsensor mittig hineinstecken und garen, bis der Kern 62 °C erreicht. 5 Minuten ruhen lassen.', settings: [b('7', 4, 'Pfanne vorheizen'), ca('Heißluft', 180, 20, 'vorheizen, Ebene 2, Gargutsensor', 62)] },
     { text: 'Den Wirsing in feine Streifen schneiden, die Zwiebel würfeln und in 10 g Butter glasig dünsten. Wirsing zugeben, mit Kalbsfond und Sahne aufgießen und sämig garen. Mit Salz, Pfeffer und Muskat abschmecken.', settings: [b('4', 3, 'Zwiebel'), b('3', 10, 'Deckel halb drauf')] },
     { text: 'Die Schupfnudeln in der restlichen Butter goldbraun braten.', settings: [b('6', 8, 'Pfanne')] },
@@ -408,7 +408,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Die Spätzle in der restlichen Butter schwenken und mit Schnittlauch bestreuen. Die Hüfte aufschneiden und mit Morchelrahm und Spätzle anrichten.', settings: [b('5', 3, 'Pfanne')] },
   ],
   'kalbsbaeckchen-weissweinrahm': [
-    { text: 'Die Kalbsbäckchen parieren, salzen, pfeffern und dünn im Mehl wenden. Im Butterschmalz im Bräter rundum hell anbraten und herausnehmen.', settings: [b('7', 8, 'Brücke')] },
+    { text: 'Die Kalbsbäckchen parieren (Fett, Sehnen und die silbrige Haut abschneiden), salzen, pfeffern und dünn im Mehl wenden. Im Butterschmalz im Bräter rundum hell anbraten und herausnehmen.', settings: [b('7', 8, 'Brücke')] },
     { text: 'Schalotten, Möhre und Sellerie fein würfeln und glasig anschwitzen. Mit Weißwein ablöschen und zur Hälfte einkochen.', settings: [b('4', 4, 'anschwitzen'), b('7', 5, 'einkochen')] },
     { text: 'Kalbsfond, Lorbeer und Thymian zugeben und die Bäckchen einlegen. Den Bräter zugedeckt in den vorgeheizten Combair schieben und schmoren, bis die Bäckchen weich sind (Gabelprobe).', settings: [ca('Heißluft feucht', 150, 120, 'vorheizen, Ebene 2, Deckel drauf')] },
     { text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, halbieren und auf dem gelochten Garbehälter weich dämpfen. Ausdampfen lassen, durchpressen und mit heißer Milch, 30 g Butter, Salz und Muskat zu Püree rühren.', settings: [cs('Dämpfen', 100, 25, 'Wasserbehälter füllen, gelocht'), b('4', 3, 'Milch erwärmen')] },
@@ -508,7 +508,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     { text: 'Die Eier vierteln, mit Speck und Schnittlauch auf den Salat geben und mit dem Vollkornbrot servieren.' },
   ],
   'strammer-max': [
-    { text: 'Den Senf mit Essig, Öl, Salz und Pfeffer verrühren. Salat, Tomate und Gurke klein schneiden und mit der Vinaigrette mischen.' },
+    { text: 'Den Senf mit Essig, Öl, Salz und Pfeffer verrühren. Kopfsalat zupfen, Tomate und Gurke klein schneiden und mit der Vinaigrette mischen.' },
     { text: 'Das Vollkornbrot mit Katenschinken belegen.' },
     { text: 'Die Butter in einer Pfanne erhitzen und die Eier als Spiegeleier braten, salzen und pfeffern.', settings: [b('4', 4, 'Spiegeleier')] },
     { text: 'Je zwei Spiegeleier auf das Brot legen, mit Schnittlauch bestreuen und mit Gewürzgurken und Salat servieren.' },
@@ -548,14 +548,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   // ───────────── Burger ─────────────
   'cheeseburger-classic': [
     { text: 'Die Kartoffeln schälen, in 1 cm dicke Stifte schneiden, 30 Minuten in kaltem Wasser wässern, gründlich abtrocknen und mit 1 EL Sonnenblumenöl und Salz mischen.' },
-    { text: 'Für die Burgersauce Mayonnaise, Ketchup, Senf und eine fein gehackte Gewürzgurke verrühren. Die übrigen Gurken in Scheiben, Tomate und rote Zwiebel in Ringe schneiden, den Kopfsalat zupfen.' },
+    { text: 'Für die Burgersauce Mayonnaise, Tomatenketchup, Senf und eine fein gehackte Gewürzgurke verrühren. Die übrigen Gurken in Scheiben, Tomate und rote Zwiebel in Ringe schneiden, den Kopfsalat zupfen.' },
     { text: 'Die Pommes in den Airfryer geben (Korb höchstens halb voll) und backen, nach 10 und 16 Minuten schütteln.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 180, minutes: 22, note: 'Pommes frisch, 2x schütteln' }] },
     { text: 'Das Rinderhackfleisch leicht kneten, in 2 Patties à 180 g formen und in der Mitte eine kleine Mulde eindrücken. Mit Salz und Pfeffer würzen.' },
     { text: 'Die Patties im restlichen Sonnenblumenöl braten. In der letzten Minute je eine Scheibe Cheddar auflegen und mit Deckel schmelzen lassen. Beim scharfen Anbraten den Abzug eine Stufe höher stellen.', settings: [b('8', 2, 'Pfanne vorheizen, Abzug höher'), b('7', 8, 'je 4 Minuten, Cheddar zum Schluss')] },
     { text: 'Die Burger-Brötchen aufschneiden und in der Butter anrösten. Unterseite mit Sauce, Kopfsalat, Tomate, Zwiebel, Gurke und Patty belegen, Deckel darauf. Mit den Pommes servieren.', settings: [b('5', 2, 'Brötchen rösten')] },
   ],
   'smashed-burger': [
-    { text: 'Das Rinderhackfleisch in 4 lockere Kugeln à 90 g formen (nicht kneten) und kalt stellen. Die Zwiebel in hauchdünne Scheiben hobeln, die Gewürzgurken in Scheiben schneiden. Mayonnaise, Ketchup und Senf zur Sauce verrühren.' },
+    { text: 'Das Rinderhackfleisch in 4 lockere Kugeln à 90 g formen (nicht kneten) und kalt stellen. Die Zwiebel in hauchdünne Scheiben hobeln, die Gewürzgurken in Scheiben schneiden. Mayonnaise, Tomatenketchup und Senf zur Sauce verrühren.' },
     { text: 'Die Pommes frites TK im Airfryer backen und einmal schütteln.', settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 190, minutes: 17, note: 'Pommes TK, 1x schütteln' }] },
     { text: 'Die Gusseisenpfanne sehr heiß werden lassen, dünn mit Sonnenblumenöl ölen und 2 Kugeln hineinlegen. Einige Zwiebelscheiben daraufgeben, jede Kugel sofort mit einem stabilen Wender fest flach drücken, salzen, pfeffern und 2 Minuten braten. Abzug eine Stufe höher stellen.', settings: [b('9', 3, 'Gusseisenpfanne vorheizen, Abzug höher'), b('9', 2, 'smashen, Abzug höher')] },
     { text: 'Die Patties abkratzen, wenden, je eine Scheibe Cheddar auflegen und 1 Minute braten. Die zweite Runde genauso braten.', settings: [b('9', 1, 'Cheddar schmelzen'), b('9', 3, 'zweite Runde')] },
