@@ -733,26 +733,36 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   kohlrouladen: [
     {
-      text: 'Den Strunk des Kohls herausschneiden und den Kohl im CombiSteamer dämpfen, bis sich die Blätter lösen. 8 große Blätter nach und nach ablösen und die dicken Blattrippen flach schneiden.',
-      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'Schale' }],
+      text: 'Den Strunk des Weißkohls mit einem spitzen Messer keilförmig tief herausschneiden. Den ganzen Kohlkopf mit der Schnittseite nach unten auf den gelochten Garbehälter legen und im CombiSteamer dämpfen, bis die äußeren Blätter weich und biegsam sind (Wasserbehälter vorher füllen).',
+      settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 15, note: 'gelocht' }],
     },
     {
-      text: 'Hack mit eingeweichtem Brötchen, Ei, Zwiebelwürfeln, Salz, Pfeffer, Paprika und Kümmel verkneten. Auf die Blätter verteilen, einrollen und mit Garn binden.',
+      text: 'Den Kohl kurz abkühlen lassen und 8 große Blätter vorsichtig vom Strunk her ablösen. Lösen sich die inneren Blätter noch schwer, den Kohl weitere 5 Minuten dämpfen. Bei jedem Blatt die dicke, harte Mittelrippe flach schneiden: das Blatt flach hinlegen und die Rippe mit einem Messer waagerecht abschneiden, bis sie so dünn ist wie das restliche Blatt – so lässt es sich aufrollen, ohne zu brechen.',
     },
     {
-      text: 'Rouladen im Butterschmalz rundum anbraten, Tomatenmark mitrösten und mit Fond ablöschen.',
-      settings: [{ device: 'bora', mode: 'Kochzone', level: '7', minutes: 8, note: 'Brücke' }],
+      text: 'Das Brötchen 10 Minuten in Wasser einweichen, gut ausdrücken und zerpflücken. Die Zwiebel fein würfeln. Hackfleisch, Brötchen, Ei, Zwiebel, Salz, Pfeffer, Paprikapulver und Kümmel kräftig verkneten und in 8 Portionen teilen.',
     },
     {
-      text: 'Den zugedeckten Bräter in den vorgeheizten Combair schieben und 45 Minuten schmoren lassen.',
-      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 160, minutes: 45, note: 'vorheizen, Deckel drauf' }],
+      text: 'Je eine Portion Füllung länglich auf das untere Ende eines Blattes legen, die Seiten einschlagen und von unten fest aufrollen. Mit Küchengarn wie ein Päckchen binden oder mit Rouladennadeln feststecken.',
     },
     {
-      text: 'Die Kartoffeln im CombiSteamer als Salzkartoffeln dämpfen.',
+      text: 'Den Combair vorheizen. Das Butterschmalz im Bräter erhitzen und die Kohlrouladen rundum goldbraun anbraten. Das Tomatenmark kurz mitrösten und mit dem Rinderfond ablöschen.',
+      settings: [
+        { device: 'combair', mode: 'Heißluft feucht', temp: 160, note: 'vorheizen' },
+        { device: 'bora', mode: 'Kochzone', level: '7', minutes: 8, note: 'Brücke' },
+      ],
+    },
+    {
+      text: 'Den Bräter mit Deckel in den Combair schieben und schmoren lassen.',
+      settings: [{ device: 'combair', mode: 'Heißluft feucht', temp: 160, minutes: 45, note: 'Deckel drauf' }],
+    },
+    {
+      text: 'Während die Rouladen schmoren, die Salzkartoffeln zubereiten: Kartoffeln schälen, große halbieren oder vierteln, sodass alle Stücke etwa gleich groß sind (ca. 4 cm). Auf den gelochten Garbehälter legen, kräftig salzen und im CombiSteamer dämpfen, bis ein Messer leicht hineingleitet.',
       settings: [{ device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' }],
     },
     {
-      text: 'Die Sauce mit Schmand verfeinern und mit Salzkartoffeln servieren.',
+      text: 'Die Kohlrouladen aus dem Bräter nehmen und das Garn entfernen. Den Schmand in die Sauce rühren, kurz aufkochen und mit Salz und Pfeffer abschmecken. Die Rouladen mit Sauce und Salzkartoffeln servieren.',
+      settings: [{ device: 'bora', mode: 'Kochzone', level: '4', minutes: 2 }],
     },
   ],
 
