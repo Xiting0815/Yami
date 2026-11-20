@@ -8,7 +8,7 @@ export function TopBar({ m }: { m: AppModel }) {
   const { tab } = ui
   const { monday } = cal
   const profile = state.profile
-  const tabTitle = tab === 'vorrat' ? 'Vorrat' : tab === 'rezepte' ? 'Rezepte' : null
+  const tabTitle = tab === 'vorrat' ? 'Vorrat' : tab === 'rezepte' ? 'Rezepte' : tab === 'liste' ? 'Einkauf' : null
 
   const weekNav = (
     <div className="weeknav">

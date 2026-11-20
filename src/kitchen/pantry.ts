@@ -17,7 +17,8 @@ export function pantryCovering(lots: PantryLot[], name: string): number {
 }
 
 /** Ist ein Posten an diesem Tag noch gut? (Haltbarkeit = letzter guter Tag) – Abgelaufenes zählt nicht mehr als Vorrat */
-export const usableOn = (lot: { expires: string; amount: number }, day: string) => lot.amount > 1e-6 && lot.expires >= day
+export const usableOn = (lot: { expires: string; amount: number; from?: string }, day: string) =>
+  lot.amount > 1e-6 && lot.expires >= day && (!lot.from || lot.from <= day)
 
 /**
  * Posten, die den Bedarf an `name` decken können, in Entnahme-Reihenfolge: Zutat selbst (bei Vorrang zuerst die

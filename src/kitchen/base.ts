@@ -12,6 +12,8 @@ export interface PantryLot {
   unit: string
   /** ISO-Datum, bis wann es gut ist */
   expires: string
+  /** nur für die Einkaufsplanung: eingeplanter Einkauf, erst ab diesem Tag da (nie im gespeicherten Vorrat) */
+  from?: string
 }
 
 /** weggeworfener Vorratsposten (für den Wochenrückblick und leichtes Lernen) */
@@ -32,7 +34,7 @@ export const WASTE_AFTER_DAYS = 7
 export type PriceOverrides = Record<string, { pack: number; price: number }>
 
 /** gekaufte Mengen je Woche: Zutat → angelegter Vorratsposten */
-export type BoughtMap = Record<string, { lotId: string; amount: number }>
+export type BoughtMap = Record<string, { lotId: string; amount: number; /** Tag des Abhakens (lernt den Einkaufstag) */ at?: string }>
 
 // ───────────── Hilfen ─────────────
 

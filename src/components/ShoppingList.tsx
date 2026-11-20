@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import type { ShopCat } from '../types'
 import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER } from '../types'
 import { forDaysText, formatAmount, isBought, missingPacks, packText } from '../shopping'
 import type { CustomItem } from '../store'
-import { type BuyItem, type WeekResult, formatEuro } from '../kitchen'
+import { type BuyItem, type TripItem, formatEuro } from '../kitchen'
 
 interface Props {
-  result: WeekResult
+  result: { buy: TripItem[]; covered: BuyItem[]; staples: { key: string; name: string; amount: string }[]; total: number }
   planned: number
   checked: string[]
   custom: CustomItem[]
@@ -21,8 +21,14 @@ interface Props {
   haShared?: boolean
   /** Meldung, wenn der Abgleich nicht klappt (blockiert nichts) */
   haError?: string
-  /** angezeigt wird die Woche, die mit HA abgeglichen wird */
+  /** angezeigte Liste wird mit HA abgeglichen (freigegeben) */
   haOnWeek?: boolean
+  /** Kopf über der Liste (Einkauf, Status, Prüfen/Freigeben) */
+  header?: ReactNode
+  /** nach der Freigabe dazugekommen */
+  newKeys?: Set<string>
+  /** Text, wenn nichts geplant ist */
+  emptyText?: string
 }
 
 export { isBought, missingPacks, packText }
@@ -31,7 +37,7 @@ export { isBought, missingPacks, packText }
 const NOTE_TEXT = { knapp: 'wird knapp', leer: 'bald leer', alle: 'ist alle' } as const
 
 export function ShoppingList(props: Props) {
-  const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan, haShared, haError, haOnWeek } = props
+  const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan, haShared, haError, haOnWeek, header, newKeys, emptyText } = props
   const [newName, setNewName] = useState('')
   const [newCat, setNewCat] = useState<ShopCat>('gemuese')
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -39,11 +45,12 @@ export function ShoppingList(props: Props) {
   const checkedSet = new Set(checked)
 
   // leer nur, wenn auch nichts für Sa/So der laufenden Woche fehlt (ab Samstag zeigt die Liste schon die nächste Woche)
-  if (planned === 0 && custom.length === 0 && !result.buy.some((b) => b.forDays?.length)) {
+  if (planned === 0 && custom.length === 0 && !result.buy.length) {
     return (
       <div className="empty-state">
+        {header}
         <div className="big-emoji">🛒</div>
-        <p>Noch keine Gerichte für diese Woche geplant.</p>
+        <p>{emptyText ?? 'Noch keine Gerichte für diese Woche geplant.'}</p>
         <button className="btn primary" onClick={onGoPlan}>Zur Wochenplanung</button>
       </div>
     )
@@ -55,6 +62,7 @@ export function ShoppingList(props: Props) {
 
   return (
     <div className="shop">
+      {header}
       <div className="shop-total">
         <div>
           <div className="muted small">Einkauf geschätzt</div>
@@ -97,7 +105,9 @@ export function ShoppingList(props: Props) {
                       <span className="item-name">
                         {it.name}
                         {it.note && <small className="item-note">{NOTE_TEXT[it.note]}</small>}
+                        {it.reason && <small className="item-note">🕒 {it.reason}</small>}
                         {it.forDays && <small className="item-note">{forDaysText(it)}</small>}
+                        {newKeys?.has(it.key) && <small className="item-note new">neu seit Freigabe</small>}
                       </span>
                       <span className="item-amt">
                         {partly ? `noch ${missingPacks(it)} ${it.product.packName ?? 'Stk'}` : packText(it)}

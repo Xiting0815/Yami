@@ -387,7 +387,8 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   const day0 = '2026-11-16' // Montag
   let t = Date.parse(day0 + 'T09:00:00')
   const devices: Record<string, AppState> = {
-    Marc: dev('Marc', { onboarding: 'done', plan: { '2026-11-17': { recipeId: A.id, servings: 2 } } }),
+    // Einkäufe Mo („Heute noch“) und Mi freigegeben → gehen an Google Tasks (Entwürfe nicht, siehe test-trips)
+    Marc: dev('Marc', { onboarding: 'done', plan: { '2026-11-17': { recipeId: A.id, servings: 2 } }, trips: { '2026-11-16': { released: 1 }, '2026-11-18': { released: 1 } } }),
     Lisa: dev('Lisa'),
   }
   const run = async (who: string, plus = 1000) => {
@@ -434,7 +435,8 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   const perDay = new Map<string, number>()
   for (const e of evs) perDay.set(e.start.slice(0, 10), (perDay.get(e.start.slice(0, 10)) ?? 0) + 1)
   ok([...perDay.values()].every((n) => n === 1) && perDay.size === 3, `keine doppelten Kalendertermine (${[...perDay].map(([d, n]) => `${d}×${n}`).join(', ')})`)
-  const names = shop().map((i) => i.summary.split(' – ')[0])
+  // je Einkauf (Zusatz „(heute)“, „(Mi)“ …) jeder Artikel höchstens einmal
+  const names = shop().map((i) => i.summary.split(' – ')[0] + (i.summary.match(/\(([^)]+)\)$/)?.[1] ?? ''))
   ok(names.length === new Set(names).size, `keine doppelten Artikel in Google Tasks (${names.length})`)
   ok(h5.items.filter((i) => i.summary === PREFIX + 'main').length === 1, 'nur ein Schreibstab-Eintrag')
   // beide übernehmen gleichzeitig → genau einer schreibt
@@ -500,6 +502,30 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   await run('Lisa', 10 * 60_000)
   await run('Marc', 10 * 60_000)
   ok(rem().filter((e) => e.summary.includes('Läuft morgen ab')).length === 1 && rem().filter((e) => e.summary.includes('wiegen')).length === 1, 'Stabwechsel: weiterhin jede Erinnerung genau einmal')
+}
+
+// ───── 13c) Einkäufe: Freigabe, „Habe ich“, Einkaufstag wandern mit (Marc gibt frei, Lisa prüft gleichzeitig) ─────
+{
+  marc = await sync(hass, marc)
+  lisa = await sync(hass, lisa)
+  marc = { ...marc, trips: { ...marc.trips, '2026-11-21': { ...marc.trips['2026-11-21'], released: clock, sent: ['Zwiebel'] } }, shopDay: 5 }
+  lisa = { ...lisa, trips: { ...lisa.trips, '2026-11-21': { ...lisa.trips['2026-11-21'], answers: { Knoblauch: 'have' } } } }
+  marc = await sync(hass, marc)
+  lisa = await sync(hass, lisa)
+  marc = await sync(hass, marc)
+  const both = (s: AppState) => !!s.trips['2026-11-21']?.released && s.trips['2026-11-21'].answers?.Knoblauch === 'have' && s.shopDay === 5
+  ok(both(marc) && both(lisa), 'Einkauf: Marcs Freigabe + Lisas „Habe ich“ + Einkaufstag auf beiden Geräten')
+  ok(lisa.sync!.notices.some((n) => /Marc hat den Einkauf Sa 21\.11\. freigegeben/.test(n.text)), 'Lisa sieht: „Marc hat den Einkauf Sa 21.11. freigegeben“')
+  // Freigabe zurückgenommen → auf beiden Geräten Entwurf, Antworten bleiben
+  lisa = { ...lisa, trips: { '2026-11-21': { answers: lisa.trips['2026-11-21'].answers } } }
+  lisa = await sync(hass, lisa)
+  marc = await sync(hass, marc)
+  ok(!marc.trips['2026-11-21']?.released && marc.trips['2026-11-21']?.answers?.Knoblauch === 'have', 'Freigabe zurückgenommen: Marc wieder Entwurf, „Habe ich“ bleibt')
+  // abgehakt auf einem Einkauf (Schlüssel trip:<Tag>) wandert wie bisher
+  marc = { ...marc, bought: { ...marc.bought, 'trip:2026-11-21': { Zwiebel: { lotId: 'zz', amount: 10, at: '2026-11-21' } } } }
+  marc = await sync(hass, marc)
+  lisa = await sync(hass, lisa)
+  ok(lisa.bought['trip:2026-11-21']?.Zwiebel?.at === '2026-11-21', 'gekauft auf Einkauf Sa 21.11. (mit Abhak-Tag) bei Lisa')
 }
 
 // ───── 14) Ruhe: ohne Änderungen wird nichts geschrieben ─────

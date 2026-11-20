@@ -58,8 +58,10 @@ ok(run(addBake({}, '2026-11-10', BIENEN, 1)).buy.length === 0, 'vergessen (älte
 const late = planWeek({}, week, [], {}, TODAY, {}, formatAmount, {}, 11, {}, addBake({}, '2026-11-17', BIENEN, 1))
 ok(late.buy.length > 0, 'gestern geplant, noch nicht beantwortet: Bedarf bleibt')
 // Home-Assistant-Einkaufsliste bekommt es über haLocalFor
+// (Einkauf Sa 21.11. muss dafür freigegeben sein – Entwürfe gehen nicht an Home Assistant)
 const st = sanitize({ bakePlan: addBake({}, '2026-11-21', BIENEN, 1), onboarding: 'done' })
-ok(haLocalFor(st, TODAY).some((i) => /Mandelblättchen/.test(i.summary ?? i.key ?? JSON.stringify(i))), 'Google Tasks: Zutaten stehen in der HA-Einkaufsliste')
+ok(!haLocalFor(st, TODAY).length, 'Google Tasks: Entwurf geht nicht an HA')
+ok(haLocalFor({ ...st, trips: { '2026-11-21': { released: 1 } } }, TODAY).some((i) => /Mandelblättchen.*\(Sa\)/.test(i.summary)), 'Google Tasks: freigegeben → Zutaten stehen in der HA-Einkaufsliste (Sa)')
 ok(bakeEntriesOf(addBake({}, '2026-11-21', BIENEN, 2), TODAY)[0][1].servings === 2, 'Plan-Eintrag: Portionen = Rezeptmenge × Basisportionen')
 
 // ───── 3) Nachfrage und Gebacken ─────

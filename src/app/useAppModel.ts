@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { useAppState } from '../store'
 import { isBought } from '../shopping'
+import { findHaItem } from '../tripState'
 import { useHomeAssistant } from '../useHa'
 import { useCalendar } from './useCalendar'
 import { useUi } from './useUi'
@@ -62,19 +63,18 @@ export function useAppModel() {
   }
 
   // ───── Home Assistant: geteilte Einkaufsliste, Kalender, Erinnerungen ─────
-  const haRef = useRef({ buy: plan.haWeek.buy, key: plan.haKey })
-  haRef.current = { buy: plan.haWeek.buy, key: plan.haKey }
+  const haRef = useRef(plan.trips)
+  haRef.current = plan.trips
   const ha = useHomeAssistant({
     ha: state.ha,
     setState,
     local: plan.haLocal,
     state,
-    // in HA abgehakt → wie Abhaken in der Liste (Vorrat füllt sich)
+    // in HA abgehakt → wie Abhaken in der Liste (Vorrat füllt sich); Schlüssel `<Einkaufstag>|<Artikel>`
     onBought: (keys) => {
-      const { buy, key } = haRef.current
       for (const k of keys) {
-        const it = buy.find((b) => b.key === k)
-        if (it && !isBought(it)) act.toggleBuy(it, key)
+        const hit = findHaItem(haRef.current, k)
+        if (hit && !isBought(hit.item)) act.toggleBuy(hit.item, hit.trip)
       }
     },
   })

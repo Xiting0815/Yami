@@ -4,7 +4,7 @@
  */
 import { RECIPE_BY_ID } from './data/recipes'
 import { PROTEIN_LOW_SHARE, dayBalance, isWorkday } from './energy'
-import { amountValue } from './kitchen'
+import { amountValue, boughtOfWeek } from './kitchen'
 import { type Rating, buildModel, summarize } from './learning'
 import { type WeighIn, weekOf } from './progress'
 import { type AppState, addDays, isoWeekNumber, mondayOf, parseIso } from './store'
@@ -104,7 +104,8 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
   }
 
   // ───── Ausgaben (Schätzung) ─────
-  const bought = state.bought[weekKey] ?? {}
+  // gekauft auf Einkäufen dieser Woche (Schlüssel trip:<Tag>) und auf der früheren Wochenliste
+  const bought = boughtOfWeek(state.bought, weekDays)
   const boughtNames = Object.keys(bought).filter((n) => bought[n].amount > 1e-6)
   const spent = boughtNames.reduce((s, n) => s + amountValue(n, bought[n].amount, state.prices), 0)
   const dinners = weekDays.filter((d) => state.plan[d] && state.plan[d]!.status !== 'skipped').length

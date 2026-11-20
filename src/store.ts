@@ -209,7 +209,48 @@ export interface AppState {
   bakeHints: BakeHint[]
   /** Familien-Abgleich: Stand des letzten Abgleichs, andere Personen, Hinweise (nur lokal; siehe src/sync.ts) */
   sync?: SyncLocal
+  /** Einkäufe: Einkaufstag (ISO) → Entwurf/freigegeben und „Habe ich“-Antworten (geteilt, siehe src/tripState.ts) */
+  trips: Record<string, TripState>
+  /** Haupteinkaufstag (JS-Wochentag, 6 = Samstag); fehlt = Samstag (geteilt) */
+  shopDay?: number
+  /** gelernter Einkaufstag, zu dem schon gefragt wurde („übernehmen?“) – nur lokal */
+  shopDayAsked?: number
+  /** „Im Vorrat führen?“ beantwortet: Zutat → ja/nein – nur lokal */
+  stockAsk: Record<string, 'yes' | 'no'>
 }
+
+/** Stand eines Einkaufs (Schlüssel = Einkaufstag) */
+export interface TripState {
+  /** freigegeben (ms) – erst dann geht die Liste an Home Assistant (Google Tasks) */
+  released?: number
+  /** Artikel, die bei der Freigabe auf der Liste standen (danach Hinzugekommenes = „neu seit Freigabe“) */
+  sent?: string[]
+  /** „Liste prüfen“: Artikel → habe ich / brauche ich */
+  answers?: Record<string, 'have' | 'need'>
+}
+
+export const TRIPS_MAX = 60
+
+/** Einkaufs-Stände prüfen (Speicher, Sicherung, Abgleich) */
+export function sanitizeTrips(x: unknown): Record<string, TripState> {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return {}
+  const out: Record<string, TripState> = {}
+  for (const [d, v] of Object.entries(x as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).slice(-TRIPS_MAX)) {
+    if (!ISO.test(d) || !v || typeof v !== 'object' || Array.isArray(v)) continue
+    const t = v as Record<string, unknown>
+    const st: TripState = {}
+    if (isNum(t.released) && t.released > 0) st.released = t.released
+    if (Array.isArray(t.sent)) st.sent = t.sent.filter((k): k is string => typeof k === 'string').slice(0, 300)
+    if (t.answers && typeof t.answers === 'object' && !Array.isArray(t.answers)) {
+      const a = Object.fromEntries(Object.entries(t.answers as Record<string, unknown>).filter(([k, v]) => k.length <= 80 && (v === 'have' || v === 'need'))) as TripState['answers']
+      if (Object.keys(a!).length) st.answers = a
+    }
+    if (Object.keys(st).length) out[d] = st
+  }
+  return out
+}
+
+const validWeekday = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 6
 
 /** höchstens so viele gegessene Stücke werden gespeichert */
 export const SNACKS_MAX = 400
@@ -249,6 +290,8 @@ const INITIAL: AppState = {
   bakeRatings: {},
   bakePlan: {},
   bakeHints: [],
+  trips: {},
+  stockAsk: {},
 }
 
 const hasData = (s: AppState) =>
@@ -514,6 +557,14 @@ export function sanitize(parsed: unknown): AppState {
   )
   state.bakePlan = sanitizeBakePlan(state.bakePlan)
   state.bakeHints = sanitizeBakeHints(state.bakeHints)
+  // Einkäufe (Entwurf/freigegeben, „Habe ich“), Einkaufstag
+  state.trips = sanitizeTrips(state.trips)
+  if (!validWeekday(state.shopDay)) delete state.shopDay
+  if (!validWeekday(state.shopDayAsked)) delete state.shopDayAsked
+  state.stockAsk = Object.fromEntries(Object.entries(state.stockAsk).filter(([k, v]) => k.length <= 60 && (v === 'yes' || v === 'no')).slice(-200))
+  state.bought = Object.fromEntries(
+    Object.entries(state.bought).map(([w, m]) => [w, Object.fromEntries(Object.entries(m).map(([k, b]) => [k, typeof b.at === 'string' && ISO.test(b.at) ? b : { lotId: b.lotId, amount: b.amount }]))]),
+  )
   // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
   if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'
   return state

@@ -157,7 +157,7 @@ export function useHomeAssistant(input: HaInput) {
     }
     if (active && sharingActive(ha)) request(2000)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [st.plan, st.pantry, st.bought, st.checked, st.custom, st.wasted, st.customRecipes, st.customIngredients, st.prices, st.staples, st.spices, st.pantryRequests, st.ratings, st.rejects, st.portionFeedback, st.bakeRatings, st.baked])
+  }, [st.plan, st.pantry, st.bought, st.checked, st.custom, st.wasted, st.customRecipes, st.customIngredients, st.prices, st.staples, st.spices, st.pantryRequests, st.ratings, st.rejects, st.portionFeedback, st.bakeRatings, st.baked, st.trips, st.shopDay])
 
   // Änderungen an Liste, Plan, Vorrat → abgleichen
   const sig = JSON.stringify([input.local, Object.entries(input.state.plan).map(([d, e]) => [d, e?.recipeId, e?.servings, e?.status]), input.state.breakfastPicks, input.state.prepDays, input.state.weighIns.length, input.state.pantry.map((l) => [l.name, l.expires]), ha?.calendar, ha?.reminders])

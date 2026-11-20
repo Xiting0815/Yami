@@ -146,7 +146,8 @@ const amt = (s, name) => s.pantry.filter((l) => l.name === name).reduce((a, l) =
     await page.waitForTimeout(200)
     await page.screenshot({ path: `${SHOT}/6b-sa-liste-fuer-so.png`, fullPage: true })
     const li = await page.locator('main').innerText()
-    ok(/Spargel weiß[\s\S]{0,40}für So/.test(li), 'Sa: Liste der nächsten Woche zeigt Spargel „für So“')
+    // Einkäufe statt Wochen: der Samstagseinkauf deckt Sa–Fr ab, Sonntag gehört einfach dazu
+    ok(/Einkauf Sa 21\.11\./.test(li) && /Spargel weiß/.test(li), 'Sa: Einkauf Sa 21.11. enthält Spargel für Sonntag')
     await page.evaluate((k) => {
       const s = JSON.parse(localStorage.getItem(k))
       delete s.plan['2026-11-22']

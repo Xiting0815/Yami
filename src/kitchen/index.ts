@@ -9,4 +9,5 @@
 export * from './base'
 export * from './pantry'
 export * from './planWeek'
+export * from './trips'
 export * from './insight'

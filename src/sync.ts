@@ -21,15 +21,16 @@
  *                  Zuordnungen), damit dort nichts doppelt entsteht.
  *
  * GETEILT (AppState-Felder): plan, bakePlan, pantry, bought, checked, custom, wasted, customRecipes, customIngredients,
- *   prices, staples, spices, pantryRequests.
+ *   prices, staples, spices, pantryRequests, trips (Einkäufe: Freigabe + „Habe ich“-Antworten), shopDay (Einkaufstag).
  * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked.
  * PERSÖNLICH (nie geteilt): profile, weighIns, adjustDecidedAt, profileCreated, breakfast, breakfastPicks, prepDays,
  *   prepChecked, snacks (kcal), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
  *   bfOpen, showClassicSteps, lastBackup, ha (Token, Person, Gerät), sync (dieser Abgleich-Stand).
  *
  * ZUSAMMENFÜHREN (pro Eintrag, „letzte Änderung gewinnt“)
- *   Jeder Eintrag hat `{ t: ms, by: Person }`. Schlüssel: plan:<Tag>, bplan:<Tag>|<Rezept-Id>, lot:<Posten-Id>, bought:<Woche>|<Artikel>,
- *   check:<Woche>|<Artikel>, cust:<Woche>|<Id>, waste:<Prüfsumme>, recipe:<Id>, ing:<Name>, price:/staple:/spice:/req:<Name>,
+ *   Jeder Eintrag hat `{ t: ms, by: Person }`. Schlüssel: plan:<Tag>, bplan:<Tag>|<Rezept-Id>, lot:<Posten-Id>, bought:<Woche bzw. trip:Einkaufstag>|<Artikel>,
+ *   check:<Woche>|<Artikel>, cust:<Woche>|<Id>, waste:<Prüfsumme>, trip:<Einkaufstag> (Freigabe), ans:<Einkaufstag>|<Artikel>
+ *   (Habe ich/Brauche ich), shop:day, recipe:<Id>, ing:<Name>, price:/staple:/spice:/req:<Name>,
  *   rating:<Tag>, reject:<Datum>|<Id>, pf:<Tag>, bake:<Datum:Id>, baked:<Datum>|<Id>.
  *   Lokale Änderungen erkennt der Abgleich selbst: Wert ≠ Prüfsumme im letzten Abgleich-Stand (`sync.base`) → neu
  *   gestempelt; fehlt ein Eintrag, der beim letzten Mal da war → Grabstein (Löschung wandert mit). Grabsteine werden
@@ -78,7 +79,7 @@ import { RECIPE_BY_ID } from './data/recipes'
 import type { BakeEntry } from './types'
 import { cookDue, uid } from './kitchen'
 import { type PortionFeedback, portionFactor } from './learning'
-import { type AppState, type HaSettings, sanitize, sharingActive, weekdayName } from './store'
+import { type AppState, type HaSettings, type TripState, sanitize, sharingActive, shortDate, weekdayName } from './store'
 import { type BaseEntry, type ItemMeta, type PersonSignals, type SyncLocal, type SyncNotice, emptySync, sanitizePerson } from './syncLocal'
 
 export const PREFIX = 'yami:v1:'
@@ -134,8 +135,9 @@ const split2 = (s: string): [string, string] => {
 const PERSON_KINDS = new Set(['rating', 'reject', 'pf', 'bake', 'baked'])
 const DOC_OF: Record<string, string> = {
   plan: 'kitchen', bplan: 'kitchen', lot: 'kitchen', bought: 'kitchen', check: 'kitchen', cust: 'kitchen', waste: 'kitchen',
+  trip: 'kitchen', ans: 'kitchen',
   recipe: 'recipes', ing: 'recipes',
-  price: 'prefs', staple: 'prefs', spice: 'prefs', req: 'prefs',
+  price: 'prefs', staple: 'prefs', spice: 'prefs', req: 'prefs', shop: 'prefs',
 }
 export function docOf(key: string, me: string): string | undefined {
   const k = kindOf(key)
@@ -160,6 +162,11 @@ export function extract(s: AppState): Record<string, unknown> {
   for (const [k, v] of Object.entries(s.staples)) o[`staple:${k}`] = v
   for (const [k, v] of Object.entries(s.spices)) o[`spice:${k}`] = v
   for (const [k, v] of Object.entries(s.pantryRequests)) o[`req:${k}`] = v
+  for (const [d, t] of Object.entries(s.trips ?? {})) {
+    if (t.released) o[`trip:${d}`] = { released: t.released, ...(t.sent ? { sent: t.sent } : {}) }
+    for (const [k, v] of Object.entries(t.answers ?? {})) o[`ans:${d}|${k}`] = v
+  }
+  if (s.shopDay != null) o['shop:day'] = s.shopDay
   for (const [d, v] of Object.entries(s.ratings)) o[`rating:${d}`] = v
   for (const r of s.rejects) o[`reject:${r.date}|${r.id}`] = 1
   for (const [d, v] of Object.entries(s.portionFeedback)) o[`pf:${d}`] = v
@@ -234,6 +241,22 @@ export function rebuild(s: AppState, live: Record<string, unknown>, kinds: Set<s
   if (kinds.has('staple')) next.staples = obj('staple') as AppState['staples']
   if (kinds.has('spice')) next.spices = obj('spice') as AppState['spices']
   if (kinds.has('req')) next.pantryRequests = obj('req') as AppState['pantryRequests']
+  if (kinds.has('trip') || kinds.has('ans')) {
+    // Freigabe und Antworten zusammen neu bauen (beide Arten stehen vollständig in `live`)
+    const t: Record<string, TripState> = {}
+    for (const [d, v] of of('trip')) t[d] = { ...(v as TripState) }
+    for (const [r, v] of of('ans')) {
+      const [d, k] = split2(r)
+      const cur = (t[d] ??= {})
+      cur.answers = { ...cur.answers, [k]: v as 'have' | 'need' }
+    }
+    next.trips = t
+  }
+  if (kinds.has('shop')) {
+    const d = live['shop:day']
+    if (typeof d === 'number') next.shopDay = d
+    else delete next.shopDay
+  }
   const p = personFrom(live)
   if (kinds.has('rating')) next.ratings = p.ratings
   if (kinds.has('reject')) next.rejects = p.rejects
@@ -575,6 +598,10 @@ export function syncRound(inp: RoundInput): RoundResult {
       const text = oldV && newV ? `${m.by} hat ${wd} geändert: ${titleOf(oldV)} → ${titleOf(newV)}` : newV ? `${m.by} hat ${wd} geplant: ${titleOf(newV)}` : `${m.by} hat ${wd} geleert (${titleOf(oldV)})`
       notices.push({ id: uid(), at: now, by: m.by, text, undo: { day, ...(oldV ? { value: oldV } : {}) } })
     } else if (kindOf(k) === 'check' && !m.d) checkedBy.set(m.by, (checkedBy.get(m.by) ?? 0) + 1)
+    else if (kindOf(k) === 'trip' && !m.d && !(l && !l.d)) {
+      const day = restOf(k)
+      notices.push({ id: uid(), at: now, by: m.by, text: `${m.by} hat den Einkauf ${weekdayName(day, true)} ${shortDate(day)} freigegeben` })
+    }
   }
   for (const [by, n] of checkedBy) notices.push({ id: uid(), at: now, by, text: `${by} hat ${n} Artikel auf der Einkaufsliste abgehakt` })
 
@@ -670,6 +697,7 @@ export function applyRound(cur: AppState, res: RoundResult): { state: AppState; 
       plan: n.plan, bakePlan: n.bakePlan, pantry: n.pantry, bought: n.bought, checked: n.checked, custom: n.custom, wasted: n.wasted,
       customRecipes: n.customRecipes, customIngredients: n.customIngredients, prices: n.prices, staples: n.staples, spices: n.spices,
       pantryRequests: n.pantryRequests, ratings: n.ratings, rejects: n.rejects, portionFeedback: n.portionFeedback, bakeRatings: n.bakeRatings, baked: n.baked,
+      trips: n.trips, shopDay: n.shopDay,
       onboarding: cur.onboarding ?? n.onboarding,
       sync,
     },

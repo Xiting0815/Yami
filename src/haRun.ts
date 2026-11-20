@@ -4,30 +4,19 @@
  * geplant hat, landet also im selben Lauf in Google Tasks und im Kalender (siehe Kopf von src/sync.ts).
  */
 import { HaError, haErrorText } from './homeassistant'
-import { type Desired, type HaApi, type LocalItem, localItems, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo } from './haSync'
-import { planWeek } from './kitchen'
-import { portionFactor } from './learning'
-import { formatAmount } from './shopping'
-import { type AppState, type HaSettings, parseIso, sharingActive, weekDays } from './store'
-import { LEASE_MS, type MainDoc, applyRound, familySync, hashOf, householdFeedback, leaseDecision, writeMain } from './sync'
-import { defaultMonday } from './app/dates'
+import { type Desired, type HaApi, type LocalItem, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo } from './haSync'
+import type { Trip } from './kitchen'
+import { type AppState, type HaSettings, sharingActive } from './store'
+import { LEASE_MS, type MainDoc, applyRound, familySync, hashOf, leaseDecision, writeMain } from './sync'
+import { haTripItems, tripReminderInput, tripsOf } from './tripState'
 
 export function isoLocal(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-/** Einkaufsliste für HA: die „aktuelle“ Woche (ab Samstag die nächste) – wie in usePlanning (haWeek) */
-export function haLocalFor(s: AppState, today: string): LocalItem[] {
-  const key = defaultMonday(today)
-  const month = new Date(today + 'T12:00:00').getMonth() + 1
-  const portion = portionFactor(householdFeedback(s), today)
-  const week = planWeek(s.plan, weekDays(parseIso(key)), s.pantry, s.bought[key] ?? {}, today, s.prices, formatAmount, s.breakfast, month, {
-    memo: s.staples,
-    spices: s.spices,
-    carry: today < key,
-    portion,
-  }, s.bakePlan)
-  return localItems(week.buy)
+/** Einkaufsliste für HA: alle freigegebenen Einkäufe (Entwürfe nicht) – wie in usePlanning (haLocal) */
+export function haLocalFor(s: AppState, today: string, trips: Trip[] = tripsOf(s, today)): LocalItem[] {
+  return haTripItems(trips, s.trips, today)
 }
 
 export interface HaRunDeps {
@@ -60,7 +49,7 @@ const mappingOf = (h: Pick<HaSettings, 'items' | 'done' | 'events'>): Mapping =>
 const personalOf = (events: HaSettings['events'], me: string) =>
   Object.fromEntries(
     Object.entries(events)
-      .map(([k, v]) => [/^rem:(prep|thaw|weigh):/.test(k) ? `rem:${me}:${k.slice(4)}` : k, v] as const)
+      .map(([k, v]) => [/^rem:(prep|thaw|weigh|shop):/.test(k) ? `rem:${me}:${k.slice(4)}` : k, v] as const)
       .filter(([k]) => k.startsWith(`rem:${me}:`)),
   )
 
@@ -85,13 +74,17 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   const today = isoLocal(now)
   const patchHa = (p: Partial<HaSettings>) => d.setState((s) => (s.ha ? { ...s, ha: { ...s.ha, ...p } } : s))
   const errText = (e?: string) => (e ? `Nicht alles ließ sich abgleichen: ${e}` : undefined)
-  const remindersOf = (state: AppState) =>
-    plannedReminders({ breakfastPicks: state.breakfastPicks, prepDays: state.prepDays, weighIns: state.weighIns, hasProfile: !!state.profile, pantry: state.pantry }, now)
+  const remindersOf = (state: AppState, trips: Trip[]) =>
+    plannedReminders(
+      { breakfastPicks: state.breakfastPicks, prepDays: state.prepDays, weighIns: state.weighIns, hasProfile: !!state.profile, pantry: state.pantry, trips: tripReminderInput(trips, state.trips, today) },
+      now,
+    )
 
   // ── ohne Familie teilen: wie bisher alles auf diesem Gerät ──
   if (!sharingActive(h0)) {
-    const todo = await syncTodo(d.api, h0, haLocalFor(s0, today), d.onBought)
-    const cal = await syncCalendar(d.api, h0, plannedDinners(s0.plan, today), remindersOf(s0), now)
+    const trips0 = tripsOf(s0, today)
+    const todo = await syncTodo(d.api, h0, haLocalFor(s0, today, trips0), d.onBought)
+    const cal = await syncCalendar(d.api, h0, plannedDinners(s0.plan, today), remindersOf(s0, trips0), now)
     const error = todo.error ?? cal.error
     patchHa({ items: todo.items, done: todo.done, events: cal.events, lastSync: now.toISOString(), error: errText(error) })
     return { again: false, error, wrote: true }
@@ -109,7 +102,8 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
     return a.state
   })
   const record = (m: MainDoc) => d.setState((s) => (s.sync ? { ...s, sync: { ...s.sync, main: { device: m.device, person: m.person, t: m.t } } } : s))
-  const { personal, shared } = splitReminders(remindersOf(state), me)
+  const trips = tripsOf(state, today)
+  const { personal, shared } = splitReminders(remindersOf(state, trips), me)
 
   // persönliche Erinnerungen: jedes Gerät für seine Person, unabhängig vom Schreibstab (nie fremde anfassen)
   const per = await syncReminders(d.api, h0.reminders, personalOf(h0.events, me), personal, now)
@@ -138,7 +132,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
 
   // Schreibstab: Einkaufsliste (Google Tasks), Abendessen im Familienkalender, Ablauf-Erinnerungen – mit dem zusammengeführten Stand
   const h: HaSettings = { ...h0, items: mapping.items, done: mapping.done, events: mapping.events }
-  const todo = await syncTodo(d.api, h, haLocalFor(state, today), d.onBought)
+  const todo = await syncTodo(d.api, h, haLocalFor(state, today, trips), d.onBought)
   const cal = await syncCalendar(d.api, h, plannedDinners(state.plan, today), shared, now)
   error ??= todo.error ?? cal.error
   const sharedEvents = Object.fromEntries(Object.entries(cal.events).filter(([k]) => isShared(k)))

@@ -953,3 +953,31 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .bake-item.ask { text-decoration: underline dotted; }
 .bake-hint .link { white-space: nowrap; }
 .bake-hint .notice-text { -webkit-line-clamp: 3; }
+
+/* ───── Einkäufe (Liste nach Einkaufstagen) ───── */
+.trip-head { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 8px; text-align: left; }
+.trip-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.trip-tabs::-webkit-scrollbar { display: none; }
+.trip-tabs button { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-height: var(--tap); padding: 7px 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); color: var(--text); font-size: 14px; }
+.trip-tabs button small { font-size: 11px; color: var(--muted); font-weight: 600; }
+.trip-tabs button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.trip-tabs button.now b { color: var(--amber-ink); }
+.trip-title { background: var(--surface); border-radius: var(--radius); padding: 12px 14px; box-shadow: var(--shadow-card); }
+.trip-title h2 { margin: 0; font-size: 20px; letter-spacing: -0.3px; }
+.trip-title p { margin: 2px 0 6px; }
+.trip-status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0; }
+.row-btns { display: flex; gap: 8px; margin: 8px 0 4px; }
+.row-links { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.trip-now { border: none; text-align: left; border-radius: var(--radius); padding: 12px 14px; min-height: var(--tap); font-weight: 700; background: color-mix(in srgb, var(--amber-ink) 14%, var(--surface)); color: var(--text); }
+.trip-suggest { background: var(--surface-2); border-radius: var(--radius); padding: 10px 14px; }
+.trip-suggest p { margin: 0; }
+.trip-day { margin: 14px 0 6px; }
+.trip-day select { font: inherit; padding: 4px 6px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--text); }
+.trip-review .review-item { background: var(--surface); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-card); margin: 8px 0; }
+.trip-review h3 { margin: 2px 0; font-size: 24px; letter-spacing: -0.3px; }
+.trip-review .review-amt { margin: 0 0 6px; font-weight: 700; }
+.review-stock { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; margin: 10px 0; }
+.review-stock p { margin: 0 0 4px; }
+.review-qty { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-weight: 600; }
+.review-qty input { width: 90px; font: inherit; padding: 8px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); color: var(--text); }
+.item-note.new { color: var(--accent-text); }

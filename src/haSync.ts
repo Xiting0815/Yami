@@ -31,10 +31,12 @@ export interface RemoteTodo {
 }
 
 /** "Rinderhackfleisch – 500 g" */
-export function todoSummary(it: BuyItem): string {
+export function todoSummary(it: BuyItem, trip?: string): string {
   const partly = !isBought(it) && it.bought > 0
   const amt = partly ? `noch ${missingPacks(it)} ${it.product.packName ?? 'Stk'}` : packText(it)
   const base = amt ? `${it.name} – ${amt}` : it.name
+  // Einkauf: Tag des Einkaufs („(Sa)“, „(Mi)“, „(heute)“)
+  if (trip) return `${base} (${trip})`
   // ab Samstag: Bedarf für Sa/So der laufenden Woche kenntlich machen
   return it.forDays?.length ? `${base} (${forDaysText(it)})` : base
 }
@@ -228,6 +230,8 @@ export interface ReminderInput {
   /** Wiege-Erinnerung nur mit Profil */
   hasProfile: boolean
   pantry: PantryLot[]
+  /** Einkäufe, die noch Entwurf sind (Einkaufstag, offene Artikel) – Erinnerung am Vorabend 19:00 */
+  trips?: { date: string; items: number }[]
 }
 
 /** Wochentag (0 = So), an dem meist gewogen wird; ohne Messungen Montag */
@@ -285,6 +289,14 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
     const tomorrow = addDaysIso(D, 1)
     const names = [...new Set(input.pantry.filter((l) => l.expires === tomorrow && l.amount > 0).map((l) => l.name))].sort((a, b) => a.localeCompare(b, 'de'))
     if (names.length) mk(`rem:exp:${D}`, `⏰ Läuft morgen ab: ${names.join(', ')}`, `Morgen laufen ab: ${names.join(', ')}. Heute noch verwenden oder einfrieren.`, at(D, 16, 30), names.join('|'))
+  }
+  // Einkauf morgen noch nicht freigegeben → heute 19:00 erinnern (nur am Vorabend selbst angelegt, damit eine
+  // inzwischen erfolgte Freigabe nicht noch eine Erinnerung auslöst – Yami löscht Erinnerungen nie)
+  for (const t of input.trips ?? []) {
+    const eve = addDaysIso(t.date, -1)
+    if (eve !== today || !t.items) continue
+    const wd = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][parseIso(t.date).getDay()]
+    mk(`rem:shop:${eve}`, '🛒 Einkaufsliste für morgen prüfen und freigeben', `Einkauf ${wd}: ${t.items} Artikel – in Yami „Liste prüfen“ und freigeben, dann steht sie in Google Tasks.`, at(eve, 19, 0), t.date)
   }
   return out
 }

@@ -32,6 +32,27 @@ export interface BuyItem {
   note?: 'knapp' | 'leer' | 'alle'
   /** Teil des Bedarfs für noch offene Tage VOR dieser Woche (ab Samstag: Sa/So der laufenden Woche) – ISO-Tage */
   forDays?: string[]
+  /** nur Einkäufe (ListScope): Kochtage, für die diese Liste die Zutat kauft */
+  days?: string[]
+}
+
+/**
+ * Einkaufsliste für einen Einkauf statt für eine Woche (siehe trips.ts). `days` umfasst dann alle offenen Tage;
+ * wem ein Bedarf gehört, entscheidet `owner`.
+ */
+export interface ListScope {
+  /** Bedarf an `name` am Tag `day`: < 0 früherer Einkauf (wird zuerst aus dem Vorrat bedient), 0 diese Liste, > 0 späterer (zählt hier nicht) */
+  owner: (day: string, name: string) => number
+  /** „Vorrat prüfen“-Zeilen dieses Tages gehören zu dieser Liste */
+  ownsDay: (day: string) => boolean
+  /** Frühstück: an welchem Tag wird es vorbereitet (null = schon vorbereitet, zählt nicht mehr) */
+  breakfastDay?: (day: string) => string | null
+  /** eingeplante Einkäufe früherer Listen (Posten mit `from`) */
+  extra?: PantryLot[]
+  /** abgehakte Einkäufe anderer Listen: liegen schon im Vorrat, kommen aber als `extra` wieder dazu */
+  subtract?: BoughtMap[]
+  /** Grundzutaten „bald leer“ und Gewürze „alle“ stehen auf dieser Liste */
+  extras: boolean
 }
 
 export interface StapleItem {
@@ -91,12 +112,15 @@ export function planWeek(
   staple: StapleContext = {},
   /** eingeplantes Backen (noch offen): Zutaten zählen wie bei Abendessen für Einkauf, Vorrat und Kosten */
   bakePlan: BakePlan = {},
+  /** Einkauf statt Woche (siehe ListScope) */
+  scope?: ListScope,
 ): WeekResult {
   const memo = staple.memo ?? {}
   // gelernte Haushalts-Portion: noch offene Abendessen brauchen mehr/weniger (schon gekochte sind über „entnommen“ erfasst)
   const pf = staple.portion ?? 1
   const plan: WeekPlan = pf === 1 ? planIn : Object.fromEntries(Object.entries(planIn).map(([d, e]) => [d, e && !e.status ? { ...e, servings: e.servings * pf } : e]))
-  const own = (key: string) => isTrackedStaple(key, pantry, memo) || Object.keys(bought).some((n) => stapleKey(n) === key)
+  const allBought = [bought, ...(scope?.subtract ?? [])]
+  const own = (key: string) => isTrackedStaple(key, pantry, memo) || allBought.some((m) => Object.keys(m).some((n) => stapleKey(n) === key))
   // Mengen-Grundzutaten zählen erst, wenn du sie führst (Vorrat oder gemerkt) – oder etwas, das sie ersetzt
   // (Olivenöl für Sonnenblumenöl, Gemüsebrühe für Hühnerbrühe) – sonst bleiben sie bei „Vorrat prüfen“
   const trackedKey = (key: string) => own(key) || substitutesFor(key).some((n) => own(stapleKey(n)))
@@ -112,7 +136,14 @@ export function planWeek(
     ...stapleNeedsOf(r, servings).filter((n) => trackedKey(stapleKey(n.name))),
   ]
   const bakes = bakeEntriesOf(bakePlan, today)
-  const entries = [...activeEntries(plan, days), ...activeEntries(breakfast, days), ...bakes.filter(([d]) => days.includes(d))].sort((a, b) => a[0].localeCompare(b[0]))
+  const bfDay = scope?.breakfastDay
+  const bfEntries = activeEntries(breakfast, days).flatMap(([d, e]) => {
+    const p = bfDay ? bfDay(d) : d
+    return p ? [[p, e] as const] : []
+  })
+  const entries = [...activeEntries(plan, days), ...bfEntries, ...bakes.filter(([d]) => days.includes(d))].sort((a, b) => a[0].localeCompare(b[0]))
+  /** wem gehört der Bedarf (ohne scope: alles dieser Liste) */
+  const ownerOf = (day: string, name: string) => (scope ? Math.sign(scope.owner(day, name)) : 0)
 
   // Bedarf der Woche
   const req = new Map<string, { amount: number; recipes: Set<string>; forDays: Set<string> }>()
@@ -122,13 +153,21 @@ export function planWeek(
     return cur
   }
   const staples = new Map<string, { parts: Map<string, number>; recipes: Set<string> }>()
-  for (const [, e] of entries) {
+  const reqDays = new Map<string, Set<string>>()
+  for (const [day, e] of entries) {
     const r = RECIPE_BY_ID[e.recipeId]
     for (const n of needsFor(r, e.servings)) {
+      if (ownerOf(day, n.name) !== 0) continue
       const cur = reqOf(n.name)
       cur.amount += n.amount
       cur.recipes.add(r.title)
+      if (scope) {
+        const ds = reqDays.get(n.name) ?? new Set<string>()
+        ds.add(day)
+        reqDays.set(n.name, ds)
+      }
     }
+    if (scope && !scope.ownsDay(day)) continue
     for (const ing of r.ingredients) {
       const name = canonical(ing.name)
       if (isTracked(name)) continue
@@ -155,7 +194,7 @@ export function planWeek(
         if (c.expires > same.expires) same.expires = c.expires
       } else pool.push({ ...c })
     }
-  for (const [name, b] of Object.entries(bought)) {
+  for (const [name, b] of allBought.flatMap((m) => Object.entries(m))) {
     let rest = b.amount
     for (const l of [...pool.filter((x) => x.id === b.lotId), ...pool.filter((x) => x.id !== b.lotId && x.name === name)]) {
       const t = Math.min(l.amount, rest)
@@ -163,6 +202,8 @@ export function planWeek(
       rest -= t
     }
   }
+  // eingeplante Einkäufe früherer Listen (erst ab ihrem Einkaufstag da)
+  for (const l of scope?.extra ?? []) pool.push({ ...l })
   /** Menge aus dem Pool nehmen (nur Posten, die am Tag noch gut sind): erst die Zutat selbst, dann austauschbare */
   const take = (name: string, amount: number, day: string, exactOnly: boolean) => {
     const got: { name: string; amount: number }[] = []
@@ -208,7 +249,13 @@ export function planWeek(
   // diese Woche: 1. Durchgang Zutat selbst (Tag für Tag) – 2. Durchgang austauschbare Posten für den Rest
   const availExact = new Map<string, number>()
   for (const name of req.keys()) availExact.set(name, sum(lotsFor(pool, name, today, true)))
-  const weekNeeds = entries.flatMap(([day, e]) => needsFor(RECIPE_BY_ID[e.recipeId], e.servings).map((n) => ({ ...n, day: useDay(day, e), exact: 0 })))
+  const allNeeds = entries.flatMap(([day, e]) => needsFor(RECIPE_BY_ID[e.recipeId], e.servings).map((n) => ({ ...n, day: useDay(day, e), owner: ownerOf(day, n.name), exact: 0 })))
+  // Bedarf früherer Einkäufe (gleiche Tage): bedient sich zuerst – Zutat selbst, dann austauschbare
+  for (const n of allNeeds.filter((x) => x.owner < 0)) {
+    const got = sum(take(n.name, n.amount, n.day, true))
+    if (n.amount - got > 1e-6) take(n.name, n.amount - got, n.day, false)
+  }
+  const weekNeeds = allNeeds.filter((x) => x.owner === 0)
   for (const n of weekNeeds) n.exact = sum(take(n.name, n.amount, n.day, true))
   const have = new Map<string, { exact: number; subs: { name: string; amount: number }[] }>()
   for (const name of req.keys()) have.set(name, { exact: 0, subs: [] })
@@ -251,6 +298,7 @@ export function planWeek(
       recipes: [...recipes],
     }
     if (forDays.size) item.forDays = [...forDays].sort()
+    if (reqDays.has(name)) item.days = [...reqDays.get(name)!].sort()
     if (packs > 0 && isQtyStaple(name)) item.note = 'knapp'
     // Brühe: der Bedarf heißt „Gemüsebrühe“, die Packung „Gemüsebrühe Würfel“ – fürs „schon im Vorrat“ bleibt der Rezeptname
     if (packs === 0 && itemName !== name) {
@@ -270,6 +318,7 @@ export function planWeek(
       twin.leftover = twin.fromPantry + twin.packs * product.pack - twin.required
       twin.recipes = [...new Set([...twin.recipes, ...item.recipes])]
       if (item.forDays) twin.forDays = [...new Set([...(twin.forDays ?? []), ...item.forDays])].sort()
+      if (item.days) twin.days = [...new Set([...(twin.days ?? []), ...item.days])].sort()
       total += twin.cost
       continue
     }
@@ -280,7 +329,7 @@ export function planWeek(
   // Lernen: Grundzutaten, die bald leer sind (aus dem Verbrauch der letzten Wochen) oder fast leer, kommen auf die Liste
   const events = useEvents(plan, breakfast)
   const keys = new Set<string>([...Object.keys(memo), ...pantry.filter((l) => isQtyStaple(l.name)).map((l) => stapleKey(l.name))])
-  for (const key of keys) {
+  for (const key of scope && !scope.extras ? [] : keys) {
     if (!trackedKey(key) || buy.some((b) => stapleKey(b.name) === key && isQtyStaple(b.name))) continue
     const name = buyName(key, memo)
     const product = productFor(name, overrides, month)
@@ -317,7 +366,7 @@ export function planWeek(
   }
 
   // Gewürze, die „alle“ sind: stehen als echter Artikel auf der Liste (abgehakt → wieder „da“)
-  for (const [name, st] of Object.entries(staple.spices ?? {})) {
+  for (const [name, st] of scope && !scope.extras ? [] : Object.entries(staple.spices ?? {})) {
     const hit = bought[name] != null
     const product = productFor(name, overrides)
     if ((st !== 'alle' && !hit) || !product) continue

@@ -5,16 +5,15 @@ import { type PersonModel, buildModel, householdPreference, portionFactor } from
 import { householdFeedback } from '../sync'
 import { sharingActive } from '../store'
 import { dayBalance, isProteinLow, isWorkday, proteinBoost } from '../energy'
-import { type AppState, addDays, isoDate, mondayOf, parseIso, weekDays } from '../store'
+import { type AppState, addDays, isoDate, mondayOf, parseIso } from '../store'
 import { matches } from '../filter'
 import { formatAmount } from '../shopping'
 import { stapleHints, useEvents } from '../staples'
 import { daysUntil, insight, lastSeenMap, planWeek, PANTRY_ONLY_MAX_EURO } from '../kitchen'
 import { activeFilterCount } from '../components/FilterBar'
-import { localItems } from '../haSync'
+import { haTripItems, tripsOf } from '../tripState'
 import type { Calendar } from './useCalendar'
 import type { Ui } from './useUi'
-import { defaultMonday } from './dates'
 
 /** Planung, Vorrat & Empfehlungen fürs Abendessen: Wocheneinkauf, gelernte Vorlieben, Wisch-Stapel */
 export function usePlanning(state: AppState, { today, days, weekKey }: Calendar, { swipeDay, pantryMode, rejected }: Pick<Ui, 'swipeDay' | 'pantryMode' | 'rejected'>) {
@@ -23,26 +22,23 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
   const swipeMonth = new Date(swipeDay + 'T12:00:00').getMonth() + 1
   // Lernen: wie groß sind die Portionen wirklich (Rückmeldung nach dem Essen) → Mengen fürs Einkaufen
   const portion = useMemo(() => portionFactor(householdFeedback(state), today), [state.portionFeedback, state.sync?.household, state.ha?.share, state.ha?.me, today])
-  // ab Samstag ist die Liste die der nächsten Woche: was für Sa/So der laufenden Woche noch fehlt, kommt mit drauf
-  const carryFor = (key: string) => today < key && key === defaultMonday(today)
+  // Wochenzahlen (Kosten/Artikel im Wochenkopf, Vorrat danach): was die Gerichte DIESER Woche brauchen.
+  // Die Einkaufsliste selbst richtet sich nach Einkäufen (trips), nicht nach Wochen.
   const week = useMemo(
-    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(weekKey), portion }, state.bakePlan),
+    () => planWeek(state.plan, days, state.pantry, state.bought[weekKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, portion }, state.bakePlan),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.plan, state.bakePlan, days, state.pantry, state.bought, weekKey, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices, portion],
   )
   // Lernen: wie lange reichen Öl, Brühe & Co. noch (aus dem Verbrauch der gekochten Gerichte)
   const hints = useMemo(() => stapleHints(useEvents(state.plan, state.breakfast), state.pantry, today), [state.plan, state.breakfast, state.pantry, today])
-  // Einkaufsliste für Home Assistant: immer die „aktuelle“ Woche (ab Samstag die nächste), unabhängig von der angezeigten
-  const haKey = defaultMonday(today)
-  const haWeek = useMemo(
-    () =>
-      haKey === weekKey
-        ? week
-        : planWeek(state.plan, weekDays(parseIso(haKey)), state.pantry, state.bought[haKey] ?? {}, today, state.prices, formatAmount, state.breakfast, todayMonth, { memo: state.staples, spices: state.spices, carry: carryFor(haKey), portion }, state.bakePlan),
+  // Einkäufe ab heute (Haupteinkauf, ggf. Zusatzeinkauf, „Heute noch“) – unabhängig von der angezeigten Woche
+  const trips = useMemo(
+    () => tripsOf(state, today),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [haKey, weekKey, week, state.plan, state.bakePlan, state.pantry, state.bought, today, state.prices, state.breakfast, todayMonth, state.customRecipes, state.customIngredients, state.staples, state.spices, portion],
+    [state.plan, state.bakePlan, state.pantry, state.bought, today, state.prices, state.breakfast, state.prepDays, state.customRecipes, state.customIngredients, state.staples, state.spices, state.shopDay, portion],
   )
-  const haLocal = useMemo(() => localItems(haWeek.buy), [haWeek])
+  // Home Assistant bekommt nur freigegebene Einkäufe
+  const haLocal = useMemo(() => haTripItems(trips, state.trips, today), [trips, state.trips, today])
   const weekRecipes = useMemo(
     () => days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => RECIPE_BY_ID[e!.recipeId]).filter(Boolean),
     [days, state.plan, state.customRecipes],
@@ -156,7 +152,7 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
     return [...fresh, ...later]
   }, [state.filters, perPortion, plannedIds, rejected, insights, pantryMode])
 
-  return { portion, todayMonth, week, hints, haKey, haWeek, haLocal, jitter, taste, others, insights, perPortion, activeFilters, filteredCount, deck }
+  return { portion, todayMonth, week, hints, trips, haLocal, jitter, taste, others, insights, perPortion, activeFilters, filteredCount, deck }
 }
 
 export type Planning = ReturnType<typeof usePlanning>

@@ -1,27 +1,33 @@
 import { type CustomItem } from '../../store'
 import { isSpice, toggleSpiceBought } from '../../staples'
-import { type BuyItem, addDaysIso, uid, unbuy } from '../../kitchen'
+import { type BuyItem, type Trip, addDaysIso, uid, unbuy } from '../../kitchen'
+import { answerTrip, haveAmount, haveLot, releaseTrip as release, unreleaseTrip as unrelease } from '../../tripState'
 import type { ActionContext } from './context'
 
-/** Einkaufsliste: abhaken (füllt den Vorrat), zurücksetzen, eigene Posten, Preise */
-export function shoppingActions({ setState, cal, flash, snapshot }: ActionContext) {
-  const { today, weekKey } = cal
+/** Liste, in die geschrieben wird: Einkauf (`trip:<Tag>`) bzw. alte Wochenliste (Montag), aus der gelesen wird */
+export interface ListRef {
+  key: string
+  legacyKey?: string
+}
 
-  function toggleBuy(item: BuyItem, forWeek = weekKey) {
-    // Gewürz: abhaken heißt „wieder da“ (kein Vorratsposten), Abwählen wieder „alle“
-    if (isSpice(item.name)) {
-      setState((s) => {
-        const r = toggleSpiceBought(s.spices, s.bought[forWeek] ?? {}, item.name, item.product.pack)
-        const checked = new Set(s.checked[forWeek] ?? [])
+/** Einkaufsliste: abhaken (füllt den Vorrat), zurücksetzen, eigene Posten, Preise, prüfen & freigeben */
+export function shoppingActions({ state: s0, setState, cal, flash, snapshot }: ActionContext) {
+  const { today } = cal
+
+  function toggleBuy(item: BuyItem, list: ListRef) {
+    setState((s) => {
+      // schon auf der alten Wochenliste abgehakt → dort zurücknehmen
+      const forKey = !s.bought[list.key]?.[item.name] && list.legacyKey && s.bought[list.legacyKey]?.[item.name] ? list.legacyKey : list.key
+      // Gewürz: abhaken heißt „wieder da“ (kein Vorratsposten), Abwählen wieder „alle“
+      if (isSpice(item.name)) {
+        const r = toggleSpiceBought(s.spices, s.bought[forKey] ?? {}, item.name, item.product.pack)
+        const checked = new Set(s.checked[forKey] ?? [])
         if (r.on) checked.add(item.key)
         else checked.delete(item.key)
-        return { ...s, spices: r.spices, bought: { ...s.bought, [forWeek]: r.bought }, checked: { ...s.checked, [forWeek]: [...checked] } }
-      })
-      return
-    }
-    setState((s) => {
-      const wk = { ...(s.bought[forWeek] ?? {}) }
-      const checked = new Set(s.checked[forWeek] ?? [])
+        return { ...s, spices: r.spices, bought: { ...s.bought, [forKey]: r.bought }, checked: { ...s.checked, [forKey]: [...checked] } }
+      }
+      const wk = { ...(s.bought[forKey] ?? {}) }
+      const checked = new Set(s.checked[forKey] ?? [])
       let pantry = s.pantry
       let { plan, breakfast } = s
       const b = wk[item.name]
@@ -32,7 +38,7 @@ export function shoppingActions({ setState, cal, flash, snapshot }: ActionContex
         const has = pantry.some((l) => l.id === b.lotId)
         if (has) pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount + delta } : l))
         else pantry = [...pantry, { id: b.lotId, name: item.name, amount: delta, unit: item.unit, expires: addDaysIso(today, item.product.shelf) }]
-        wk[item.name] = { lotId: b.lotId, amount: needed }
+        wk[item.name] = { lotId: b.lotId, amount: needed, at: today }
         checked.add(item.key)
       } else if (b) {
         // doch nicht gekauft: nur den Rest des Postens entfernen; schon damit Gekochtes verweist danach nicht mehr darauf
@@ -45,53 +51,105 @@ export function shoppingActions({ setState, cal, flash, snapshot }: ActionContex
         const amount = item.packs * item.product.pack
         const lot = { id: uid(), name: item.name, amount, unit: item.unit, expires: addDaysIso(today, item.product.shelf) }
         pantry = [...pantry, lot]
-        wk[item.name] = { lotId: lot.id, amount }
+        // Abhak-Tag: daraus lernt Yami, an welchem Wochentag ihr wirklich einkauft
+        wk[item.name] = { lotId: lot.id, amount, at: today }
         checked.add(item.key)
       }
-      return { ...s, pantry, plan, breakfast, bought: { ...s.bought, [forWeek]: wk }, checked: { ...s.checked, [forWeek]: [...checked] } }
+      return { ...s, pantry, plan, breakfast, bought: { ...s.bought, [forKey]: wk }, checked: { ...s.checked, [forKey]: [...checked] } }
     })
   }
 
-  function resetChecks() {
+  function resetChecks(list: ListRef) {
     const snap = snapshot()
     flash('Haken zurückgesetzt', snap)
     setState((s) => {
-      const wk = s.bought[weekKey] ?? {}
       let pantry = s.pantry
       let plans = [s.plan, s.breakfast]
       const spices = { ...s.spices }
-      for (const [name, b] of Object.entries(wk)) {
-        if (b.lotId.startsWith('spice:')) {
-          spices[name] = 'alle'
-          continue
+      const bought = { ...s.bought }
+      const checked = { ...s.checked }
+      for (const key of [list.key, list.legacyKey].filter((k): k is string => !!k)) {
+        for (const [name, b] of Object.entries(s.bought[key] ?? {})) {
+          if (b.lotId.startsWith('spice:')) {
+            spices[name] = 'alle'
+            continue
+          }
+          ;({ pantry, plans } = unbuy(pantry, plans, b.lotId, b.amount))
         }
-        ;({ pantry, plans } = unbuy(pantry, plans, b.lotId, b.amount))
+        if (bought[key]) bought[key] = {}
+        if (checked[key]) checked[key] = []
       }
-      return { ...s, spices, pantry, plan: plans[0], breakfast: plans[1], bought: { ...s.bought, [weekKey]: {} }, checked: { ...s.checked, [weekKey]: [] } }
+      return { ...s, spices, pantry, plan: plans[0], breakfast: plans[1], bought, checked }
     })
   }
 
   /** Haken ohne Vorratsbuchung (eigene Posten, Grundzutaten) */
-  function toggleChecked(key: string) {
+  function toggleChecked(key: string, list: ListRef) {
     setState((s) => {
-      const cur = new Set(s.checked[weekKey] ?? [])
-      if (cur.has(key)) cur.delete(key)
-      else cur.add(key)
-      return { ...s, checked: { ...s.checked, [weekKey]: [...cur] } }
+      const keys = [list.key, list.legacyKey].filter((k): k is string => !!k)
+      const on = keys.some((k) => s.checked[k]?.includes(key))
+      const checked = { ...s.checked }
+      if (on) for (const k of keys) checked[k] = (checked[k] ?? []).filter((x) => x !== key)
+      else checked[list.key] = [...(checked[list.key] ?? []), key]
+      return { ...s, checked }
     })
   }
 
-  function addCustomItem(item: CustomItem) {
-    setState((s) => ({ ...s, custom: { ...s.custom, [weekKey]: [...(s.custom[weekKey] ?? []), item] } }))
+  function addCustomItem(item: CustomItem, list: ListRef) {
+    setState((s) => ({ ...s, custom: { ...s.custom, [list.key]: [...(s.custom[list.key] ?? []), item] } }))
   }
 
-  function removeCustomItem(id: string) {
-    setState((s) => ({ ...s, custom: { ...s.custom, [weekKey]: (s.custom[weekKey] ?? []).filter((c) => c.id !== id) } }))
+  function removeCustomItem(id: string, list: ListRef) {
+    setState((s) => {
+      const custom = { ...s.custom }
+      for (const k of [list.key, list.legacyKey]) if (k && custom[k]) custom[k] = custom[k].filter((c) => c.id !== id)
+      return { ...s, custom }
+    })
   }
 
   function editPrice(name: string, pack: number, price: number) {
     setState((s) => ({ ...s, prices: { ...s.prices, [name]: { pack, price } } }))
   }
 
-  return { toggleBuy, resetChecks, toggleChecked, addCustomItem, removeCustomItem, editPrice }
+  // ───── Liste prüfen & freigeben ─────
+
+  /** „Habe ich“: Menge kommt in den Vorrat (Artikel verschwindet von der Liste), Antwort wird gemerkt (Lernen) */
+  function answerHave(trip: Trip, item: BuyItem, amount = haveAmount(item)) {
+    setState((s) => {
+      const trips = answerTrip(s.trips, trip.date, item.key, 'have')
+      if (isSpice(item.name)) return { ...s, trips, spices: { ...s.spices, [item.name]: 'da' } }
+      if (!(amount > 0)) return { ...s, trips }
+      return { ...s, trips, pantry: [...s.pantry, haveLot(item, amount, today, uid())] }
+    })
+  }
+
+  function answerNeed(trip: Trip, item: BuyItem) {
+    setState((s) => ({ ...s, trips: answerTrip(s.trips, trip.date, item.key, 'need') }))
+  }
+
+  /** Freigeben: erst jetzt geht die Liste an Home Assistant (Google Tasks) */
+  function releaseTrip(trip: Trip) {
+    setState((s) => ({ ...s, trips: release(s.trips, trip, Date.now()) }))
+    flash(s0.ha?.enabled ? 'Freigegeben ✓ – die Liste geht an Google Tasks' : 'Einkauf freigegeben ✓')
+  }
+
+  function unreleaseTrip(trip: Trip) {
+    setState((s) => ({ ...s, trips: unrelease(s.trips, trip.date) }))
+  }
+
+  /** Haupteinkaufstag setzen (aus dem gelernten Vorschlag oder von Hand) */
+  function setShopDay(day: number) {
+    setState((s) => ({ ...s, shopDay: day, shopDayAsked: day }))
+  }
+
+  function dismissShopDay(day: number) {
+    setState((s) => ({ ...s, shopDayAsked: day }))
+  }
+
+  /** „Im Vorrat führen?“ beantwortet (einmal fragen) */
+  function answerStock(name: string, yes: boolean) {
+    setState((s) => ({ ...s, stockAsk: { ...s.stockAsk, [name]: yes ? 'yes' : 'no' } }))
+  }
+
+  return { toggleBuy, resetChecks, toggleChecked, addCustomItem, removeCustomItem, editPrice, answerHave, answerNeed, releaseTrip, unreleaseTrip, setShopDay, dismissShopDay, answerStock }
 }
