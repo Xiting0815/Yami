@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { CATALOG, SHOP_ALIAS } from '../data/catalog'
 import { PRODUCTS } from '../data/products'
-import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER, type CustomIngredient, type ShopCat } from '../types'
+import { SHOP_ICON, SHOP_LABEL, INGREDIENT_CATS, type CustomIngredient, type ShopCat } from '../types'
 import { searchIngredients, titleCase } from '../customIngredients'
 import { CAT_DEFAULTS } from '../data/custom-registry'
 import { formatAmount } from '../shopping'
@@ -31,7 +31,7 @@ interface Props {
 }
 
 const NEW_UNITS = ['g', 'ml', 'Stk'] as const
-const NEW_CATS = SHOP_ORDER.filter((c) => c !== 'vorrat')
+const NEW_CATS = INGREDIENT_CATS.filter((c) => c !== 'vorrat')
 
 /** alle Zutaten mit Produktdaten (auch selbst angelegte) – zur Laufzeit, weil eigene Zutaten dazukommen */
 const trackedNames = () =>

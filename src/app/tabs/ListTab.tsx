@@ -95,6 +95,7 @@ export function ListTab({ m }: { m: AppModel }) {
           trip={trip}
           states={state.trips}
           stockAsk={state.stockAsk}
+          shopOrder={state.shopOrder}
           onHave={(it, amount) => act.answerHave(trip, it, amount)}
           onNeed={(it) => act.answerNeed(trip, it)}
           onStock={act.answerStock}
@@ -111,6 +112,7 @@ export function ListTab({ m }: { m: AppModel }) {
     <>
       <ShoppingList
         header={header}
+        shopOrder={state.shopOrder}
         result={trip}
         planned={trip.days.length}
         checked={checked}

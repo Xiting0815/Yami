@@ -21,7 +21,7 @@
  *                  Zuordnungen), damit dort nichts doppelt entsteht.
  *
  * GETEILT (AppState-Felder): plan, bakePlan, pantry, bought, checked, custom, wasted, customRecipes, customIngredients,
- *   prices, staples, spices, pantryRequests, trips (Einkäufe: Freigabe + „Habe ich“-Antworten), shopDay (Einkaufstag).
+ *   prices, staples, spices, pantryRequests, trips (Einkäufe: Freigabe + „Habe ich“-Antworten), shopDay (Einkaufstag), shopOrder (Abschnitts-Reihenfolge).
  * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked.
  * PERSÖNLICH (nie geteilt): profile, weighIns, adjustDecidedAt, profileCreated, breakfast, breakfastPicks, prepDays,
  *   prepChecked, snacks (kcal), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
@@ -167,6 +167,7 @@ export function extract(s: AppState): Record<string, unknown> {
     for (const [k, v] of Object.entries(t.answers ?? {})) o[`ans:${d}|${k}`] = v
   }
   if (s.shopDay != null) o['shop:day'] = s.shopDay
+  if (s.shopOrder?.length) o['shop:order'] = s.shopOrder
   for (const [d, v] of Object.entries(s.ratings)) o[`rating:${d}`] = v
   for (const r of s.rejects) o[`reject:${r.date}|${r.id}`] = 1
   for (const [d, v] of Object.entries(s.portionFeedback)) o[`pf:${d}`] = v
@@ -256,6 +257,9 @@ export function rebuild(s: AppState, live: Record<string, unknown>, kinds: Set<s
     const d = live['shop:day']
     if (typeof d === 'number') next.shopDay = d
     else delete next.shopDay
+    const o = live['shop:order']
+    if (Array.isArray(o) && o.every((c) => typeof c === 'string')) next.shopOrder = o as string[]
+    else delete next.shopOrder
   }
   const p = personFrom(live)
   if (kinds.has('rating')) next.ratings = p.ratings
@@ -697,7 +701,7 @@ export function applyRound(cur: AppState, res: RoundResult): { state: AppState; 
       plan: n.plan, bakePlan: n.bakePlan, pantry: n.pantry, bought: n.bought, checked: n.checked, custom: n.custom, wasted: n.wasted,
       customRecipes: n.customRecipes, customIngredients: n.customIngredients, prices: n.prices, staples: n.staples, spices: n.spices,
       pantryRequests: n.pantryRequests, ratings: n.ratings, rejects: n.rejects, portionFeedback: n.portionFeedback, bakeRatings: n.bakeRatings, baked: n.baked,
-      trips: n.trips, shopDay: n.shopDay,
+      trips: n.trips, shopDay: n.shopDay, shopOrder: n.shopOrder,
       onboarding: cur.onboarding ?? n.onboarding,
       sync,
     },

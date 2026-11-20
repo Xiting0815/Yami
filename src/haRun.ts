@@ -16,7 +16,7 @@ export function isoLocal(d: Date): string {
 
 /** Einkaufsliste für HA: alle freigegebenen Einkäufe (Entwürfe nicht) – wie in usePlanning (haLocal) */
 export function haLocalFor(s: AppState, today: string, trips: Trip[] = tripsOf(s, today)): LocalItem[] {
-  return haTripItems(trips, s.trips, today)
+  return haTripItems(trips, s.trips, today, s.shopOrder)
 }
 
 export interface HaRunDeps {

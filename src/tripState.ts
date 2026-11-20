@@ -13,6 +13,7 @@ import { type BuyItem, type Trip, type TripItem, DEFAULT_SHOP_DAY, addDaysIso, d
 import { portionFactor } from './learning'
 import { formatAmount, isBought } from './shopping'
 import { isQtyStaple, isSpice } from './staples'
+import { compareShop, shopOrderOf } from './shopSection'
 import { type AppState, type TripState, mondayOf, parseIso, shortDate, weekDays } from './store'
 import { householdFeedback } from './sync'
 import { type LocalItem, todoSummary } from './haSync'
@@ -73,11 +74,16 @@ export function unreleaseTrip(trips: Record<string, TripState>, date: string): R
 
 const tripLabel = (t: Pick<Trip, 'date' | 'kind'>) => (t.kind === 'now' ? 'heute' : wdShort(t.date))
 
-/** Was an Home Assistant (Google Tasks) geht: nur freigegebene Einkäufe; Schlüssel `<Einkaufstag>|<Artikel>` */
-export function haTripItems(trips: Trip[], states: Record<string, TripState>, today: string): LocalItem[] {
+/**
+ * Was an Home Assistant (Google Tasks) geht: nur freigegebene Einkäufe; Schlüssel `<Einkaufstag>|<Artikel>`.
+ * Reihenfolge = Rundgang im Laden: je Einkauf (frühester zuerst) nach Abschnitt (`shopOrder`, Standard Kaufland), dann Name.
+ * Der Abgleich bringt die Einträge in Google Tasks in genau diese Reihenfolge (siehe syncTodo).
+ */
+export function haTripItems(trips: Trip[], states: Record<string, TripState>, today: string, shopOrder?: string[]): LocalItem[] {
+  const cmp = compareShop(shopOrderOf(shopOrder))
   return trips
     .filter((t) => isReleased(states, t, today))
-    .flatMap((t) => t.buy.map((b) => ({ key: `${t.date}|${b.key}`, summary: todoSummary(b, tripLabel(t)), bought: isBought(b) })))
+    .flatMap((t) => [...t.buy].sort(cmp).map((b) => ({ key: `${t.date}|${b.key}`, summary: todoSummary(b, tripLabel(t)), bought: isBought(b) })))
 }
 
 /** in HA abgehakter Schlüssel → Einkauf und Artikel */
@@ -109,7 +115,8 @@ export function haveCounts(trips: Record<string, TripState>): Record<string, num
 }
 
 /** Reihenfolge beim Prüfen: was wahrscheinlich da ist zuerst (Grundzutaten, lange haltbar, typisch im Haus, gelernt) */
-export function reviewQueue(trip: Trip, states: Record<string, TripState>): TripItem[] {
+export function reviewQueue(trip: Trip, states: Record<string, TripState>, shopOrder?: string[]): TripItem[] {
+  const cmp = compareShop(shopOrderOf(shopOrder))
   const counts = haveCounts(states)
   const answered = trip ? states[trip.date]?.answers ?? {} : {}
   const score = (b: BuyItem) => {
@@ -121,7 +128,7 @@ export function reviewQueue(trip: Trip, states: Record<string, TripState>): Trip
   return trip.buy
     .filter((b) => !isBought(b) && !answered[b.key])
     .map((b) => ({ b, s: score(b) }))
-    .sort((x, y) => y.s - x.s || x.b.name.localeCompare(y.b.name, 'de'))
+    .sort((x, y) => y.s - x.s || cmp(x.b, y.b))
     .map((x) => x.b)
 }
 

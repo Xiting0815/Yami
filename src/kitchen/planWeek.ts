@@ -3,7 +3,8 @@ import { CATALOG } from '../data/catalog'
 import type { Product } from '../data/products'
 import { RECIPE_BY_ID } from '../data/recipes'
 import { substitutesFor } from '../data/substitutes'
-import type { BakePlan, PlanEntry, Recipe, ShopCat, WeekPlan } from '../types'
+import type { BakePlan, PlanEntry, Recipe, ShopSection, WeekPlan } from '../types'
+import { shopSection } from '../shopSection'
 import { bakeEntriesOf } from '../bakePlan'
 import { type SpiceStatus, isSpice, type StapleMemos, STAPLE_SHOP_CAT, buyName, isQtyStaple, isTrackedStaple, runningLow, stapleKey, useEvents, useRate } from '../staples'
 import { type PantryLot, type PriceOverrides, type BoughtMap, addDaysIso, canonical, productFor, isTracked, needsOf, stapleNeedsOf, allNeedsOf } from './base'
@@ -12,7 +13,8 @@ import { usableOn, lotsFor, consume } from './pantry'
 export interface BuyItem {
   key: string
   name: string
-  cat: ShopCat
+  /** Einkaufsabschnitt (Katalog-Kategorie, Nudeln/Mehl/Reis als „nudeln“) */
+  cat: ShopSection
   unit: string
   /** Bedarf der ganzen Woche */
   required: number
@@ -285,7 +287,7 @@ export function planWeek(
     const item: BuyItem = {
       key: itemName,
       name: itemName,
-      cat: isQtyStaple(name) ? STAPLE_SHOP_CAT : (CATALOG[name] ?? 'konserven'),
+      cat: shopSection(name, isQtyStaple(name) ? STAPLE_SHOP_CAT : (CATALOG[name] ?? 'konserven')),
       unit: product.unit,
       required,
       fromPantry,
@@ -341,7 +343,7 @@ export function planWeek(
     const after = Math.max(0, pool.filter((l) => group(l.name) && usableOn(l, today)).reduce((s, l) => s + l.amount, 0))
     if (!runningLow(after, product.pack, useRate(events, key, today))) continue
     const item: BuyItem = {
-      key: name, name, cat: STAPLE_SHOP_CAT, unit: product.unit, required: inCovered?.required ?? 0, fromPantry: 0, substitutes: [], packs: 1, product,
+      key: name, name, cat: shopSection(name, STAPLE_SHOP_CAT), unit: product.unit, required: inCovered?.required ?? 0, fromPantry: 0, substitutes: [], packs: 1, product,
       cost: product.price, leftover: after + product.pack, bought: bought[name]?.amount ?? 0, recipes: inCovered?.recipes ?? [], note: 'leer',
     }
     if (inCovered) covered.splice(covered.indexOf(inCovered), 1)
@@ -372,7 +374,7 @@ export function planWeek(
     if ((st !== 'alle' && !hit) || !product) continue
     const used = entries.map(([, e]) => RECIPE_BY_ID[e.recipeId]).filter((r) => r.ingredients.some((i) => canonical(i.name) === name))
     const item: BuyItem = {
-      key: name, name, cat: STAPLE_SHOP_CAT, unit: product.unit, required: 0, fromPantry: 0, substitutes: [], packs: 1, product,
+      key: name, name, cat: shopSection(name, STAPLE_SHOP_CAT), unit: product.unit, required: 0, fromPantry: 0, substitutes: [], packs: 1, product,
       cost: product.price, leftover: 0, bought: bought[name]?.amount ?? 0, recipes: [...new Set(used.map((r) => r.title))], note: 'alle',
     }
     total += item.cost

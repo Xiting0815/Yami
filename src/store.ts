@@ -5,7 +5,7 @@ import { PRODUCTS } from './data/products'
 import { rememberStaples, sanitizeMemos, sanitizeSpices, type SpiceStatus, type StapleMemos } from './staples'
 import {
   BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, TYPE_LABEL,
-  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type BakePlan, type PlanEntry, type ShopCat, type WeekPlan,
+  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type BakePlan, type PlanEntry, type ShopSection, type WeekPlan,
 } from './types'
 import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
 import { DEFAULT_PROFILE, type Profile, type Snack } from './energy'
@@ -31,7 +31,7 @@ export const EMPTY_FILTERS: Filters = { cuisines: [], types: [], vegetarian: fal
 export interface CustomItem {
   id: string
   name: string
-  cat: ShopCat
+  cat: ShopSection
 }
 
 /** Home-Assistant-Verbindung (Token bleibt nur auf diesem Gerät, kommt nie in die Sicherung) */
@@ -213,6 +213,8 @@ export interface AppState {
   trips: Record<string, TripState>
   /** Haupteinkaufstag (JS-Wochentag, 6 = Samstag); fehlt = Samstag (geteilt) */
   shopDay?: number
+  /** Abschnitts-Reihenfolge der Einkaufsliste (Haushalt, geteilt); fehlt = Ladenreihenfolge `SHOP_ORDER` (Kaufland) */
+  shopOrder?: string[]
   /** gelernter Einkaufstag, zu dem schon gefragt wurde („übernehmen?“) – nur lokal */
   shopDayAsked?: number
   /** „Im Vorrat führen?“ beantwortet: Zutat → ja/nein – nur lokal */
@@ -303,7 +305,7 @@ const MAX_IMAGE = 300_000
 function validIngredient(x: unknown): x is CustomIngredient {
   const c = x as Partial<CustomIngredient> | null
   return (
-    !!c && typeof c.name === 'string' && c.name.trim() !== '' && c.name.length <= 60 && typeof c.cat === 'string' && c.cat in SHOP_LABEL &&
+    !!c && typeof c.name === 'string' && c.name.trim() !== '' && c.name.length <= 60 && typeof c.cat === 'string' && c.cat in SHOP_LABEL && (c.cat as string) !== 'nudeln' &&
     Number.isFinite(c.kcal) && Number.isFinite(c.protein) && typeof c.unit === 'string' && c.unit !== '' &&
     (c.gramsPerPiece == null || (Number.isFinite(c.gramsPerPiece) && c.gramsPerPiece > 0))
   )
@@ -561,6 +563,7 @@ export function sanitize(parsed: unknown): AppState {
   state.trips = sanitizeTrips(state.trips)
   if (!validWeekday(state.shopDay)) delete state.shopDay
   if (!validWeekday(state.shopDayAsked)) delete state.shopDayAsked
+  if (!(Array.isArray(state.shopOrder) && state.shopOrder.length > 0 && state.shopOrder.length <= 12 && state.shopOrder.every((c) => typeof c === 'string' && c in SHOP_LABEL))) delete state.shopOrder
   state.stockAsk = Object.fromEntries(Object.entries(state.stockAsk).filter(([k, v]) => k.length <= 60 && (v === 'yes' || v === 'no')).slice(-200))
   state.bought = Object.fromEntries(
     Object.entries(state.bought).map(([w, m]) => [w, Object.fromEntries(Object.entries(m).map(([k, b]) => [k, typeof b.at === 'string' && ISO.test(b.at) ? b : { lotId: b.lotId, amount: b.amount }]))]),

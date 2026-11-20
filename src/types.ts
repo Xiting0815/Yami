@@ -3,30 +3,42 @@ export type Cuisine = 'de' | 'it' | 'as' | 'gr'
 export type Festive = 'martini' | 'weihnachten' | 'plaetzchen'
 export type DishType = 'haupt' | 'pasta' | 'eintopf' | 'suppe' | 'auflauf' | 'brotzeit'
 
-/** Einkaufslisten-Abschnitte – Reihenfolge = Reihenfolge im Laden */
+/** Zutaten-Kategorie im Katalog (src/data/catalog.ts, Rezepte, Lernen, check-data) */
 export type ShopCat = 'gemuese' | 'konserven' | 'backwaren' | 'molkerei' | 'fleisch' | 'tk' | 'vorrat'
+/** Einkaufslisten-Abschnitt = Kategorie + „Nudeln & Mehl“ (wird erst beim Bauen der Liste abgeleitet, siehe src/shopSection.ts) */
+export type ShopSection = ShopCat | 'nudeln'
 
-export const SHOP_ORDER: ShopCat[] = ['gemuese', 'konserven', 'backwaren', 'molkerei', 'fleisch', 'tk', 'vorrat']
+/**
+ * Abschnitte in der Reihenfolge des Rundgangs im Laden (Kaufland): Obst & Gemüse → Konserven → Backwaren →
+ * Nudeln & Mehl → Butter & Käse → Wurst & Fleisch → Tiefkühl; „Vorrat prüfen“ bleibt in Yami zuletzt.
+ * Pro Haushalt überschreibbar: `AppState.shopOrder` (geteilt, siehe `shopOrderOf` in src/shopSection.ts).
+ */
+export const SHOP_ORDER: ShopSection[] = ['gemuese', 'konserven', 'backwaren', 'nudeln', 'molkerei', 'fleisch', 'tk', 'vorrat']
 
-export const SHOP_LABEL: Record<ShopCat, string> = {
-  gemuese: 'Gemüse, Obst & Kräuter',
-  konserven: 'Konserven & Trockenware',
+export const SHOP_LABEL: Record<ShopSection, string> = {
+  gemuese: 'Obst & Gemüse',
+  konserven: 'Konserven',
   backwaren: 'Backwaren',
-  molkerei: 'Käse, Nudeln & Molkerei',
-  fleisch: 'Fleisch & Fisch',
+  nudeln: 'Nudeln & Mehl',
+  molkerei: 'Butter & Käse',
+  fleisch: 'Wurst & Fleisch',
   tk: 'Tiefkühl',
   vorrat: 'Vorrat prüfen',
 }
 
-export const SHOP_ICON: Record<ShopCat, string> = {
+export const SHOP_ICON: Record<ShopSection, string> = {
   gemuese: '🥕',
   konserven: '🥫',
   backwaren: '🥖',
+  nudeln: '🍝',
   molkerei: '🧀',
   fleisch: '🥩',
   tk: '❄️',
   vorrat: '🧂',
 }
+
+/** Kategorien, die eine neue Zutat haben darf (ohne den abgeleiteten Abschnitt „Nudeln & Mehl“) */
+export const INGREDIENT_CATS = SHOP_ORDER.filter((c): c is ShopCat => c !== 'nudeln')
 
 export const CUISINE_LABEL: Record<Cuisine, string> = { de: 'Deutsch', it: 'Italienisch', as: 'Asiatisch', gr: 'Griechisch' }
 export const TYPE_LABEL: Record<DishType, string> = {

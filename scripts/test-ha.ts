@@ -3,11 +3,13 @@
 import { HaClient, HaError, normalizeUrl, type WsLike } from '../src/homeassistant'
 import {
   type Desired, type HaApi, type LocalItem, type RemoteTodo, MARKER,
-  diffDinnerEvents, diffTodo, plannedDinners, plannedReminders, syncCalendar, syncTodo, usualWeighDay,
+  diffDinnerEvents, diffTodo, planMoves, plannedDinners, plannedReminders, syncCalendar, syncTodo, usualWeighDay,
 } from '../src/haSync'
 import { backupBody, parseBackup } from '../src/backup'
 import { newHa, sanitize, withHaTargets, HA_DEFAULTS } from '../src/store'
 import { RECIPES } from '../src/data/recipes'
+import { compareShop, shopOrderOf, shopSection } from '../src/shopSection'
+import { SHOP_LABEL, SHOP_ORDER } from '../src/types'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -174,9 +176,21 @@ class FakeHa implements HaApi {
   next = 1
   calSupported = true
   noDescription = false
+  moveSupported = true
+  /** Google Tasks legt neue Einträge oben an */
+  addOnTop = false
   async command<T>(msg: Record<string, unknown>): Promise<T> {
     this.cmds.push(msg)
     if (msg.type === 'todo/item/list') return { items: this.todos.map((t) => ({ uid: t.uid, summary: t.summary, status: t.status, ...(this.noDescription ? {} : { description: t.description }) })) } as T
+    if (msg.type === 'todo/item/move') {
+      if (!this.moveSupported) throw new HaError('unsupported', 'unknown', 'unknown_command')
+      const i = this.todos.findIndex((t) => t.uid === msg.uid)
+      if (i < 0) throw new HaError('failed', 'not found')
+      const [it] = this.todos.splice(i, 1)
+      const p = msg.previous_uid ? this.todos.findIndex((t) => t.uid === msg.previous_uid) : -1
+      this.todos.splice(p + 1, 0, it)
+      return null as T
+    }
     if (msg.type === 'calendar/event/delete') {
       this.events = this.events.filter((e) => e.uid !== msg.uid)
       return null as T
@@ -188,7 +202,9 @@ class FakeHa implements HaApi {
     if (domain === 'todo') {
       if (service === 'add_item') {
         if (this.noDescription && 'description' in data) throw new HaError('failed', 'Description not supported')
-        this.todos.push({ uid: 'u' + this.next++, summary: String(data.item), status: 'needs_action', description: (data.description as string) ?? null, n: 0 })
+        const t = { uid: 'u' + this.next++, summary: String(data.item), status: 'needs_action' as const, description: (data.description as string) ?? null, n: 0 }
+        if (this.addOnTop) this.todos.unshift(t)
+        else this.todos.push(t)
       } else {
         const t = this.todos.find((x) => x.uid === data.item)!
         if (service === 'update_item') {
@@ -259,6 +275,63 @@ class FakeHa implements HaApi {
   ha.todos.push({ uid: 'fx', summary: 'Fremd', status: 'needs_action', description: null, n: 0 })
   await syncTodo(ha, settings, [], () => {})
   ok(ha.todos.length === 1 && ha.todos[0].uid === 'fx', 'Sync: ohne Beschreibung wird nur das über die uid Bekannte entfernt')
+}
+
+// ───── 3b) Ladenreihenfolge (Kaufland): Abschnitte und Reihenfolge in Google Tasks ─────
+{
+  const sec = (n: string, c: Parameters<typeof shopSection>[1]) => SHOP_LABEL[shopSection(n, c)]
+  ok(sec('Spaghetti', 'molkerei') === 'Nudeln & Mehl' && sec('Penne', 'molkerei') === 'Nudeln & Mehl' && sec('Lasagneplatten', 'molkerei') === 'Nudeln & Mehl', 'Abschnitt: Trockenpasta → Nudeln & Mehl')
+  ok(sec('Weizenmehl', 'vorrat') === 'Nudeln & Mehl' && sec('Weizenmehl Tipo 00', 'konserven') === 'Nudeln & Mehl' && sec('Roggenmehl', 'vorrat') === 'Nudeln & Mehl' && sec('Hartweizengrieß', 'vorrat') === 'Nudeln & Mehl', 'Abschnitt: Mehl und Grieß → Nudeln & Mehl')
+  ok(sec('Reis', 'konserven') === 'Nudeln & Mehl' && sec('Risottoreis', 'konserven') === 'Nudeln & Mehl' && sec('Jasminreis', 'konserven') === 'Nudeln & Mehl' && sec('Polenta', 'konserven') === 'Nudeln & Mehl', 'Abschnitt: Reis und Polenta → Nudeln & Mehl')
+  ok(sec('Haferflocken', 'konserven') === 'Konserven' && sec('Reisessig', 'konserven') === 'Konserven' && sec('Shaoxing-Reiswein', 'konserven') === 'Konserven' && sec('Kartoffeln mehligkochend', 'gemuese') === 'Obst & Gemüse', 'Abschnitt: Haferflocken, Reisessig, mehligkochende Kartoffeln bleiben')
+  ok(sec('Gnocchi', 'molkerei') === 'Butter & Käse' && sec('Tortellini frisch', 'molkerei') === 'Butter & Käse' && sec('Butter', 'molkerei') === 'Butter & Käse' && sec('Gouda gerieben', 'molkerei') === 'Butter & Käse', 'Abschnitt: Butter, Gouda, frische Pasta → Butter & Käse')
+  ok(sec('Hackfleisch gemischt', 'fleisch') === 'Wurst & Fleisch' && sec('Salami', 'fleisch') === 'Wurst & Fleisch' && sec('Erbsen TK', 'tk') === 'Tiefkühl' && sec('Paniermehl', 'konserven') === 'Nudeln & Mehl', 'Abschnitt: Hackfleisch/Salami → Wurst & Fleisch, TK bleibt, Paniermehl beim Mehl')
+  ok(SHOP_ORDER.map((c) => SHOP_LABEL[c]).join(' → ') === 'Obst & Gemüse → Konserven → Backwaren → Nudeln & Mehl → Butter & Käse → Wurst & Fleisch → Tiefkühl → Vorrat prüfen', 'Reihenfolge: Kaufland-Rundgang, Vorrat prüfen zuletzt')
+  const o = shopOrderOf(['tk', 'gemuese', 'xyz', 'vorrat'])
+  ok(o.join() === 'tk,gemuese,konserven,backwaren,nudeln,molkerei,fleisch,vorrat' && shopOrderOf().join() === SHOP_ORDER.join(), 'Reihenfolge: Haushalts-Überschreibung (unbekannt fällt weg, Rest hinten, Vorrat zuletzt)')
+
+  const mk = (name: string, cat: Parameters<typeof shopSection>[1]) => ({ name, cat: shopSection(name, cat) })
+  const shop = [mk('Salami', 'fleisch'), mk('Butter', 'molkerei'), mk('Erbsen TK', 'tk'), mk('Spaghetti', 'molkerei'), mk('Zwiebel', 'gemuese'), mk('Weizenmehl', 'vorrat'), mk('Kidneybohnen', 'konserven'), mk('Toastbrot', 'backwaren'), mk('Apfel', 'gemuese'), mk('Gouda gerieben', 'molkerei')]
+  const names = [...shop].sort(compareShop(shopOrderOf())).map((x) => x.name)
+  ok(names.join() === 'Apfel,Zwiebel,Kidneybohnen,Toastbrot,Spaghetti,Weizenmehl,Butter,Gouda gerieben,Salami,Erbsen TK', 'Liste: Obst & Gemüse → Konserven → Backwaren → Nudeln & Mehl → Butter & Käse → Wurst & Fleisch → Tiefkühl')
+
+  ok(planMoves(['a', 'b', 'c'], ['a', 'b', 'c']).length === 0, 'Verschieben: gleiche Reihenfolge → nichts')
+  ok(planMoves(['x', 'a', 'f', 'b', 'c'], ['a', 'b', 'c']).length === 0, 'Verschieben: Fremdes dazwischen zählt nicht')
+  ok(planMoves(['c', 'a', 'b'], ['a', 'b', 'c']).length === 1, 'Verschieben: ein Eintrag falsch → eine Verschiebung')
+
+  // Attrappe im Verhalten von Google Tasks (neue Einträge oben) + ein fremder Eintrag
+  const order = [L('Apfel', 'Apfel – 1 kg'), L('Kidneybohnen', 'Kidneybohnen – 2 Dosen'), L('Spaghetti', 'Spaghetti – 500 g'), L('Butter', 'Butter – 250 g'), L('Salami', 'Salami – 1 Pck'), L('Erbsen', 'Erbsen TK – 1 Pck')]
+  const ha = new FakeHa()
+  ha.addOnTop = true
+  ha.todos.push({ uid: 'f1', summary: 'Klopapier', status: 'needs_action', description: null, n: 0 })
+  const settings = { todo: 'todo.einkaufen', items: {} as Record<string, string>, done: [] as string[] }
+  const run = async (local: LocalItem[]) => {
+    const r = await syncTodo(ha, settings, local, () => {})
+    settings.items = r.items
+    settings.done = r.done
+    return r
+  }
+  const yamiOrder = () => ha.todos.filter((t) => t.description === MARKER && t.status === 'needs_action').map((t) => t.summary.split(' – ')[0])
+  const moves = () => ha.cmds.filter((c) => c.type === 'todo/item/move')
+  const r1 = await run(order) // oben angelegt → liegt umgekehrt in Tasks
+  ok(yamiOrder().join() === 'Apfel,Kidneybohnen,Spaghetti,Butter,Salami,Erbsen TK' && r1.moved > 0, `Tasks: Reihenfolge per todo/item/move auf Ladenreihenfolge gebracht (${r1.moved} Verschiebungen)`)
+  ok(moves().every((c) => c.entity_id === 'todo.einkaufen' && typeof c.uid === 'string'), 'Tasks: Verschiebung nennt Liste und Eintrag')
+  ok(ha.todos.some((t) => t.uid === 'f1'), 'Tasks: Fremder Eintrag bleibt')
+  const before = ha.cmds.length
+  const r3 = await run(order)
+  ok(r3.moved === 0 && !ha.cmds.slice(before).some((c) => c.type === 'todo/item/move'), 'Tasks: zweiter unveränderter Lauf verschiebt nichts')
+  const withGouda = [...order.slice(0, 3), L('Gouda', 'Gouda gerieben – 200 g'), ...order.slice(3)]
+  const r4 = await run(withGouda)
+  ok(yamiOrder().join() === 'Apfel,Kidneybohnen,Spaghetti,Gouda gerieben,Butter,Salami,Erbsen TK' && r4.moved === 1, `Tasks: neuer Artikel landet im richtigen Abschnitt (${r4.moved} Verschiebung)`)
+  ha.todos.find((t) => t.uid === settings.items.Apfel)!.status = 'completed'
+  const r5 = await run([L('Apfel', 'Apfel – 1 kg', true), ...withGouda.slice(1)])
+  ok(r5.moved === 0, 'Tasks: Erledigtes wird nicht verschoben')
+  const ha2 = new FakeHa()
+  ha2.moveSupported = false
+  ha2.addOnTop = true
+  const s2 = { todo: 'todo.einkaufen', items: {} as Record<string, string>, done: [] as string[] }
+  const r6 = await syncTodo(ha2, s2, order, () => {})
+  ok(ha2.todos.length === order.length && r6.moved === 0 && !r6.error, 'Tasks: Verschieben nicht unterstützt → übersprungen, kein Fehler')
 }
 
 // ───── 4) Erinnerungen ─────

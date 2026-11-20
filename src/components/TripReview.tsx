@@ -8,6 +8,7 @@ interface Props {
   trip: Trip
   states: Record<string, TripState>
   stockAsk: Record<string, 'yes' | 'no'>
+  shopOrder?: string[]
   onHave: (item: TripItem, amount?: number) => void
   onNeed: (item: TripItem) => void
   onStock: (name: string, yes: boolean) => void
@@ -22,9 +23,9 @@ const amountText = (n: number) => String(Math.round(n * 100) / 100).replace('.',
  * „Liste prüfen“: Artikel für Artikel – was wahrscheinlich schon da ist, zuerst (Grundzutaten, lange haltbar,
  * gelernt aus früheren „Habe ich“). „Habe ich“ legt die Menge in den Vorrat, der Artikel verschwindet von der Liste.
  */
-export function TripReview({ trip, states, stockAsk, onHave, onNeed, onStock, onRelease, onClose }: Props) {
+export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, onStock, onRelease, onClose }: Props) {
   // Reihenfolge einmal beim Start festlegen (sonst springt sie nach jeder Antwort)
-  const [queue] = useState(() => reviewQueue(trip, states).map((b) => b.key))
+  const [queue] = useState(() => reviewQueue(trip, states, shopOrder).map((b) => b.key))
   const [skipped, setSkipped] = useState<string[]>([])
   const [amount, setAmount] = useState<string | null>(null)
   const answered = states[trip.date]?.answers ?? {}

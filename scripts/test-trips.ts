@@ -248,5 +248,25 @@ ok(keepDays(1) === 1 && keepDays(4) === 4 && keepDays(5) === 4 && keepDays(30) =
   ok(bought.includes('2026-11-21|Zwiebel'), 'HA: in Google Tasks abgehakt → Yami bekommt „2026-11-21|Zwiebel“')
 }
 
+// ───── Ladenreihenfolge (Kaufland) in Liste und Google Tasks ─────
+{
+  const SECT = ['gemuese', 'konserven', 'backwaren', 'nudeln', 'molkerei', 'fleisch', 'tk', 'vorrat']
+  const tr = tripsOf(base(), TODAY)
+  const t0 = tr.find((t) => t.date === '2026-11-21')!
+  const st = releaseTrip({}, t0, 1)
+  ok(t0.buy.some((b) => b.cat === 'nudeln') && t0.buy.filter((b) => b.cat === 'nudeln').every((b) => /nudel|mehl|reis|penne|spaghetti|zucker|speisest|polenta|grieß/i.test(b.name)), `Einkauf hat Abschnitt „Nudeln & Mehl“: ${t0.buy.filter((b) => b.cat === 'nudeln').map((b) => b.name).join(', ')}`)
+  const items = haTripItems(tr, st, TODAY)
+  const byKey = new Map(tr.flatMap((t) => t.buy.map((b) => [`${t.date}|${b.key}`, b.cat] as const)))
+  const sections = items.filter((i) => i.key.startsWith('2026-11-21|')).map((i) => SECT.indexOf(byKey.get(i.key)!))
+  ok(sections.length > 5 && sections.every((x, i) => i === 0 || x >= sections[i - 1]), 'HA-Liste: Einträge je Einkauf in Ladenreihenfolge')
+  const custom = haTripItems(tr, st, TODAY, ['tk', 'fleisch'])
+  const first = byKey.get(custom.find((i) => i.key.startsWith('2026-11-21|'))!.key)
+  ok(first === 'tk' || first === 'fleisch', 'HA-Liste: Haushalts-Reihenfolge (shopOrder) gilt')
+  // geteilt (Familien-Abgleich) und gesichert
+  const withOrder = base({ shopOrder: ['tk', 'gemuese'] })
+  ok(extract(withOrder)['shop:order'] !== undefined && rebuild(base(), extract(withOrder), new Set(['shop'])).shopOrder?.join() === 'tk,gemuese', 'shopOrder geht durch den Familien-Abgleich')
+  ok(sanitize({ shopOrder: ['tk', 'blah'] }).shopOrder === undefined && sanitize({ shopOrder: ['tk', 'nudeln'] }).shopOrder?.length === 2, 'shopOrder: ungültig → verworfen')
+}
+
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')
 if (fails) process.exit(1)

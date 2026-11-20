@@ -141,6 +141,43 @@ export interface TodoSyncResult {
   done: string[]
   error?: string
   changed: number
+  /** Einträge, die in Google Tasks verschoben wurden (Ladenreihenfolge) */
+  moved: number
+}
+
+/**
+ * Welche Einträge müssen verschoben werden, damit `current` (aktuelle Reihenfolge) zu `desired` passt?
+ * Nur die relative Reihenfolge der Yami-Einträge zählt (Fremdes dazwischen bleibt, wo es ist). Der längste schon
+ * richtig geordnete Teil bleibt liegen; jeder andere Eintrag wird hinter seinen Vorgänger gesetzt (erster: nach oben,
+ * `previous` leer). Schon richtige Reihenfolge → keine Verschiebung.
+ */
+export function planMoves(current: string[], desired: string[]): { uid: string; previous?: string }[] {
+  const pos = new Map(current.map((u, i) => [u, i]))
+  const seq = desired.filter((u) => pos.has(u))
+  // längste aufsteigende Teilfolge der aktuellen Positionen in Wunschreihenfolge
+  const tail: number[] = []
+  const prev: number[] = []
+  const idx: number[] = []
+  seq.forEach((u, i) => {
+    const p = pos.get(u)!
+    let lo = 0
+    let hi = tail.length
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1
+      if (tail[mid] < p) lo = mid + 1
+      else hi = mid
+    }
+    tail[lo] = p
+    idx[lo] = i
+    prev[i] = lo > 0 ? idx[lo - 1] : -1
+  })
+  const keep = new Set<number>()
+  for (let i = tail.length ? idx[tail.length - 1] : -1; i >= 0; i = prev[i]) keep.add(i)
+  const out: { uid: string; previous?: string }[] = []
+  seq.forEach((u, i) => {
+    if (!keep.has(i)) out.push(i === 0 ? { uid: u } : { uid: u, previous: seq[i - 1] })
+  })
+  return out
 }
 
 /** Einkaufsliste abgleichen. `onBought` bekommt die Schlüssel, die in HA abgehakt wurden. */
@@ -196,7 +233,27 @@ export async function syncTodo(
   }
   if (d.bought.length) onBought(d.bought)
   const done = [...d.done, ...d.bought]
-  return { items: d.items, done, error, changed }
+
+  // Reihenfolge wie im Laden: Yami-Einträge (offen) in der Reihenfolge von `local`; Fremdes bleibt unberührt.
+  // Nur wenn sich die Reihenfolge unterscheidet, wird verschoben (todo/item/move) – sonst keine Anfrage.
+  let moved = 0
+  try {
+    const now = added ? await listTodo(api, ha.todo) : remote
+    const mine = new Set(Object.values(d.items))
+    const closing = new Set(d.complete.map((c) => c.uid))
+    const open = (r: RemoteTodo) => mine.has(r.uid) && r.status === 'needs_action' && !closing.has(r.uid)
+    const current = now.filter(open).map((r) => r.uid)
+    const openSet = new Set(current)
+    const desired = local.filter((l) => !done.includes(l.key)).map((l) => d.items[l.key]).filter((u): u is string => !!u && openSet.has(u))
+    for (const m of planMoves(current, desired)) {
+      await api.command({ type: 'todo/item/move', entity_id: ha.todo, uid: m.uid, ...(m.previous ? { previous_uid: m.previous } : {}) })
+      moved++
+    }
+  } catch (e) {
+    // Verschieben nicht unterstützt oder fehlgeschlagen → Reihenfolge bleibt, wie sie ist (blockiert nichts)
+    if (e instanceof HaError && e.kind === 'network') throw e
+  }
+  return { items: d.items, done, error, changed, moved }
 }
 
 // ───────────── Erinnerungen & Plan ─────────────

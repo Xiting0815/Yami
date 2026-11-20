@@ -7,7 +7,7 @@ import { ingredientText, parseIngredientText, searchIngredients, titleCase, unit
 import { shrinkImage } from '../imageResize'
 import { uid } from '../kitchen'
 import {
-  BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, SHOP_ORDER, TYPE_LABEL,
+  BREAKFAST_LABEL, CUISINE_LABEL, INGREDIENT_CATS, SHOP_LABEL, TYPE_LABEL,
   type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type ShopCat,
 } from '../types'
 
@@ -429,7 +429,7 @@ export function RecipeEditor({ initial, defaultMeal, onSave, onCreateIngredient,
                                       patch(r.id, { create: { ...r.create!, cat, kcal: String(d.kcal), protein: String(d.protein) } })
                                     }}
                                   >
-                                    {SHOP_ORDER.map((c) => (
+                                    {INGREDIENT_CATS.map((c) => (
                                       <option key={c} value={c}>
                                         {SHOP_LABEL[c]}
                                       </option>

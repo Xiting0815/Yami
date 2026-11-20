@@ -38,7 +38,7 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
     [state.plan, state.bakePlan, state.pantry, state.bought, today, state.prices, state.breakfast, state.prepDays, state.customRecipes, state.customIngredients, state.staples, state.spices, state.shopDay, portion],
   )
   // Home Assistant bekommt nur freigegebene Einkäufe
-  const haLocal = useMemo(() => haTripItems(trips, state.trips, today), [trips, state.trips, today])
+  const haLocal = useMemo(() => haTripItems(trips, state.trips, today, state.shopOrder), [trips, state.trips, today, state.shopOrder])
   const weekRecipes = useMemo(
     () => days.map((d) => state.plan[d]).filter((e) => e && e.status !== 'skipped').map((e) => RECIPE_BY_ID[e!.recipeId]).filter(Boolean),
     [days, state.plan, state.customRecipes],

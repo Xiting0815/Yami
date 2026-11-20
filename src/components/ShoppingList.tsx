@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from 'react'
-import type { ShopCat } from '../types'
-import { SHOP_ICON, SHOP_LABEL, SHOP_ORDER } from '../types'
+import type { ShopSection } from '../types'
+import { SHOP_ICON, SHOP_LABEL } from '../types'
+import { compareShop, shopOrderOf } from '../shopSection'
 import { forDaysText, formatAmount, isBought, missingPacks, packText } from '../shopping'
 import type { CustomItem } from '../store'
 import { type BuyItem, type TripItem, formatEuro } from '../kitchen'
@@ -29,6 +30,8 @@ interface Props {
   newKeys?: Set<string>
   /** Text, wenn nichts geplant ist */
   emptyText?: string
+  /** Abschnitts-Reihenfolge des Haushalts (`AppState.shopOrder`); fehlt = Ladenreihenfolge */
+  shopOrder?: string[]
 }
 
 export { isBought, missingPacks, packText }
@@ -37,9 +40,10 @@ export { isBought, missingPacks, packText }
 const NOTE_TEXT = { knapp: 'wird knapp', leer: 'bald leer', alle: 'ist alle' } as const
 
 export function ShoppingList(props: Props) {
-  const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan, haShared, haError, haOnWeek, header, newKeys, emptyText } = props
+  const { result, planned, checked, custom, onToggleBuy, onToggleKey, onResetChecks, onAddCustom, onRemoveCustom, onEditPrice, onGoPlan, haShared, haError, haOnWeek, header, newKeys, emptyText, shopOrder } = props
+  const order = shopOrderOf(shopOrder)
   const [newName, setNewName] = useState('')
-  const [newCat, setNewCat] = useState<ShopCat>('gemuese')
+  const [newCat, setNewCat] = useState<ShopSection>('gemuese')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [showCovered, setShowCovered] = useState(false)
   const checkedSet = new Set(checked)
@@ -81,12 +85,12 @@ export function ShoppingList(props: Props) {
       {haShared && haOnWeek && <p className="muted small">🏠 Mit Home Assistant geteilt</p>}
       {haError && haOnWeek && <p className="muted small" role="status">🏠 Home Assistant: {haError} – die Liste hier funktioniert trotzdem.</p>}
 
-      {SHOP_ORDER.filter((c) => c !== 'vorrat').map((cat) => {
+      {order.filter((c) => c !== 'vorrat').map((cat) => {
         const items = result.buy.filter((b) => b.cat === cat)
         const cust = custom.filter((c) => c.cat === cat)
         if (!items.length && !cust.length) return null
         const sorted = [...items].sort(
-          (a, b) => Number(isBought(a)) - Number(isBought(b)) || a.name.localeCompare(b.name, 'de'),
+          (a, b) => Number(isBought(a)) - Number(isBought(b)) || compareShop(order)(a, b),
         )
         return (
           <section key={cat} className={`shop-section cat-${cat}`}>
@@ -200,8 +204,8 @@ export function ShoppingList(props: Props) {
         }}
       >
         <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Eigener Artikel, z. B. Kaffee" />
-        <select value={newCat} onChange={(e) => setNewCat(e.target.value as ShopCat)} aria-label="Kategorie">
-          {SHOP_ORDER.map((c) => (
+        <select value={newCat} onChange={(e) => setNewCat(e.target.value as ShopSection)} aria-label="Kategorie">
+          {order.map((c) => (
             <option key={c} value={c}>
               {SHOP_ICON[c]} {SHOP_LABEL[c]}
             </option>
