@@ -34,18 +34,18 @@ const airfryer = (temp: number, minutes: number, note?: string): DeviceSetting =
   ...(note ? { note } : {}),
 })
 /** Reis im CombiSteamer (flache Form, Wasser 1:1,5; Sushireis etwas weniger) */
-const rice = (sorte: string, wasser: number): DeviceStep => ({
-  text: `Den Wasserbehälter des CombiSteamers füllen. Den ${sorte} gründlich waschen, mit ${wasser} ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.`,
+const rice = (sorte: string, wasser: number, vorher?: string): DeviceStep => ({
+  text: `${vorher ? `${vorher} den` : 'Den'} Wasserbehälter des CombiSteamers füllen. Den ${sorte} in einem Sieb unter kaltem Wasser waschen, bis das Wasser klar abläuft, mit ${wasser} ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.`,
   settings: [steamer('Dämpfen', 100, 22, 'Ebene 2')],
 })
 
 export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'gong-bao': [
     {
-      text: 'Das Hähnchenbrustfilet in 1,5 cm große Würfel schneiden und mit 1 EL Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke marinieren.',
+      text: 'Das Hähnchenbrustfilet in 1,5 cm große Würfel schneiden, mit 1 EL Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig).',
     },
     {
-      text: 'Für die Sauce 2 EL Sojasauce, Chinkiang-Essig, Zucker, 1 TL Speisestärke und 3 EL Wasser verrühren.',
+      text: 'Knoblauch und Ingwer fein hacken, die Frühlingszwiebeln in 2 cm lange Stücke schneiden. Für die Sauce 2 EL Sojasauce, Chinkiang-Essig, Zucker, 1 TL Speisestärke und 3 EL Wasser verrühren.',
     },
     rice('Jasminreis', 225),
     {
@@ -57,7 +57,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('9', 3, 'Abzug Power')],
     },
     {
-      text: 'Knoblauch, Ingwer und Frühlingszwiebeln zugeben, die Sauce angießen und kurz eindicken. Die gerösteten Erdnüsse unterheben und mit dem Reis servieren.',
+      text: 'Knoblauch, Ingwer und Frühlingszwiebeln zugeben. Die Sauce noch einmal umrühren (die Stärke setzt sich ab), angießen und kurz eindicken, bis sie glänzt. Die gerösteten Erdnüsse unterheben und mit dem Reis servieren.',
       settings: [bora('7', 1, 'eindicken')],
     },
   ],
@@ -69,15 +69,16 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('Simmern', 2, 'Tofu ziehen lassen')],
     },
     {
-      text: 'Das Schweinehackfleisch im Sonnenblumenöl knusprig braten. Doubanjiang, fermentierte schwarze Bohnen, Knoblauch und Ingwer zugeben und braten, bis das Öl rot wird.',
+      text: 'Knoblauch und Ingwer fein hacken. Das Schweinehackfleisch im Sonnenblumenöl knusprig braten. Doubanjiang (scharfe, fermentierte Bohnenpaste), fermentierte schwarze Bohnen, Knoblauch und Ingwer zugeben und braten, bis das Öl rot wird.',
       settings: [bora('7', 6, 'Hack knusprig'), bora('5', 1, 'Paste braten')],
     },
     {
-      text: 'Hühnerbrühe und Sojasauce angießen, den Tofu vorsichtig zugeben und 5 Minuten köcheln lassen. Mit angerührter Speisestärke binden.',
+      text: 'Hühnerbrühe und Sojasauce angießen, den Tofu vorsichtig zugeben und 5 Minuten köcheln lassen. Die Speisestärke mit 2 EL kaltem Wasser glatt rühren, unter vorsichtigem Schwenken einlaufen lassen und aufkochen, bis die Sauce sämig ist.',
       settings: [bora('4', 5, 'köcheln')],
     },
     {
-      text: 'Den Szechuanpfeffer rösten, mörsern und mit den Frühlingszwiebeln über das Mapo Tofu streuen. Mit dem Reis servieren.',
+      text: 'Den Szechuanpfeffer in einer kleinen Pfanne ohne Fett rösten, bis er duftet, dann mörsern. Die Frühlingszwiebeln in Ringe schneiden und beides über das Mapo Tofu streuen. Mit dem Reis servieren.',
+      settings: [bora('4', 1, 'ohne Fett')],
     },
   ],
 
@@ -91,10 +92,10 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [airfryer(190, 14, 'vorheizen, 2× schütteln')],
     },
     {
-      text: 'Ketchup, Reisessig, Zucker, Sojasauce, 1 TL Speisestärke und 4 EL Wasser verrühren.',
+      text: 'Für die Sauce Tomatenketchup, Reisessig, Zucker, Sojasauce, 1 TL Speisestärke und 4 EL Wasser verrühren. Paprika und Zwiebel in mundgerechte Stücke, die Ananas in Würfel schneiden.',
     },
     {
-      text: 'Paprika, Zwiebel und Ananas im heißen Wok kurz pfannenrühren, die Sauce zugeben und eindicken. Das Fleisch unterheben und sofort servieren.',
+      text: 'Den Wok vorheizen. Paprika, Zwiebel und Ananas mit etwas Frittieröl im heißen Wok unter ständigem Rühren kurz braten (pfannenrühren), sie sollen knackig bleiben. Die Sauce noch einmal umrühren, zugeben und eindicken, bis sie glänzt. Das Fleisch unterheben und sofort servieren.',
       settings: [bora('9', 2, 'Wok vorheizen'), bora('6', 1, 'eindicken')],
     },
   ],
@@ -105,15 +106,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Den gedämpften Reis kalt werden lassen und mit den Fingern auflockern. Am besten schon am Vortag zubereiten und kalt stellen.',
     },
     {
-      text: 'Die Eier im heißen Wok in 1 EL Sonnenblumenöl zu Rührei braten und herausnehmen. Die Garnelen kurz anbraten und ebenfalls herausnehmen.',
+      text: 'Die Eier im heißen Wok in 1 EL Sonnenblumenöl zu Rührei braten und herausnehmen. Die aufgetauten, trocken getupften Garnelen kurz anbraten, bis sie rosa sind, und ebenfalls herausnehmen.',
       settings: [bora('9', 1, 'Wok vorheizen'), bora('7', 3, 'Rührei, Garnelen')],
     },
     {
-      text: 'Das restliche Öl erhitzen und den Reis unter ständigem Rühren braten, bis er springt. Dazu den Abzug eine Stufe höher stellen.',
+      text: 'Das restliche Öl erhitzen und den Reis unter ständigem Rühren braten, bis die Körner einzeln sind und in der Pfanne leicht hüpfen. Dazu den Abzug eine Stufe höher stellen.',
       settings: [bora('9', 4, 'Abzug Power')],
     },
     {
-      text: 'Kochschinken, Erbsen, Garnelen und Ei zugeben. Mit Sojasauce, Salz und weißem Pfeffer würzen und mit den Frühlingszwiebeln servieren.',
+      text: 'Kochschinken, Erbsen, Garnelen und Ei zugeben. Mit Sojasauce, Salz und weißem Pfeffer würzen und mit den Frühlingszwiebeln in Ringen servieren.',
       settings: [bora('7', 2)],
     },
   ],
@@ -124,7 +125,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('7', 4, 'Nudeln garen')],
     },
     {
-      text: 'Das Hähnchenbrustfilet in Streifen schneiden und mit 1 EL Sojasauce und Speisestärke marinieren.',
+      text: 'Das Hähnchenbrustfilet in Streifen schneiden, mit 1 EL Sojasauce und der Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig). Möhre und Chinakohl in feine Streifen schneiden, Knoblauch hacken, Frühlingszwiebeln in Ringe schneiden.',
     },
     {
       text: 'Den Wok 2 Minuten vorheizen. Das Hähnchen im restlichen Öl braten, dann Knoblauch, Möhrenstreifen und Chinakohl zugeben.',
@@ -138,11 +139,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'rind-brokkoli': [
     {
-      text: 'Die Rinderhüfte quer zur Faser in dünne Scheiben schneiden. Mit Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke marinieren.',
+      text: 'Die Rinderhüfte quer zur Faser in dünne Scheiben schneiden. Mit Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig).',
     },
     rice('Jasminreis', 225),
     {
-      text: 'Den Brokkoli in Röschen teilen, auf ein gelochten Garbehälter legen und auf Ebene 3 zum Reis in den CombiSteamer schieben. Bissfest dämpfen.',
+      text: 'Den Brokkoli in Röschen teilen. Wenn der Reis noch 6 Minuten braucht, den Brokkoli auf einem zweiten gelochten Garbehälter auf Ebene 3 zum Reis in den CombiSteamer schieben und bissfest dämpfen. Knoblauch und Ingwer fein hacken.',
       settings: [steamer('Dämpfen', 100, 6, 'Ebene 3, gelocht')],
     },
     {
@@ -150,14 +151,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('9', 2, 'Wok vorheizen'), bora('Power', 1, 'Abzug Power')],
     },
     {
-      text: 'Knoblauch, Ingwer und Brokkoli im Wok braten. Fleisch, Austernsauce, Zucker und 1 TL angerührte Speisestärke zugeben, kurz eindicken und mit dem Reis servieren.',
+      text: 'Knoblauch, Ingwer und Brokkoli im Wok braten. Fleisch, Austernsauce, Zucker und 1 TL Speisestärke (mit 1 EL kaltem Wasser glatt verrührt) zugeben, kurz eindicken und mit dem Reis servieren.',
       settings: [bora('9', 3), bora('7', 1, 'eindicken')],
     },
   ],
 
   'hui-guo-rou': [
     {
-      text: 'Den Schweinebauch mit Ingwer in Wasser aufkochen und 20 Minuten leise köcheln lassen. Dann abkühlen lassen und in hauchdünne Scheiben schneiden.',
+      text: 'Den Schweinebauch mit dem Ingwer in Scheiben in einem Topf mit Wasser bedecken, aufkochen und 20 Minuten leise köcheln lassen. Dann abkühlen lassen (kalt lässt er sich besser schneiden) und in hauchdünne Scheiben schneiden.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('3', 20, 'köcheln')],
     },
     rice('Jasminreis', 225),
@@ -170,7 +171,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('6', 2)],
     },
     {
-      text: 'Spitzpaprika und Frühlingszwiebeln in Stücken, Shaoxing-Reiswein und Zucker zugeben und kurz pfannenrühren. Mit dem Reis servieren.',
+      text: 'Spitzpaprika in Stücke und Frühlingszwiebeln in 4 cm lange Stücke schneiden, mit Shaoxing-Reiswein und Zucker zugeben und unter ständigem Rühren kurz braten. Mit dem Reis servieren.',
       settings: [bora('9', 2, 'Abzug Power')],
     },
   ],
@@ -235,7 +236,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'cashew-huhn': [
     {
-      text: 'Das Hähnchenbrustfilet würfeln und mit 1 EL Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke marinieren.',
+      text: 'Das Hähnchenbrustfilet würfeln, mit 1 EL Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig). Paprika und Zwiebel in Stücke schneiden, Knoblauch hacken.',
     },
     rice('Jasminreis', 225),
     {
@@ -247,7 +248,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 5, 'Abzug Power')],
     },
     {
-      text: 'Sojasauce, Austernsauce und 1 TL angerührte Speisestärke zugeben und kurz eindicken. Die Cashews unterheben und mit dem Reis servieren.',
+      text: 'Restliche Sojasauce, Austernsauce und 1 TL Speisestärke (mit 1 EL kaltem Wasser glatt verrührt) zugeben und kurz eindicken. Die Cashews unterheben und mit dem Reis servieren.',
       settings: [bora('7', 1, 'eindicken')],
     },
   ],
@@ -260,10 +261,10 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Den Combair vorheizen. Das Fleisch auf einem Gitter über einem Blech mit etwas Wasser auf Ebene 2 schieben, rösten und zwischendurch mehrmals mit Marinade bestreichen. Den Kerntemperaturfühler in die dickste Stelle stecken.',
       settings: [combair('Heißluft', 180, 35, 'vorheizen, Ebene 2', 75)],
     },
-    rice('Jasminreis', 225),
+    rice('Jasminreis', 225, 'Während das Fleisch röstet,'),
     {
-      text: 'Das Fleisch mit dem restlichen Honig bestreichen und unter dem Grill 3 Minuten karamellisieren. Dabei nicht aus den Augen lassen.',
-      settings: [{ device: 'combair', mode: 'Grill', minutes: 3, note: 'Stufe 3 (stark), Ebene 3' }],
+      text: 'Wenn das Fleisch die Kerntemperatur erreicht hat, den Combair auf Grill Stufe 3 umschalten und 3 Minuten vorheizen. Das Fleisch mit dem restlichen Honig bestreichen, auf Ebene 3 schieben und unter dem Grill 3 Minuten karamellisieren. Dabei nicht aus den Augen lassen, Honig verbrennt schnell.',
+      settings: [{ device: 'combair', mode: 'Grill', minutes: 3, note: 'Stufe 3 (stark), Ebene 3, 3 Min. vorheizen' }],
     },
     {
       text: 'Den Pak Choi auf einem gelochten Garbehälter 4 Minuten im CombiSteamer dämpfen, solange das Fleisch ruht.',
@@ -279,15 +280,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Den Schweinebauch in 3 cm große Würfel schneiden, in kochendem Wasser kurz blanchieren und abtropfen lassen.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('6', 3, 'blanchieren')],
     },
-    rice('Jasminreis', 225),
     {
       text: 'Das Sonnenblumenöl und den Kandiszucker im Wok erhitzen, bis der Zucker karamellisiert. Das Fleisch darin rundum glasieren.',
       settings: [bora('5', 6, 'Zucker karamellisieren')],
     },
     {
-      text: 'Shaoxing-Reiswein, beide Sojasaucen, Sternanis, Zimtstange, Ingwer, Frühlingszwiebeln und so viel heißes Wasser zugeben, dass das Fleisch knapp bedeckt ist. Zugedeckt 75 Minuten schmoren.',
+      text: 'Den Ingwer in Scheiben, die Frühlingszwiebeln in lange Stücke schneiden. Shaoxing-Reiswein, beide Sojasaucen, Sternanis, Zimtstange, Ingwer, Frühlingszwiebeln und so viel heißes Wasser zugeben, dass das Fleisch knapp bedeckt ist. Zugedeckt 75 Minuten schmoren, bis sich das Fleisch mit einem Stäbchen leicht durchstechen lässt.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('2', 75, 'Deckel drauf')],
     },
+    rice('Jasminreis', 225, 'Etwa 25 Minuten vor Ende der Schmorzeit'),
     {
       text: 'Den Deckel abnehmen und die Sauce einkochen, bis sie glänzend am Fleisch haftet. Mit dem Reis servieren.',
       settings: [bora('7', 8, 'einkochen')],
@@ -299,7 +300,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Den Chinakohl fein hacken, salzen, 10 Minuten ziehen lassen und kräftig ausdrücken.',
     },
     {
-      text: 'Das Schweinehackfleisch mit Kohl, Frühlingszwiebeln, Ingwer, Sojasauce, Sesamöl, Shaoxing-Reiswein und 2 EL Wasser in eine Richtung rühren, bis die Masse bindet.',
+      text: 'Frühlingszwiebeln fein hacken, Ingwer fein reiben. Das Schweinehackfleisch mit Kohl, Frühlingszwiebeln, Ingwer, Sojasauce, Sesamöl, Shaoxing-Reiswein und 2 EL Wasser in eine Richtung rühren, bis die Masse bindet.',
     },
     {
       text: 'Je 1 TL Füllung auf ein Jiaozi-Teigblatt geben, den Rand befeuchten, zu einem Halbmond falten und die Ränder in Falten andrücken.',
@@ -333,7 +334,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'ingwer-huhn': [
     {
-      text: 'Das Hähnchenschenkelfilet in Stücke schneiden und mit 1 EL Sojasauce, Shaoxing-Reiswein und Speisestärke marinieren.',
+      text: 'Das Hähnchenschenkelfilet in Stücke schneiden, mit 1 EL Sojasauce, Shaoxing-Reiswein und Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig).',
     },
     rice('Jasminreis', 225),
     {
@@ -351,7 +352,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'pfeffer-rind': [
     {
-      text: 'Die Rinderhüfte in Streifen schneiden und mit Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke marinieren.',
+      text: 'Die Rinderhüfte quer zur Faser in Streifen schneiden, mit Sojasauce, Shaoxing-Reiswein und 1 TL Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig). Zwiebel und Paprika in Stücke schneiden.',
     },
     rice('Jasminreis', 225),
     {
@@ -363,7 +364,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('9', 3)],
     },
     {
-      text: 'Fleisch, Austernsauce, dunkle Sojasauce, Zucker und 1 TL angerührte Speisestärke zugeben und glasieren. Mit dem Reis servieren.',
+      text: 'Fleisch, Austernsauce, dunkle Sojasauce, Zucker und 1 TL Speisestärke (mit 1 EL kaltem Wasser glatt verrührt) zugeben und glasieren. Mit dem Reis servieren.',
       settings: [bora('7', 1, 'glasieren')],
     },
   ],
@@ -374,7 +375,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     rice('Jasminreis', 225),
     {
-      text: 'Die Doradenfilets auf einen Teller legen und mit der Hälfte des Ingwers belegen. Den Teller auf Ebene 3 zum Reis in den CombiSteamer stellen und dämpfen. Den Pak Choi daneben auf ein gelochten Garbehälter legen und mitdämpfen.',
+      text: 'Wenn der Reis noch 10 Minuten braucht: Die Doradenfilets auf einen Teller legen und mit der Hälfte des Ingwers belegen. Den Teller auf Ebene 3 zum Reis in den CombiSteamer stellen, den Pak Choi daneben auf einen gelochten Garbehälter legen und beides dämpfen, bis der Fisch weiß und nicht mehr glasig ist.',
       settings: [steamer('Dämpfen', 90, 10, 'Ebene 3, Fisch')],
     },
     {
@@ -408,12 +409,12 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'pak-choi-shiitake': [
     {
-      text: 'Den Tofu würfeln und im Sonnenblumenöl goldbraun braten. Dann herausnehmen.',
+      text: 'Den Tofu in 2 cm große Würfel schneiden, gut trocken tupfen und im Sonnenblumenöl rundum goldbraun braten. Dann herausnehmen.',
       settings: [bora('8', 2, 'Pfanne vorheizen'), bora('6', 6, 'goldbraun')],
     },
     rice('Jasminreis', 225),
     {
-      text: 'Die Shiitake in Scheiben schneiden und mit dem Knoblauch braten.',
+      text: 'Die Shiitake in Scheiben schneiden, den Knoblauch hacken und beides braten.',
       settings: [bora('7', 4)],
     },
     {
@@ -421,7 +422,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('8', 2)],
     },
     {
-      text: 'Tofu, Austernsauce, Sojasauce und angerührte Speisestärke zugeben, kurz eindicken und mit Sesamöl beträufeln. Mit dem Reis servieren.',
+      text: 'Tofu, Austernsauce, Sojasauce und die Speisestärke (mit 2 EL kaltem Wasser glatt verrührt) zugeben, kurz eindicken und mit Sesamöl beträufeln. Mit dem Reis servieren.',
       settings: [bora('5', 1, 'eindicken')],
     },
   ],
@@ -481,7 +482,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [steamer('Dämpfen', 100, 22, 'Reis + Eier')],
     },
     {
-      text: 'Die gepellten Eier in den letzten 15 Minuten zum Fleisch geben. Den Pak Choi kurz blanchieren.',
+      text: 'Die gepellten Eier in den letzten 15 Minuten zum Fleisch geben. Den Pak Choi in einem Topf mit kochendem Wasser 1 bis 2 Minuten blanchieren (kurz sprudelnd kochen) und abtropfen lassen.',
       settings: [bora('6', 2, 'Pak Choi blanchieren')],
     },
     {
@@ -491,18 +492,18 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'suan-la-tang': [
     {
-      text: 'Die Mu-Err-Pilze in warmem Wasser einweichen und in Streifen schneiden. Schweineschnitzel, Tofu und Bambussprossen in feine Streifen schneiden.',
+      text: 'Die Mu-Err-Pilze 20 Minuten in warmem Wasser einweichen, harte Stellen abschneiden und die Pilze in Streifen schneiden. Schweineschnitzel, Tofu und Bambussprossen in feine Streifen schneiden.',
     },
     {
       text: 'Die Hühnerbrühe aufkochen. Fleisch, Pilze und Bambus 5 Minuten garen, dann den Tofu zugeben.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('4', 5, 'köcheln')],
     },
     {
-      text: 'Mit Sojasauce, Chinkiang-Essig und weißem Pfeffer kräftig abschmecken und mit angerührter Speisestärke binden.',
+      text: 'Mit Sojasauce, Chinkiang-Essig und weißem Pfeffer kräftig abschmecken. Die Speisestärke mit 4 EL kaltem Wasser glatt rühren, einrühren und aufkochen, bis die Suppe leicht sämig ist.',
       settings: [bora('4', 1, 'binden')],
     },
     {
-      text: 'Das verquirlte Ei in dünnem Strahl einrühren, so dass Flocken entstehen. Mit Chiliöl und Frühlingszwiebeln servieren.',
+      text: 'Das Ei verquirlen und in dünnem Strahl unter langsamem Rühren in die heiße Suppe laufen lassen, so dass feine Flocken entstehen. Mit Chiliöl und Frühlingszwiebeln servieren.',
       settings: [bora('Warmhalten', undefined, 'Ei einrühren')],
     },
   ],
@@ -532,15 +533,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Das Hähnchenbrustfilet fein hacken.',
     },
     {
-      text: 'Die Hühnerbrühe mit Ingwer aufkochen. Hähnchen, Rahmmais und Mais zugeben und 5 Minuten köcheln lassen.',
+      text: 'Den Ingwer in Scheiben schneiden und mit der Hühnerbrühe aufkochen. Hähnchen, Rahmmais und den abgetropften Mais zugeben und 5 Minuten köcheln lassen.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('4', 5, 'köcheln')],
     },
     {
-      text: 'Mit angerührter Speisestärke binden und mit Salz und weißem Pfeffer würzen.',
+      text: 'Die Speisestärke mit 4 EL kaltem Wasser glatt rühren, einrühren und aufkochen, bis die Suppe leicht sämig ist. Ingwer entfernen, mit Salz und weißem Pfeffer würzen.',
       settings: [bora('4', 1, 'binden')],
     },
     {
-      text: 'Die verquirlten Eier einlaufen lassen und mit Sesamöl und Frühlingszwiebeln servieren.',
+      text: 'Die Eier verquirlen und unter langsamem Rühren in dünnem Strahl einlaufen lassen, sodass feine Flocken entstehen. Mit Sesamöl und Frühlingszwiebeln in Ringen servieren.',
       settings: [bora('Warmhalten', undefined, 'Ei einlaufen lassen')],
     },
   ],
@@ -551,15 +552,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('6', 3, 'blanchieren')],
     },
     {
-      text: 'Doubanjiang, Ingwer und Knoblauch im Sonnenblumenöl rösten. Fleisch, Sternanis, Zimtstange, Sojasauce, dunkle Sojasauce, Shaoxing-Reiswein, Tomate und 1,5 l Wasser zugeben.',
+      text: 'Ingwer in Scheiben schneiden, Knoblauch andrücken, die Tomate vierteln. Doubanjiang, Ingwer und Knoblauch im Sonnenblumenöl rösten, bis das Öl rot wird. Fleisch, Sternanis, Zimtstange, Sojasauce, dunkle Sojasauce, Shaoxing-Reiswein, Tomate und 1,5 l Wasser zugeben.',
       settings: [bora('6', 3, 'rösten'), bora('Power', undefined, 'aufkochen')],
     },
     {
-      text: 'Zugedeckt schmoren, bis das Fleisch zart ist. Zwischendurch eine Garprobe machen.',
+      text: 'Zugedeckt etwa 2 Stunden schmoren, bis das Fleisch zart ist und sich mit einer Gabel leicht zerteilen lässt. Ab 90 Minuten eine Garprobe machen.',
       settings: [bora('2', 120, 'Deckel drauf')],
     },
     {
-      text: 'Die Weizennudeln und den Pak Choi in sprudelndem Wasser getrennt garen.',
+      text: 'Kurz vor dem Servieren einen zweiten Topf Wasser aufkochen und erst den Pak Choi 1 bis 2 Minuten, dann darin die Weizennudeln nach Packungsangabe garen.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('7', 4, 'Nudeln')],
     },
     {
@@ -569,7 +570,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'pad-thai': [
     {
-      text: 'Die Reisbandnudeln 20 Minuten in lauwarmem Wasser einweichen. Tamarindenpaste, Fischsauce und Palmzucker verrühren.',
+      text: 'Die Reisbandnudeln 20 Minuten in lauwarmem Wasser einweichen, bis sie biegsam, aber noch fest sind, dann abgießen. Tamarindenpaste, Fischsauce und Palmzucker zu einer Sauce verrühren. Tofu würfeln, Knoblauch hacken, Frühlingszwiebeln in Stücke schneiden, die Garnelen auftauen und trocken tupfen.',
     },
     {
       text: 'Den Wok 2 Minuten vorheizen. Tofuwürfel und Knoblauch im heißen Sonnenblumenöl braten, dann die Garnelen zugeben.',
@@ -580,7 +581,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('8', 5)],
     },
     {
-      text: 'Sojasprossen und Frühlingszwiebeln untermischen. Mit gerösteten Erdnüssen, Limette und Chiliflocken servieren.',
+      text: 'Sojasprossen und Frühlingszwiebeln untermischen. Mit gehackten gerösteten Erdnüssen, Limettenspalten und Chiliflocken servieren.',
       settings: [bora('8', 1)],
     },
   ],
@@ -588,7 +589,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'gruenes-curry': [
     rice('Jasminreis', 225),
     {
-      text: 'Den dicken Teil der Kokosmilch mit der grünen Currypaste im Wok einkochen, bis sich das Öl trennt.',
+      text: 'Die Kokosmilchdose nicht schütteln und die feste Creme oben abschöpfen. Diesen dicken Teil der Kokosmilch mit der grünen Currypaste im Wok einkochen, bis sich das Öl trennt (kleine Fettaugen auf der Oberfläche) und die Paste duftet.',
       settings: [bora('6', 5, 'einkochen')],
     },
     {
@@ -612,11 +613,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('6', 2, 'anrösten')],
     },
     {
-      text: 'Restliche Kokosmilch, Kaffirlimettenblätter, Paprika, Bambussprossen und Ananas zugeben und 8 Minuten köcheln lassen.',
+      text: 'Paprika in Streifen, Ananas in Stücke schneiden, Bambussprossen abtropfen lassen. Restliche Kokosmilch, Kaffirlimettenblätter, Paprika, Bambussprossen und Ananas zugeben und 8 Minuten köcheln lassen.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('4', 8, 'köcheln')],
     },
     {
-      text: 'Die Garnelen zugeben und 3 Minuten gar ziehen lassen.',
+      text: 'Die aufgetauten Garnelen zugeben und 3 Minuten gar ziehen lassen, bis sie rosa sind.',
       settings: [bora('Simmern', 3, 'gar ziehen')],
     },
     {
@@ -647,7 +648,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Das Hähnchenschenkelfilet grob hacken. Knoblauch und rote Chilis im Mörser zerstoßen.',
     },
     {
-      text: 'Die Spiegeleier in reichlich heißem Sonnenblumenöl mit knusprigem Rand braten und herausnehmen.',
+      text: 'Die Eier einzeln in reichlich heißem Sonnenblumenöl als Spiegeleier mit knusprigem Rand braten (das Eigelb bleibt flüssig) und herausnehmen.',
       settings: [bora('8', 1, 'Wok vorheizen'), bora('7', 3, 'Spiegelei')],
     },
     {
@@ -661,9 +662,8 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
 
   massaman: [
-    rice('Jasminreis', 225),
     {
-      text: 'Die Massaman-Currypaste mit dem dicken Teil der Kokosmilch im Topf anrösten. Das Rindergulasch zugeben und anbraten.',
+      text: 'Die Kokosmilchdose nicht schütteln und die feste Creme oben abschöpfen. Die Massaman-Currypaste mit diesem dicken Teil der Kokosmilch im Topf anrösten, bis sie duftet. Das Rindergulasch zugeben und anbraten.',
       settings: [bora('6', 3, 'anrösten'), bora('7', 5, 'Fleisch anbraten')],
     },
     {
@@ -671,9 +671,10 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('2', 75, 'Deckel drauf')],
     },
     {
-      text: 'Kartoffeln und Zwiebel in Stücken und die Erdnüsse zugeben und weitere 25 Minuten garen.',
+      text: 'Kartoffeln schälen und in 3 cm große Stücke, Zwiebel in Spalten schneiden. Mit den Erdnüssen zugeben und weitere 25 Minuten garen, bis die Kartoffeln weich sind.',
       settings: [bora('3', 25, 'Deckel drauf')],
     },
+    rice('Jasminreis', 225, 'Sobald die Kartoffeln im Topf sind,'),
     {
       text: 'Mit Fischsauce, Palmzucker und Tamarindenpaste süß-sauer-salzig abschmecken und mit dem Reis servieren.',
     },
@@ -685,7 +686,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     rice('Sushireis', 180),
     {
-      text: 'Den Brokkoli in Röschen teilen, auf ein gelochten Garbehälter legen und auf Ebene 3 zum Reis in den CombiSteamer schieben.',
+      text: 'Den Brokkoli in Röschen teilen. In den letzten 8 Minuten der Reisgarzeit auf einem zweiten gelochten Garbehälter auf Ebene 3 zum Reis in den CombiSteamer schieben und bissfest dämpfen.',
       settings: [steamer('Dämpfen', 100, 8, 'Ebene 3, gelocht')],
     },
     {
@@ -703,11 +704,11 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'shoyu-ramen': [
     {
-      text: 'Den Schweinebauch mit 3 EL Sojasauce, Mirin, Ingwer und 300 ml Wasser aufkochen und zugedeckt 60 Minuten schmoren. Dann in Scheiben schneiden und den Schmorsud aufbewahren.',
+      text: 'Den Ingwer in Scheiben schneiden. Den Schweinebauch mit 3 EL Sojasauce, Mirin, Ingwer und 300 ml Wasser aufkochen und zugedeckt 60 Minuten schmoren. Dann in Scheiben schneiden und den Schmorsud aufbewahren.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('2', 60, 'Deckel drauf')],
     },
     {
-      text: 'Die Eier im CombiSteamer dämpfen, abschrecken, pellen und 30 Minuten in etwas Schmorsud marinieren.',
+      text: 'Während der Schweinebauch schmort, den Wasserbehälter des CombiSteamers füllen und die Eier auf dem gelochten Garbehälter wachsweich dämpfen. Sofort in Eiswasser abschrecken, damit das Eigelb flüssig bleibt, pellen und 30 Minuten in etwas Schmorsud marinieren.',
       settings: [steamer('Dämpfen', 100, 7, 'wachsweich')],
     },
     {
@@ -719,7 +720,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('7', 4, 'Nudeln')],
     },
     {
-      text: 'Die Nudeln mit der Brühe übergießen. Mit Schweinebauch, halbierten Eiern, Sojasprossen, Frühlingszwiebeln, Nori und Sesamöl belegen.',
+      text: 'Die Nudeln mit der Brühe übergießen. Mit Schweinebauch, halbierten Eiern, Sojasprossen, Frühlingszwiebeln in Ringen, Nori in Streifen und Sesamöl belegen.',
     },
   ],
 
@@ -748,19 +749,19 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     rice('Sushireis', 180),
     {
-      text: 'Spinat und Sojasprossen auf ein gelochten Garbehälter legen, auf Ebene 3 zum Reis schieben und kurz dämpfen. Mit Sesamöl und Salz würzen.',
+      text: 'In den letzten 3 Minuten der Reisgarzeit Spinat und Sojasprossen auf einen zweiten gelochten Garbehälter legen, auf Ebene 3 zum Reis schieben und dämpfen, bis der Spinat zusammenfällt. Getrennt mit etwas Sesamöl und Salz würzen.',
       settings: [steamer('Dämpfen', 100, 3, 'Ebene 3, gelocht')],
     },
     {
-      text: 'Möhre, Zucchini und Shiitake in Streifen im Sonnenblumenöl getrennt kurz anbraten.',
+      text: 'Möhre, Zucchini und Shiitake in feine Streifen schneiden und nacheinander im Sonnenblumenöl jeweils kurz bissfest anbraten, damit jede Zutat ihren Geschmack behält.',
       settings: [bora('7', 6, 'Pfanne')],
     },
     {
-      text: 'Das Fleisch in der sehr heißen Pfanne scharf anbraten. Dazu den Abzug eine Stufe höher stellen. Dann die Spiegeleier braten.',
+      text: 'Das Fleisch in der sehr heißen Pfanne scharf anbraten. Dazu den Abzug eine Stufe höher stellen. Dann in derselben Pfanne die Eier als Spiegeleier braten, das Eigelb soll flüssig bleiben.',
       settings: [bora('9', 3, 'Abzug Power'), bora('5', 3, 'Spiegeleier')],
     },
     {
-      text: 'Den Reis in Schüsseln geben, Gemüse und Fleisch darauf anrichten und das Ei obenauf legen. Mit Gochujang und Sesam servieren und am Tisch alles vermengen.',
+      text: 'Den Reis in Schüsseln geben, Gemüse und Fleisch darauf anrichten und das Ei obenauf legen. Mit Gochujang (koreanische Chilipaste) und Sesam servieren und am Tisch alles vermengen.',
     },
   ],
 
@@ -769,15 +770,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Die Rinderhüfte hauchdünn schneiden. Leicht angefroren geht es am besten.',
     },
     {
-      text: 'Birne, Knoblauch und Ingwer reiben und mit Sojasauce, Zucker und Sesamöl mischen. Fleisch und Zwiebelstreifen darin mindestens 30 Minuten marinieren.',
+      text: 'Birne, Knoblauch und Ingwer reiben und mit Sojasauce, Zucker und Sesamöl mischen. Die Zwiebel in feine Streifen schneiden. Fleisch und Zwiebelstreifen darin mindestens 30 Minuten marinieren.',
     },
     rice('Sushireis', 180),
     {
-      text: 'Das Fleisch portionsweise in der sehr heißen Pfanne mit etwas Sonnenblumenöl scharf braten. Dazu den Abzug eine Stufe höher stellen. Die Frühlingszwiebeln zugeben.',
+      text: 'Das Fleisch portionsweise in der sehr heißen Pfanne mit etwas Sonnenblumenöl scharf braten. Dazu den Abzug eine Stufe höher stellen. Die Frühlingszwiebeln in Stücke schneiden und kurz mitbraten.',
       settings: [bora('9', 2, 'Pfanne vorheizen'), bora('9', 6, 'Abzug Power')],
     },
     {
-      text: 'Mit Sesam bestreuen und mit dem Reis und den Kopfsalatblättern zum Einwickeln servieren.',
+      text: 'Mit Sesam bestreuen und mit dem Reis und den gewaschenen, trocken geschüttelten Kopfsalatblättern zum Einwickeln servieren.',
     },
   ],
 
@@ -791,15 +792,15 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Power', undefined, 'aufkochen'), bora('6', 5, 'blanchieren')],
     },
     {
-      text: 'Fleisch und Knochen mit 2,5 l Wasser, Zwiebel, Ingwer und Gewürzen aufkochen und leise köcheln lassen. Dann abseihen und mit Fischsauce und Zucker abschmecken.',
+      text: 'Fleisch und Knochen mit 2,5 l Wasser, Zwiebel, Ingwer und Gewürzen aufkochen und 2,5 Stunden offen leise köcheln lassen. Aufsteigenden Schaum abschöpfen, damit die Brühe klar bleibt. Dann durch ein Sieb abseihen, das Suppenfleisch in Scheiben schneiden und die Brühe mit Fischsauce und Zucker abschmecken.',
       settings: [bora('Power', undefined, 'aufkochen'), bora('Simmern', 150, 'leise köcheln')],
     },
     {
-      text: 'Die Reisbandnudeln einweichen und kurz kochen. Die rohe Rinderhüfte hauchdünn schneiden.',
+      text: 'Die Reisbandnudeln 20 Minuten in lauwarmem Wasser einweichen und in kochendem Wasser kurz garen, bis sie weich sind. Die rohe Rinderhüfte hauchdünn schneiden (leicht angefroren geht es am besten) – sie gart erst in der heißen Brühe.',
       settings: [bora('7', 3, 'Nudeln')],
     },
     {
-      text: 'Nudeln, gekochtes und rohes Fleisch in Schüsseln geben und mit kochender Brühe übergießen. Mit Sojasprossen, Thai-Basilikum, Koriander, Limette und Chili servieren.',
+      text: 'Nudeln, gekochtes und rohes Fleisch in Schüsseln geben und mit kochender Brühe übergießen. Mit Sojasprossen, Thai-Basilikum, Koriander, Limettenspalten und Chili in Ringen servieren.',
       settings: [bora('Power', undefined, 'Brühe aufkochen')],
     },
   ],
@@ -813,7 +814,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Schalotten, Knoblauch, rote Chili und Garnelenpaste zu einer Paste zerstoßen.',
     },
     {
-      text: 'Die Hähnchenwürfel im Sonnenblumenöl braten, die Paste zugeben und anrösten.',
+      text: 'Das Hähnchenbrustfilet in kleine Würfel schneiden und im Sonnenblumenöl braten, die Paste zugeben und anrösten.',
       settings: [bora('9', 2, 'Wok vorheizen'), bora('8', 5)],
     },
     {
@@ -821,7 +822,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('9', 4, 'Abzug Power')],
     },
     {
-      text: 'Die Spiegeleier braten und den Reis mit Spiegelei, Gurken- und Tomatenscheiben und Röstzwiebeln servieren.',
+      text: 'Die Eier als Spiegeleier braten. Salatgurke und Tomaten in Scheiben schneiden und den Reis mit Spiegelei, Gurken- und Tomatenscheiben und Röstzwiebeln servieren.',
       settings: [bora('5', 3, 'Spiegeleier')],
     },
   ],
@@ -836,7 +837,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 4, 'Abzug Power')],
     },
     {
-      text: 'Weißkohl, Möhre und Lauch in Streifen zugeben und bissfest braten. Die Eier unterrühren und stocken lassen.',
+      text: 'Weißkohl, Möhre und Lauch in feine Streifen schneiden, zugeben und bissfest braten. Die Eier verquirlen, unterrühren und stocken lassen.',
       settings: [bora('8', 4)],
     },
     {
@@ -856,7 +857,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('3', 5, 'Sauce eindicken')],
     },
     {
-      text: 'Die Schweineschnitzel salzen, im Mehl wenden und durch Ei und Panko ziehen.',
+      text: 'Die Schweineschnitzel salzen, im Mehl wenden, durch das verquirlte Ei ziehen und im Panko (grobes japanisches Paniermehl) wenden, die Panade gut andrücken.',
     },
     {
       text: 'Den Airfryer vorheizen. Die Schnitzel in den Korb legen, mit etwas Frittieröl einsprühen und goldbraun garen. Einmal wenden.',
@@ -876,21 +877,21 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [combair('Heißluft feucht', 150, 75, 'vorheizen, Ebene 2', 88)],
     },
     {
-      text: 'Den Wasserbehälter des CombiSteamers füllen. Den Jasminreis mit 300 ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.',
+      text: 'Etwa 30 Minuten vor Ende der Garzeit den Wasserbehälter des CombiSteamers füllen. Den Jasminreis mit 300 ml Wasser und etwas Salz in eine flache Schale geben, auf den gelochten Garbehälter auf Ebene 2 stellen und dämpfen.',
       settings: [steamer('Dämpfen', 100, 22, 'Ebene 2')],
     },
     {
-      text: 'Die Keulen abkühlen lassen, trocken tupfen und mit Speisestärke bestäuben.',
+      text: 'Die Keulen kurz abkühlen lassen, trocken tupfen und mit dem größten Teil der Speisestärke bestäuben (1 TL für die Soße zurückbehalten).',
     },
     {
       text: 'Den Airfryer vorheizen. Die Keulen mit etwas Frittieröl einsprühen, in den Korb legen und knusprig garen. Dann in Stücke schneiden.',
       settings: [airfryer(190, 10, 'vorheizen, 1× wenden')],
     },
     {
-      text: 'Paprika, Ananas und Zwiebel in Stücke schneiden. Ketchup, Reisessig, Zucker, 1 TL Sojasauce und 100 ml Wasser verrühren.',
+      text: 'Paprika, Ananas und Zwiebel in Stücke schneiden. Tomatenketchup, Reisessig, Zucker, 1 TL Sojasauce und 100 ml Wasser verrühren.',
     },
     {
-      text: 'Das Gemüse im Wok in wenig Öl 2 Minuten anbraten, die Soße zugeben und aufkochen. Mit etwas angerührter Speisestärke leicht binden.',
+      text: 'Das Gemüse im Wok in wenig Öl 2 Minuten anbraten, die Soße zugeben und aufkochen. Die zurückbehaltene Speisestärke mit 1 EL kaltem Wasser glatt rühren, einrühren und die Soße leicht binden.',
       settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 2), bora('6', 2, 'aufkochen')],
     },
     {
@@ -899,14 +900,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   ],
   // ───────────── Leicht & sättigend ─────────────
   'haehnchen-brokkoli-kanton': [
-    { text: 'Das Hähnchen in dünne Scheiben schneiden und mit Reiswein, 1 EL Sojasauce und der Hälfte der Speisestärke marinieren.' },
+    { text: 'Das Hähnchen in dünne Scheiben schneiden, mit Reiswein, 1 EL Sojasauce und der Hälfte der Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig).' },
     rice('Jasminreis', 180),
-    { text: 'Den Brokkoli in Röschen teilen, auf den gelochten Garbehälter legen und zum Reis in den CombiSteamer geben. Knoblauch und Ingwer fein hacken.', settings: [steamer('Dämpfen', 100, 6, 'Ebene 3, Brokkoli')] },
+    { text: 'Den Brokkoli in Röschen teilen. In den letzten 6 Minuten der Reisgarzeit auf einem zweiten gelochten Garbehälter auf Ebene 3 zum Reis in den CombiSteamer geben. Knoblauch und Ingwer fein hacken.', settings: [steamer('Dämpfen', 100, 6, 'Ebene 3, Brokkoli')] },
     { text: 'Das Sonnenblumenöl im Wok stark erhitzen, das Hähnchen 3 Minuten anbraten, Knoblauch und Ingwer kurz mitbraten.', settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 3, 'Abzug höher')] },
     { text: 'Den Brokkoli zugeben. Hühnerbrühe, restliche Sojasauce, Austernsauce und restliche Speisestärke verrühren, in den Wok gießen und 2 Minuten eindicken lassen. Mit Sesamöl abschmecken und mit dem Reis servieren.', settings: [bora('6', 2, 'eindicken')] },
   ],
   'rind-gemuese-wok': [
-    { text: 'Das Rindfleisch quer zur Faser in dünne Scheiben schneiden und mit Sojasauce, Reiswein, Speisestärke und Pfeffer marinieren.' },
+    { text: 'Das Rindfleisch quer zur Faser in dünne Scheiben schneiden, mit Sojasauce, Reiswein, Speisestärke und Pfeffer mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig).' },
     rice('Jasminreis', 180),
     { text: 'Paprika in Streifen, Möhre in dünne Scheiben schneiden, Zuckerschoten putzen, Knoblauch und Ingwer hacken.' },
     { text: 'Das Sonnenblumenöl im Wok stark erhitzen und das Rindfleisch in zwei Portionen je 1 Minute anbraten, dann herausnehmen. Beim scharfen Anbraten den Abzug eine Stufe höher stellen.', settings: [bora('9', 2, 'Wok vorheizen, Abzug höher'), bora('9', 2, 'zwei Portionen')] },
@@ -915,18 +916,18 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
   'seelachs-shiitake-pakchoi': [
     { text: 'Ingwer und Frühlingszwiebeln in feine Streifen schneiden. Shiitake in Scheiben, Pak Choi in Viertel schneiden.' },
     rice('Jasminreis', 180),
-    { text: 'Den Seelachs auf einen tiefen Teller legen, mit den Shiitake und der Hälfte des Ingwers belegen und mit dem Reiswein beträufeln. Den Teller auf Ebene 3 zum Reis in den CombiSteamer stellen und dämpfen. Den Pak Choi daneben auf den gelochten Garbehälter legen und die letzten 5 Minuten mitdämpfen.', settings: [steamer('Dämpfen', 90, 10, 'Ebene 3, Fisch'), steamer('Dämpfen', 90, 5, 'Pak Choi dazu')] },
+    { text: 'Den Seelachs auf einen tiefen Teller legen, mit den Shiitake und der Hälfte des Ingwers belegen und mit dem Reiswein beträufeln. Wenn der Reis noch 10 Minuten braucht, den Teller auf Ebene 3 zum Reis in den CombiSteamer stellen und dämpfen, bis der Fisch weiß und nicht mehr glasig ist. Den Pak Choi daneben auf den gelochten Garbehälter legen und die letzten 5 Minuten mitdämpfen.', settings: [steamer('Dämpfen', 90, 10, 'Ebene 3, Fisch'), steamer('Dämpfen', 90, 5, 'Pak Choi dazu')] },
     { text: 'Sojasauce, Sesamöl und Zucker verrühren, über den Fisch geben und mit Frühlingszwiebeln, restlichem Ingwer und Koriander servieren. Dazu den Reis.' },
   ],
   'haehnchen-chop-suey': [
-    { text: 'Das Hähnchen in dünne Streifen schneiden und mit 1 EL Sojasauce und der Hälfte der Speisestärke marinieren.' },
+    { text: 'Das Hähnchen in dünne Streifen schneiden, mit 1 EL Sojasauce und der Hälfte der Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig).' },
     { text: 'Die Mie-Nudeln nach Packungsanweisung garen und abgießen.', settings: [bora('Power', undefined, 'aufkochen'), bora('7', 4, 'Nudeln')] },
     { text: 'Chinakohl in Streifen, Möhre in Stifte, Champignons in Scheiben schneiden. Frühlingszwiebeln in Ringe, Knoblauch fein hacken.' },
     { text: 'Das Sonnenblumenöl im Wok stark erhitzen, das Hähnchen 3 Minuten anbraten und herausnehmen. Möhre, Champignons und Knoblauch 3 Minuten braten, Chinakohl und Sojasprossen 2 Minuten mitbraten.', settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 3, 'Hähnchen'), bora('9', 5, 'Gemüse')] },
     { text: 'Hühnerbrühe, restliche Sojasauce, Austernsauce und restliche Speisestärke verrühren, zugeben und kurz binden. Hähnchen und Nudeln unterheben und mit Frühlingszwiebeln servieren.', settings: [bora('6', 2, 'binden')] },
   ],
   'pute-paprika-cashew': [
-    { text: 'Die Putenbrust in Würfel schneiden und mit 1 EL Sojasauce und der Speisestärke marinieren.' },
+    { text: 'Die Putenbrust in Würfel schneiden, mit 1 EL Sojasauce und der Speisestärke mischen und 15 Minuten ziehen lassen (die Stärke legt sich als dünner Mantel ums Fleisch und hält es beim scharfen Braten saftig).' },
     rice('Jasminreis', 180),
     { text: 'Paprika, Zucchini und Zwiebel in Stücke schneiden, Knoblauch hacken. Die Cashewkerne in einer trockenen Pfanne rösten.', settings: [bora('4', 3, 'Cashewkerne ohne Fett')] },
     { text: 'Das Sonnenblumenöl im Wok stark erhitzen, die Pute 3 Minuten anbraten und herausnehmen. Das Gemüse mit dem Knoblauch 4 Minuten braten.', settings: [bora('9', 2, 'Wok vorheizen'), bora('9', 3, 'Pute'), bora('9', 4, 'Gemüse')] },

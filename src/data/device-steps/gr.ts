@@ -69,28 +69,28 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('7', 4)],
     },
     {
-      text: 'Tomatenmark und Paprikapulver kurz anrösten, mit Metaxa ablöschen und fast verkochen lassen. Die Sahne angießen und die Soße 5 Minuten sämig einköcheln. Mit Salz und Pfeffer abschmecken.',
-      settings: [bora('6', 1, 'anrösten'), bora('5', 7, 'einköcheln')],
+      text: 'Den Combair auf 200 °C Grill-Umluft vorheizen. Tomatenmark und Paprikapulver kurz anrösten, mit Metaxa ablöschen und fast verkochen lassen. Die Sahne angießen und die Soße 5 Minuten sämig einköcheln. Mit Salz und Pfeffer abschmecken.',
+      settings: [bora('6', 1, 'anrösten'), bora('5', 7, 'einköcheln'), combair('Grill-Umluft', 200, undefined, 'vorheizen')],
     },
     {
-      text: 'Den Reis in eine Auflaufform geben, das Gyros mit der Soße darüber verteilen und mit Gouda bestreuen.',
+      text: 'Den fertig gedämpften Reis in eine Auflaufform geben, das Gyros mit der Soße darüber verteilen und mit Gouda bestreuen.',
     },
     {
-      text: 'Den Combair vorheizen. Die Form auf Ebene 2 schieben und goldbraun überbacken.',
-      settings: [combair('Grill-Umluft', 200, 10, 'vorheizen, Ebene 2')],
+      text: 'Die Form auf Ebene 2 in den vorgeheizten Combair schieben und überbacken, bis der Käse goldbraun ist und blubbert.',
+      settings: [combair('Grill-Umluft', 200, 10, 'Ebene 2')],
     },
   ],
 
   'souvlaki-pita': [
     {
-      text: 'Den Schweinenacken in 3 cm große Würfel schneiden und mit Olivenöl, Zitronensaft, Knoblauch, Oregano, Salz und Pfeffer mindestens 30 Minuten marinieren.',
+      text: 'Den Schweinenacken in 3 cm große Würfel schneiden. Den Knoblauch pressen und mit Olivenöl, dem Saft der Zitrone, Oregano, Salz und Pfeffer verrühren. Das Fleisch darin mindestens 30 Minuten marinieren. Holzspieße so lange in Wasser legen, damit sie in der Pfanne nicht verbrennen.',
     },
     {
       text: 'Die Kartoffeln in Spalten schneiden und mit etwas Olivenöl mischen. Den Airfryer vorheizen, die Spalten in den Korb geben und knusprig garen. Dabei zweimal schütteln.',
       settings: [airfryer(200, 20, 'vorheizen, 2× schütteln')],
     },
     {
-      text: 'Das Fleisch auf Spieße stecken. Die Grillpfanne 2 Minuten vorheizen, die Spieße rundum braten, bis sie gebräunt und saftig gar sind. Dazu den Abzug eine Stufe höher stellen.',
+      text: 'Das Fleisch auf die Spieße stecken. Die Grillpfanne 2 Minuten vorheizen, die Spieße rundum braten, bis sie gebräunt und innen nicht mehr rosa, aber noch saftig sind. Dazu den Abzug eine Stufe höher stellen.',
       settings: [bora('8', 2, 'Brücke, vorheizen'), bora('7', 12, 'rundum, Abzug Power')],
     },
     {
@@ -104,7 +104,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   moussaka: [
     {
-      text: 'Die Auberginen in 1 cm dicke Scheiben schneiden, salzen und 20 Minuten Wasser ziehen lassen, dann trocken tupfen. Die Kartoffeln in dünne Scheiben schneiden.',
+      text: 'Die Auberginen in 1 cm dicke Scheiben schneiden, salzen und 20 Minuten Wasser ziehen lassen (das nimmt Bitterstoffe und Feuchtigkeit), dann trocken tupfen. Die Kartoffeln schälen und in dünne Scheiben schneiden. Zwiebel und Knoblauch fein hacken.',
     },
     {
       text: 'Den Combair vorheizen. Auberginen und Kartoffeln mit Olivenöl bestreichen, auf zwei Blechen auf Ebene 1 und 3 verteilen und goldbraun backen. Beiseitestellen.',
@@ -115,14 +115,14 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('8', 2, 'Pfanne vorheizen'), bora('7', 6, 'krümelig braten'), bora('4', 20, 'köcheln')],
     },
     {
-      text: 'Für die Béchamel die Butter schmelzen, das Weizenmehl einrühren, nach und nach die Milch zugießen und unter Rühren 5 Minuten köcheln lassen. Mit Salz, Pfeffer und Muskat würzen, etwas abkühlen lassen und das Eigelb unterrühren.',
+      text: 'Für die Béchamel die Butter schmelzen, das Weizenmehl einrühren und 1 Minute hell anschwitzen. Nach und nach die Milch mit dem Schneebesen einrühren, damit keine Klümpchen entstehen, und unter Rühren 5 Minuten köcheln lassen, bis die Sauce cremig eindickt. Mit Salz, Pfeffer und Muskat würzen, etwas abkühlen lassen (sonst stockt das Ei) und das Eigelb unterrühren.',
       settings: [bora('Schmelzen', 2, 'Butter'), bora('4', 5, 'köcheln')],
     },
     {
       text: 'In eine Auflaufform schichten: Kartoffeln, Hacksoße, Auberginen, dann Béchamel. Mit Gouda bestreuen.',
     },
     {
-      text: 'Die Form auf Ebene 2 in den Combair schieben und goldbraun backen. Anschließend 10 Minuten ruhen lassen.',
+      text: 'Den Combair auf 180 °C herunterschalten. Die Form auf Ebene 2 in den Combair schieben und backen, bis die Béchamel goldbraun ist. Anschließend 10 Minuten ruhen lassen, damit sich die Schichten beim Anschneiden nicht lösen.',
       settings: [combair('Heißluft', 180, 35, 'Ebene 2')],
     },
   ],
@@ -170,7 +170,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   'giouvetsi-kritharaki': [
     {
-      text: 'Das Rindergulasch in Olivenöl im ofenfesten Bräter rundum anbraten. Zwiebel und Knoblauch zugeben, Tomatenmark mitrösten und mit Rotwein ablöschen. Dazu den Abzug eine Stufe höher stellen.',
+      text: 'Das Rindergulasch in Olivenöl im ofenfesten Bräter rundum anbraten. Zwiebel und Knoblauch fein hacken und zugeben, Tomatenmark mitrösten und mit Rotwein ablöschen. Dazu den Abzug eine Stufe höher stellen.',
       settings: [bora('9', 2, 'Brücke, vorheizen'), bora('8', 8, 'Abzug Power')],
     },
     {
@@ -178,7 +178,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [combair('Heißluft', 170, 90, 'vorheizen, Ebene 2')],
     },
     {
-      text: 'Zimtstange und Lorbeer entfernen. Das Kritharaki und die restliche heiße Rinderbrühe unterrühren und abgedeckt weitergaren, bis die Nudeln weich sind und die Soße aufgesogen ist.',
+      text: 'Zimtstange und Lorbeer entfernen. Das Kritharaki (griechische Nudeln in Reiskornform) und die restliche heiße Rinderbrühe unterrühren und abgedeckt weitergaren, bis die Nudeln weich sind und die Soße aufgesogen ist.',
       settings: [combair('Heißluft', 170, 25, 'abgedeckt')],
     },
     {
@@ -264,7 +264,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
 
   gemista: [
     {
-      text: 'Bei Paprika und Tomaten einen Deckel abschneiden, die Tomaten aushöhlen und das Fruchtfleisch grob hacken.',
+      text: 'Bei Paprika und Tomaten einen Deckel abschneiden und aufheben. Die Paprika entkernen, die Tomaten mit einem Löffel aushöhlen und das Fruchtfleisch grob hacken. Die Zwiebel fein würfeln, die Kartoffeln schälen und in Spalten schneiden.',
     },
     {
       text: 'Die Zwiebel in Olivenöl anschwitzen, das Hackfleisch krümelig anbraten. Tomatenfruchtfleisch, rohen Langkornreis, gehackte Petersilie, Oregano, Salz und Pfeffer unterrühren.',
@@ -274,7 +274,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Das Gemüse zu zwei Dritteln mit der Füllung befüllen, weil der Reis quillt. Deckel aufsetzen und in eine Form setzen. Kartoffelspalten dazwischen verteilen, mit Olivenöl beträufeln und 150 ml Wasser angießen.',
     },
     {
-      text: 'Den Combair vorheizen. Die Form auf Ebene 2 schieben und backen, bis Reis und Kartoffeln weich sind. Zwischendurch eine Garprobe machen.',
+      text: 'Den Combair vorheizen. Die Form auf Ebene 2 schieben und backen, bis Reis und Kartoffeln weich sind: Nach 60 Minuten mit einem Löffel etwas Füllung probieren und in eine Kartoffel stechen. Wird die Oberfläche zu dunkel, die Form abdecken.',
       settings: [combair('Heißluft', 170, 70, 'vorheizen, Ebene 2')],
     },
   ],
