@@ -220,6 +220,11 @@ export interface PlanEntry {
   status?: 'cooked' | 'skipped'
   /** beim Kochen aus dem Vorrat entnommene Mengen (für "nicht gekocht") */
   consumed?: { id: string; name: string; amount: number; unit: string; expires: string }[]
+  /**
+   * nur Frühstück: Posten-Id der vorbereiteten Portionen im Vorrat („Fertig vorbereitet“, siehe src/breakfastPrep.ts).
+   * Dann sind die Zutaten schon beim Vorbereiten abgezogen – am Tag wird nur 1 Glas/Dose aus diesem Posten verbraucht.
+   */
+  prep?: string
 }
 
 /** Eingeplantes Backen an einem Tag: Rezept (Backen & Desserts, Grundrezept) × Rezeptmenge */

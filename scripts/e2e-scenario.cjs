@@ -188,6 +188,65 @@ const amt = (s, name) => s.pantry.filter((l) => l.name === name).reduce((a, l) =
     await page.screenshot({ path: `${SHOT}/10-di-24-woche.png`, fullPage: true })
   })
 
+  // ── Frühstück „Fertig vorbereitet“: So 29.11. vorbereiten → Bewertung → Gläser im Vorrat → Satt-Frage Mo → Di 1 Glas weniger ──
+  const W = ['2026-11-30', '2026-12-01', '2026-12-02', '2026-12-03']
+  const bfLot = (name, amount, unit) => ({ id: 'b' + n++, name, amount, unit, expires: LONG })
+  saved = JSON.stringify({
+    ...initial,
+    plan: {}, ratings: {}, wasted: [],
+    breakfast: Object.fromEntries(W.map((d) => [d, { recipeId: 'linsen-ei-salat', servings: 1 }])),
+    breakfastPicks: { '2026-11-30': ['linsen-ei-salat'] },
+    prepDays: { '2026-11-30': '2026-11-29' },
+    pantry: [bfLot('Tellerlinsen', 200, 'g'), bfLot('Ei', 4, 'Stk'), bfLot('Feta', 120, 'g'), bfLot('Kirschtomaten', 400, 'g'), bfLot('Salatgurke', 1, 'Stk'), bfLot('Petersilie', 1, 'Bund')],
+  })
+  await day('2026-11-29', '16:00', async (page, st) => {
+    await page.locator('.bf-toggle').click()
+    await page.locator('.bf-row').first().click()
+    await page.getByRole('button', { name: /Kochmodus starten/ }).click()
+    await page.waitForTimeout(200)
+    const fin = page.getByRole('button', { name: 'Fertig vorbereitet ✓' })
+    await fin.scrollIntoViewIfNeeded()
+    ok(await fin.isVisible(), 'Frühstück-Kochmodus: am Ende „Fertig vorbereitet ✓“')
+    const box = await page.locator('.cook-finish').innerText()
+    ok(/4 Gläser Herzhafter Linsensalat/.test(box) && /4 Tage im Kühlschrank/.test(box), `Kochmodus: Hinweis „${box.split('\n')[0]}“`)
+    await page.screenshot({ path: `${SHOT}/11-so-fruehstueck-fertig.png` })
+    await fin.click()
+    await page.waitForTimeout(300)
+    const rate = page.locator('.rate-sheet')
+    ok(await rate.isVisible(), 'nach „Fertig vorbereitet“: Bewertung „Wie war’s?“')
+    await page.screenshot({ path: `${SHOT}/12-so-fruehstueck-bewertung.png` })
+    await rate.getByRole('button', { name: /Gut/ }).click()
+    await rate.getByRole('button', { name: 'Fertig' }).click()
+    await page.waitForTimeout(200)
+    const s = await st()
+    const jar = s.pantry.find((l) => l.name === 'Herzhafter Linsensalat mit Ei und Feta')
+    ok(jar && jar.amount === 4 && jar.unit === 'Glas' && jar.expires === '2026-12-03', 'Vorrat: 4 Gläser, haltbar bis Do 3.12.')
+    ok(amt(s, 'Tellerlinsen') === 0 && amt(s, 'Ei') === 0 && amt(s, 'Feta') === 0, 'Vorrat: Zutaten beim Fertig-Klick abgezogen')
+    ok(W.every((d) => s.breakfast[d].prep === jar.id), 'Frühstückstage Mo–Do mit den Gläsern verknüpft')
+    ok((s.prepChecked['2026-11-30'] || []).filter((k) => k.startsWith('linsen-ei-salat:')).length >= 3, 'Prep-Liste abgehakt')
+    ok(s.bfRatings['2026-11-29:linsen-ei-salat'] === 'up' && Object.keys(s.ratings).length === 0, 'Bewertung im Frühstücks-Profil (nicht als Abendessen)')
+    ok(/Prep ✓/.test(await page.locator('.bf-card').innerText()), 'Wochenansicht: „Prep ✓“')
+  })
+  await day('2026-11-30', '13:00', async (page, st) => {
+    const card = page.locator('.satiety-card')
+    ok(await card.isVisible(), 'Mo mittags: „Hat dich … bis mittags satt gemacht?“')
+    await page.screenshot({ path: `${SHOT}/13-mo-satt-frage.png`, fullPage: true })
+    await card.getByRole('button', { name: 'Zu wenig' }).click()
+    await page.waitForTimeout(200)
+    const s = await st()
+    ok(s.bfSatiety['2026-11-29:linsen-ei-salat'] === -1 && !(await card.isVisible()), 'Sättigung „zu wenig“ gespeichert, Karte weg')
+  })
+  await day('2026-12-01', '08:00', async (page, st) => {
+    const s = await st()
+    const jar = s.pantry.find((l) => l.name === 'Herzhafter Linsensalat mit Ei und Feta')
+    ok(s.breakfast['2026-11-30'].status === 'cooked' && jar && jar.amount === 3, 'Di: Montag gegessen → 3 Gläser übrig')
+    ok(amt(s, 'Tellerlinsen') === 0 && amt(s, 'Kirschtomaten') === 0, 'Di: keine Zutaten nochmal abgezogen')
+    await tab(page, 'Liste')
+    await page.waitForTimeout(200)
+    const li = await page.locator('main').innerText()
+    ok(!/Tellerlinsen|Feta|Kirschtomaten/.test(li), 'Einkaufsliste: nichts für den vorbereiteten Linsensalat')
+  })
+
   ok(errors.length === 0, `keine Fehler in der Konsole ${errors.length ? JSON.stringify(errors) : ''}`)
   await browser.close()
   console.log(fails ? `\n${fails} Fehler` : '\nAlle Tests OK')

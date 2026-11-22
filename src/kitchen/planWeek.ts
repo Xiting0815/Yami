@@ -8,7 +8,7 @@ import { shopSection } from '../shopSection'
 import { bakeEntriesOf } from '../bakePlan'
 import { type SpiceStatus, isSpice, type StapleMemos, STAPLE_SHOP_CAT, buyName, isQtyStaple, isTrackedStaple, runningLow, stapleKey, useEvents, useRate } from '../staples'
 import { type PantryLot, type PriceOverrides, type BoughtMap, addDaysIso, canonical, productFor, isTracked, needsOf, stapleNeedsOf, allNeedsOf } from './base'
-import { usableOn, lotsFor, consume } from './pantry'
+import { usableOn, lotsFor, consume, takeFromLot } from './pantry'
 
 export interface BuyItem {
   key: string
@@ -139,7 +139,8 @@ export function planWeek(
   ]
   const bakes = bakeEntriesOf(bakePlan, today)
   const bfDay = scope?.breakfastDay
-  const bfEntries = activeEntries(breakfast, days).flatMap(([d, e]) => {
+  // vorbereitetes Frühstück (`prep`): Zutaten sind schon abgezogen, die Portionen liegen im Vorrat → kein Bedarf mehr
+  const bfEntries = activeEntries(breakfast, days).filter(([, e]) => !e.prep).flatMap(([d, e]) => {
     const p = bfDay ? bfDay(d) : d
     return p ? [[p, e] as const] : []
   })
@@ -229,7 +230,7 @@ export function planWeek(
   // brauchen ihre Zutaten noch – die dürfen für diese Woche nicht als vorhanden zählen.
   const earlier: [string, PlanEntry][] = [plan, breakfast]
     .flatMap((p) => Object.entries(p))
-    .filter((x): x is [string, PlanEntry] => !!x[1] && x[0] < days[0] && !x[1].status && !!RECIPE_BY_ID[x[1].recipeId])
+    .filter((x): x is [string, PlanEntry] => !!x[1] && x[0] < days[0] && !x[1].status && !x[1].prep && !!RECIPE_BY_ID[x[1].recipeId])
   earlier.push(...bakes.filter(([d]) => d < days[0]))
   earlier.sort((a, b) => a[0].localeCompare(b[0]))
   for (const [day, e] of earlier) {
@@ -365,6 +366,12 @@ export function planWeek(
       consume(lots, n.name, n.amount, day < today ? today : day)
       consume(free, n.name, n.amount, day < today ? today : day)
     }
+  }
+  // vorbereitetes Frühstück: an jedem noch offenen Tag wird eine Portion aus dem Glas-Posten gegessen
+  for (const [d, e] of Object.entries(breakfast)) {
+    if (!e?.prep || e.status || d > days[days.length - 1]) continue
+    takeFromLot(lots, e.prep, e.servings)
+    takeFromLot(free, e.prep, e.servings)
   }
 
   // Gewürze, die „alle“ sind: stehen als echter Artikel auf der Liste (abgehakt → wieder „da“)

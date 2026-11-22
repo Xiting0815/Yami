@@ -549,5 +549,23 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   ok(ap.stale && ap.state.plan['2026-11-28']?.recipeId === D.id, 'Änderung während des Abgleichs bleibt erhalten (neuer Abgleich folgt)')
 }
 
+// ───── Frühstück: Bewertung/Sättigung nach dem Vorbereiten – eigenes Personen-Dokument, nicht Haushalts-Abendessen ─────
+{
+  const h = new FakeHa()
+  const key = '2026-11-15:linsen-ei-salat'
+  let phone = dev('Marc', { onboarding: 'done', bfRatings: { [key]: 'up' }, bfSatiety: { [key]: -1 }, bfPreps: [{ week: '2026-11-16', recipeId: 'linsen-ei-salat', date: '2026-11-15', portions: 4, lotId: 'jar1', days: ['2026-11-16'], consumed: [] }] })
+  phone = await sync(h, phone)
+  const doc = h.items.find((i) => i.summary === PREFIX + 'person:Marc')
+  ok(!!doc && doc.description.includes(`bfr:${key}`) && doc.description.includes(`bfs:${key}`), 'Frühstück: Bewertung & Sättigung im eigenen Personen-Dokument')
+  ok(!h.items.some((i) => i.summary === PREFIX + 'kitchen' && (i.description.includes('bfr:') || i.description.includes('bfPreps'))), 'Frühstück: nichts davon im geteilten Küchen-Dokument')
+  let mac = dev('Marc', { onboarding: 'done' })
+  mac = await sync(h, mac)
+  ok(mac.bfRatings[key] === 'up' && mac.bfSatiety[key] === -1, 'Frühstück: zweites Gerät derselben Person übernimmt Bewertung & Sättigung')
+  ok(mac.bfPreps.length === 0, 'Frühstück: Vorbereitungen bleiben persönlich auf dem Gerät')
+  let wife = dev('Lisa', { onboarding: 'done' })
+  wife = await sync(h, wife)
+  ok(Object.keys(wife.bfRatings).length === 0 && Object.keys(wife.ratings).length === 0, 'Frühstück: Lisa bekommt keine Frühstücks-Bewertung als eigene/Haushalts-Bewertung')
+}
+
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')
 if (fails) process.exit(1)

@@ -1,6 +1,7 @@
 import { RECIPE_BY_ID } from '../data/recipes'
 import { learnedPrepWeekday } from '../breakfast'
-import { pantryWishes, portionNote, summarize } from '../learning'
+import { findPrep, preppedKeep, preppedText } from '../breakfastPrep'
+import { pantryWishes, portionNote, satietyNote, summarize } from '../learning'
 import { cookTarget } from '../cookDone'
 import { bakesOn } from '../bakePlan'
 import { portionFor } from '../energy'
@@ -51,7 +52,7 @@ export function Sheets({ m }: { m: AppModel }) {
           })()}
           servings={
             sheet.recipe.breakfast
-              ? 1
+              ? act.prepPortions(sheet.recipe.id)
               : sheet.recipe.basic
                 ? (sheet.day ? bakesOn(state.bakePlan, sheet.day).find((e) => e.recipeId === sheet.recipe.id && !e.status)?.amount ?? 1 : 1) * sheet.recipe.servings
                 : ((sheet.day && state.plan[sheet.day]?.recipeId === sheet.recipe.id ? state.plan[sheet.day]?.servings : undefined) ??
@@ -62,7 +63,11 @@ export function Sheets({ m }: { m: AppModel }) {
           onCooking={ui.setCooking}
           onFinish={
             sheet.recipe.breakfast
-              ? undefined
+              ? {
+                  label: 'Fertig vorbereitet ✓',
+                  stock: (n: number) => `${preppedText(sheet.recipe, n)} (${preppedKeep(sheet.recipe)})`,
+                  run: (servings: number) => act.finishPrep(sheet.recipe, servings),
+                }
               : sheet.recipe.basic
                 ? { run: (servings: number) => act.finishBasic(sheet.recipe, servings, sheet.day) }
                 : (() => {
@@ -249,6 +254,24 @@ export function Sheets({ m }: { m: AppModel }) {
         />
       )}
 
+      {ui.rateBf && RECIPE_BY_ID[ui.rateBf.recipeId] && (() => {
+        const key = `${ui.rateBf.date}:${ui.rateBf.recipeId}`
+        return (
+          <RateSheet
+            title={RECIPE_BY_ID[ui.rateBf.recipeId].title}
+            day={ui.rateBf.date}
+            today={today}
+            hint="Probiert? Ob es bis mittags satt macht, frage ich nach dem ersten Frühstück."
+            rating={state.bfRatings[key]}
+            onRate={(v) => act.setBfRating(ui.rateBf!.date, ui.rateBf!.recipeId, v)}
+            onClose={() => {
+              if (state.bfRatings[key] !== undefined) m.flash('Danke – gemerkt ✓')
+              ui.setRateBf(null)
+            }}
+          />
+        )
+      })()}
+
       {ui.showPrep && (
         <PrepSheet
           items={bf.prepItems}
@@ -258,6 +281,15 @@ export function Sheets({ m }: { m: AppModel }) {
           onPrepDay={act.changePrepDay}
           checked={state.prepChecked[weekKey] ?? []}
           onToggle={act.togglePrepCheck}
+          prepped={(id) => {
+            const p = findPrep(state.bfPreps, weekKey, id)
+            return p ? { date: p.date, text: preppedText(RECIPE_BY_ID[id], p.portions) } : undefined
+          }}
+          onFinish={(r) => {
+            ui.setShowPrep(false)
+            act.finishPrep(r, act.prepPortions(r.id))
+          }}
+          onUndo={(id) => act.undoPrep(id, weekKey)}
           onClose={() => ui.setShowPrep(false)}
         />
       )}
@@ -288,6 +320,7 @@ export function Sheets({ m }: { m: AppModel }) {
           familyStatus={sharingActive(state.ha) ? syncStatusText(state.sync, state.ha.me, Date.now()) : undefined}
           haMain={state.sync?.main ? { person: state.sync.main.person, mine: state.sync.main.device === state.ha?.device } : undefined}
           portionNote={portionNote(plan.portion)}
+          satietyNote={satietyNote(bf.satiety)}
           wishes={pantryWishes(state.pantryRequests)}
           prepWeekday={learnedPrepWeekday(state.prepDays, today)}
           onResetLearning={act.resetLearning}

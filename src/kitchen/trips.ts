@@ -109,7 +109,8 @@ export function shoppingTrips(inp: TripInput): Trip[] {
     if (d > end) end = d
   }
   for (const [d, e] of Object.entries(breakfast)) {
-    if (!e || e.status || d < today || d > limit || !RECIPE_BY_ID[e.recipeId]) continue
+    // schon vorbereitet (`prep`): Portionen liegen im Vorrat, nichts mehr einzukaufen
+    if (!e || e.status || e.prep || d < today || d > limit || !RECIPE_BY_ID[e.recipeId]) continue
     const p = inp.breakfastDay ? inp.breakfastDay(d) : d
     if (!p || p < today) continue
     uses.push({ day: p, recipeId: e.recipeId, servings: e.servings })

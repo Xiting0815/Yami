@@ -13,6 +13,7 @@ import type { WeighIn } from './progress'
 import type { PortionFeedback, Rating, RejectEvent } from './learning'
 import { type SyncLocal, sanitizeSync } from './syncLocal'
 import { type BakeHint, sanitizeBakeHints, sanitizeBakePlan } from './bakePlan'
+import { type BfPrep, sanitizePreps } from './breakfastPrep'
 
 export interface Filters {
   cuisines: Cuisine[]
@@ -153,6 +154,14 @@ export interface AppState {
   prepDays: Record<string, string>
   /** abgehakte Prep-Schritte je Woche */
   prepChecked: Record<string, string[]>
+  /** erledigte Frühstücks-Vorbereitungen („Fertig vorbereitet“): Portionen im Vorrat, entnommene Zutaten (persönlich) */
+  bfPreps: BfPrep[]
+  /** Frühstücks-Bewertung nach dem Vorbereiten: `Prep-Tag:Rezept-Id` → 👍/🔁/👎 (eigenes Profil, Personen-Dokument) */
+  bfRatings: Record<string, Rating>
+  /** „Hat es bis mittags satt gemacht?“: `Prep-Tag:Rezept-Id` → −1 zu wenig · 0 passt · 1 zu viel (eigenes Profil) */
+  bfSatiety: Record<string, PortionFeedback>
+  /** weggeklickte Sättigungsfragen (`Prep-Tag:Rezept-Id`, nur lokal) */
+  bfSatietyDismissed: string[]
   /** Körperdaten & Ziel (optional) */
   profile?: Profile
   /** Messungen der Waage (1 pro Woche) */
@@ -272,6 +281,10 @@ const INITIAL: AppState = {
   breakfastPicks: {},
   prepDays: {},
   prepChecked: {},
+  bfPreps: [],
+  bfRatings: {},
+  bfSatiety: {},
+  bfSatietyDismissed: [],
   weighIns: [],
   adjustDecidedAt: 0,
   // immer gespeichert → daran erkennt load() einen Stand von vor der Start-Checkliste
@@ -368,7 +381,8 @@ function validEntry(e: PlanEntry, defaultServings: number): PlanEntry {
   const servings = isNum(e.servings) && e.servings >= 1 ? Math.min(12, Math.round(e.servings)) : defaultServings
   const status = e.status === 'cooked' || e.status === 'skipped' ? e.status : undefined
   const consumed = Array.isArray(e.consumed) ? e.consumed.map(validLot).filter((l): l is PantryLot => !!l) : undefined
-  return { recipeId: e.recipeId, servings, ...(status ? { status } : {}), ...(consumed ? { consumed } : {}) }
+  const prep = typeof e.prep === 'string' && e.prep ? e.prep : undefined
+  return { recipeId: e.recipeId, servings, ...(status ? { status } : {}), ...(consumed ? { consumed } : {}), ...(prep ? { prep } : {}) }
 }
 
 function validWeighIn(x: unknown): x is WeighIn {
@@ -557,6 +571,12 @@ export function sanitize(parsed: unknown): AppState {
       .filter(([k, v]) => /^\d{4}-\d{2}-\d{2}:.+/.test(k) && !!RECIPE_BY_ID[k.slice(11)] && (v === 'up' || v === 'again' || v === 'down'))
       .slice(-200),
   )
+  // Frühstück: Vorbereitungen, Bewertungen, Sättigung
+  state.bfPreps = sanitizePreps(state.bfPreps)
+  const prepKeyOk = (k: string) => /^\d{4}-\d{2}-\d{2}:.+/.test(k) && !!RECIPE_BY_ID[k.slice(11)]
+  state.bfRatings = Object.fromEntries(Object.entries(state.bfRatings).filter(([k, v]) => prepKeyOk(k) && (v === 'up' || v === 'again' || v === 'down')).slice(-200))
+  state.bfSatiety = Object.fromEntries(Object.entries(state.bfSatiety).filter(([k, v]) => prepKeyOk(k) && (v === -1 || v === 0 || v === 1)).slice(-200))
+  state.bfSatietyDismissed = state.bfSatietyDismissed.filter((k) => typeof k === 'string').slice(-60)
   state.bakePlan = sanitizeBakePlan(state.bakePlan)
   state.bakeHints = sanitizeBakeHints(state.bakeHints)
   // Einkäufe (Entwurf/freigegeben, „Habe ich“), Einkaufstag

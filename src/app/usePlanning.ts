@@ -65,8 +65,11 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
         baked: state.baked,
         snacks: state.snacks,
         bakeRatings: state.bakeRatings,
+        bfPrepped: state.bfPreps,
+        bfRatings: state.bfRatings,
+        bfSatiety: state.bfSatiety,
       }),
-    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings],
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings, state.bfPreps, state.bfRatings, state.bfSatiety],
   )
 
   // ───── Familie: Geschmack der anderen Personen (eigene Bewertungen/Wischen, gemeinsamer Plan) ─────

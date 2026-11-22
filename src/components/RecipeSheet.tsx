@@ -127,7 +127,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
 
             {recipe.breakfast && (
               <p className="muted small bf-portion-hint">
-                1 Portion = 1 Frühstück. Für die ganze Woche rechnet Yami die Mengen in der Prep-Liste auf deine Tage hoch.
+                1 Portion = 1 Frühstück ({recipe.breakfast.container}). Vorbelegt mit deinen Frühstückstagen dieser Woche – „Fertig vorbereitet“ am Ende des Kochmodus legt sie in den Vorrat.
               </p>
             )}
 

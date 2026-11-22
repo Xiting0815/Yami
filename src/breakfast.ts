@@ -163,8 +163,10 @@ export function applyBreakfastPicks(breakfast: WeekPlan, ids: string[], days: st
   const next = { ...breakfast }
   for (const d of workdays(days)) {
     if (d < today || next[d]?.status === 'cooked') continue
+    const old = next[d]
     delete next[d]
-    if (a.days[d]) next[d] = { recipeId: a.days[d], servings: 1 }
+    // schon vorbereitet (Portion liegt im Vorrat): bleibt verknüpft, solange dasselbe Frühstück auf dem Tag liegt
+    if (a.days[d]) next[d] = old?.prep && old.recipeId === a.days[d] ? { recipeId: a.days[d], servings: 1, prep: old.prep } : { recipeId: a.days[d], servings: 1 }
   }
   return next
 }

@@ -6,10 +6,14 @@ import { DeviceChips } from './DeviceChip'
 import { isBake } from '../types'
 import { shelfText, yieldText } from '../bake'
 
-/** „Fertig gekocht“ am Ende des Kochmodus (fehlt bei Frühstück) */
+/** „Fertig gekocht/gebacken/vorbereitet“ am Ende des Kochmodus */
 export interface CookFinish {
   /** heute steht schon ein anderes Gericht: Titel für die Rückfrage „Statt … heute eintragen?“ */
   conflict?: string
+  /** eigene Beschriftung des Knopfs (Frühstück: „Fertig vorbereitet ✓“) */
+  label?: string
+  /** Hinweis über dem Knopf, was in den Vorrat kommt (Frühstück: „4 Gläser … (hält 4 Tage im Kühlschrank)“) – je Portionen */
+  stock?: (servings: number) => string
   run: (servings: number, replace: boolean) => void
 }
 
@@ -187,11 +191,14 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
               </>
             ) : (
               <>
-                {stockText(recipe, servings) && (
+                {finish.stock && (
+                  <p className="muted small">Kommt in den Vorrat: <b>{finish.stock(servings)}</b>. Die Zutaten werden abgezogen.</p>
+                )}
+                {!finish.stock && stockText(recipe, servings) && (
                   <p className="muted small">Kommt in den Vorrat: <b>{stockText(recipe, servings)}</b> ({keepText(recipe)}). Die Zutaten werden abgezogen.</p>
                 )}
                 <button className="btn primary wide" onClick={() => (finish.conflict ? setAsking(true) : finish.run(servings, false))}>
-                  {finishLabel(recipe)}
+                  {finish.label ?? finishLabel(recipe)}
                 </button>
               </>
             )}

@@ -1,7 +1,7 @@
 // Logiktest lernende Vorlieben:  npx vite-node scripts/test-learning.ts
-import { RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
+import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { addDaysIso } from '../src/kitchen'
-import { buildModel, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
+import { buildModel, satietyBonus, satietyIndex, satietyLean, satietyNote, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
 import type { WeekPlan } from '../src/types'
 
 let fails = 0
@@ -80,6 +80,48 @@ ok(pOld < 1.05, `Portionsfaktor: sehr alte Rückmeldungen verblassen (${pOld})`)
 const recent = portionFactor(fb([[1, -1], [2, -1], [3, -1], [4, -1], [200, 1], [201, 1], [202, 1]]), today)
 ok(recent > 1, `Portionsfaktor: neue Rückmeldungen zählen mehr als alte (${recent})`)
 ok(portionNote(1) === undefined && portionNote(1.1) === 'ihr braucht eher etwas mehr (+10 %)' && portionNote(0.9) === 'ihr braucht eher etwas weniger (−10 %)', 'Portionsfaktor: Text für „Das habe ich gelernt“')
+
+
+// ───── Frühstück: vorbereitet, Bewertung nach dem Vorbereiten, Sättigung ─────
+{
+  const base = { plan: {}, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: {}, today }
+  const lins = RECIPE_BY_ID['linsen-ei-salat']
+  const key = `${addDaysIso(today, -6)}:${lins.id}`
+  const p0 = preference(buildModel(base), lins).score
+  const pPrep = preference(buildModel({ ...base, bfPrepped: [{ date: addDaysIso(today, -6), recipeId: lins.id }] }), lins).score
+  const pUp = preference(buildModel({ ...base, bfRatings: { [key]: 'again' } }), lins).score
+  const pDown = preference(buildModel({ ...base, bfRatings: { [key]: 'down' } }), lins).score
+  ok(pPrep > p0, 'Frühstück: vorbereitet zählt wie gekocht (+)')
+  ok(pUp > p0 && pDown < p0, `Frühstück: Bewertung 🔁 hebt, 👎 senkt (${pDown.toFixed(2)} < ${p0} < ${pUp.toFixed(2)})`)
+  const pHungry = preference(buildModel({ ...base, bfSatiety: { [key]: -1 } }), lins).score
+  const pFits = preference(buildModel({ ...base, bfSatiety: { [key]: 0 } }), lins).score
+  ok(pHungry < p0 && pFits > p0, 'Frühstück: „zu wenig“ senkt das Rezept, „passt“ hebt es')
+  // Merkmal bf:<Typ>: ein anderes herzhaftes Frühstück profitiert mit
+  const other = RECIPE_BY_ID['eiermuffins-spinat-feta']
+  ok(preference(buildModel({ ...base, bfRatings: { [key]: 'up' } }), other).score > preference(buildModel(base), other).score, 'Frühstück: 👍 hebt auch andere herzhafte Frühstücke (Merkmal bf:herzhaft)')
+  // Abendessen mit anderer Hauptzutat bleiben von Frühstücks-Bewertungen unberührt (geteilt ist nur das Merkmal protein:…)
+  const dinner = RECIPES.find((r) => mainProtein(r) === 'Rind')!
+  ok(preference(buildModel({ ...base, bfRatings: { [key]: 'down' } }), dinner).score === preference(buildModel(base), dinner).score, 'Frühstücks-Bewertung verschiebt kein Rind-Abendessen')
+
+  // Sättigungs-Neigung
+  const d = (n: number) => `${addDaysIso(today, -n)}:${lins.id}`
+  ok(satietyLean({ [d(3)]: -1 }, today) === 0, 'Sättigung: eine Rückmeldung reicht noch nicht')
+  const hungry = satietyLean({ [d(3)]: -1, [d(10)]: -1, [d(17)]: -1 }, today)
+  const full = satietyLean({ [d(3)]: 1, [d(10)]: 1, [d(17)]: 1 }, today)
+  ok(hungry > 0.3 && full < -0.3 && satietyLean({ [d(3)]: 0, [d(10)]: 0 }, today) === 0, `Sättigung: zu wenig → +${hungry}, zu viel → ${full}, passt → 0`)
+  ok(satietyLean({ [d(3)]: -1, [d(10)]: -1, '2099-01-01:x': 1 }, today) > 0, 'Sättigung: Zukunft zählt nicht')
+  // Rangfolge: „zu wenig“ → sättigendste Frühstücke nach vorn, „zu viel“ → leichteste nach vorn
+  const rank = (lean: number) => [...BREAKFASTS].sort((a, b) => satietyBonus(b, lean, BREAKFASTS) - satietyBonus(a, lean, BREAKFASTS))
+  const bySat = [...BREAKFASTS].sort((a, b) => satietyIndex(b) - satietyIndex(a))
+  const top = rank(hungry).slice(0, 5)
+  ok(top.filter((r) => bySat.slice(0, 8).includes(r)).length >= 4, `Sättigung „zu wenig“: oben ${top.map((r) => r.id).join(', ')}`)
+  const light = rank(full)[0]
+  const minKcal = Math.min(...BREAKFASTS.map((r) => r.nutrition.kcal))
+  ok(light.nutrition.kcal <= minKcal + 40, `Sättigung „zu viel“: leichtestes zuerst (${light.id}, ${light.nutrition.kcal} kcal)`)
+  ok(BREAKFASTS.every((r) => satietyBonus(r, 0, BREAKFASTS) === 0), 'Sättigung: ohne Rückmeldung keine Verschiebung')
+  ok(satietyBonus(RECIPES[0], hungry, BREAKFASTS) === 0, 'Sättigung: gilt nur fürs Frühstück')
+  ok(!satietyNote(0) && !!satietyNote(hungry)?.includes('sättigendere') && !!satietyNote(full)?.includes('leichtere'), 'Sättigung: Text für „Das habe ich gelernt“')
+}
 
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }
 console.log('Alle Tests OK')

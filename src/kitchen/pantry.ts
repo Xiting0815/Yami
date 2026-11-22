@@ -90,6 +90,20 @@ export function moveExpired(
   }
 }
 
+/**
+ * Menge aus genau einem Posten nehmen (vorbereitete Frühstücksportionen) – ohne Ablaufprüfung und ohne Ersatz:
+ * Fehlt der Posten (weggeworfen, schon gegessen), wird nichts genommen – die Zutaten werden NICHT noch einmal abgezogen.
+ */
+export function takeFromLot(lots: PantryLot[], id: string, amount: number): PantryLot[] {
+  const i = lots.findIndex((l) => l.id === id)
+  if (i < 0 || amount <= 1e-9) return []
+  const lot = lots[i]
+  const t = Math.min(lot.amount, amount)
+  lot.amount -= t
+  if (lot.amount <= 1e-6) lots.splice(i, 1)
+  return t > 1e-9 ? [{ ...lot, amount: t }] : []
+}
+
 /** Gekochte Gerichte (Tage vor heute) automatisch vom Vorrat abziehen */
 export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string, factor = 1): { plan: WeekPlan; pantry: PantryLot[]; changed: boolean } {
   const due = Object.keys(plan)
@@ -102,7 +116,9 @@ export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string, fact
     const entry = next[day]!
     const recipe = RECIPE_BY_ID[entry.recipeId]
     const consumed: PantryLot[] = []
-    if (recipe) for (const n of allNeedsOf(recipe, entry.servings * factor)) consumed.push(...consume(lots, n.name, n.amount, day))
+    // vorbereitetes Frühstück: Zutaten sind schon beim Vorbereiten abgezogen → nur 1 Portion aus dem Glas-Posten
+    if (entry.prep) consumed.push(...takeFromLot(lots, entry.prep, entry.servings))
+    else if (recipe) for (const n of allNeedsOf(recipe, entry.servings * factor)) consumed.push(...consume(lots, n.name, n.amount, day))
     next[day] = { ...entry, status: 'cooked', consumed }
   }
   return { plan: next, pantry: lots, changed: true }

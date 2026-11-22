@@ -7,6 +7,8 @@
  *   Bewertung 👍 +2 · 🔁 „bald wieder“ +2,5 · 👎 −3
  *   Gerichte einer Woche, die eine weggeworfene Zutat brauchen −0,3 (höchstens 1× pro Tag)
  *   Backen & Desserts: gebacken +0,8 · ein Stück gegessen +0,3 · Bewertung wie oben
+ *   Frühstück: pro Woche gewählt +1 · fertig vorbereitet +0,8 · Bewertung nach dem Vorbereiten wie oben ·
+ *   Sättigung „bis mittags satt?“ zu wenig −0,6 · passt +0,3 · zu viel −0,2 (dazu Sättigungs-Neigung, siehe unten)
  *   (eigenes Muster „bake:kuchen“ usw. – Abendessen-Muster wie Küche oder Hauptzutat bleiben davon unberührt)
  *
  * Gelernt wird pro Gericht UND pro Muster (Küche, Gerichtart, Hauptzutat, schnell/aufwendig an Werktagen
@@ -30,6 +32,8 @@ export interface RejectEvent {
 
 const HALF_LIFE = 60
 const W = { waste: -0.3, take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3, eaten: 0.3 }
+/** Frühstück: Sättigung „bis mittags satt?“ (−1 zu wenig · 0 passt · 1 zu viel) als Signal fürs Rezept */
+const W_SATIETY: Record<PortionFeedback, number> = { [-1]: -0.6, 0: 0.3, 1: -0.2 }
 /** Glättung: so viele „neutrale“ Beobachtungen werden angenommen, bevor etwas als Vorliebe gilt */
 const PRIOR_RECIPE = 2
 const PRIOR_FEATURE = 4
@@ -124,6 +128,12 @@ export interface TasteInput {
   snacks?: { date: string; recipeId?: string }[]
   /** Backen & Desserts: Bewertung, Schlüssel `Datum:Rezept-ID` */
   bakeRatings?: Record<string, Rating>
+  /** Frühstück: fertig vorbereitet (+0,8) */
+  bfPrepped?: { date: string; recipeId: string }[]
+  /** Frühstück: Bewertung nach dem Vorbereiten, Schlüssel `Prep-Tag:Rezept-Id` */
+  bfRatings?: Record<string, Rating>
+  /** Frühstück: „bis mittags satt?“, Schlüssel `Prep-Tag:Rezept-Id` */
+  bfSatiety?: Record<string, PortionFeedback>
 }
 
 export function buildModel(inp: TasteInput): TasteModel {
@@ -164,6 +174,10 @@ export function buildModel(inp: TasteInput): TasteModel {
   for (const b of inp.baked ?? []) add(b.recipeId, b.date, W.cooked)
   for (const s of inp.snacks ?? []) if (s.recipeId) add(s.recipeId, s.date, W.eaten)
   for (const [key, v] of Object.entries(inp.bakeRatings ?? {})) add(key.slice(11), key.slice(0, 10), W[v])
+  // Frühstück: vorbereitet, bewertet, satt gemacht?
+  for (const p of inp.bfPrepped ?? []) add(p.recipeId, p.date, W.cooked)
+  for (const [key, v] of Object.entries(inp.bfRatings ?? {})) add(key.slice(11), key.slice(0, 10), W[v])
+  for (const [key, v] of Object.entries(inp.bfSatiety ?? {})) if (v in W_SATIETY) add(key.slice(11), key.slice(0, 10), W_SATIETY[v])
   // Weggeworfen: Gerichte derselben Woche, die die Zutat brauchen, leicht abwerten
   const hit = new Set<string>()
   for (const w of inp.wasted ?? []) {
@@ -332,4 +346,53 @@ export function portionNote(factor: number): string | undefined {
   const pct = Math.round((factor - 1) * 100)
   if (pct === 0) return undefined
   return `ihr braucht eher etwas ${pct > 0 ? 'mehr' : 'weniger'} (${pct > 0 ? '+' : '−'}${Math.abs(pct)} %)`
+}
+
+// ───────────── Frühstück: Sättigung ─────────────
+
+/**
+ * Gelernte Sättigungs-Neigung fürs Frühstück aus „Hat es bis mittags satt gemacht?“ (Schlüssel `Prep-Tag:Rezept-Id`):
+ * > 0 = eher zu wenig (sättigendere Frühstücke nach vorn), < 0 = eher zu viel (leichtere nach vorn), 0 = passt/unbekannt.
+ * Wie der Portionsfaktor: Zeitverfall (60 Tage), gedämpft (zwei gedachte „passt“), erst ab 2 Rückmeldungen. Bereich −1…1.
+ */
+export function satietyLean(feedback: Record<string, PortionFeedback> | undefined, today: string): number {
+  const entries = Object.entries(feedback ?? {}).filter(([k, v]) => k.slice(0, 10) <= today && (v === -1 || v === 0 || v === 1))
+  if (entries.length < PORTION_MIN_FEEDBACK) return 0
+  let sum = 0
+  let n = 0
+  for (const [k, v] of entries) {
+    const w = Math.pow(0.5, Math.max(0, -daysUntil(k.slice(0, 10), today)) / HALF_LIFE)
+    sum += -v * w // „zu wenig“ (−1) → braucht mehr Sättigung
+    n += w
+  }
+  return Math.round((sum / (n + 2)) * 100) / 100
+}
+
+/** Sättigungs-Index eines Frühstücks: Eiweiß + 2 × Ballaststoffe je 100 kcal (beides macht lange satt) */
+export function satietyIndex(r: Recipe): number {
+  const n = r.nutrition
+  return n.kcal > 0 ? ((n.protein + 2 * n.fiber) / n.kcal) * 100 : 0
+}
+
+/**
+ * Beitrag zur Frühstücks-Sortierung aus der Sättigungs-Neigung (−3…3): „zu wenig“ → Frühstücke mit viel Eiweiß und
+ * Ballaststoffen (und eher mehr kcal) steigen; „zu viel“ → leichtere (weniger kcal) steigen. `all` = Vergleichsgruppe.
+ */
+export function satietyBonus(r: Recipe, lean: number, all: Recipe[]): number {
+  if (!lean || !r.breakfast || all.length < 2) return 0
+  const z = (f: (x: Recipe) => number) => {
+    const vals = all.map(f)
+    const mean = vals.reduce((a, b) => a + b, 0) / vals.length
+    const sd = Math.sqrt(vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length) || 1
+    return Math.max(-2, Math.min(2, (f(r) - mean) / sd))
+  }
+  const kcal = z((x) => x.nutrition.kcal)
+  const raw = lean > 0 ? 0.75 * z(satietyIndex) + 0.25 * kcal : kcal
+  return Math.max(-3, Math.min(3, lean * raw * 3))
+}
+
+/** Text für „Das habe ich gelernt“: leer, solange die Neigung klein ist */
+export function satietyNote(lean: number): string | undefined {
+  if (Math.abs(lean) < 0.15) return undefined
+  return lean > 0 ? 'Frühstück macht dich oft nicht bis mittags satt – sättigendere (mehr Eiweiß & Ballaststoffe) kommen nach vorn' : 'Frühstück ist dir oft zu viel – leichtere kommen nach vorn'
 }

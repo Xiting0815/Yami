@@ -27,6 +27,10 @@ export interface PersonSignals {
   portionFeedback: Record<string, PortionFeedback>
   bakeRatings: Record<string, Rating>
   baked: { date: string; recipeId: string }[]
+  /** Frühstück (nur die Person selbst): Bewertung nach dem Vorbereiten, Schlüssel `Prep-Tag:Rezept-Id` */
+  bfRatings: Record<string, Rating>
+  /** Frühstück: „bis mittags satt?“ −1 zu wenig · 0 passt · 1 zu viel, Schlüssel `Prep-Tag:Rezept-Id` */
+  bfSatiety: Record<string, PortionFeedback>
 }
 
 /** Hinweis „Lisa hat Montag geändert: Gulasch → Lasagne · Rückgängig“ */
@@ -76,7 +80,11 @@ export function sanitizePerson(x: unknown): PersonSignals {
   const baked = Array.isArray(p.baked)
     ? p.baked.filter((b): b is { date: string; recipeId: string } => obj(b) && typeof b.recipeId === 'string' && typeof b.date === 'string' && ISO.test(b.date)).map((b) => ({ date: b.date, recipeId: b.recipeId })).slice(-200)
     : []
-  return { ratings, rejects, portionFeedback, bakeRatings, baked }
+  const bfRatings: Record<string, Rating> = {}
+  if (obj(p.bfRatings)) for (const [k, v] of Object.entries(p.bfRatings)) if (/^\d{4}-\d{2}-\d{2}:.+/.test(k) && isRating(v)) bfRatings[k] = v
+  const bfSatiety: Record<string, PortionFeedback> = {}
+  if (obj(p.bfSatiety)) for (const [k, v] of Object.entries(p.bfSatiety)) if (/^\d{4}-\d{2}-\d{2}:.+/.test(k) && (v === -1 || v === 0 || v === 1)) bfSatiety[k] = v
+  return { ratings, rejects, portionFeedback, bakeRatings, baked, bfRatings, bfSatiety }
 }
 
 /** gespeicherten Sync-Zustand prüfen (kaputte Teile fallen weg, nie Absturz) */

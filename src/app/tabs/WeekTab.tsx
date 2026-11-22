@@ -8,7 +8,8 @@ import { sharingActive, shortDate, weekdayName } from '../../store'
 import { plannedBy } from '../../sync'
 import { formatEuro } from '../../kitchen'
 import { BreakfastCard, shortTitle } from '../../components/BreakfastCard'
-import { RatingCard } from '../../components/RatingCard'
+import { RatingCard, SatietyCard } from '../../components/RatingCard'
+import { pendingSatiety, prepRatingKey } from '../../breakfastPrep'
 import { ReviewCard } from '../../components/ReviewCard'
 import { StartCard, type StartStep } from '../../components/StartCard'
 import { type Notice, WeekView } from '../../components/WeekView'
@@ -116,8 +117,16 @@ export function WeekTab({ m }: { m: AppModel }) {
       ratingSlot={(() => {
         const day = pendingRating(state.plan, state.ratings, today, state.ratingDismissed)
         const r = day ? RECIPE_BY_ID[state.plan[day]!.recipeId] : undefined
-        if (!day || !r) return null
-        return <RatingCard title={r.title} day={day} portion={state.portionFeedback[day]} onPortion={(v) => act.setPortionFeedback(day, v)} onRate={(v) => act.rate(day, v)} onDismiss={() => act.dismissRating(day)} />
+        // Frühstück: Sättigung am ersten Frühstückstag nach dem Vorbereiten (ab mittags) bzw. danach
+        const sp = pendingSatiety(state.bfPreps, state.bfSatiety, state.bfSatietyDismissed, today, new Date().getHours())
+        const sr = sp ? RECIPE_BY_ID[sp.recipeId] : undefined
+        if ((!day || !r) && !sr) return null
+        return (
+          <>
+            {day && r && <RatingCard title={r.title} day={day} portion={state.portionFeedback[day]} onPortion={(v) => act.setPortionFeedback(day, v)} onRate={(v) => act.rate(day, v)} onDismiss={() => act.dismissRating(day)} />}
+            {sp && sr && <SatietyCard title={sr.title} day={sp.days[0]} onAnswer={(v) => act.setBfSatiety(prepRatingKey(sp), v)} onDismiss={() => act.dismissSatiety(prepRatingKey(sp))} />}
+          </>
+        )
       })()}
       days={days}
       plan={state.plan}

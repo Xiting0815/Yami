@@ -9,7 +9,9 @@ interface Props {
   rating?: Rating
   portion?: PortionFeedback
   onRate: (v: Rating | undefined) => void
-  /** fehlt bei Gebackenem (keine Portionsfrage) */
+  /** kleiner Hinweis unter der Bewertung (Frühstück: Sättigungsfrage kommt später) */
+  hint?: string
+  /** fehlt bei Gebackenem und Frühstück (keine Portionsfrage) */
   onPortion?: (v: PortionFeedback | undefined) => void
   onClose: () => void
 }
@@ -26,7 +28,7 @@ export const PORTIONS: [PortionFeedback, string][] = [
 ]
 
 /** „Wie war’s?“ direkt nach „Fertig gekocht“: Bewertung + Portion (beides sofort gespeichert, nochmal tippen nimmt zurück) */
-export function RateSheet({ title, day, today, rating, portion, onRate, onPortion, onClose }: Props) {
+export function RateSheet({ title, day, today, rating, portion, hint, onRate, onPortion, onClose }: Props) {
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', h)
@@ -52,6 +54,7 @@ export function RateSheet({ title, day, today, rating, portion, onRate, onPortio
             </button>
           ))}
         </div>
+        {hint && <p className="muted small rate-hint">{hint}</p>}
         {onPortion && (
           <>
             <h3>Portion</h3>

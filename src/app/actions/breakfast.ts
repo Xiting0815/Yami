@@ -1,12 +1,16 @@
 import type { Recipe } from '../../types'
 import { RECIPE_BY_ID } from '../../data/recipes'
-import { applyBreakfastPicks, assignBreakfasts } from '../../breakfast'
+import { applyBreakfastPicks, assignBreakfasts, mondayIso } from '../../breakfast'
+import { finishPrep as finishPrepState, findPrep, openPrepDays, prepWeek, preppedText, undoPrep as undoPrepState } from '../../breakfastPrep'
+import type { PortionFeedback, Rating } from '../../learning'
+import { addDaysIso } from '../../kitchen'
 import { shortDate, weekdayName } from '../../store'
+import { defaultMonday } from '../dates'
 import type { BreakfastPlan } from '../useBreakfastPlan'
 import type { ActionContext } from './context'
 
 /** Frühstück: 1–2 Rezepte wählen, Prep-Tag, Prep-Liste abhaken */
-export function breakfastActions({ setState, cal, ui, flash, snapshot }: ActionContext, { picks, prep, covered }: Pick<BreakfastPlan, 'picks' | 'prep' | 'covered'>) {
+export function breakfastActions({ state, setState, cal, ui, flash, snapshot }: ActionContext, { picks, prep, covered }: Pick<BreakfastPlan, 'picks' | 'prep' | 'covered'>) {
   const { today, days, weekKey } = cal
 
   /** Frühstücke für die Woche festlegen und auf die Tage nach dem Prep-Tag verteilen (Tage davor bekommen keins) */
@@ -65,5 +69,63 @@ export function breakfastActions({ setState, cal, ui, flash, snapshot }: ActionC
     })
   }
 
-  return { setPicks, changePrepDay, pickBreakfast, resetBreakfast, togglePrepCheck }
+  /** Woche, für die ein Frühstück gerade vorbereitet wird (angezeigte, aktuelle oder nächste) */
+  function prepWeekOf(recipeId: string): string {
+    return prepWeek(state.breakfastPicks, state.breakfast, recipeId, today, [weekKey, mondayIso(today), defaultMonday(today), mondayIso(addDaysIso(today, 7))])
+  }
+
+  /** Portionen fürs Vorbereiten: so viele offene Frühstückstage dieses Rezepts in der Prep-Woche (sonst 1) */
+  function prepPortions(recipeId: string): number {
+    const w = prepWeekOf(recipeId)
+    const done = findPrep(state.bfPreps, w, recipeId)
+    return done?.portions ?? (openPrepDays(state.breakfast, recipeId, w, today).length || 1)
+  }
+
+  /**
+   * „Fertig vorbereitet“ (Kochmodus-Ende oder Prep-Liste): Zutaten abziehen, Portionen in den Vorrat, Frühstückstage
+   * verknüpfen, Prep-Liste abhaken – danach „Wie war’s?“. Rückgängig über den Toast oder in der Prep-Liste.
+   */
+  function finishPrep(recipe: Recipe, portions: number, ask = true) {
+    if (!recipe.breakfast) return
+    const snap = snapshot()
+    const week = prepWeekOf(recipe.id)
+    setState((s) => {
+      const r = finishPrepState(s, recipe, portions, week, today)
+      return { ...s, ...r.state }
+    })
+    flash(`${preppedText(recipe, Math.max(1, Math.round(portions)))} im Vorrat ✓`, snap)
+    ui.setCooking(false)
+    ui.setSheet(null)
+    if (ask) ui.setRateBf({ recipeId: recipe.id, date: today })
+  }
+
+  /** Vorbereitung zurücknehmen (Zutaten zurück, Portionen aus dem Vorrat) */
+  function undoPrep(recipeId: string, week: string = weekKey) {
+    const snap = snapshot()
+    setState((s) => ({ ...s, ...undoPrepState(s, week, recipeId, today) }))
+    flash('Vorbereitung zurückgenommen – Zutaten wieder im Vorrat', snap)
+  }
+
+  /** Bewertung nach dem Vorbereiten (nochmal tippen nimmt zurück) – zählt nur fürs eigene Profil */
+  function setBfRating(date: string, recipeId: string, v: Rating | undefined) {
+    const key = `${date}:${recipeId}`
+    setState((s) => {
+      const bfRatings = { ...s.bfRatings }
+      if (v) bfRatings[key] = v
+      else delete bfRatings[key]
+      return { ...s, bfRatings }
+    })
+  }
+
+  /** „Hat es bis mittags satt gemacht?“ (Schlüssel `Prep-Tag:Rezept-Id`) */
+  function setBfSatiety(key: string, v: PortionFeedback) {
+    setState((s) => ({ ...s, bfSatiety: { ...s.bfSatiety, [key]: v } }))
+    flash(v === -1 ? 'Gemerkt – sättigendere Frühstücke kommen nach vorn ✓' : v === 1 ? 'Gemerkt – leichtere Frühstücke kommen nach vorn ✓' : 'Danke – gemerkt ✓')
+  }
+
+  function dismissSatiety(key: string) {
+    setState((s) => ({ ...s, bfSatietyDismissed: [...s.bfSatietyDismissed, key].slice(-60) }))
+  }
+
+  return { setPicks, changePrepDay, pickBreakfast, resetBreakfast, togglePrepCheck, prepWeekOf, prepPortions, finishPrep, undoPrep, setBfRating, setBfSatiety, dismissSatiety }
 }

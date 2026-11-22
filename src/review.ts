@@ -127,6 +127,13 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
       }
     }
   }
+  // vorbereitetes Frühstück: Zutaten wurden am Prep-Tag entnommen (die Portionen danach haben keinen eigenen Warenwert)
+  for (const p of state.bfPreps ?? [])
+    if (inWeek(p.date))
+      for (const c of p.consumed) {
+        usedEuro += amountValue(c.name, c.amount, state.prices)
+        usedItems++
+      }
   const wastedWeek = state.wasted.filter((w) => inWeek(w.date))
   const byName = new Map<string, number>()
   for (const w of wastedWeek) byName.set(w.name, (byName.get(w.name) ?? 0) + w.value)
@@ -157,6 +164,9 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
     baked: state.baked,
     snacks: state.snacks,
     bakeRatings: state.bakeRatings,
+    bfPrepped: state.bfPreps,
+    bfRatings: state.bfRatings,
+    bfSatiety: state.bfSatiety,
   })
   const learned = summarize(model).liked.slice(0, 2).map((l) => l.label)
 

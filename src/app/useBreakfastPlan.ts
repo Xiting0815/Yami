@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { Recipe } from '../types'
 import { BREAKFASTS } from '../data/recipes'
 import { assignBreakfasts, coveredDays, prepOptions, prepPlan, resolvePrepDay } from '../breakfast'
-import { preference } from '../learning'
+import { preference, satietyBonus, satietyLean } from '../learning'
 import type { AppState } from '../store'
 import { insight, lastSeenMap, PANTRY_ONLY_MAX_EURO } from '../kitchen'
 import type { Calendar } from './useCalendar'
@@ -24,6 +24,8 @@ export function useBreakfastPlan(
   const prepItems = useMemo(() => prepPlan(assignment), [assignment])
   const prepTotal = prepItems.reduce((n, i) => n + i.recipe.steps.length, 0)
   const prepDone = (state.prepChecked[weekKey] ?? []).filter((k) => prepItems.some((i) => k.startsWith(i.recipe.id + ':'))).length
+  // Lernen: „bis mittags satt?“ → sättigendere bzw. leichtere Frühstücke nach vorn
+  const satiety = useMemo(() => satietyLean(state.bfSatiety, today), [state.bfSatiety, today])
   const bLastSeen = useMemo(() => lastSeenMap(state.breakfast, days[0]), [state.breakfast, days])
   const bInsights = useMemo(
     () =>
@@ -34,10 +36,12 @@ export function useBreakfastPlan(
             month: todayMonth,
           })
           const pref = preference(taste, r)
-          return [r.id, { ...ins, score: ins.score + pref.score, taste: pref.reason }]
+          const sat = satietyBonus(r, satiety, BREAKFASTS)
+          const why = pref.reason ?? (sat >= 1 ? (satiety > 0 ? '💪 macht lange satt' : '🪶 leichter') : undefined)
+          return [r.id, { ...ins, score: ins.score + pref.score + sat, taste: why }]
         }),
       ),
-    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length, taste, todayMonth, state.customRecipes, state.customIngredients],
+    [week.leftovers, today, state.prices, bLastSeen, jitter, picks.length, taste, todayMonth, satiety, state.customRecipes, state.customIngredients],
   )
   const bDeck = useMemo(() => {
     const list = BREAKFASTS.filter(
@@ -55,7 +59,7 @@ export function useBreakfastPlan(
     return [...fresh, ...later]
   }, [bTypes, picks, rejected, bInsights, days, bPantryOnly, prep, covered])
 
-  return { picks, prep, prepChoices, covered, assignment, prepItems, prepTotal, prepDone, bInsights, bDeck }
+  return { picks, prep, prepChoices, covered, assignment, prepItems, prepTotal, prepDone, bInsights, bDeck, satiety }
 }
 
 export type BreakfastPlan = ReturnType<typeof useBreakfastPlan>

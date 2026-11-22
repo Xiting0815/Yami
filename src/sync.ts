@@ -22,16 +22,18 @@
  *
  * GETEILT (AppState-Felder): plan, bakePlan, pantry, bought, checked, custom, wasted, customRecipes, customIngredients,
  *   prices, staples, spices, pantryRequests, trips (Einkäufe: Freigabe + „Habe ich“-Antworten), shopDay (Einkaufstag), shopOrder (Abschnitts-Reihenfolge).
- * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked.
+ * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked, bfRatings, bfSatiety
+ *   (Frühstück: Bewertung/Sättigung nach dem Vorbereiten – zählt nur fürs eigene Profil, nie als Haushalts-Abendessen).
+ *   Persönlich bleibt bfPreps (Vorbereitungen; die Portionen selbst liegen als Posten im geteilten Vorrat).
  * PERSÖNLICH (nie geteilt): profile, weighIns, adjustDecidedAt, profileCreated, breakfast, breakfastPicks, prepDays,
- *   prepChecked, snacks (kcal), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
+ *   prepChecked, bfPreps, bfSatietyDismissed, snacks (kcal), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
  *   bfOpen, showClassicSteps, lastBackup, ha (Token, Person, Gerät), sync (dieser Abgleich-Stand).
  *
  * ZUSAMMENFÜHREN (pro Eintrag, „letzte Änderung gewinnt“)
  *   Jeder Eintrag hat `{ t: ms, by: Person }`. Schlüssel: plan:<Tag>, bplan:<Tag>|<Rezept-Id>, lot:<Posten-Id>, bought:<Woche bzw. trip:Einkaufstag>|<Artikel>,
  *   check:<Woche>|<Artikel>, cust:<Woche>|<Id>, waste:<Prüfsumme>, trip:<Einkaufstag> (Freigabe), ans:<Einkaufstag>|<Artikel>
  *   (Habe ich/Brauche ich), shop:day, recipe:<Id>, ing:<Name>, price:/staple:/spice:/req:<Name>,
- *   rating:<Tag>, reject:<Datum>|<Id>, pf:<Tag>, bake:<Datum:Id>, baked:<Datum>|<Id>.
+ *   rating:<Tag>, reject:<Datum>|<Id>, pf:<Tag>, bake:<Datum:Id>, baked:<Datum>|<Id>, bfr:<Prep-Tag:Id>, bfs:<Prep-Tag:Id>.
  *   Lokale Änderungen erkennt der Abgleich selbst: Wert ≠ Prüfsumme im letzten Abgleich-Stand (`sync.base`) → neu
  *   gestempelt; fehlt ein Eintrag, der beim letzten Mal da war → Grabstein (Löschung wandert mit). Grabsteine werden
  *   nach 30 Tagen vergessen. Die Aktionen der App müssen davon nichts wissen.
@@ -132,7 +134,7 @@ const split2 = (s: string): [string, string] => {
   const i = s.indexOf('|')
   return [s.slice(0, i), s.slice(i + 1)]
 }
-const PERSON_KINDS = new Set(['rating', 'reject', 'pf', 'bake', 'baked'])
+const PERSON_KINDS = new Set(['rating', 'reject', 'pf', 'bake', 'baked', 'bfr', 'bfs'])
 const DOC_OF: Record<string, string> = {
   plan: 'kitchen', bplan: 'kitchen', lot: 'kitchen', bought: 'kitchen', check: 'kitchen', cust: 'kitchen', waste: 'kitchen',
   trip: 'kitchen', ans: 'kitchen',
@@ -173,6 +175,8 @@ export function extract(s: AppState): Record<string, unknown> {
   for (const [d, v] of Object.entries(s.portionFeedback)) o[`pf:${d}`] = v
   for (const [k, v] of Object.entries(s.bakeRatings)) o[`bake:${k}`] = v
   for (const b of s.baked) o[`baked:${b.date}|${b.recipeId}`] = 1
+  for (const [k, v] of Object.entries(s.bfRatings ?? {})) o[`bfr:${k}`] = v
+  for (const [k, v] of Object.entries(s.bfSatiety ?? {})) o[`bfs:${k}`] = v
   return o
 }
 
@@ -267,19 +271,26 @@ export function rebuild(s: AppState, live: Record<string, unknown>, kinds: Set<s
   if (kinds.has('pf')) next.portionFeedback = p.portionFeedback
   if (kinds.has('bake')) next.bakeRatings = p.bakeRatings
   if (kinds.has('baked')) next.baked = p.baked
+  if (kinds.has('bfr')) next.bfRatings = p.bfRatings
+  if (kinds.has('bfs')) next.bfSatiety = p.bfSatiety
   return next
 }
 
 /** Lernsignale einer Person aus ihren Einträgen */
 export function personFrom(live: Record<string, unknown>): PersonSignals {
-  const raw: Record<string, unknown> = { ratings: {}, portionFeedback: {}, bakeRatings: {}, rejects: [], baked: [] }
-  const r = raw as { ratings: Record<string, unknown>; portionFeedback: Record<string, unknown>; bakeRatings: Record<string, unknown>; rejects: unknown[]; baked: unknown[] }
+  const raw: Record<string, unknown> = { ratings: {}, portionFeedback: {}, bakeRatings: {}, rejects: [], baked: [], bfRatings: {}, bfSatiety: {} }
+  const r = raw as {
+    ratings: Record<string, unknown>; portionFeedback: Record<string, unknown>; bakeRatings: Record<string, unknown>; rejects: unknown[]; baked: unknown[]
+    bfRatings: Record<string, unknown>; bfSatiety: Record<string, unknown>
+  }
   for (const [k, v] of Object.entries(live)) {
     const kind = kindOf(k)
     const rest = restOf(k)
     if (kind === 'rating') r.ratings[rest] = v
     else if (kind === 'pf') r.portionFeedback[rest] = v
     else if (kind === 'bake') r.bakeRatings[rest] = v
+    else if (kind === 'bfr') r.bfRatings[rest] = v
+    else if (kind === 'bfs') r.bfSatiety[rest] = v
     else if (kind === 'reject') {
       const [date, id] = split2(rest)
       r.rejects.push({ id, date })
@@ -701,6 +712,7 @@ export function applyRound(cur: AppState, res: RoundResult): { state: AppState; 
       plan: n.plan, bakePlan: n.bakePlan, pantry: n.pantry, bought: n.bought, checked: n.checked, custom: n.custom, wasted: n.wasted,
       customRecipes: n.customRecipes, customIngredients: n.customIngredients, prices: n.prices, staples: n.staples, spices: n.spices,
       pantryRequests: n.pantryRequests, ratings: n.ratings, rejects: n.rejects, portionFeedback: n.portionFeedback, bakeRatings: n.bakeRatings, baked: n.baked,
+      bfRatings: n.bfRatings, bfSatiety: n.bfSatiety,
       trips: n.trips, shopDay: n.shopDay, shopOrder: n.shopOrder,
       onboarding: cur.onboarding ?? n.onboarding,
       sync,

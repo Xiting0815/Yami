@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { type PrepItem, prepMinutes } from '../breakfast'
+import { prepKey } from '../breakfastPrep'
 import { formatAmount } from '../shopping'
-import { weekdayName } from '../store'
+import { shortDate, weekdayName } from '../store'
+import type { Recipe } from '../types'
 import { NutritionRow } from './NutritionRow'
 import { PrepDayChip } from './PrepDayChip'
 
@@ -13,13 +15,16 @@ interface Props {
   onPrepDay: (iso: string) => void
   checked: string[]
   onToggle: (key: string) => void
+  /** schon vorbereitet? → Tag + „4 Gläser …“ */
+  prepped?: (recipeId: string) => { date: string; text: string } | undefined
+  /** „Fertig vorbereitet“ ohne Kochmodus */
+  onFinish?: (r: Recipe, portions: number) => void
+  onUndo?: (recipeId: string) => void
   onClose: () => void
 }
 
-/** Schritt-Schlüssel für die Abhakliste */
-export const prepKey = (rid: string, i: number) => `${rid}:${i}`
 
-export function PrepSheet({ items, notes, prep, prepChoices, onPrepDay, checked, onToggle, onClose }: Props) {
+export function PrepSheet({ items, notes, prep, prepChoices, onPrepDay, checked, onToggle, prepped, onFinish, onUndo, onClose }: Props) {
   const done = new Set(checked)
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -89,6 +94,19 @@ export function PrepSheet({ items, notes, prep, prepChoices, onPrepDay, checked,
                   })}
                 </ul>
                 <p className="morning">☀️ Morgens: {r.breakfast!.morning}</p>
+                {(() => {
+                  const done = prepped?.(r.id)
+                  if (done)
+                    return (
+                      <p className="prep-done">
+                        ✓ Vorbereitet {weekdayName(done.date, true)}, {shortDate(done.date)} · {done.text} im Vorrat
+                        {onUndo && <button className="link small" onClick={() => onUndo(r.id)}>Rückgängig</button>}
+                      </p>
+                    )
+                  return onFinish ? (
+                    <button className="btn primary wide" onClick={() => onFinish(r, it.portions)}>Fertig vorbereitet ✓</button>
+                  ) : null
+                })()}
               </section>
             )
           })}

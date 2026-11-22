@@ -30,3 +30,26 @@ export function RatingCard({ title, day, portion, onRate, onPortion, onDismiss }
     </section>
   )
 }
+
+/** Frühstück: „Hat dich … bis mittags satt gemacht?“ – nach dem ersten Frühstückstag nach dem Vorbereiten (Lernsignal) */
+export function SatietyCard({ title, day, onAnswer, onDismiss }: { title: string; day: string; onAnswer: (v: PortionFeedback) => void; onDismiss: () => void }) {
+  return (
+    <section className="rate-card satiety-card" aria-label="Sättigung Frühstück">
+      <div className="rate-head">
+        <span>
+          ☀️ Hat dich <b>{title}</b> am {weekdayName(day)} bis mittags satt gemacht?
+        </span>
+        <button className="icon-btn tiny" aria-label="Nicht beantworten" onClick={onDismiss}>
+          <Icon name="close" size={18} />
+        </button>
+      </div>
+      <div className="portion-btns compact" role="group" aria-label="Sättigung">
+        {PORTIONS.map(([v, label]) => (
+          <button key={v} onClick={() => onAnswer(v)}>
+            {label}
+          </button>
+        ))}
+      </div>
+    </section>
+  )
+}

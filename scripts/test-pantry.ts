@@ -7,7 +7,7 @@ import { SUBSTITUTE_GROUPS, interchangeable, substitutesFor } from '../src/data/
 import { searchIngredients } from '../src/customIngredients'
 import { pantryWishes } from '../src/learning'
 import { formatAmount } from '../src/shopping'
-import { addDaysIso, cookDue, insight, needsOf, pantryCovering, planWeek, uncook, type PantryLot } from '../src/kitchen'
+import { addDaysIso, cookDue, takeFromLot, insight, needsOf, pantryCovering, planWeek, uncook, type PantryLot } from '../src/kitchen'
 import type { WeekPlan } from '../src/types'
 
 let fails = 0
@@ -130,6 +130,22 @@ ok(em.slice(0, 10).filter(uses).length >= 8, `Beispiel/Modus: ≥ 8 der Top 10 n
 ok(em[0].i.fromPantry.includes('Rinderhackfleisch'), 'Beispiel/Modus: Platz 1 nutzt das Hack')
 ok(en.slice(0, 30).filter(uses).length >= 12, `Beispiel/normal: ≥ 12 der Top 30 nutzen den Vorrat (${en.slice(0, 30).filter(uses).length})`)
 ok(!en.slice(0, 3).some((x) => x.r.title.includes('Rahmspinat') && !uses(x)), 'Beispiel/normal: keine Gerichte ohne Vorrat ganz oben')
+
+// ───── Vorbereitetes Frühstück: cookDue nimmt 1 Portion aus dem Glas-Posten statt der Zutaten ─────
+{
+  const t = '2026-11-18'
+  const lots: PantryLot[] = [
+    { id: 'jar', name: 'Herzhafter Linsensalat mit Ei und Feta', amount: 2, unit: 'Glas', expires: '2026-11-17' },
+    { id: 'e', name: 'Ei', amount: 10, unit: 'Stk', expires: '2026-12-30' },
+  ]
+  const bf: WeekPlan = { '2026-11-16': { recipeId: 'linsen-ei-salat', servings: 1, prep: 'jar' }, '2026-11-17': { recipeId: 'linsen-ei-salat', servings: 1, prep: 'jar' } }
+  const r = cookDue(bf, lots, t)
+  ok(!r.pantry.some((l) => l.id === 'jar') && r.pantry.find((l) => l.id === 'e')?.amount === 10, 'Frühstück vorbereitet: 2 Tage → 2 Gläser weg, keine Eier abgezogen (auch am Ablauftag)')
+  ok(r.plan['2026-11-16']!.consumed![0].id === 'jar' && r.plan['2026-11-16']!.prep === 'jar', 'Frühstück vorbereitet: „entnommen“ = das Glas (Rückgängig bringt es zurück)')
+  ok(uncook(r.plan['2026-11-16']!, r.pantry).find((l) => l.id === 'jar')?.amount === 1, 'Frühstück vorbereitet: nicht gegessen → Glas zurück in den Vorrat')
+  const one = lots.map((l) => ({ ...l }))
+  ok(takeFromLot(one, 'jar', 5).length === 1 && !one.some((l) => l.id === 'jar') && takeFromLot(one, 'jar', 1).length === 0, 'takeFromLot: höchstens, was da ist; fehlender Posten → nichts')
+}
 
 if (fails) { console.error(`${fails} Fehler`); process.exit(1) }
 console.log('Alle Tests OK')
