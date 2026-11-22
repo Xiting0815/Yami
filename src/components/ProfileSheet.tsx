@@ -16,6 +16,8 @@ interface Props {
   portionNote?: string
   /** gelernt aus „bis mittags satt?“ (Frühstück) */
   satietyNote?: string
+  /** gelernt beim Löschen im Vorrat: „Vergessen zu kaufen“ (Zutat → Markierung) */
+  forgotten?: Record<string, string>
   /** oft in den Vorrat gelegt, aber kaum Rezepte dafür */
   wishes?: { name: string; count: number; recipes: number }[]
   /** gelernter Prep-Wochentag (0 = Sonntag = Standard) */
@@ -43,7 +45,7 @@ interface Props {
 
 const fmt = (n: number) => Math.round(n).toLocaleString('de-DE')
 
-export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, satietyNote, wishes = [], prepWeekday = 0, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing, familyStatus, haMain, learnedOthers = [], profileOptional, focusHa }: Props) {
+export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, satietyNote, forgotten = {}, wishes = [], prepWeekday = 0, onResetLearning, lastBackup, onExport, onImport, ha, onHaChange, onHaSyncNow, haSyncing, familyStatus, haMain, learnedOthers = [], profileOptional, focusHa }: Props) {
   const [p, setP] = useState<Profile>(profile ?? DEFAULT_PROFILE)
   const fileInput = useRef<HTMLInputElement>(null)
   const [backupError, setBackupError] = useState<string | null>(null)
@@ -212,6 +214,9 @@ export function ProfileSheet({ profile, onSave, onClose, learned, portionNote, s
               {learnedOthers.length > 0 && <p className="muted small">Vorschläge berücksichtigen euch alle: was eine Person gar nicht mag, rutscht nach hinten.</p>}
               {portionNote && <p><b>Portionen:</b> {portionNote}.</p>}
               {satietyNote && <p><b>Frühstück:</b> {satietyNote}.</p>}
+              {Object.keys(forgotten).length > 0 && (
+                <p><b>Oft vergessen:</b> {Object.keys(forgotten).sort((a, b) => a.localeCompare(b, 'de')).join(', ')} – steht auf der Einkaufsliste und in Google Tasks mit ⚠️ vorne in der Abteilung.</p>
+              )}
               {wishes.map((w) => (
                 <p key={w.name}>
                   <b>Vorrat:</b> Du hast oft {w.name} im Vorrat – dafür gibt es noch {w.recipes === 0 ? 'keine' : 'kaum'} Rezepte.

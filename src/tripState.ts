@@ -12,17 +12,19 @@ import { resolvePrepDay } from './breakfast'
 import { type BuyItem, type Trip, type TripItem, DEFAULT_SHOP_DAY, addDaysIso, daysUntil, shoppingTrips, wdShort } from './kitchen'
 import { portionFactor } from './learning'
 import { formatAmount, isBought } from './shopping'
-import { isQtyStaple, isSpice } from './staples'
+import { isQtyStaple, isSpice, removalUseEvents } from './staples'
 import { compareShop, shopOrderOf } from './shopSection'
 import { type AppState, type TripState, mondayOf, parseIso, shortDate, weekDays } from './store'
 import { householdFeedback } from './sync'
+import { forgottenItems } from './forgot'
 import { type LocalItem, todoSummary } from './haSync'
 
 /** Einkäufe ab heute aus dem App-Zustand (wie in der Liste und für Home Assistant) */
 export function tripsOf(s: AppState, today: string): Trip[] {
   const month = new Date(today + 'T12:00:00').getMonth() + 1
   const portion = portionFactor(householdFeedback(s), today)
-  return shoppingTrips({
+  const forgot = forgottenItems(s.removals ?? [], today)
+  const trips = shoppingTrips({
     today,
     plan: s.plan,
     breakfast: s.breakfast,
@@ -32,7 +34,7 @@ export function tripsOf(s: AppState, today: string): Trip[] {
     prices: s.prices,
     formatStaple: formatAmount,
     month,
-    staple: { memo: s.staples, spices: s.spices, portion },
+    staple: { memo: s.staples, spices: s.spices, portion, extraUse: removalUseEvents(s.removals) },
     // Frühstück wird am Prep-Tag vorbereitet: dann braucht es die Zutaten; vorbei = schon vorbereitet
     breakfastDay: (d) => {
       const p = resolvePrepDay(s.prepDays, weekDays(mondayOf(parseIso(d))), today)
@@ -40,6 +42,9 @@ export function tripsOf(s: AppState, today: string): Trip[] {
     },
     shopDay: s.shopDay,
   })
+  // Lernen: oft vergessene Artikel markieren
+  if (!Object.keys(forgot).length) return trips
+  return trips.map((t) => ({ ...t, buy: t.buy.map((b) => (forgot[b.name] ? { ...b, forgot: forgot[b.name] } : b)) }))
 }
 
 // ───────────── Entwurf / Freigabe ─────────────
@@ -80,10 +85,13 @@ const tripLabel = (t: Pick<Trip, 'date' | 'kind'>) => (t.kind === 'now' ? 'heute
  * Der Abgleich bringt die Einträge in Google Tasks in genau diese Reihenfolge (siehe syncTodo).
  */
 export function haTripItems(trips: Trip[], states: Record<string, TripState>, today: string, shopOrder?: string[]): LocalItem[] {
-  const cmp = compareShop(shopOrderOf(shopOrder))
+  const order = shopOrderOf(shopOrder)
+  const cmp = compareShop(order)
+  // oft vergessen: vorne in seiner Abteilung (und mit ⚠️ im Titel)
+  const sort = (a: TripItem, b: TripItem) => order.indexOf(a.cat) - order.indexOf(b.cat) || Number(!!b.forgot) - Number(!!a.forgot) || cmp(a, b)
   return trips
     .filter((t) => isReleased(states, t, today))
-    .flatMap((t) => [...t.buy].sort(cmp).map((b) => ({ key: `${t.date}|${b.key}`, summary: todoSummary(b, tripLabel(t)), bought: isBought(b) })))
+    .flatMap((t) => [...t.buy].sort(sort).map((b) => ({ key: `${t.date}|${b.key}`, summary: todoSummary(b, tripLabel(t)), bought: isBought(b) })))
 }
 
 /** in HA abgehakter Schlüssel → Einkauf und Artikel */

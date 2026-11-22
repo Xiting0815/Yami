@@ -122,6 +122,11 @@ export function useEvents(...plans: WeekPlan[]): UseEvent[] {
   return out
 }
 
+/** „Aufgebraucht“ gelöschte Mengen-Grundzutaten zählen als Verbrauch (lernt, wann Öl, Brühe & Co. leer werden) */
+export function removalUseEvents(removals: { date: string; name: string; amount: number; reason: string }[] | undefined): UseEvent[] {
+  return (removals ?? []).filter((r) => r.reason === 'used' && isQtyStaple(r.name) && r.amount > 0).map((r) => ({ date: r.date, key: stapleKey(r.name), amount: r.amount }))
+}
+
 const dayNum = (iso: string) => {
   const [y, m, d] = iso.split('-').map(Number)
   return Math.round(Date.UTC(y, m - 1, d) / 86400000)

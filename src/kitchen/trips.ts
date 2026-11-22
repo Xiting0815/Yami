@@ -16,6 +16,7 @@ import type { BakePlan, WeekPlan } from '../types'
 import { bakeEntriesOf } from '../bakePlan'
 import { type BoughtMap, type PantryLot, type PriceOverrides, addDaysIso, daysUntil, needsOf } from './base'
 import { type BuyItem, type StapleContext, type StapleItem, planWeek } from './planWeek'
+import { entryRecipe } from './swap'
 
 export const TRIP_PREFIX = 'trip:'
 /** Schlüssel für gekauft/abgehakt/eigene Artikel eines Einkaufs (Wochenlisten benutzten den Montag) */
@@ -47,6 +48,8 @@ export type TripKind = 'now' | 'main' | 'extra'
 export interface TripItem extends BuyItem {
   /** warum der Artikel auf diesem Einkauf steht („hält nicht bis Do“) */
   reason?: string
+  /** gelernt: schon mal vergessen zu kaufen („⚠️ oft vergessen“, siehe src/forgot.ts) */
+  forgot?: string
 }
 
 export interface Trip {
@@ -90,6 +93,7 @@ interface Use {
   day: string
   recipeId: string
   servings: number
+  swap?: Record<string, string>
 }
 
 export function shoppingTrips(inp: TripInput): Trip[] {
@@ -105,7 +109,7 @@ export function shoppingTrips(inp: TripInput): Trip[] {
   let end = today
   for (const [d, e] of Object.entries(inp.plan)) {
     if (!e || e.status || d < today || d > limit || !RECIPE_BY_ID[e.recipeId]) continue
-    uses.push({ day: d, recipeId: e.recipeId, servings: e.servings * pf })
+    uses.push({ day: d, recipeId: e.recipeId, servings: e.servings * pf, ...(e.swap ? { swap: e.swap } : {}) })
     if (d > end) end = d
   }
   for (const [d, e] of Object.entries(breakfast)) {
@@ -139,7 +143,7 @@ export function shoppingTrips(inp: TripInput): Trip[] {
   // erster Verbrauch je (Standard-Einkauf, Zutat): ab da ist die Packung angebrochen
   const firstUse = new Map<string, string>()
   for (const u of uses)
-    for (const n of needsOf(RECIPE_BY_ID[u.recipeId], u.servings)) {
+    for (const n of needsOf(entryRecipe(u), u.servings)) {
       const k = `${defaultOf(u.day)}|${n.name}`
       if (!firstUse.has(k)) firstUse.set(k, u.day)
     }
@@ -178,7 +182,7 @@ export function shoppingTrips(inp: TripInput): Trip[] {
   }
   // alle Bedarfe einmal zuordnen (damit leere Zusatzeinkäufe gar nicht erst entstehen)
   const extraUsed = new Set<string>()
-  for (const u of uses) for (const n of needsOf(RECIPE_BY_ID[u.recipeId], u.servings)) {
+  for (const u of uses) for (const n of needsOf(entryRecipe(u), u.servings)) {
     const o = ownerOf(u.day, n.name)
     if (extras.includes(o)) extraUsed.add(o)
   }

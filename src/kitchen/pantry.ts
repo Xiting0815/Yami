@@ -4,6 +4,7 @@ import { RECIPE_BY_ID } from '../data/recipes'
 import { ownTiers, substituteTiers, substitutesFor } from '../data/substitutes'
 import { yieldStock } from '../data/define'
 import type { PlanEntry, Recipe, WeekPlan } from '../types'
+import { entryRecipe } from './swap'
 import { type PantryLot, type WastedItem, WASTED_MAX, WASTE_AFTER_DAYS, type PriceOverrides, addDaysIso, daysUntil, minIso, productFor, allNeedsOf, uid } from './base'
 
 export function pantryAmount(lots: PantryLot[], name: string): number {
@@ -114,7 +115,7 @@ export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string, fact
   const next = { ...plan }
   for (const day of due) {
     const entry = next[day]!
-    const recipe = RECIPE_BY_ID[entry.recipeId]
+    const recipe = RECIPE_BY_ID[entry.recipeId] ? entryRecipe(entry) : undefined
     const consumed: PantryLot[] = []
     // vorbereitetes Frühstück: Zutaten sind schon beim Vorbereiten abgezogen → nur 1 Portion aus dem Glas-Posten
     if (entry.prep) consumed.push(...takeFromLot(lots, entry.prep, entry.servings))
@@ -132,7 +133,9 @@ export function cookDue(plan: WeekPlan, pantry: PantryLot[], today: string, fact
 export function cookNow(plan: WeekPlan, pantry: PantryLot[], day: string, entry: { recipeId: string; servings: number }, factor = 1): { plan: WeekPlan; pantry: PantryLot[] } {
   const old = plan[day]
   const base = old?.status ? uncook(old, pantry) : pantry
-  const r = cookDue({ [day]: { recipeId: entry.recipeId, servings: entry.servings } }, base, addDaysIso(day, 1), factor)
+  // angenommener Ersatz („Schmand statt Sahne“) gilt weiter, solange dasselbe Gericht dort steht
+  const swap = old?.recipeId === entry.recipeId ? old.swap : undefined
+  const r = cookDue({ [day]: { recipeId: entry.recipeId, servings: entry.servings, ...(swap ? { swap } : {}) } }, base, addDaysIso(day, 1), factor)
   return { plan: { ...plan, [day]: r.plan[day]! }, pantry: r.pantry }
 }
 

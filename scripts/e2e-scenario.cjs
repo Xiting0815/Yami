@@ -188,6 +188,61 @@ const amt = (s, name) => s.pantry.filter((l) => l.name === name).reduce((a, l) =
     await page.screenshot({ path: `${SHOT}/10-di-24-woche.png`, fullPage: true })
   })
 
+
+  // ── Do 26.11.: Sahne im Vorrat gelöscht (vergessen zu kaufen) → Fr-Gericht wird auf Sa verschoben → Rückgängig → Warnung → Noch kaufen ──
+  const fl = (name, amount, unit) => ({ id: 'v' + n++, name, amount, unit, expires: LONG })
+  saved = JSON.stringify({
+    ...initial,
+    breakfast: {}, breakfastPicks: {}, prepDays: {}, ratings: {}, wasted: [],
+    plan: { '2026-11-27': { recipeId: 'haehnchen-rahm-bandnudeln', servings: 2 }, '2026-11-28': { recipeId: 'frikadellen', servings: 2 } },
+    pantry: [
+      fl('Hähnchenbrustfilet', 400, 'g'), fl('Champignons', 250, 'g'), fl('Zwiebel', 2, 'Stk'), fl('Sahne', 200, 'ml'), fl('Bandnudeln', 250, 'g'), fl('Petersilie', 1, 'Bund'),
+      fl('Hackfleisch gemischt', 400, 'g'), fl('Brötchen vom Vortag', 1, 'Stk'), fl('Ei', 2, 'Stk'), fl('Butterschmalz', 250, 'g'), fl('Kartoffeln mehligkochend', 1000, 'g'),
+      fl('Milch', 1000, 'ml'), fl('Butter', 250, 'g'), fl('Erbsen und Möhren TK', 300, 'g'),
+    ],
+  })
+  await day('2026-11-26', '10:00', async (page, st) => {
+    ok((await page.locator('.day-alert').count()) === 0, 'Do: alles da → keine Warnung')
+    await tab(page, 'Vorrat')
+    const row = page.locator('.lot').filter({ hasText: /^Sahne/ }).first()
+    await row.getByRole('button', { name: 'Verbraucht / entfernen' }).click()
+    await page.waitForTimeout(300)
+    const toast = page.locator('.toast.has-choices')
+    const tt = await toast.innerText()
+    ok(/Sahne entfernt/.test(tt) && /auf Sa verschoben, weil Sahne fehlt/.test(tt) && /warum\?/.test(tt), `Toast: „${tt.split('\n')[0]}“`)
+    await page.screenshot({ path: `${SHOT}/14-do-sahne-warum.png` })
+    await toast.getByRole('button', { name: 'Vergessen zu kaufen' }).click()
+    await page.waitForTimeout(200)
+    let s = await st()
+    ok(s.removals.some((r) => r.name === 'Sahne' && r.reason === 'forgot'), 'Grund „Vergessen zu kaufen“ gemerkt')
+    ok(s.plan['2026-11-27'].recipeId === 'frikadellen' && s.plan['2026-11-28'].recipeId === 'haehnchen-rahm-bandnudeln' && s.shifts.length === 1, 'automatisch verschoben: Hähnchen auf Sa, Frikadellen auf Fr')
+    await tab(page, 'Woche')
+    await page.waitForTimeout(200)
+    const alert = page.locator('.day-alert').filter({ hasText: 'hierher verschoben' })
+    ok(await alert.isVisible() && /Von Fr hierher verschoben – Sahne fehlte/.test(await alert.innerText()), 'Woche: Hinweis „Von Fr hierher verschoben – Sahne fehlte“')
+    await page.screenshot({ path: `${SHOT}/15-do-verschoben.png`, fullPage: true })
+    await alert.getByRole('button', { name: 'Rückgängig' }).click()
+    await page.waitForTimeout(300)
+    s = await st()
+    ok(s.plan['2026-11-27'].recipeId === 'haehnchen-rahm-bandnudeln' && s.shifts[0].undone === true, 'Rückgängig: Hähnchen wieder am Freitag')
+    const warn = page.locator('.day-alert.warn')
+    ok(await warn.isVisible() && /Es fehlt: Sahne 200 ml/.test(await warn.innerText()), 'Woche: „⚠️ Es fehlt: Sahne 200 ml“ am Freitag')
+    ok(await warn.getByRole('button', { name: /Verschieben/ }).isVisible(), 'Warnung: Knöpfe Noch kaufen / Verschieben')
+    await page.screenshot({ path: `${SHOT}/16-do-warnung.png`, fullPage: true })
+    await warn.getByRole('button', { name: /Noch kaufen/ }).click()
+    await page.waitForTimeout(300)
+    s = await st()
+    ok(!!s.trips['2026-11-26']?.released && (s.trips['2026-11-26'].sent || []).includes('Sahne'), 'Noch kaufen: „Heute noch“ freigegeben mit Sahne')
+    ok((await page.locator('.day-alert.warn').count()) === 0 && /Sahne kommt mit „Heute noch“/.test(await page.locator('.day-alert').first().innerText()), 'danach nur Hinweis „kommt mit Heute noch“')
+    await tab(page, 'Liste')
+    await page.waitForTimeout(200)
+    await page.locator('.trip-tabs button', { hasText: 'Heute noch' }).click()
+    await page.waitForTimeout(200)
+    const li = await page.locator('main').innerText()
+    ok(/Sahne\s*⚠️ zuletzt vergessen/.test(li), 'Einkaufsliste: Sahne mit „⚠️ zuletzt vergessen“')
+    await page.screenshot({ path: `${SHOT}/17-do-liste-vergessen.png`, fullPage: true })
+  })
+
   // ── Frühstück „Fertig vorbereitet“: So 29.11. vorbereiten → Bewertung → Gläser im Vorrat → Satt-Frage Mo → Di 1 Glas weniger ──
   const W = ['2026-11-30', '2026-12-01', '2026-12-02', '2026-12-03']
   const bfLot = (name, amount, unit) => ({ id: 'b' + n++, name, amount, unit, expires: LONG })

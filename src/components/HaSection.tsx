@@ -37,6 +37,7 @@ export function HaSection({ ha, onChange, onSyncNow, syncing, familyStatus, main
     reminders: ha?.reminders ?? HA_DEFAULTS.reminders,
   })
   const [syncList, setSyncList] = useState(ha?.syncList ?? SYNC_LIST_DEFAULT)
+  const [notify, setNotify] = useState(ha?.notify ?? '')
   const [otherName, setOtherName] = useState(ha?.me && !PEOPLE.includes(ha.me) ? ha.me : '')
   const [otherOpen, setOtherOpen] = useState(!!ha?.me && !PEOPLE.includes(ha.me))
   const connected = !!ha?.token && !!ha.url
@@ -202,6 +203,33 @@ export function HaSection({ ha, onChange, onSyncNow, syncing, familyStatus, main
             />
           </label>
         </div>
+        <div className="ha-fields">
+          <label>
+            Sofort aufs Handy (notify-Dienst, optional)
+            <input
+              value={notify}
+              placeholder="notify.mobile_app_…"
+              aria-label="notify-Dienst"
+              onChange={(e) => setNotify(e.target.value)}
+              onBlur={(e) => {
+                const v = e.target.value.trim()
+                const val = /^notify\.[a-z0-9_]+$/.test(v) ? v : ''
+                setNotify(val)
+                if (ha && val !== (ha.notify ?? '')) {
+                  const { notify: _n, ...rest } = ha
+                  onChange(val ? { ...ha, notify: val } : rest)
+                }
+              }}
+              autoCapitalize="off"
+              spellCheck={false}
+            />
+          </label>
+        </div>
+        <p className="muted small">
+          Fehlt fürs Essen heute oder morgen etwas (oder hat Yami ein Gericht deshalb verschoben), schickt Yami dir sofort eine Mitteilung – über
+          diesen Dienst (z. B. derselbe wie in der Automation „Yami: Erinnerung aufs Handy“). Leer: als Erinnerung im Kalender, kommt dann etwa
+          15–20 Minuten später.
+        </p>
         <p className="muted small">Nur eigene Einträge (Beschreibung „Yami“) werden geändert oder gelöscht – alles andere in deinen Listen bleibt unberührt.</p>
       </details>
     </section>

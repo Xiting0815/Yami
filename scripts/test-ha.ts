@@ -6,6 +6,7 @@ import {
   diffDinnerEvents, diffTodo, planMoves, plannedDinners, plannedReminders, syncCalendar, syncTodo, usualWeighDay,
 } from '../src/haSync'
 import { backupBody, parseBackup } from '../src/backup'
+import { sendAlerts } from '../src/haRun'
 import { newHa, sanitize, withHaTargets, HA_DEFAULTS } from '../src/store'
 import { RECIPES } from '../src/data/recipes'
 import { compareShop, shopOrderOf, shopSection } from '../src/shopSection'
@@ -497,5 +498,25 @@ const plan = (o: Record<string, [string, number]>) => Object.fromEntries(Object.
   const rem = withHaTargets(old, { reminders: 'calendar.familie' })
   ok(!rem.events['rem:prep:2026-11-15'] && !!rem.events['dinner:2026-11-16'], 'Erinnerungs-Kalender gewechselt: nur Erinnerungen verworfen')
 }
+// Sofort-Hinweise aufs Handy (fehlt heute/morgen etwas, Gericht verschoben)
+{
+  const alerts = [
+    { key: 'miss:2026-11-27:dinner:x:Sahne', title: '⚠️ Morgen fehlt: Sahne', message: 'Für X fehlt Sahne.' },
+    { key: 'shift:abc', title: '↪️ X verschoben', message: 'X auf Sa verschoben, weil Sahne fehlt.' },
+  ]
+  const now = new Date('2026-11-26T10:00:00')
+  const h1 = new FakeHa()
+  const r1 = await sendAlerts(h1, { notify: 'notify.mobile_app_s25ultra', reminders: 'calendar.yami_erinnerungen' }, alerts, now)
+  const n1 = h1.calls.filter((c) => c.domain === 'notify')
+  ok(r1.sent === 2 && n1.length === 2 && n1[0].service === 'mobile_app_s25ultra' && n1[0].data.title === '⚠️ Morgen fehlt: Sahne' && !h1.calls.some((c) => c.domain === 'calendar'), 'Push mit notify-Dienst: sofort per call_service, kein Kalendereintrag')
+  const r2 = await sendAlerts(h1, { notify: 'notify.mobile_app_s25ultra', pushed: r1.pushed, reminders: 'calendar.yami_erinnerungen' }, alerts, now)
+  ok(r2.sent === 0 && h1.calls.length === 2, 'Push: jeder Hinweis nur einmal')
+  const h2 = new FakeHa()
+  const r3 = await sendAlerts(h2, { reminders: 'calendar.yami_erinnerungen' }, alerts.slice(0, 1), now)
+  ok(r3.sent === 1 && h2.events.length === 1 && h2.events[0].start === '2026-11-26T10:16:00', 'Push ohne notify-Dienst: Erinnerung 16 Min. in der Zukunft (Kalender-Auslöser verpasst frühere)')
+  ok(sanitize({ ha: { ...newHa('https://x', 't'), notify: 'notify.mobile_app_s25ultra', pushed: ['a'] } }).ha?.notify === 'notify.mobile_app_s25ultra' && !sanitize({ ha: { ...newHa('https://x', 't'), notify: 'light.kueche' } }).ha?.notify, 'notify-Dienst: nur notify.* gespeichert (Standard leer)')
+  ok(!('notify' in newHa()), 'notify-Dienst: Standard leer')
+}
+
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')
 process.exit(fails ? 1 : 0)

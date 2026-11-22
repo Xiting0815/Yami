@@ -55,6 +55,8 @@ interface Props {
   onBake?: (day: string, recipeId: string) => void
   /** Nachfrage „Gebacken?“ und sanfter Backvorschlag */
   bakeSlot?: ReactNode
+  /** Warnung unter einem Tag („⚠️ Es fehlt: Sahne“, Hinweis nach automatischem Verschieben) */
+  dayAlert?: (day: string) => ReactNode
 }
 
 export function NoticeRow({ notice }: { notice: Notice }) {
@@ -73,7 +75,7 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions, planBy, syncSlot, bakes = {}, onBake, bakeSlot } = props
+  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions, planBy, syncSlot, bakes = {}, onBake, bakeSlot, dayAlert } = props
   const planned = days.filter((d) => plan[d]).length
   // nur der nächste freie Tag bekommt die Akzentfarbe – die übrigen leeren Tage bleiben ruhig
   const nextOpen = days.find((d) => d >= today && !plan[d])
@@ -114,6 +116,7 @@ export function WeekView(props: Props) {
           {days.map((day) => (
             <Fragment key={day}>
               {renderDay(day)}
+              {dayAlert?.(day)}
               <BakeRow day={day} list={bakes[day]} today={today} onBake={onBake} />
             </Fragment>
           ))}

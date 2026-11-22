@@ -62,6 +62,13 @@ export interface HaSettings {
   me?: string
   /** zufällige Kennung dieses Geräts (nur lokal, nicht in der Sicherung) */
   device: string
+  /**
+   * Sofort-Benachrichtigung aufs Handy (z. B. `notify.mobile_app_s25ultra`, nur dieses Gerät/diese Person). Leer = über
+   * den Erinnerungs-Kalender (kommt dann mit ca. 15–20 Min. Verzögerung über die HA-Automation).
+   */
+  notify?: string
+  /** schon geschickte Sofort-Hinweise (Schlüssel, nur lokal) – nichts doppelt */
+  pushed?: string[]
 }
 
 /** Familien-Abgleich läuft (verbunden, eingeschaltet, Person gewählt) */
@@ -127,6 +134,8 @@ function sanitizeHa(x: unknown): HaSettings | undefined {
     device: typeof h.device === 'string' && /^[a-z0-9]{6,32}$/.test(h.device) ? h.device : uid() + uid(),
   }
   if (h.share === true) base.share = true
+  if (typeof h.notify === 'string' && ENTITY.test(h.notify.trim()) && h.notify.trim().startsWith('notify.')) base.notify = h.notify.trim()
+  if (Array.isArray(h.pushed)) base.pushed = h.pushed.filter((k): k is string => typeof k === 'string' && k.length <= 200).slice(-60)
   if (typeof h.me === 'string' && h.me.trim()) base.me = h.me.trim().slice(0, 30)
   // alte Standardziele auf die neuen umstellen (selbst gewählte Ziele bleiben)
   const move: Partial<Pick<HaSettings, 'todo' | 'calendar'>> = {}
@@ -228,7 +237,43 @@ export interface AppState {
   shopDayAsked?: number
   /** „Im Vorrat führen?“ beantwortet: Zutat → ja/nein – nur lokal */
   stockAsk: Record<string, 'yes' | 'no'>
+  /** gelöschte Vorratsposten mit Grund (vergessen/aufgebraucht/weggeworfen) – geteilt, lernt „oft vergessen“ (höchstens 300) */
+  removals: PantryRemoval[]
+  /** automatische Verschiebungen, weil etwas fehlt – geteilt (höchstens 40) */
+  shifts: ShiftRecord[]
 }
+
+/** Warum ein Vorratsposten gelöscht wurde („Warum?“ nach dem Löschen) – lernt „oft vergessen“ und den Verbrauch */
+export type RemovalReason = 'forgot' | 'used' | 'wasted'
+
+export interface PantryRemoval {
+  /** Id des gelöschten Postens (ein Grund je Posten – neu wählen überschreibt) */
+  id: string
+  /** ISO-Datum des Löschens */
+  date: string
+  name: string
+  amount: number
+  unit: string
+  reason: RemovalReason
+}
+export const REMOVALS_MAX = 300
+
+/** Yami hat ein Gericht verschoben, weil etwas fehlt (src/shortage.ts) – gemerkt gegen Ping-Pong und für „Rückgängig“ */
+export interface ShiftRecord {
+  id: string
+  recipeId: string
+  from: string
+  to: string
+  /** Gericht, das dafür von `to` auf `from` getauscht wurde (fehlt = `to` war frei) */
+  other?: string
+  /** was gefehlt hat */
+  missing: string[]
+  /** ISO-Datum der Verschiebung */
+  date: string
+  /** zurückgenommen (bleibt gemerkt: dasselbe Gericht wird dann nicht noch einmal automatisch verschoben) */
+  undone?: true
+}
+export const SHIFTS_MAX = 40
 
 /** Stand eines Einkaufs (Schlüssel = Einkaufstag) */
 export interface TripState {
@@ -259,6 +304,40 @@ export function sanitizeTrips(x: unknown): Record<string, TripState> {
     if (Object.keys(st).length) out[d] = st
   }
   return out
+}
+
+/** gelöschte Posten mit Grund prüfen (Speicher, Sicherung, Abgleich) */
+export function sanitizeRemovals(x: unknown): PantryRemoval[] {
+  if (!Array.isArray(x)) return []
+  const seen = new Set<string>()
+  const out: PantryRemoval[] = []
+  for (const r of x as Partial<PantryRemoval>[]) {
+    if (!r || typeof r.id !== 'string' || !r.id || seen.has(r.id) || typeof r.name !== 'string' || !r.name || r.name.length > 80) continue
+    if (typeof r.date !== 'string' || !ISO.test(r.date) || typeof r.unit !== 'string' || !isNum(r.amount) || r.amount < 0) continue
+    if (r.reason !== 'forgot' && r.reason !== 'used' && r.reason !== 'wasted') continue
+    seen.add(r.id)
+    out.push({ id: r.id, date: r.date, name: r.name, amount: r.amount, unit: r.unit, reason: r.reason })
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date)).slice(-REMOVALS_MAX)
+}
+
+/** automatische Verschiebungen prüfen */
+export function sanitizeShifts(x: unknown): ShiftRecord[] {
+  if (!Array.isArray(x)) return []
+  const seen = new Set<string>()
+  const out: ShiftRecord[] = []
+  for (const r of x as Partial<ShiftRecord>[]) {
+    if (!r || typeof r.id !== 'string' || !r.id || seen.has(r.id) || typeof r.recipeId !== 'string' || !RECIPE_BY_ID[r.recipeId]) continue
+    if (typeof r.from !== 'string' || !ISO.test(r.from) || typeof r.to !== 'string' || !ISO.test(r.to) || typeof r.date !== 'string' || !ISO.test(r.date)) continue
+    seen.add(r.id)
+    out.push({
+      id: r.id, recipeId: r.recipeId, from: r.from, to: r.to, date: r.date,
+      missing: Array.isArray(r.missing) ? r.missing.filter((n): n is string => typeof n === 'string').slice(0, 8) : [],
+      ...(typeof r.other === 'string' && RECIPE_BY_ID[r.other] ? { other: r.other } : {}),
+      ...(r.undone === true ? { undone: true as const } : {}),
+    })
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date)).slice(-SHIFTS_MAX)
 }
 
 const validWeekday = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 6
@@ -307,6 +386,8 @@ const INITIAL: AppState = {
   bakeHints: [],
   trips: {},
   stockAsk: {},
+  removals: [],
+  shifts: [],
 }
 
 const hasData = (s: AppState) =>
@@ -382,7 +463,14 @@ function validEntry(e: PlanEntry, defaultServings: number): PlanEntry {
   const status = e.status === 'cooked' || e.status === 'skipped' ? e.status : undefined
   const consumed = Array.isArray(e.consumed) ? e.consumed.map(validLot).filter((l): l is PantryLot => !!l) : undefined
   const prep = typeof e.prep === 'string' && e.prep ? e.prep : undefined
-  return { recipeId: e.recipeId, servings, ...(status ? { status } : {}), ...(consumed ? { consumed } : {}), ...(prep ? { prep } : {}) }
+  // Ersatz für dieses Gericht: nur bekannte Zutaten (Produkt vorhanden), höchstens ein paar
+  const swap = e.swap && typeof e.swap === 'object' && !Array.isArray(e.swap)
+    ? Object.fromEntries(Object.entries(e.swap).filter(([a, b]) => typeof b === 'string' && a !== b && !!PRODUCTS[a] && !!PRODUCTS[b]).slice(0, 6))
+    : undefined
+  return {
+    recipeId: e.recipeId, servings, ...(status ? { status } : {}), ...(consumed ? { consumed } : {}), ...(prep ? { prep } : {}),
+    ...(swap && Object.keys(swap).length ? { swap } : {}),
+  }
 }
 
 function validWeighIn(x: unknown): x is WeighIn {
@@ -584,6 +672,8 @@ export function sanitize(parsed: unknown): AppState {
   if (!validWeekday(state.shopDay)) delete state.shopDay
   if (!validWeekday(state.shopDayAsked)) delete state.shopDayAsked
   if (!(Array.isArray(state.shopOrder) && state.shopOrder.length > 0 && state.shopOrder.length <= 12 && state.shopOrder.every((c) => typeof c === 'string' && c in SHOP_LABEL))) delete state.shopOrder
+  state.removals = sanitizeRemovals(state.removals)
+  state.shifts = sanitizeShifts(state.shifts)
   state.stockAsk = Object.fromEntries(Object.entries(state.stockAsk).filter(([k, v]) => k.length <= 60 && (v === 'yes' || v === 'no')).slice(-200))
   state.bought = Object.fromEntries(
     Object.entries(state.bought).map(([w, m]) => [w, Object.fromEntries(Object.entries(m).map(([k, b]) => [k, typeof b.at === 'string' && ISO.test(b.at) ? b : { lotId: b.lotId, amount: b.amount }]))]),

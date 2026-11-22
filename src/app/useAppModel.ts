@@ -17,6 +17,7 @@ import { bakeActions } from './actions/bake'
 import { breakfastActions } from './actions/breakfast'
 import { shoppingActions } from './actions/shopping'
 import { pantryActions } from './actions/pantry'
+import { shortageActions } from './actions/shortage'
 import { recipeActions } from './actions/recipes'
 import { profileActions } from './actions/profile'
 
@@ -44,6 +45,7 @@ export function useAppModel() {
     ...breakfastActions(ctx, bf),
     ...shoppingActions(ctx),
     ...pantryActions(ctx),
+    ...shortageActions(ctx),
     ...recipeActions(ctx),
     ...profileActions(ctx, status.pendingSuggestion),
   }

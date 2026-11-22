@@ -9,6 +9,14 @@ import { pantryWishes } from '../src/learning'
 import { formatAmount } from '../src/shopping'
 import { addDaysIso, cookDue, takeFromLot, insight, needsOf, pantryCovering, planWeek, uncook, type PantryLot } from '../src/kitchen'
 import type { WeekPlan } from '../src/types'
+import { type AppState, sanitize } from '../src/store'
+import { tripsOf, haTripItems } from '../src/tripState'
+import { activeShifts, autoShift, commitBuy, findShift, pushAlerts, shiftText, standInsOf, undoShift, warningsOf } from '../src/shortage'
+import { forgotLabel, forgotScores, forgottenItems } from '../src/forgot'
+import { applyRemovalReason } from '../src/app/actions/pantry'
+import { isQtyStaple, removalUseEvents } from '../src/staples'
+import { todoSummary } from '../src/haSync'
+import { extract, rebuild } from '../src/sync'
 
 let fails = 0
 const ok = (cond: boolean, msg: string) => { console.log(`${cond ? '✓' : '✗'} ${msg}`); if (!cond) fails++ }
@@ -145,6 +153,110 @@ ok(!en.slice(0, 3).some((x) => x.r.title.includes('Rahmspinat') && !uses(x)), 'B
   ok(uncook(r.plan['2026-11-16']!, r.pantry).find((l) => l.id === 'jar')?.amount === 1, 'Frühstück vorbereitet: nicht gegessen → Glas zurück in den Vorrat')
   const one = lots.map((l) => ({ ...l }))
   ok(takeFromLot(one, 'jar', 5).length === 1 && !one.some((l) => l.id === 'jar') && takeFromLot(one, 'jar', 1).length === 0, 'takeFromLot: höchstens, was da ist; fehlender Posten → nichts')
+}
+
+// ───── Fehlt etwas? Warnung am Tag, Noch kaufen, Ersatz, automatisch verschieben, oft vergessen ─────
+{
+  const T = '2026-11-26' // Donnerstag, Haupteinkauf Sa 28.11.
+  let k = 0
+  const fill = (ids: string[], except: string[] = [], expires = '2027-01-31'): PantryLot[] => {
+    const m = new Map<string, number>()
+    for (const id of ids) for (const x of needsOf(RECIPE_BY_ID[id], 2)) m.set(x.name, (m.get(x.name) ?? 0) + x.amount)
+    return [...m].filter(([nm]) => !except.includes(nm)).map(([name, amount]) => ({ id: 'f' + k++, name, amount, unit: PRODUCTS[name].unit, expires }))
+  }
+  const st = (x: Partial<AppState>) => sanitize({ onboarding: 'done', ...x })
+  const plan: WeekPlan = { '2026-11-27': { recipeId: 'haehnchen-rahm-bandnudeln', servings: 2 }, '2026-11-28': { recipeId: 'frikadellen', servings: 2 } }
+  const full = st({ plan, pantry: fill(['haehnchen-rahm-bandnudeln', 'frikadellen']) })
+  const noSahne: AppState = { ...full, pantry: full.pantry.filter((l) => l.name !== 'Sahne') }
+  ok(warningsOf(full, T).length === 0, 'Fehlmenge: alles da → keine Warnung')
+  const w = warningsOf(noSahne, T)
+  ok(w.length === 1 && w[0].day === '2026-11-27' && w[0].kind === 'dinner' && w[0].missing.map((m) => m.name).join() === 'Sahne' && Math.round(w[0].missing[0].amount) === 200, `Fehlmenge erkannt: Fr fehlt Sahne 200 ml (${w.map((x) => x.day + ':' + x.missing.map((m) => m.name)).join(' ')})`)
+  // Verbrauch der Tage davor zählt: Sahne reicht nur für einen von zwei Tagen
+  const two = st({ plan: { '2026-11-26': { recipeId: 'huehnerfrikassee', servings: 2 }, '2026-11-27': { recipeId: 'haehnchen-rahm-bandnudeln', servings: 2 } }, pantry: fill(['huehnerfrikassee', 'haehnchen-rahm-bandnudeln'], ['Sahne']).concat({ id: 's1', name: 'Sahne', amount: 200, unit: 'ml', expires: '2026-12-10' }) })
+  const w2 = warningsOf(two, T)
+  ok(w2.length === 1 && w2[0].day === '2026-11-27' && Math.round(w2[0].missing[0].amount) === 100, 'Vorrat minus Verbrauch der Tage davor: Do nimmt 100 ml, Fr fehlen 100 ml')
+  // Einkauf vorher → keine Warnung
+  const later = st({ plan: { '2026-11-30': { recipeId: 'haehnchen-rahm-bandnudeln', servings: 2 } }, pantry: fill(['haehnchen-rahm-bandnudeln'], ['Sahne']) })
+  ok(warningsOf(later, T).length === 0, 'kommt mit dem Einkauf Sa vor dem Kochtag (Mo) → keine Warnung')
+  // Gewürze/Grundzutaten nie
+  ok(!w.some((x) => x.missing.some((m) => isQtyStaple(m.name) || CATALOG[m.name] === 'vorrat')), 'Gewürze/Grundzutaten werden nicht angemahnt')
+
+  // Noch kaufen → „Heute noch“ (freigegeben, geht an HA), danach nur Hinweis
+  const trips = tripsOf(noSahne, T)
+  const now = trips.find((t) => t.kind === 'now')
+  ok(!!now && now.date === T && now.buy.some((b) => b.name === 'Sahne') && !trips.find((t) => t.kind === 'main')?.buy.some((b) => b.name === 'Sahne'), 'Sahne steht auf „Heute noch“ (nicht auf dem Einkauf Sa)')
+  const c = commitBuy(noSahne, trips, 1)
+  const bought = { ...noSahne, trips: c.trips }
+  const wb = warningsOf(bought, T)
+  ok(c.trip?.kind === 'now' && !!c.trips[T]?.released && wb.length === 1 && !wb[0].missing.length && wb[0].coming[0]?.name === 'Sahne', 'Noch kaufen: „Heute noch“ freigegeben, Karte zeigt nur „kommt mit Heute noch“')
+  ok(haTripItems(tripsOf(bought, T), bought.trips, T).some((i) => i.key === `${T}|Sahne`), 'Noch kaufen: Sahne geht an Google Tasks (freigegebener Einkauf)')
+
+  // Ersatz aus dem Vorrat
+  const cf: AppState = { ...noSahne, pantry: [...noSahne.pantry, { id: 'cf', name: 'Crème fraîche', amount: 200, unit: 'g', expires: '2026-12-10' }] }
+  const si = standInsOf(cf, T, '2026-11-27')
+  ok(si.length === 1 && si[0].from === 'Sahne' && si[0].to === 'Crème fraîche', `Ersatz: ${si.map((x) => `${x.to} statt ${x.from}`).join()}`)
+  const swapped: AppState = { ...cf, plan: { ...cf.plan, '2026-11-27': { ...cf.plan['2026-11-27']!, swap: { Sahne: 'Crème fraîche' } } } }
+  ok(warningsOf(swapped, T).length === 0 && !tripsOf(swapped, T).some((t) => t.buy.some((b) => b.name === 'Sahne')), 'Ersatz angenommen: keine Warnung, Sahne nicht mehr auf der Liste')
+  const cooked = cookDue(swapped.plan, swapped.pantry, '2026-11-28')
+  ok(cooked.plan['2026-11-27']!.consumed!.some((x) => x.name === 'Crème fraîche' && Math.round(x.amount) === 200) && !cooked.pantry.some((l) => l.id === 'cf'), 'Ersatz: beim Kochen wird Crème fraîche statt Sahne abgezogen')
+  ok(sanitize({ plan: swapped.plan }).plan['2026-11-27']!.swap?.Sahne === 'Crème fraîche' && !sanitize({ plan: { '2026-11-27': { recipeId: 'frikadellen', servings: 2, swap: { Sahne: 'Gibtsnicht' } } } }).plan['2026-11-27']!.swap, 'Ersatz: gespeichert und geprüft (unbekannte Zutat verworfen)')
+
+  // automatisch verschieben: Fr ↔ Sa (Sa kommt die Sahne mit dem Haupteinkauf, Frikadellen sind Fr kochbar)
+  const a = autoShift(full, noSahne, T)
+  const r0 = a.records[0]
+  ok(a.records.length === 1 && r0.from === '2026-11-27' && r0.to === '2026-11-28' && r0.other === 'frikadellen' && a.state.plan['2026-11-27']!.recipeId === 'frikadellen' && a.state.plan['2026-11-28']!.recipeId === 'haehnchen-rahm-bandnudeln', 'automatisch verschoben: Hähnchen auf Sa, Frikadellen auf Fr')
+  ok(shiftText(r0) === 'Hähnchen-Champignon-Rahmgeschnetzeltes mit Bandnudeln auf Sa verschoben, weil Sahne fehlt', `Hinweis: ${shiftText(r0)}`)
+  ok(warningsOf(a.state, T).length === 0 && tripsOf(a.state, T).find((t) => t.kind === 'main')!.buy.some((b) => b.name === 'Sahne'), 'nach dem Verschieben: keine Warnung, Sahne landet auf dem Einkauf Sa')
+  ok(activeShifts(a.state, T).length === 1, 'Verschiebung wird auf der Karte gezeigt')
+  const u = undoShift(a.state, r0.id)
+  ok(u.plan['2026-11-27']!.recipeId === 'haehnchen-rahm-bandnudeln' && u.plan['2026-11-28']!.recipeId === 'frikadellen' && u.shifts[0].undone === true && !activeShifts(u, T).length, 'Rückgängig: Plan wie vorher, als zurückgenommen gemerkt')
+  ok(autoShift(full, u, T).records.length === 0, 'kein Ping-Pong: dasselbe Gericht wird nicht noch einmal verschoben')
+  // freier Tag hinter dem Einkauf
+  const solo = st({ plan: { '2026-11-27': { recipeId: 'haehnchen-rahm-bandnudeln', servings: 2 } }, pantry: fill(['haehnchen-rahm-bandnudeln']) })
+  const b1 = autoShift(solo, { ...solo, pantry: solo.pantry.filter((l) => l.name !== 'Sahne') }, T)
+  ok(b1.records[0]?.to === '2026-11-28' && !b1.records[0].other && !b1.state.plan['2026-11-27'], 'freier Tag: hinter den nächsten Einkauf geschoben (Sa)')
+  // Haltbarkeit: frisches Hähnchen hält nicht bis Sa → nicht verschieben, nur warnen
+  const fresh = st({ plan, pantry: [...fill(['frikadellen']), ...fill(['haehnchen-rahm-bandnudeln'], [], '2026-11-27')] })
+  const f1 = autoShift(fresh, { ...fresh, pantry: fresh.pantry.filter((l) => l.name !== 'Sahne') }, T)
+  ok(f1.records.length === 0 && warningsOf(f1.state, T).length === 1, 'frische Zutaten würden verderben → nicht verschoben, nur gewarnt')
+  // gekochte/abgeschlossene Tage bleiben
+  const done = st({ plan: { ...plan, '2026-11-28': { recipeId: 'frikadellen', servings: 2, status: 'skipped' } }, pantry: full.pantry })
+  ok(!findShift({ ...done, pantry: noSahne.pantry }, T, '2026-11-27') || findShift({ ...done, pantry: noSahne.pantry }, T, '2026-11-27')!.to !== '2026-11-28', 'abgeschlossener Tag wird nicht getauscht')
+
+  // Handy-Hinweise nur heute/morgen
+  const pa = pushAlerts(noSahne, T, new Date('2026-11-26T10:00:00'))
+  ok(pa.length === 1 && pa[0].title.startsWith('⚠️ Morgen fehlt: Sahne'), `Push: morgen fehlt Sahne (${pa.map((x) => x.title).join(' | ')})`)
+  ok(pushAlerts(noSahne, '2026-11-25', new Date('2026-11-25T10:00:00')).every((x) => !x.key.startsWith('miss:')), 'Push: übermorgen betroffen → kein Hinweis')
+  const ps = pushAlerts(a.state, T, new Date('2026-11-26T10:00:00'))
+  ok(ps.length === 1 && ps[0].key === `shift:${r0.id}` && ps[0].message.includes('auf Sa verschoben'), 'Push nach automatischem Verschieben: kurze Nachricht')
+
+  // Löschen mit Grund → Lernen
+  const lotS = full.pantry.find((l) => l.name === 'Sahne')!
+  const wk = 'trip:2026-11-21'
+  const withBought: AppState = { ...noSahne, bought: { [wk]: { Sahne: { lotId: lotS.id, amount: 200, at: '2026-11-21' } } }, checked: { [wk]: ['Sahne'] } }
+  const fg = applyRemovalReason(withBought, lotS, 'forgot', T)
+  ok(fg.removals.length === 1 && fg.removals[0].reason === 'forgot' && !fg.bought[wk].Sahne && !fg.checked[wk].includes('Sahne'), 'Vergessen: gemerkt, Haken auf der Einkaufsliste zurück')
+  const fs = forgotScores(fg.removals, T)
+  ok(Math.abs(fs.Sahne - 1) < 1e-9 && forgotLabel(fs.Sahne) === '⚠️ zuletzt vergessen' && forgotLabel(forgotScores(fg.removals, '2027-01-25').Sahne) === undefined, 'Vergessen klingt ab (Halbwertszeit 60 Tage)')
+  const twice: AppState = { ...fg, removals: [...fg.removals, { id: 'old', date: '2026-11-10', name: 'Sahne', amount: 200, unit: 'ml', reason: 'forgot' }] }
+  ok(forgottenItems(twice.removals, T).Sahne === '⚠️ oft vergessen', 'zweimal vergessen → „oft vergessen“')
+  const ft = tripsOf(twice, T)
+  const item = ft.find((t) => t.kind === 'now')!.buy.find((b) => b.name === 'Sahne')!
+  ok(item.forgot === '⚠️ oft vergessen' && todoSummary(item, 'heute').startsWith('⚠️ Sahne'), 'oft vergessen: auf der Einkaufsliste markiert, in Google Tasks mit ⚠️')
+  const rel = commitBuy(twice, ft, 1).trips
+  const hi = haTripItems(ft, rel, T).filter((i) => i.key.startsWith(T + '|'))
+  const molk = hi.filter((i) => ft[0].buy.find((b) => `${T}|${b.key}` === i.key)?.cat === 'molkerei')
+  ok(molk[0]?.key === `${T}|Sahne`, 'Google Tasks: oft Vergessenes vorne in seiner Abteilung')
+  const ws = applyRemovalReason({ ...noSahne, wasted: [] }, lotS, 'wasted', T)
+  ok(ws.wasted.length === 1 && ws.wasted[0].date === T && applyRemovalReason(ws, lotS, 'used', T).wasted.length === 0, 'Weggeworfen zählt (Wochenrückblick); anderer Grund nimmt es wieder heraus')
+  const oil = { id: 'oil', name: 'Olivenöl', amount: 300, unit: 'ml', expires: '2027-06-01' }
+  ok(removalUseEvents(applyRemovalReason(noSahne, oil, 'used', T).removals).some((e) => e.key === 'Olivenöl' && e.amount === 300), 'Aufgebraucht (Grundzutat) zählt als Verbrauch')
+  // geteilt, gesichert
+  const sh = { ...a.state, removals: twice.removals }
+  const ex = extract(sh)
+  const rb = rebuild(st({}), ex, new Set(['rm', 'shift']))
+  ok(rb.removals.length === 2 && rb.shifts.length === 1 && rb.shifts[0].id === r0.id, 'Familien-Abgleich: Gründe und Verschiebungen gehen mit')
+  ok(sanitize(JSON.parse(JSON.stringify(sh))).removals.length === 2 && sanitize({ removals: [{ id: 'x', reason: 'blah' }], shifts: [{ id: 'y' }] }).removals.length === 0, 'Speichern/Sicherung: geprüft')
 }
 
 if (fails) { console.error(`${fails} Fehler`); process.exit(1) }

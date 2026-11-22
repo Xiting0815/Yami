@@ -9,6 +9,8 @@ import type { Trip } from './kitchen'
 import { type AppState, type HaSettings, sharingActive } from './store'
 import { LEASE_MS, type MainDoc, applyRound, familySync, hashOf, leaseDecision, writeMain } from './sync'
 import { haTripItems, tripReminderInput, tripsOf } from './tripState'
+import { type PushAlert, pushAlerts } from './shortage'
+import { stamp } from './haSync'
 
 export function isoLocal(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -65,6 +67,40 @@ export function splitReminders(all: Desired[], me: string): { personal: Desired[
   }
 }
 
+/** Link, den die Mitteilung öffnet */
+export const APP_URL = 'https://xiting0815.github.io/Yami/'
+/** Kalender-Erinnerung als Ersatz für die Sofort-Mitteilung: so weit in der Zukunft (HA prüft Kalender etwa alle 15 Min.) */
+export const ALERT_LEAD_MIN = 16
+
+/**
+ * Sofort-Hinweise aufs Handy (fehlt heute/morgen etwas, Gericht verschoben) – persönlich, jedes Gerät für seine Person,
+ * jeder Hinweis nur einmal (`ha.pushed`, nur lokal). Mit `ha.notify` (z. B. notify.mobile_app_s25ultra) direkt über
+ * call_service; ohne als Termin im Erinnerungs-Kalender 16 Min. in der Zukunft (die HA-Automation „Yami: Erinnerung aufs
+ * Handy“ schickt ihn zum Beginn – Termine, die früher beginnen, verpasst der Kalender-Auslöser evtl.).
+ */
+export async function sendAlerts(api: HaApi, h: Pick<HaSettings, 'notify' | 'pushed' | 'reminders'>, alerts: PushAlert[], now: Date): Promise<{ pushed: string[]; error?: string; sent: number }> {
+  const pushed = [...(h.pushed ?? [])]
+  let error: string | undefined
+  let sent = 0
+  for (const a of alerts) {
+    if (pushed.includes(a.key)) continue
+    try {
+      if (h.notify) {
+        await api.callService('notify', h.notify.slice('notify.'.length), { title: a.title, message: a.message, data: { channel: 'Yami', tag: 'yami-alert', clickAction: APP_URL } })
+      } else {
+        const start = new Date(now.getTime() + ALERT_LEAD_MIN * 60_000)
+        await api.callService('calendar', 'create_event', { summary: a.title, description: a.message, start_date_time: stamp(start), end_date_time: stamp(new Date(start.getTime() + 15 * 60_000)) }, { entity_id: h.reminders })
+      }
+      pushed.push(a.key)
+      sent++
+    } catch (e) {
+      if (e instanceof HaError && e.kind === 'network') throw e
+      error ??= e instanceof Error ? e.message : String(e)
+    }
+  }
+  return { pushed: pushed.slice(-60), error, sent }
+}
+
 /** Ein ganzer Lauf. Wirft bei Netzwerkfehlern (der Aufrufer zeigt den Fehler und versucht es später wieder). */
 export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   const s0 = d.getState()
@@ -85,8 +121,9 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
     const trips0 = tripsOf(s0, today)
     const todo = await syncTodo(d.api, h0, haLocalFor(s0, today, trips0), d.onBought)
     const cal = await syncCalendar(d.api, h0, plannedDinners(s0.plan, today), remindersOf(s0, trips0), now)
-    const error = todo.error ?? cal.error
-    patchHa({ items: todo.items, done: todo.done, events: cal.events, lastSync: now.toISOString(), error: errText(error) })
+    const push = await sendAlerts(d.api, h0, pushAlerts(s0, today, now, trips0), now)
+    const error = todo.error ?? cal.error ?? push.error
+    patchHa({ items: todo.items, done: todo.done, events: cal.events, pushed: push.pushed, lastSync: now.toISOString(), error: errText(error) })
     return { again: false, error, wrote: true }
   }
 
@@ -108,6 +145,10 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   // persönliche Erinnerungen: jedes Gerät für seine Person, unabhängig vom Schreibstab (nie fremde anfassen)
   const per = await syncReminders(d.api, h0.reminders, personalOf(h0.events, me), personal, now)
   error ??= per.error
+  // Sofort-Hinweise: auch persönlich (jedes Gerät seiner Person), unabhängig vom Schreibstab
+  const push = await sendAlerts(d.api, h0, pushAlerts(state, today, now, trips), now)
+  error ??= push.error
+  if (push.sent) patchHa({ pushed: push.pushed })
   const withPersonal = (events: HaSettings['events']) => ({ ...Object.fromEntries(Object.entries(events).filter(([k]) => !k.startsWith(`rem:${me}:`))), ...per.events })
 
   const dec = leaseDecision(fam.res.remote, h0.device, now.getTime())

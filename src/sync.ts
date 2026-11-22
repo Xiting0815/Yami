@@ -21,7 +21,9 @@
  *                  Zuordnungen), damit dort nichts doppelt entsteht.
  *
  * GETEILT (AppState-Felder): plan, bakePlan, pantry, bought, checked, custom, wasted, customRecipes, customIngredients,
- *   prices, staples, spices, pantryRequests, trips (Einkäufe: Freigabe + „Habe ich“-Antworten), shopDay (Einkaufstag), shopOrder (Abschnitts-Reihenfolge).
+ *   prices, staples, spices, pantryRequests, trips (Einkäufe: Freigabe + „Habe ich“-Antworten), shopDay (Einkaufstag), shopOrder (Abschnitts-Reihenfolge),
+ *   removals (gelöschte Vorratsposten mit Grund → „oft vergessen“ haushaltsweit, rm:<Posten-Id>), shifts (automatische
+ *   Verschiebungen, weil etwas fehlt, shift:<Id> – so verschiebt kein anderes Gerät dasselbe Gericht noch einmal).
  * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked, bfRatings, bfSatiety
  *   (Frühstück: Bewertung/Sättigung nach dem Vorbereiten – zählt nur fürs eigene Profil, nie als Haushalts-Abendessen).
  *   Persönlich bleibt bfPreps (Vorbereitungen; die Portionen selbst liegen als Posten im geteilten Vorrat).
@@ -137,7 +139,7 @@ const split2 = (s: string): [string, string] => {
 const PERSON_KINDS = new Set(['rating', 'reject', 'pf', 'bake', 'baked', 'bfr', 'bfs'])
 const DOC_OF: Record<string, string> = {
   plan: 'kitchen', bplan: 'kitchen', lot: 'kitchen', bought: 'kitchen', check: 'kitchen', cust: 'kitchen', waste: 'kitchen',
-  trip: 'kitchen', ans: 'kitchen',
+  trip: 'kitchen', ans: 'kitchen', rm: 'kitchen', shift: 'kitchen',
   recipe: 'recipes', ing: 'recipes',
   price: 'prefs', staple: 'prefs', spice: 'prefs', req: 'prefs', shop: 'prefs',
 }
@@ -168,6 +170,8 @@ export function extract(s: AppState): Record<string, unknown> {
     if (t.released) o[`trip:${d}`] = { released: t.released, ...(t.sent ? { sent: t.sent } : {}) }
     for (const [k, v] of Object.entries(t.answers ?? {})) o[`ans:${d}|${k}`] = v
   }
+  for (const r of s.removals ?? []) o[`rm:${r.id}`] = r
+  for (const r of s.shifts ?? []) o[`shift:${r.id}`] = r
   if (s.shopDay != null) o['shop:day'] = s.shopDay
   if (s.shopOrder?.length) o['shop:order'] = s.shopOrder
   for (const [d, v] of Object.entries(s.ratings)) o[`rating:${d}`] = v
@@ -257,6 +261,9 @@ export function rebuild(s: AppState, live: Record<string, unknown>, kinds: Set<s
     }
     next.trips = t
   }
+  // gelöschte Posten mit Grund („oft vergessen“ gilt für den ganzen Haushalt), automatische Verschiebungen
+  if (kinds.has('rm')) next.removals = (of('rm').map(([, v]) => v) as AppState['removals']).sort((a, b) => a.date.localeCompare(b.date))
+  if (kinds.has('shift')) next.shifts = (of('shift').map(([, v]) => v) as AppState['shifts']).sort((a, b) => a.date.localeCompare(b.date))
   if (kinds.has('shop')) {
     const d = live['shop:day']
     if (typeof d === 'number') next.shopDay = d
@@ -713,7 +720,7 @@ export function applyRound(cur: AppState, res: RoundResult): { state: AppState; 
       customRecipes: n.customRecipes, customIngredients: n.customIngredients, prices: n.prices, staples: n.staples, spices: n.spices,
       pantryRequests: n.pantryRequests, ratings: n.ratings, rejects: n.rejects, portionFeedback: n.portionFeedback, bakeRatings: n.bakeRatings, baked: n.baked,
       bfRatings: n.bfRatings, bfSatiety: n.bfSatiety,
-      trips: n.trips, shopDay: n.shopDay, shopOrder: n.shopOrder,
+      trips: n.trips, shopDay: n.shopDay, shopOrder: n.shopOrder, removals: n.removals, shifts: n.shifts,
       onboarding: cur.onboarding ?? n.onboarding,
       sync,
     },

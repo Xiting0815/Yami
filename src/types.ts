@@ -225,6 +225,11 @@ export interface PlanEntry {
    * Dann sind die Zutaten schon beim Vorbereiten abgezogen – am Tag wird nur 1 Glas/Dose aus diesem Posten verbraucht.
    */
   prep?: string
+  /**
+   * nur Abendessen: angenommene Notlösung für dieses Gericht, Zutat → Ersatz (z. B. { Sahne: 'Schmand' }, siehe
+   * src/kitchen/swap.ts). Bedarf, Einkauf, Abziehen und Kalender rechnen dann mit dem Ersatz.
+   */
+  swap?: Record<string, string>
 }
 
 /** Eingeplantes Backen an einem Tag: Rezept (Backen & Desserts, Grundrezept) × Rezeptmenge */

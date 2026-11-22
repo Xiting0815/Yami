@@ -5,7 +5,7 @@
 import { RECIPE_BY_ID } from './data/recipes'
 import { assignBreakfasts, mondayIso, prepPlan, resolvePrepDay } from './breakfast'
 import { HaError } from './homeassistant'
-import { addDaysIso } from './kitchen'
+import { addDaysIso, entryRecipe, swapText } from './kitchen'
 import type { PantryLot } from './kitchen'
 import { weighedThisWeek, type WeighIn } from './progress'
 import { forDaysText, formatAmount, isBought, missingPacks, packText, scale } from './shopping'
@@ -31,10 +31,12 @@ export interface RemoteTodo {
 }
 
 /** "Rinderhackfleisch – 500 g" */
-export function todoSummary(it: BuyItem, trip?: string): string {
+export function todoSummary(it: BuyItem & { forgot?: string }, trip?: string): string {
   const partly = !isBought(it) && it.bought > 0
   const amt = partly ? `noch ${missingPacks(it)} ${it.product.packName ?? 'Stk'}` : packText(it)
-  const base = amt ? `${it.name} – ${amt}` : it.name
+  // gelernt: oft vergessen → auffällig markieren
+  const name = it.forgot ? `⚠️ ${it.name}` : it.name
+  const base = amt ? `${name} – ${amt}` : name
   // Einkauf: Tag des Einkaufs („(Sa)“, „(Mi)“, „(heute)“)
   if (trip) return `${base} (${trip})`
   // ab Samstag: Bedarf für Sa/So der laufenden Woche kenntlich machen
@@ -364,7 +366,7 @@ export function plannedDinners(plan: WeekPlan, today: string): Desired[] {
   for (let i = 0; i <= 7; i++) {
     const D = addDaysIso(today, i)
     const e = plan[D]
-    const r = e && RECIPE_BY_ID[e.recipeId]
+    const r = e && RECIPE_BY_ID[e.recipeId] ? entryRecipe(e) : undefined
     if (!e || !r || e.status) continue
     const lines = r.ingredients.map((ing) => {
       const amt = formatAmount(scale(ing, r.servings, e.servings), ing.unit)
@@ -376,7 +378,7 @@ export function plannedDinners(plan: WeekPlan, today: string): Desired[] {
       description: `${e.servings} ${e.servings === 1 ? 'Portion' : 'Portionen'}\n${lines.join('\n')}`,
       start: stamp(at(D, 18, 30)),
       end: stamp(at(D, 19, 30)),
-      sig: `${e.recipeId}×${e.servings}`,
+      sig: `${e.recipeId}×${e.servings}${e.swap ? `|${swapText(e.swap)}` : ''}`,
     })
   }
   return out

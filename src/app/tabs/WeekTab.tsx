@@ -13,6 +13,8 @@ import { pendingSatiety, prepRatingKey } from '../../breakfastPrep'
 import { ReviewCard } from '../../components/ReviewCard'
 import { StartCard, type StartStep } from '../../components/StartCard'
 import { type Notice, WeekView } from '../../components/WeekView'
+import { DayAlert } from '../../components/DayAlert'
+import { activeShifts, standInsOf, warningsOf } from '../../shortage'
 import { dayRangeText } from '../dates'
 import type { AppModel } from '../useAppModel'
 
@@ -97,8 +99,39 @@ export function WeekTab({ m }: { m: AppModel }) {
   )
   const askRecipe = pendingBake ? RECIPE_BY_ID[pendingBake.entry.recipeId] : undefined
 
+  // Fehlt etwas? (Vorrat minus Verbrauch der Tage davor, plus kommende Einkäufe) – Warnung, Ersatz, Verschiebungen
+  const warnings = useMemo(
+    () => warningsOf(state, today, plan.trips),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [plan.trips, state.plan, state.pantry, state.breakfast, state.bakePlan, state.prepDays, state.trips, today],
+  )
+  const standIns = useMemo(
+    () => new Map(warnings.filter((w) => w.kind === 'dinner' && w.missing.length).map((w) => [w.day, standInsOf(state, today, w.day, plan.trips)])),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [warnings],
+  )
+  const shifts = activeShifts(state, today)
+
   return (
     <WeekView
+      dayAlert={(day) =>
+        day < today ? null : (
+          <DayAlert
+            day={day}
+            today={today}
+            warnings={warnings.filter((w) => w.day === day)}
+            shift={shifts.find((x) => x.to === day)}
+            swap={state.plan[day] && !state.plan[day]!.status ? state.plan[day]!.swap : undefined}
+            standIns={standIns.get(day) ?? []}
+            onBuy={act.buyMissing}
+            onShift={act.shiftDay}
+            onStandIn={act.takeStandIn}
+            onDropStandIn={act.dropStandIn}
+            onUndoShift={act.undoShiftRec}
+            onBuyBack={act.undoShiftAndBuy}
+          />
+        )
+      }
       bakes={state.bakePlan}
       onBake={(day, recipeId) => ui.setBakeSheet({ day, recipeId })}
       bakeSlot={

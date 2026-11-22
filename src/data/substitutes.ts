@@ -86,3 +86,66 @@ export function substitutesFor(name: string): string[] {
 export function interchangeable(a: string, b: string): boolean {
   return a === b || (GROUP_OF.has(a) && GROUP_OF.get(a) === GROUP_OF.get(b))
 }
+
+/**
+ * Notlösung für EIN Gericht („Schmand statt Sahne“): fehlt eine Zutat, schlägt die Wochenansicht vor, was davon im Vorrat
+ * liegt. Anders als SUBSTITUTE_GROUPS wird das nie automatisch genommen – erst, wenn du den Ersatz für dieses Gericht
+ * annimmst (PlanEntry.swap). Reihenfolge = Vorschlags-Reihenfolge. Nur Zutaten, deren Mengen sich umrechnen lassen.
+ */
+export const STAND_INS: Record<string, string[]> = {
+  Sahne: ['Crème fraîche', 'Schmand', 'Mascarpone', 'Frischkäse', 'Milch'],
+  'Crème fraîche': ['Sahne', 'Joghurt natur', 'Frischkäse'],
+  Schmand: ['Sahne', 'Joghurt natur', 'Frischkäse'],
+  'Saure Sahne': ['Joghurt natur', 'Sahne', 'Frischkäse'],
+  'Joghurt natur': ['Skyr', 'Saure Sahne', 'Speisequark'],
+  Skyr: ['Joghurt natur', 'Magerquark'],
+  Magerquark: ['Speisequark', 'Skyr'],
+  Speisequark: ['Magerquark', 'Skyr'],
+  Frischkäse: ['Mascarpone', 'Schmand'],
+  Speckwürfel: ['Bacon', 'Pancetta', 'Guanciale', 'Schweinebauch geräuchert', 'Katenschinken', 'Kochschinken'],
+  Bacon: ['Speckwürfel', 'Pancetta', 'Guanciale'],
+  Pancetta: ['Guanciale', 'Speckwürfel', 'Bacon'],
+  Guanciale: ['Pancetta', 'Speckwürfel', 'Bacon'],
+  'Hackfleisch gemischt': ['Rinderhackfleisch', 'Schweinehackfleisch'],
+  Rinderhackfleisch: ['Hackfleisch gemischt', 'Schweinehackfleisch'],
+  Schweinehackfleisch: ['Hackfleisch gemischt', 'Rinderhackfleisch'],
+  Hähnchenbrustfilet: ['Hähnchenschenkelfilet', 'Putenbrust'],
+  Hähnchenschenkelfilet: ['Hähnchenbrustfilet', 'Putenbrust'],
+  Putenbrust: ['Hähnchenbrustfilet', 'Hähnchenschenkelfilet'],
+  'Parmigiano Reggiano': ['Pecorino Romano', 'Bergkäse', 'Gruyère'],
+  'Pecorino Romano': ['Parmigiano Reggiano'],
+  'Emmentaler gerieben': ['Gouda gerieben', 'Bergkäse', 'Gruyère'],
+  'Gouda gerieben': ['Emmentaler gerieben', 'Bergkäse'],
+  Bergkäse: ['Gruyère', 'Emmentaler gerieben'],
+  Gruyère: ['Bergkäse', 'Emmentaler gerieben'],
+  Butter: ['Butterschmalz'],
+  Butterschmalz: ['Butter'],
+  Zwiebel: ['Zwiebel rot', 'Schalotte'],
+  'Zwiebel rot': ['Zwiebel', 'Schalotte'],
+  Schalotte: ['Zwiebel', 'Zwiebel rot'],
+  'Kartoffeln festkochend': ['Kartoffeln mehligkochend'],
+  'Kartoffeln mehligkochend': ['Kartoffeln festkochend'],
+  Datteltomaten: ['Kirschtomaten'],
+  Kirschtomaten: ['Datteltomaten'],
+  'Gehackte Tomaten': ['Geschälte Tomaten'],
+  'Geschälte Tomaten': ['Gehackte Tomaten'],
+  Langkornreis: ['Jasminreis'],
+  Jasminreis: ['Langkornreis'],
+  Champignons: ['Champignons braun'],
+  'Champignons braun': ['Champignons'],
+  'Paprika rot': ['Paprika gelb', 'Paprika grün'],
+  'Paprika gelb': ['Paprika rot', 'Paprika grün'],
+  'Paprika grün': ['Paprika rot', 'Paprika gelb'],
+  Zitrone: ['Limette'],
+  Limette: ['Zitrone'],
+  'Blattspinat frisch': ['Blattspinat TK'],
+  'Blattspinat TK': ['Blattspinat frisch'],
+  'Erbsen TK': ['Erbsen und Möhren TK'],
+  Rinderfond: ['Kalbsfond'],
+  Kalbsfond: ['Rinderfond'],
+}
+
+/** Kandidaten für eine Notlösung (ohne die Zutat selbst) */
+export function standInsFor(name: string): string[] {
+  return (STAND_INS[name] ?? []).filter((n) => n !== name)
+}

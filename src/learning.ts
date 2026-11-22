@@ -13,6 +13,9 @@
  *
  * Gelernt wird pro Gericht UND pro Muster (Küche, Gerichtart, Hauptzutat, schnell/aufwendig an Werktagen
  * bzw. am Wochenende, Frühstückstyp). So bekommen auch nie gesehene Gerichte einen passenden Platz.
+ *
+ * Kein Geschmack, aber auch gelernt: „Vergessen zu kaufen“ beim Löschen im Vorrat → „⚠️ oft vergessen“ (src/forgot.ts),
+ * „Aufgebraucht“ bei Grundzutaten → Verbrauch (removalUseEvents in src/staples.ts).
  */
 import { CATALOG } from './data/catalog'
 import { RECIPE_BY_ID } from './data/recipes'

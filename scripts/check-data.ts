@@ -8,8 +8,8 @@ import { EXTRA_NUTRI_DUPLICATES } from '../src/data/nutrition'
 import { BASICS } from '../src/data/recipes'
 import { yieldStock } from '../src/data/define'
 import { EXTRA_GROUPS, EXTRA_SUBSTITUTE_GROUPS, EXTRA_PREFERRED } from '../src/data/extra'
-import { SUBSTITUTE_GROUPS } from '../src/data/substitutes'
-import { canonical, toBase } from '../src/kitchen'
+import { STAND_INS, SUBSTITUTE_GROUPS } from '../src/data/substitutes'
+import { canonical, convertAmount, toBase } from '../src/kitchen'
 import { isSpice } from '../src/staples'
 import { DEVICE_STEPS } from '../src/data/device-steps'
 import { validateSetting } from '../src/deviceText'
@@ -117,6 +117,12 @@ for (const [g, names] of Object.entries(SUBSTITUTE_GROUPS)) {
   for (const n of names) if (!CATALOG[n] || !PRODUCTS[n]) { console.error(`Austausch-Gruppe ${g}: "${n}" ohne Katalog/Produkt`); errors++ }
   if (units.size > 1) { console.error(`Austausch-Gruppe ${g}: verschiedene Einheiten (${[...units].join(', ')})`); errors++ }
 }
+// Notlösungen für ein Gericht („Schmand statt Sahne“): beide Zutaten bekannt, Menge umrechenbar
+for (const [n, subs] of Object.entries(STAND_INS))
+  for (const sub of [n, ...subs]) {
+    if (!CATALOG[sub] || !PRODUCTS[sub]) { console.error(`Ersatz ${n}: "${sub}" ohne Katalog/Produkt`); errors++ }
+    else if (sub !== n && convertAmount(n, 100, sub) == null) { console.error(`Ersatz ${n} → ${sub}: Menge nicht umrechenbar`); errors++ }
+  }
 for (const g of Object.keys(EXTRA_SUBSTITUTE_GROUPS)) if (!SUBSTITUTE_GROUPS[g]) { console.error(`extra: Austausch-Gruppe ${g} hat nur ein Mitglied`); errors++ }
 for (const [n, prefs] of Object.entries(EXTRA_PREFERRED))
   for (const p of prefs) if (!SUBSTITUTE_GROUPS[Object.keys(SUBSTITUTE_GROUPS).find((g) => SUBSTITUTE_GROUPS[g].includes(n) && SUBSTITUTE_GROUPS[g].includes(p)) ?? '']) {

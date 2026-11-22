@@ -6,9 +6,10 @@ import { substitutesFor } from '../data/substitutes'
 import type { BakePlan, PlanEntry, Recipe, ShopSection, WeekPlan } from '../types'
 import { shopSection } from '../shopSection'
 import { bakeEntriesOf } from '../bakePlan'
-import { type SpiceStatus, isSpice, type StapleMemos, STAPLE_SHOP_CAT, buyName, isQtyStaple, isTrackedStaple, runningLow, stapleKey, useEvents, useRate } from '../staples'
+import { type SpiceStatus, isSpice, type StapleMemos, STAPLE_SHOP_CAT, buyName, isQtyStaple, isTrackedStaple, runningLow, stapleKey, type UseEvent, useEvents, useRate } from '../staples'
 import { type PantryLot, type PriceOverrides, type BoughtMap, addDaysIso, canonical, productFor, isTracked, needsOf, stapleNeedsOf, allNeedsOf } from './base'
 import { usableOn, lotsFor, consume, takeFromLot } from './pantry'
+import { entryRecipe } from './swap'
 
 export interface BuyItem {
   key: string
@@ -77,6 +78,8 @@ export interface StapleContext {
   carry?: boolean
   /** gelernter Portionsfaktor des Haushalts (Abendessen): offene Gerichte brauchen Portionen × Faktor, Standard 1 */
   portion?: number
+  /** weiterer Verbrauch von Grundzutaten außerhalb der Rezepte (im Vorrat als „Aufgebraucht“ gelöscht) */
+  extraUse?: UseEvent[]
 }
 
 export interface WeekResult {
@@ -158,7 +161,7 @@ export function planWeek(
   const staples = new Map<string, { parts: Map<string, number>; recipes: Set<string> }>()
   const reqDays = new Map<string, Set<string>>()
   for (const [day, e] of entries) {
-    const r = RECIPE_BY_ID[e.recipeId]
+    const r = entryRecipe(e)
     for (const n of needsFor(r, e.servings)) {
       if (ownerOf(day, n.name) !== 0) continue
       const cur = reqOf(n.name)
@@ -234,7 +237,7 @@ export function planWeek(
   earlier.push(...bakes.filter(([d]) => d < days[0]))
   earlier.sort((a, b) => a[0].localeCompare(b[0]))
   for (const [day, e] of earlier) {
-    const r = RECIPE_BY_ID[e.recipeId]
+    const r = entryRecipe(e)
     for (const n of needsFor(r, e.servings)) {
       const d = useDay(day, e)
       const got = sum(take(n.name, n.amount, d, true))
@@ -252,7 +255,7 @@ export function planWeek(
   // diese Woche: 1. Durchgang Zutat selbst (Tag für Tag) – 2. Durchgang austauschbare Posten für den Rest
   const availExact = new Map<string, number>()
   for (const name of req.keys()) availExact.set(name, sum(lotsFor(pool, name, today, true)))
-  const allNeeds = entries.flatMap(([day, e]) => needsFor(RECIPE_BY_ID[e.recipeId], e.servings).map((n) => ({ ...n, day: useDay(day, e), owner: ownerOf(day, n.name), exact: 0 })))
+  const allNeeds = entries.flatMap(([day, e]) => needsFor(entryRecipe(e), e.servings).map((n) => ({ ...n, day: useDay(day, e), owner: ownerOf(day, n.name), exact: 0 })))
   // Bedarf früherer Einkäufe (gleiche Tage): bedient sich zuerst – Zutat selbst, dann austauschbare
   for (const n of allNeeds.filter((x) => x.owner < 0)) {
     const got = sum(take(n.name, n.amount, n.day, true))
@@ -330,7 +333,7 @@ export function planWeek(
   }
 
   // Lernen: Grundzutaten, die bald leer sind (aus dem Verbrauch der letzten Wochen) oder fast leer, kommen auf die Liste
-  const events = useEvents(plan, breakfast)
+  const events = [...useEvents(plan, breakfast), ...(staple.extraUse ?? [])]
   const keys = new Set<string>([...Object.keys(memo), ...pantry.filter((l) => isQtyStaple(l.name)).map((l) => stapleKey(l.name))])
   for (const key of scope && !scope.extras ? [] : keys) {
     if (!trackedKey(key) || buy.some((b) => stapleKey(b.name) === key && isQtyStaple(b.name))) continue
@@ -362,7 +365,7 @@ export function planWeek(
   // erst die noch offenen Gerichte vor dieser Woche, dann die dieser Woche
   for (const [day, e] of [...earlier, ...entries]) {
     if (e.status === 'cooked') continue
-    for (const n of allNeedsOf(RECIPE_BY_ID[e.recipeId], e.servings)) {
+    for (const n of allNeedsOf(entryRecipe(e), e.servings)) {
       consume(lots, n.name, n.amount, day < today ? today : day)
       consume(free, n.name, n.amount, day < today ? today : day)
     }
@@ -379,7 +382,7 @@ export function planWeek(
     const hit = bought[name] != null
     const product = productFor(name, overrides)
     if ((st !== 'alle' && !hit) || !product) continue
-    const used = entries.map(([, e]) => RECIPE_BY_ID[e.recipeId]).filter((r) => r.ingredients.some((i) => canonical(i.name) === name))
+    const used = entries.map(([, e]) => entryRecipe(e)).filter((r) => r.ingredients.some((i) => canonical(i.name) === name))
     const item: BuyItem = {
       key: name, name, cat: shopSection(name, STAPLE_SHOP_CAT), unit: product.unit, required: 0, fromPantry: 0, substitutes: [], packs: 1, product,
       cost: product.price, leftover: 0, bought: bought[name]?.amount ?? 0, recipes: [...new Set(used.map((r) => r.title))], note: 'alle',

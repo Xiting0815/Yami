@@ -108,6 +108,7 @@ export function ShoppingList(props: Props) {
                       <span className="check" aria-hidden />
                       <span className="item-name">
                         {it.name}
+                        {it.forgot && <small className="forgot">{it.forgot}</small>}
                         {it.note && <small className="item-note">{NOTE_TEXT[it.note]}</small>}
                         {it.reason && <small className="item-note">🕒 {it.reason}</small>}
                         {it.forDays && <small className="item-note">{forDaysText(it)}</small>}

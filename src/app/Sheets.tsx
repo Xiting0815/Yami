@@ -1,4 +1,5 @@
 import { RECIPE_BY_ID } from '../data/recipes'
+import { forgottenItems } from '../forgot'
 import { learnedPrepWeekday } from '../breakfast'
 import { findPrep, preppedKeep, preppedText } from '../breakfastPrep'
 import { pantryWishes, portionNote, satietyNote, summarize } from '../learning'
@@ -321,6 +322,7 @@ export function Sheets({ m }: { m: AppModel }) {
           haMain={state.sync?.main ? { person: state.sync.main.person, mine: state.sync.main.device === state.ha?.device } : undefined}
           portionNote={portionNote(plan.portion)}
           satietyNote={satietyNote(bf.satiety)}
+          forgotten={forgottenItems(state.removals, today)}
           wishes={pantryWishes(state.pantryRequests)}
           prepWeekday={learnedPrepWeekday(state.prepDays, today)}
           onResetLearning={act.resetLearning}

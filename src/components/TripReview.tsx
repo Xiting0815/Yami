@@ -48,7 +48,7 @@ export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, 
       {item ? (
         <div className="review-item">
           <p className="muted small">Hast du das schon da?</p>
-          <h3>{item.name}</h3>
+          <h3>{item.name}{item.forgot && <small className="forgot">{item.forgot}</small>}</h3>
           <p className="review-amt">{packText(item)}</p>
           {item.reason && <p className="item-note">🕒 {item.reason}</p>}
           {item.recipes.length > 0 && <p className="muted small">Für: {item.recipes.join(' · ')}</p>}
