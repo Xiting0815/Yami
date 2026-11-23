@@ -19,6 +19,7 @@ import { plannedDinners } from '../src/haSync'
 import { settingText, validateSetting } from '../src/deviceText'
 import { gasgrill, traeger } from '../src/data/device-helpers'
 import { basicFor } from '../src/data/recipes'
+import { nutritionOf } from '../src/data/nutrition-calc'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -146,6 +147,15 @@ ok(settingText(traeger('Smoken', 250, { minutes: 210, core: 95 })) === 'Traeger 
 ok(validateSetting({ device: 'dutch', mode: 'Schmoren', level: 'niedrig', minutes: 150 }).length === 0 && validateSetting({ device: 'dutch', mode: 'Schmoren', level: 'niedrig', temp: 180 }).length > 0, 'Dutch Oven (Gas): Flamme statt Temperatur')
 ok(validateSetting({ device: 'vakuum', mode: 'Vakuumieren feucht' }).length === 0 && validateSetting({ device: 'vakuum', mode: 'Vakuumieren', minutes: 5 }).length > 0, 'Vakuumierer: nur Betriebsart')
 ok(pp.deviceSteps!.some((s) => s.settings?.some((x) => x.device === 'vakuum')) && pp.deviceSteps!.some((s) => s.settings?.some((x) => x.device === 'steamer' && x.mode === 'Vacuisine')), 'Pulled Pork: vakuumieren, später im CombiSteamer (Vacuisine) aufwärmen')
+
+// ───── 9) Fettverlust beim Smoken (`fatLoss`) ─────
+const brisket = RECIPE_BY_ID['texas-brisket']
+const raw = brisket && nutritionOf(brisket.ingredients, brisket.portions!)
+ok(!!brisket && !!raw && brisket.nutrition.fat < raw.fat && brisket.nutrition.kcal < raw.kcal && Math.abs(raw.kcal - brisket.nutrition.kcal - (raw.fat - brisket.nutrition.fat) * 9) < 2,
+  `Brisket: abtropfendes Fett senkt Fett/kcal je Portion (${raw?.kcal} → ${brisket?.nutrition.kcal} kcal)`)
+const bacon = [{ name: 'Bacon', amount: 100, unit: 'g' }, { name: 'BBQ-Sauce', amount: 100, unit: 'ml' }]
+ok(nutritionOf(bacon, 1, 0.4).fat === Math.round((nutritionOf(bacon, 1).fat - 37 * 0.4) * 10) / 10 && nutritionOf(bacon, 1, 0.9).fat === nutritionOf(bacon, 1, 0.4).fat, 'Fettverlust nur am Fleisch, höchstens 40 %')
+ok((NUTRI['Brisket (vakuumiert)']?.[2] ?? 99) < 25 && (NUTRI['Pulled Pork (vakuumiert)']?.[0] ?? 0) > 100, 'Reste-Nährwerte berücksichtigen den Fettverlust')
 
 if (fails) {
   console.error(`${fails} Test(s) fehlgeschlagen`)

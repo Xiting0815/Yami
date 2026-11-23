@@ -30,6 +30,8 @@ export interface RawRecipe {
   bbq?: BbqGroup
   /** BBQ: Portionen der ganzen Ladung */
   portions?: number
+  /** BBQ: Anteil des Fleischfetts, der beim Smoken abtropft (0–0,4; siehe `BbqOptions.fatLoss`) */
+  fatLoss?: number
 }
 
 /**
@@ -212,6 +214,12 @@ export interface BbqOptions {
   cuisine?: Cuisine
   /** „💡 Leichter:“-Tipp (optional) */
   lighter?: string
+  /**
+   * Anteil des Fleischfetts, der beim Smoken abtropft bzw. ausgelassen wird (0–0,4): senkt Fett und kcal je Portion
+   * und in den Reste-Nährwerten (nur Zutaten aus „Fleisch & Fisch“). Richtwerte: Brisket/Pork Belly 0,35–0,4,
+   * Nacken/Ribs 0,25–0,3, Hähnchen mit Haut 0,2–0,25, Hack/Speck-Gerichte 0,15–0,25, Fisch 0.
+   */
+  fatLoss?: number
 }
 
 /**
@@ -239,6 +247,7 @@ export function bbq(id: string, title: string, o: BbqOptions, ingredients: strin
     kind: 'bbq',
     bbq: o.group,
     lighter: o.lighter,
+    ...(o.fatLoss ? { fatLoss: Math.min(0.4, Math.max(0, o.fatLoss)) } : {}),
     ...(l
       ? {
           yields: {

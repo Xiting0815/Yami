@@ -46,7 +46,7 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
     image: images[r.id]?.file,
     festive: r.festive,
     // BBQ: Zutaten für die ganze Ladung → Nährwerte je Portion der Ladung
-    nutrition: nutritionOf(r.ingredients, r.portions ?? servings),
+    nutrition: nutritionOf(r.ingredients, r.portions ?? servings, r.fatLoss),
     ...(r.basic ? { basic: true as const, yields: withPerPiece(r), kind: r.kind ?? 'grundrezept', lighter: r.lighter } : {}),
     ...(r.bbq ? { bbq: r.bbq } : {}),
     ...(r.portions ? { portions: r.portions } : {}),

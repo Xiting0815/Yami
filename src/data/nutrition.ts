@@ -5,7 +5,7 @@
  * Fleisch mit Knochen/Muscheln mit Schale sind auf das Einkaufsgewicht bezogen (essbarer Anteil eingerechnet).
  */
 import { SLICE_G, type RawRecipe } from './define'
-import { SHOP_ALIAS } from './catalog'
+import { CATALOG, SHOP_ALIAS } from './catalog'
 import { EXTRA_GRAMS, EXTRA_NUTRI, EXTRA_YIELDS } from './extra'
 
 type N = [number, number, number, number, number]
@@ -518,6 +518,14 @@ const gramsLocal = (name: string, amount: number, unit: string): number | null =
   return d != null ? amount * d : null
 }
 
+/**
+ * BBQ (`bbq({ fatLoss })`): Anteil des Fleischfetts, der beim Smoken abtropft/ausgelassen wird (0–0,4).
+ * Gilt nur für Zutaten aus „Fleisch & Fisch“; je Gramm verlorenem Fett 9 kcal weniger.
+ */
+export function lostFat(name: string, fatGrams: number, fatLoss?: number): number {
+  return fatLoss && CATALOG[name] === 'fleisch' ? fatGrams * Math.min(0.4, Math.max(0, fatLoss)) : 0
+}
+
 /** Summe der Nährwerte und Rohgewicht eines ganzen Rezepts */
 function batchTotals(r: RawRecipe): { n: N; grams: number } {
   const n: N = [0, 0, 0, 0, 0]
@@ -528,7 +536,11 @@ function batchTotals(r: RawRecipe): { n: N; grams: number } {
     const g = gramsLocal(i.name, i.amount, i.unit)
     if (g == null) continue
     grams += g
-    if (v) for (let k = 0; k < 5; k++) n[k] += (v[k] * g) / 100
+    if (!v) continue
+    for (let k = 0; k < 5; k++) n[k] += (v[k] * g) / 100
+    const lost = lostFat(i.name, (v[2] * g) / 100, r.fatLoss)
+    n[2] -= lost
+    n[0] -= lost * 9
   }
   return { n, grams }
 }
