@@ -1,53 +1,83 @@
 | Datei-Name | Gericht |
 |---|---|
-| haehnchen-paprika-pfanne | Goldbraun gebratene Hähnchenstreifen mit roten und gelben Paprikastreifen, Zwiebeln und Champignons in einer Pfanne, daneben knusprige Kartoffelspalten, mit Petersilie bestreut |
-| puten-champignon-geschnetzeltes | Zartes Putengeschnetzeltes mit braunen Champignons in heller Sauce auf einem Berg Reis, mit gehackter Petersilie auf einem tiefen Teller |
-| senf-haehnchen-ofengemuese | Senf-bestrichene Hähnchenbrust auf einem Blech mit geröstetem Ofengemüse: Möhren, Zucchini, rote Paprika, rote Zwiebel und Kartoffelwürfel mit Thymian |
-| seelachs-gemuesebett | Saftiges Seelachsfilet auf einem Bett aus Lauchringen und Möhrenscheiben in heller Senfsauce, dazu Dillkartoffeln und eine Zitronenspalte auf einem Teller |
-| zander-gurkengemuese | Goldbraun gebratenes Zanderfilet auf cremigem Gurkengemüse mit Dill, daneben Dillkartoffeln und eine Zitronenspalte |
-| schweinefilet-bohnen | Rosa gebratene Schweinefilet-Medaillons mit brauner Sauce, grüne Bohnen mit Speckstreifen und halbierte Salzkartoffeln auf einem Teller |
-| brotzeitbrett | Rustikales Holzbrett mit Vollkornbrotscheiben, Katenschinken, Kochschinken, orangefarbenem Obazda mit Schnittlauch, Radieschen, Gurkenscheiben und Tomatenspalten |
-| bauernsalat-speck | Großer Salat aus Tomaten, Gurke, roter Paprika und roten Zwiebelringen mit knusprigen Speckwürfeln und gevierteltem Ei, dazu dicke Scheiben Vollkornbrot |
-| rosenkohl-speck-bratwurst | Dunkel geröstete Rosenkohlhälften mit knusprigen Speckwürfeln und Zwiebelspalten, daneben zwei braun gebratene Bratwürste und ein Hügel cremiges Kartoffelpüree mit einem Stich Butter auf einem Teller |
-| rahm-rosenkohl-frikadellen | Zarter Rosenkohl in heller Sahnesauce, zwei goldbraune Frikadellen und gekochte Salzkartoffeln mit gehackter Petersilie auf einem tiefen Teller |
-| rosenkohl-speck-kasseler | Ein gebratenes Kasseler-Kotelett mit Röststreifen, daneben Rosenkohl mit Speckwürfeln und Zwiebeln und halbierte Petersilienkartoffeln auf einem Teller |
-| smashed-burger | Ein Burger mit zwei dünnen, knusprig gebräunten Smash-Patties mit zerlaufenem Cheddar und karamellisierten Zwiebeln im gerösteten Brötchen, dazu Pommes auf einem Teller |
-| cacciatora-leggera | Hähnchenstücke in rotem Tomatenschmorgemüse mit Paprika, Champignons, schwarzen Oliven und Kapern, daneben weiche Polenta, mit Rosmarinzweig |
-| puten-saltimbocca | Zwei Putenschnitzel mit Parmaschinken und Salbeiblättern in glänzender Weißweinsauce, gebratene Zucchinischeiben und knusprige Rosmarinkartoffeln |
-| merluzzo-livornese | Kabeljaufilet in Tomatensauce mit halbierten Kirschtomaten, schwarzen Oliven, Kapern und Petersilie in einer flachen Pfanne, dazu Scheiben Toskanisches Brot |
-| straccetti-rucola | Dünne, gebratene Rinderstreifen auf einem Bett aus frischem Rucola mit Kirschtomaten und gehobeltem Parmesan, dazu Scheiben Toskanisches Brot |
-| orecchiette-rosenkohl-salsiccia | Kleine Ohrnudeln mit feinen Rosenkohlstreifen und krümelig gebratener Salsiccia, Chiliringen und frisch gehobeltem Parmigiano Reggiano in einer tiefen Schale |
-| rind-gemuese-wok | Dünne Rindfleischscheiben mit roter Paprika, Zuckerschoten und Möhren in dunkler Sauce aus dem Wok, mit Jasminreis in einer Schale |
-| seelachs-shiitake-pakchoi | Gedämpftes Seelachsfilet mit Shiitake-Scheiben, Ingwer- und Frühlingszwiebelstreifen und Koriander auf einem tiefen Teller, dazu Pak Choi und Jasminreis |
-| haehnchen-chop-suey | Hähnchenstreifen mit Sojasprossen, Chinakohl, Möhrenstiften und Champignons in heller Sauce, unter die Mie-Nudeln gehoben, mit Frühlingszwiebelringen |
-| pute-paprika-cashew | Putenwürfel mit roter und gelber Paprika, Zucchini und gerösteten Cashewkernen in glänzender Hoisin-Sauce, dazu Jasminreis |
-| cannoli-creme | Ein Glas mit geschichteter weißer Ricottacreme und Keksbröseln, bestreut mit Schokoladenstückchen und gehackten Mandeln, daneben ein Löffel |
-| semifreddo-himbeeren | Eine dicke Scheibe cremig-weißes Semifreddo mit roten Himbeermarmorstreifen und gerösteten Mandeln auf einem Teller, daneben frische Himbeeren |
-| streuselkuchen-apfel | Ein Blechkuchen mit dicken, goldbraunen Butterstreuseln, an einer Schnittkante sind Apfelspalten und der Hefeteig zu sehen, ein Stück auf einem Teller mit Kuchengabel |
-| crostata-marmellata | Eine italienische Tarte mit goldbraunem Mürbeteig-Gitter, durch die Lücken leuchtet orange Aprikosenmarmelade, ein Stück herausgenommen auf einem Teller, rustikaler Holztisch |
-| bauernbrot-sauerteig | Ein rundes, dunkelbraunes Roggenmischbrot mit rissiger, bemehlter Kruste auf einem Holzbrett, daneben ein angeschnittenes Stück mit grober Krume und ein Brotmesser |
-| dinkelvollkornbrot | Ein Kastenbrot mit dichter Kruste, einige dicke Scheiben abgeschnitten, sichtbare Leinsamen in der dunklen Krume, auf einem Holzbrett mit Leinentuch |
-| dinkelbroetchen-ueber-nacht | Sechs rustikale, goldbraune Dinkelbrötchen mit eingeschnittener, leicht bemehlter Oberseite in einem Brotkorb mit Leinentuch, ein Brötchen aufgebrochen mit luftiger Krume |
-| brioche-burger-buns | Acht goldbraune, glänzende Brioche-Brötchen mit Sesam auf einem Kuchengitter, eines waagerecht aufgeschnitten, sodass die weiche, helle Krume zu sehen ist |
-| laugenbroetchen | Dunkelbraun glänzende Laugenbrötchen mit Kreuzschnitt und groben Salzkörnern, dazu zwei Laugenbrezeln, auf einem Holzbrett mit Backpapier |
-| pittule-salentine | Goldbraun frittierte, unregelmäßig geformte Pittule (kleine Hefeteig-Bällchen) aus dem Salento auf Küchenpapier in einer Schale, einige mit Tomatenstückchen und Oliven, einige mit Puderzucker bestäubt, daneben ein Schälchen Honig |
-| butterplaetzchen | Goldgelbe Plätzchen in Sternen, Tannenbäumen und Monden, teils mit weißer Zitronenglasur, auf einem Holzbrett mit Ausstechformen und Mehl, weihnachtlich dezent dekoriert |
-| spitzbuben | Runde Mürbeteigplätzchen mit ausgestochenem Loch, dick mit Puderzucker bestäubt, durch das Loch leuchtet rotes Johannisbeergelee, ein Plätzchen aufgeklappt, auf einem weißen Teller |
-| kokosmakronen | Goldbraun gebackene, zerklüftete Kokosmakronen mit weißen Kokosraspeln, bei einigen ist der Boden in dunkle Schokolade getaucht, auf einem Backpapier-Bogen |
-| erdnussbutter-cookies | Runde, hellbraune Cookies mit dem klassischen Gabelmuster (Kreuzmuster) auf der Oberfläche, im Hintergrund ein Glas Erdnussbutter mit Löffel und ein paar Erdnüsse |
-| skyr-haferflocken-cookies | Helle, weiche und dicke Haferflocken-Cookies mit Rosinen und kleinen Schokostückchen, ein Cookie durchgebrochen, auf einem hellen Teller, daneben eine Schale Skyr |
-| baci-di-dama | Kleine Doppelkekse aus Haselnuss-Mürbeteig, zusammengehalten von dunkler Schokolade, die in der Mitte herausschaut, aufgereiht auf einem Teller, daneben ein paar Haselnüsse |
-| biscotti-al-limone | Ovale, hellgelbe Zitronenkekse mit weißer Zitronenglasur und feiner Zitronenschale darauf, auf einem Teller neben halbierten Zitronen und Zitronenblättern, sizilianische Atmosphäre |
-| pizza-napoletana | Neapolitanische Pizza Margherita mit luftigem, aufgegangenem Rand mit dunklen Leopardenflecken, zerdrückten Tomaten, zerlaufenen Mozzarella-Stücken, frischen Basilikumblättern und einem Faden Olivenöl auf einem Holzbrett |
-| pizza-teglia-romana | Rechteckige Stücke römische Blechpizza (Pizza in Teglia) mit knusprigem, luftigem Boden, belegt mit hauchdünnen goldbraunen Kartoffelscheiben, Rosmarin, Salsiccia-Stücken und zerlaufenem Mozzarella auf einem dunklen Blech |
-| pinsa-romana | Ovale Pinsa Romana mit knusprigem, großporigem Rand, Tomatensauce und Mozzarella, belegt mit Parmaschinken und frischem Rucola, auf einem Holzbrett |
-| pizza-bianca-mortadella | Goldbraune Pizza Bianca mit Rosmarin und grobem Salz, belegt mit hauchdünn gefalteter Mortadella, zerzupfter cremiger Burrata und gehackten grünen Pistazien, mit Olivenöl beträufelt |
 | jambalaya | Eine flache Pfanne Jambalaya: rötlicher Reis mit Hähnchenstücken, Wurstscheiben, rosa Garnelen, grüner Paprika und Staudensellerie, bestreut mit Frühlingszwiebelringen, Südstaaten-Küchentisch |
 | pulled-pork-quesadillas | Goldbraun gebratene, halbierte Quesadillas mit sichtbarer Füllung aus Pulled Pork, zerlaufenem Cheddar und Mais, daneben ein Schälchen Limetten-Sauerrahm-Dip und Koriander |
+| chicken-andouille-gumbo | Dark brown Louisiana chicken and sausage gumbo in a deep bowl with a scoop of white rice in the center, sliced green onions and parsley |
+| red-beans-and-rice | New Orleans red beans and rice with smoked sausage slices, creamy kidney beans over white rice, green onions, bottle of hot sauce nearby |
+| shrimp-and-grits | Shrimp and grits: creamy cheesy yellow grits topped with seared Cajun-spiced shrimp, bacon bits and green onions in a shallow bowl |
+| shrimp-etouffee | Shrimp étouffée, thick reddish-brown Cajun sauce with shrimp over white rice, garnished with green onions and parsley |
+| southern-fried-chicken | Crispy golden Southern fried chicken drumsticks and thighs with craggy crust on a wire rack, side of coleslaw |
+| chicken-fried-steak | Chicken fried steak smothered in white peppery country gravy with mashed potatoes and green beans on a plate, diner style |
+| sloppy-joes | Sloppy joe sandwiches with saucy ground beef filling spilling out of toasted buns, pickles and coleslaw on the side |
+| meatloaf-mashed-potatoes | Sliced American meatloaf with shiny ketchup glaze, mashed potatoes and green beans on a plate |
+| chicken-pot-pie | Individual chicken pot pies in ramekins with golden puff pastry lids, one broken open showing creamy chicken, carrots and peas |
+| philly-cheesesteak | Philly cheesesteak sandwich with thinly sliced beef, onions, peppers, mushrooms and melted provolone in a ciabatta roll |
+| buffalo-chicken-wraps | Buffalo chicken wraps cut in half showing spicy orange chicken strips, lettuce, celery and carrot sticks, with blue cheese dip |
+| pulled-pork-mac-and-cheese | Mac and cheese with broccoli topped with BBQ pulled pork and golden panko crust in a baking dish |
+| pulled-pork-nachos | Sheet pan nachos with homemade tortilla chips, BBQ pulled pork, kidney beans, corn, melted cheddar, pico de gallo and sour cream |
 | pulled-pork | Saftiges, gezupftes Pulled Pork mit dunkler, krustiger Bark auf einem Holzbrett, daneben zwei Gabeln und ein Schälchen dunkle BBQ-Sauce, im Hintergrund ein Pellet-Smoker |
+| spareribs-321 | Two racks of smoked St. Louis cut pork spare ribs with glossy dark red BBQ glaze and pink smoke ring, cut into bones on a wooden board, rustic backyard barbecue |
+| baby-back-ribs | Glazed baby back pork ribs from a pellet smoker, sliced between the bones, sticky caramelized barbecue sauce, wooden cutting board, natural light |
+| pork-belly-burnt-ends | Pork belly burnt ends, caramelized sticky cubes of smoked pork belly in a foil pan with glossy BBQ glaze, toothpicks, close-up |
+| texas-brisket | Sliced Texas style smoked beef brisket with thick black pepper bark and red smoke ring on butcher paper, juicy slices, pickles and white bread on the side |
+| brisket-burnt-ends | Kansas City brisket burnt ends, dark crusty cubes of smoked beef brisket glazed with BBQ sauce in a pan, close-up, rustic |
+| chicken-wings-smoker | Crispy smoked buffalo chicken wings tossed in orange hot sauce, celery sticks and blue cheese dip, on a dark plate |
+| spatchcock-chicken | Golden brown spatchcocked whole chicken with crispy skin fresh from a pellet smoker, lemon halves, on a wooden board |
+| moink-balls | Moink balls: bacon wrapped meatballs glazed with BBQ sauce on toothpicks, smoked, served on a board |
+| atomic-buffalo-turds | Atomic buffalo turds: halved jalapeno peppers stuffed with cream cheese and cheddar, wrapped in crispy bacon, smoked on a grill rack |
+| smoked-salmon | Hot smoked salmon fillet with honey glaze and cracked black pepper, flaky pink flesh, fresh dill and lemon wedges |
+| carolina-pulled-pork | Carolina pulled pork sandwich with vinegar sauce, chopped smoked pork on a soft bun topped with creamy coleslaw |
+| smoked-meatloaf | Smoked meatloaf with shiny ketchup brown sugar glaze, sliced thick on a cutting board, smoke ring visible |
+| bacon-fatty | Bacon explosion fatty: woven bacon lattice roll stuffed with sausage meat, cheddar and peppers, sliced showing the spiral |
+| picanha-reverse-sear | Reverse seared picanha (top sirloin cap) with crispy scored fat cap, sliced medium rare, coarse salt, on a wooden board |
 | beer-can-chicken | Ein ganzes, goldbraun glänzendes Hähnchen aufrecht auf einer Bierdose auf dem Rost eines Gasgrills mit offenem Deckel, krosse, rötliche Gewürzhaut |
+| rumpsteak-gasgrill | Two thick grilled New York strip steaks with crosshatch grill marks and melting garlic herb butter on a wooden board, next to a foil-wrapped baked potato split open with sour cream and chives |
+| ribeye-reverse-sear | A thick reverse-seared ribeye steak sliced against the grain on a cutting board, evenly pink from edge to edge with a dark crust, rosemary sprig and coarse black pepper |
+| shish-kebab | American-style shish kebab skewers with charred beef cubes, red and green bell pepper, red onion, mushrooms and cherry tomatoes on a platter with rice pilaf and a bowl of garlic yogurt sauce |
+| chicken-thighs-alabama | Crispy grilled chicken leg quarters glistening with creamy white Alabama barbecue sauce on a metal tray, a small bowl of extra white sauce and coarse black pepper on the side |
+| elote | Mexican street corn: grilled charred corn cobs coated with creamy mayonnaise crema, crumbled white cheese, smoked paprika, chopped cilantro and lime wedges on a plate |
+| cajun-garnelen-spiesse | Grilled Cajun shrimp skewers with red bell pepper and red onion, brushed with garlic parsley butter, served on white rice with lemon wedges |
+| cedar-plank-salmon | A glazed salmon fillet with caramelized brown sugar mustard crust on a smoking cedar wood plank on a gas grill, garnished with dill and lemon, green beans on the side |
 | chili-dutch-oven | Ein schwarzer gusseiserner Dutch Oven voller dunkelrotem Chili con Carne mit Rindfleischwürfeln und Kidneybohnen, Holzlöffel, im Freien auf einem Gaskocher |
+| texas-chili | A bowl of dark red Texas chili con carne with tender cubes of beef and no beans, topped with shredded cheddar, a black cast iron dutch oven and saltine crackers in the background |
+| schichtfleisch | German Schichtfleisch in a black cast iron dutch oven: layers of braised pork neck steaks, soft onion rings, red pepper strips and bacon in a rich paprika sauce, served outdoors |
+| cowboy-beans | Cowboy beans with ground beef and crispy bacon in a thick smoky barbecue sauce with kidney beans and white beans in a cast iron dutch oven, wooden spoon, cornbread on the side |
+| pulled-chicken-dutch | A pulled chicken sandwich on a toasted bun piled high with shredded barbecue chicken thighs, coleslaw on the side, cast iron dutch oven with more pulled chicken behind |
+| pot-roast | Yankee pot roast in a cast iron dutch oven: fork-tender braised beef chuck with carrots, potatoes and celery in a dark red wine gravy, thyme and rosemary sprigs |
+| peach-cobbler | Southern peach cobbler in a black cast iron dutch oven with a golden brown cake topping bubbling around cinnamon peach slices, a scoop of vanilla ice cream melting on top |
+| no-knead-brot | A crusty round no-knead bread loaf with a deep brown crackly crust and flour dusting, sitting in an open black cast iron dutch oven, one slice cut showing an open airy crumb |
+| brunswick-stew | A bowl of thick Southern Brunswick stew with shredded chicken and pulled pork, corn, white beans, potatoes and tomatoes in a smoky barbecue broth, cornbread on the side |
 | bacon-cheeseburger-grill | Ein Bacon-Cheeseburger mit dickem, gegrilltem Patty mit Grillstreifen, zerlaufenem Cheddar, knusprigem Bacon, Salat, Tomate und roten Zwiebeln im gerösteten Brötchen |
+| smash-burger-plancha | Double smash burger with crispy lacy-edged thin beef patties, melted cheddar, thin onions, pickles and burger sauce in a toasted bun, on a plate next to a cast-iron griddle, daylight, no text |
+| pulled-pork-burger | Pulled pork sandwich piled high with pulled pork, creamy coleslaw on top, in a toasted brioche bun, vinegar sauce bottle beside it, daylight, no text |
+| brisket-burger | Thick grilled brisket burger with coarse pepper crust, melted cheddar, pink pickled red onions, tomato, lettuce and chipotle mayo in a toasted bun, daylight, no text |
+| jalapeno-popper-burger | Grilled beef burger topped with melted cream cheese, cheddar, chopped jalapeños and crumbled bacon, lettuce, tomato and ranch in a toasted bun, daylight, no text |
+| oklahoma-onion-burger | Oklahoma fried onion burger: two thin beef patties with deeply caramelized onions smashed into them, melted cheese, pickles and mustard sauce in a soft steamed bun, daylight, no text |
+| mushroom-swiss-burger | Grilled beef burger topped with sautéed brown mushrooms with thyme and melted Swiss cheese, white barbecue sauce and lettuce in a toasted bun, daylight, no text |
+| bbq-bacon-burger-onion-rings | Tall BBQ bacon cheeseburger with glossy barbecue sauce, crispy bacon and golden panko onion rings stacked inside, extra onion rings on the side, daylight, no text |
+| nashville-hot-chicken-burger | Nashville hot chicken sandwich: crispy deep-red spicy fried chicken thigh with pickles, lettuce and ranch in a toasted bun, drizzled with hot honey, daylight, no text |
 | pit-beans | Eine gusseiserne Pfanne mit dunklen, glänzenden BBQ-Bohnen mit Speckwürfeln und Paprika, Rauchschwaden, auf dem unteren Rost eines Smokers |
+| southern-potato-salad | Southern-style American potato salad with mayonnaise, yellow mustard, chopped hard-boiled eggs, celery, pickles and a dusting of paprika in a white bowl, picnic table, natural light |
+| german-potato-salad-bacon | Warm German-style potato salad with sliced potatoes, crispy bacon bits, onions and parsley glistening with a bacon vinegar dressing in a cast iron skillet, rustic wooden table |
+| smoked-mac-and-cheese | Smoked mac and cheese in a cast iron skillet with golden bubbly cheddar crust and panko, wisps of smoke, pellet grill in the background, BBQ setting |
+| stovetop-mac-and-cheese | Creamy stovetop macaroni and cheese with elbow macaroni in a glossy orange cheddar sauce, served in a pot with a wooden spoon, close-up |
+| creamy-coleslaw | Creamy American coleslaw with finely shredded white cabbage and grated carrots in a light mayonnaise dressing, glass bowl, barbecue side dish |
+| vinegar-slaw | Carolina vinegar slaw with shredded cabbage, carrot and thin red onion rings, glistening vinegar dressing with chili flakes, no mayonnaise, white enamel bowl |
+| skillet-cornbread | Golden Southern skillet cornbread in a cast iron pan, one wedge cut out, crispy edges, butter melting on top, rustic table |
+| buttermilk-biscuits | Tall flaky Southern buttermilk biscuits with visible layers on a baking sheet, one split open with butter and honey |
+| hush-puppies | Golden round hush puppies made from cornmeal with green onions, crispy outside, in a paper-lined basket with a small dip |
+| southern-greens | Southern-style braised greens (kale used as collard greens substitute) with crispy bacon in a dark broth in a cast iron Dutch oven |
+| grill-baked-potatoes | Loaded baked potatoes from the grill split open with sour cream, melted cheddar, crispy bacon bits and chives, on a wooden board next to a gas grill |
 | kc-bbq-sauce | Ein Schraubglas mit dicker, dunkelroter Kansas-City-BBQ-Sauce, ein Pinsel und ein Löffel daneben, rustikaler Holztisch |
 | memphis-rub | Ein offenes Schraubglas mit rotbraunem BBQ-Gewürz (Rub) aus Paprika, braunem Zucker und Pfeffer, daneben kleine Häufchen der einzelnen Gewürze auf einem Holzbrett |
+| texas-spg | Glass jar of coarse Texas SPG rub (coarse black pepper, coarse sea salt and granulated garlic) on a dark wooden board with a small spoon, overhead, daylight, no text |
+| magic-dust | Small bowl of reddish-brown Magic Dust barbecue rub (paprika, cumin, mustard powder) with a few spice piles around it, overhead, daylight, no text |
+| cajun-gewuerz | Glass jar of homemade Cajun seasoning, red-orange paprika mix with visible dried thyme and oregano flecks, on a rustic table, daylight, no text |
+| carolina-gold-sauce | Jar of golden-yellow Carolina Gold mustard barbecue sauce with a basting brush, next to sliced pulled pork, daylight, no text |
+| carolina-vinegar-sauce | Glass bottle of thin, reddish Eastern Carolina vinegar barbecue sauce with visible chili flakes, next to a bowl of pulled pork, daylight, no text |
+| alabama-white-sauce | Bowl of creamy white Alabama white barbecue sauce speckled with black pepper, next to a smoked chicken leg, daylight, no text |
+| burger-sauce | Small bowl of pinkish-orange Big-Mac-style burger sauce with finely chopped pickles, next to a burger bun, daylight, no text |
+| chipotle-mayo | Small bowl of smoky orange chipotle mayonnaise with a lime wedge and a chipotle pepper beside it, daylight, no text |
+| ranch-dressing | Glass jar of creamy ranch dressing flecked with fresh dill, chives and parsley, with carrot and celery sticks, daylight, no text |
+| pickled-red-onions | Glass jar of bright pink quick-pickled red onion half-rings in clear brine with a bay leaf, daylight, no text |
+| hot-honey | Glass jar of golden hot honey with red chili flakes, honey dripping from a dipper, daylight, no text |
