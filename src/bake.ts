@@ -22,6 +22,8 @@ export function yieldText(recipe: Recipe, servings: number): string {
   if (!y) return ''
   const f = servings / recipe.servings
   const st = yieldStock(recipe.kind, y)
+  // BBQ-Reste: „1,5 kg (6 × 250 g)“
+  if (y.portion && y.unit === 'g') return `${formatAmount(y.amount * f, y.unit)} (${Math.round((y.amount * f) / y.portion)} × ${y.portion} g)`
   if (st.unit !== y.unit) return `${formatAmount(y.amount * f, y.unit)} (≈ ${amountText(st.amount * f, st.unit)})`
   return amountText(y.amount * f, y.unit)
 }

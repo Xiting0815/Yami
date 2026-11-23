@@ -1,5 +1,5 @@
 import type { ShopCat } from '../types'
-import { EXTRA_CATALOG, EXTRA_NON_VEG, EXTRA_YIELDS } from './extra'
+import { EXTRA_CATALOG, EXTRA_NON_VEG, EXTRA_SPICES, EXTRA_YIELDS } from './extra'
 
 /**
  * Zutatenkatalog: jede Zutat aus den Rezepten gehört genau einer Einkaufslisten-Kategorie an.
@@ -99,6 +99,8 @@ export const SPICES = new Set([
   'Paprikapulver rosenscharf', 'Kümmel', 'Kümmel gemahlen', 'Kreuzkümmel', 'Majoran', 'Oregano getrocknet', 'Lorbeerblatt',
   'Nelke', 'Zimt gemahlen', 'Zimtstange', 'Sternanis', 'Szechuanpfeffer', 'Fünf-Gewürze-Pulver', 'Currypulver',
   'Chili getrocknet', 'Chiliflocken', 'Wacholderbeere',
+  // neue Gewürze aus src/data/extra (BBQ-Rubs, Cajun …)
+  ...EXTRA_SPICES,
 ])
 
 /** Brühen: Rezeptname → Formen im Vorrat (Pulver, Würfel, flüssig – alles in ml fertiger Brühe) */
@@ -120,8 +122,9 @@ for (const [cat, names] of Object.entries(EXTRA_CATALOG) as [ShopCat, string[]][
     if (CATALOG[n]) EXTRA_DUPLICATES.push(n)
     else CATALOG[n] = cat
   }
-// Ergebnisse von Backen & Desserts (z. B. „Bienenstich (selbstgebacken)“) liegen unter Backwaren
-for (const { name } of EXTRA_YIELDS) if (!CATALOG[name]) CATALOG[name] = 'backwaren'
+// Ergebnisse von Backen & Desserts (z. B. „Bienenstich (selbstgebacken)“) liegen unter Backwaren,
+// BBQ-Reste (vakuumiert eingefroren) unter Tiefkühl, Rubs/Saucen dort, wo `yields.cat` sagt
+for (const { name, recipe } of EXTRA_YIELDS) if (!CATALOG[name]) CATALOG[name] = recipe.yields?.cat ?? 'backwaren'
 
 /** Varianten, die auf der Einkaufsliste zusammengefasst werden */
 export const SHOP_ALIAS: Record<string, string> = {
@@ -159,3 +162,8 @@ export const NON_VEG = new Set([
   'Rinderbrühe Pulver', 'Rinderbrühe Würfel', 'Rinderbrühe flüssig',
   ...EXTRA_NON_VEG,
 ])
+// Ergebnisse aus Rezepten mit Fleisch (z. B. „Pulled Pork (vakuumiert)“, Rub mit Speck) sind nicht vegetarisch – zwei Durchgänge,
+// falls ein Ergebnis aus einem anderen Ergebnis entsteht
+for (let pass = 0; pass < 2; pass++)
+  for (const { name, recipe } of EXTRA_YIELDS)
+    if (recipe.ingredients.some((i) => CATALOG[i.name] === 'fleisch' || NON_VEG.has(i.name))) NON_VEG.add(name)

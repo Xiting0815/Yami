@@ -7,7 +7,7 @@ import { EXTRA_PRODUCT_DUPLICATES, PRODUCTS } from '../src/data/products'
 import { EXTRA_NUTRI_DUPLICATES } from '../src/data/nutrition'
 import { BASICS } from '../src/data/recipes'
 import { yieldStock } from '../src/data/define'
-import { EXTRA_GROUPS, EXTRA_SUBSTITUTE_GROUPS, EXTRA_PREFERRED } from '../src/data/extra'
+import { EXTRA_GROUPS, EXTRA_INGREDIENT_GROUPS, EXTRA_SUBSTITUTE_GROUPS, EXTRA_PREFERRED } from '../src/data/extra'
 import { STAND_INS, SUBSTITUTE_GROUPS } from '../src/data/substitutes'
 import { canonical, convertAmount, toBase } from '../src/kitchen'
 import { isSpice } from '../src/staples'
@@ -58,11 +58,29 @@ for (const n of Object.keys(CATALOG)) if (CATALOG[n] === 'vorrat' && !PRODUCTS[c
 // Grundrezepte: Ergebnis (z. B. „Rinderfond selbstgemacht“) braucht Katalog, Produkt in derselben Einheit und Nährwerte;
 // sie dürfen nicht unter den Abendessen landen
 const yieldNames = new Set<string>()
-const KINDS = ['grundrezept', 'dessert', 'kuchen', 'brot', 'gebaeck']
+const KINDS = ['grundrezept', 'dessert', 'kuchen', 'brot', 'gebaeck', 'bbq']
+const BBQ_GROUPS = ['smoker', 'grill', 'dutch', 'burger', 'beilage']
 for (const r of RAW_BASICS) {
   const y = r.yields
-  if (!r.basic || !y) { console.error(`Grundrezept ${r.id} ohne basic/yields`); errors++; continue }
   if (!r.kind || !KINDS.includes(r.kind)) { console.error(`${r.id}: Art (kind) fehlt/ungültig`); errors++ }
+  if (RECIPES.some((x) => x.id === r.id)) { console.error(`Grundrezept ${r.id} steht unter den Abendessen`); errors++ }
+  // BBQ: Untergruppe, Portionen der Ladung; Reste (optional) vakuumiert eingefroren in g oder Portion
+  if (r.kind === 'bbq') {
+    if (!r.basic || !r.bbq || !BBQ_GROUPS.includes(r.bbq)) { console.error(`${r.id}: BBQ-Rezept ohne gültige Gruppe (bbq() aus define.ts)`); errors++ }
+    if (!(r.portions && r.portions >= 1 && r.portions <= 40)) { console.error(`${r.id}: BBQ-Portionen der Ladung fehlen/unplausibel`); errors++ }
+    const built = BASICS.find((b) => b.id === r.id)
+    if (!built || !(built.nutrition.kcal > 50) || built.nutrition.kcal > 2000) { console.error(`${r.id}: BBQ-Nährwerte je Portion unplausibel (${built?.nutrition.kcal} kcal)`); errors++ }
+    if (y) {
+      if (!['g', 'Portion'].includes(y.unit)) { console.error(`${r.id}: BBQ-Rest in g oder Portion`); errors++ }
+      if (y.unit === 'g' && !y.portion) { console.error(`${r.id}: BBQ-Rest in g braucht die Beutelgröße (portion, z. B. 250)`); errors++ }
+      if (!(y.share != null && y.share > 0 && y.share < 1)) { console.error(`${r.id}: BBQ-Rest ohne Esser am Grilltag (portions > eat)`); errors++ }
+      if (!/vakuum/i.test(y.name)) console.warn(`${r.id}: BBQ-Rest „${y.name}“ – Name mit „(vakuumiert)“?`)
+    }
+    if (!y) continue
+  } else if (!r.basic || !y) { console.error(`Grundrezept ${r.id} ohne basic/yields`); errors++; continue }
+  if (r.bbq && r.bbq !== 'rub' && r.kind !== 'bbq') { console.error(`${r.id}: bbq-Gruppe „${r.bbq}“ nur mit bbq()`); errors++ }
+  if (r.bbq === 'rub' && r.kind !== 'grundrezept') { console.error(`${r.id}: Rubs & Saucen sind Grundrezepte`); errors++ }
+  if (!y) continue
   if (yieldNames.has(y.name)) { console.error(`${r.id}: Ergebnis "${y.name}" gibt es schon bei einem anderen Rezept`); errors++ }
   yieldNames.add(y.name)
   if (!CATALOG[y.name]) { console.error(`Grundrezept ${r.id}: Ergebnis "${y.name}" fehlt im Katalog`); errors++ }
@@ -71,9 +89,8 @@ for (const r of RAW_BASICS) {
   const st = yieldStock(r.kind, y)
   if (!prod || prod.unit !== st.unit) { console.error(`Grundrezept ${r.id}: Produkt für "${y.name}" fehlt oder Einheit ≠ ${st.unit}`); errors++ }
   if (!(y.amount > 0) || !(y.shelf > 0)) { console.error(`Grundrezept ${r.id}: Menge/Haltbarkeit ungültig`); errors++ }
-  if (RECIPES.some((x) => x.id === r.id)) { console.error(`Grundrezept ${r.id} steht unter den Abendessen`); errors++ }
-  // Backen & Desserts: Einheit, Leichter-Tipp, Nährwerte je Stück
-  if (r.kind && r.kind !== 'grundrezept') {
+  // Backen & Desserts: Einheit, Leichter-Tipp, Nährwerte je Stück (BBQ-Reste: grammweise, siehe oben)
+  if (r.kind && r.kind !== 'grundrezept' && r.kind !== 'bbq') {
     if (!['Stk', 'Portion', 'g', 'ml'].includes(y.unit)) { console.error(`${r.id}: Ergebnis-Einheit "${y.unit}" (erlaubt: Stk, Portion, g, ml)`); errors++ }
     if (r.kind === 'gebaeck' && y.unit !== 'Stk') { console.error(`${r.id}: Plätzchen/Cookies zählen in Stk`); errors++ }
     if (r.kind === 'gebaeck' && !/dose|luftdicht|trocken/i.test(y.store ?? '')) { console.error(`${r.id}: Plätzchen in Blechdose/luftdicht lagern (store)`); errors++ }
@@ -86,6 +103,7 @@ for (const r of RAW_BASICS) {
     if (!pp || !(pp.kcal > 0) || pp.kcal > 1500) { console.error(`${r.id}: Nährwerte je Stück unplausibel (${pp?.kcal} kcal)`); errors++ }
     if (built && built.nutrition.kcal <= 0) { console.error(`${r.id}: keine Nährwerte berechenbar`); errors++ }
   }
+  if (y.cat && CATALOG[y.name] !== y.cat) { console.error(`${r.id}: Ergebnis „${y.name}“ steht nicht unter ${y.cat}`); errors++ }
 }
 // src/data/extra: nichts doppelt anlegen, Geräte-Schritte und Bildsuche für jedes Rezept
 for (const n of EXTRA_DUPLICATES) { console.error(`extra: Zutat "${n}" gibt es schon im Katalog – nicht neu anlegen`); errors++ }
@@ -96,10 +114,13 @@ for (const [file, g] of Object.entries(EXTRA_GROUPS)) {
   const own = new Set(g.recipes.map((r) => r.id))
   for (const r of g.recipes) {
     extraIds.add(r.id)
-    if (!r.basic || !r.kind) { console.error(`extra/${file}: ${r.id} nicht mit backen() angelegt`); errors++ }
+    if (!r.basic || !r.kind) { console.error(`extra/${file}: ${r.id} nicht mit backen()/bbq() angelegt`); errors++ }
+    // BBQ-Dateien (bbq/…) enthalten nur BBQ-Rezepte bzw. Rubs & Saucen
+    if (file.startsWith('bbq/') && r.kind !== 'bbq' && r.bbq !== 'rub') { console.error(`extra/${file}: ${r.id} ist kein BBQ-Rezept (bbq() bzw. backen('grundrezept', …, { bbq: 'rub' }))`); errors++ }
+    if (!file.startsWith('bbq/') && (r.kind === 'bbq' || r.bbq)) { console.error(`extra/${file}: BBQ-Rezept ${r.id} gehört nach src/data/extra/bbq/`); errors++ }
     // Kuchen und Brot brauchen Geräte-Schritte (Ofen); Desserts/Grundrezepte ohne Hitze dürfen ohne auskommen
     if (!g.deviceSteps[r.id]?.length) {
-      if (r.kind === 'kuchen' || r.kind === 'brot' || r.kind === 'gebaeck') { console.error(`extra/${file}: ${r.id} ohne Geräte-Schritte (deviceSteps)`); errors++ }
+      if (r.kind === 'kuchen' || r.kind === 'brot' || r.kind === 'gebaeck' || (r.kind === 'bbq' && r.bbq !== 'beilage')) { console.error(`extra/${file}: ${r.id} ohne Geräte-Schritte (deviceSteps)`); errors++ }
       else console.warn(`extra/${file}: ${r.id} ohne Geräte-Schritte`)
     }
     if (!g.imageQueries[r.id]) { console.error(`extra/${file}: ${r.id} ohne Bild-Suchbegriff (imageQueries)`); errors++ }
@@ -111,6 +132,14 @@ for (const [file, g] of Object.entries(EXTRA_GROUPS)) {
     if (!g.nutrition[n]) { console.error(`extra/${file}: "${n}" ohne Nährwerte`); errors++ }
   }
 }
+for (const [file, g] of Object.entries(EXTRA_INGREDIENT_GROUPS))
+  for (const names of Object.values(g.catalog)) for (const n of names ?? []) {
+    if (!g.products[n] && !PRODUCTS[n]) { console.error(`${file}: "${n}" ohne Produkt`); errors++ }
+    if (!g.nutrition[n]) { console.error(`${file}: "${n}" ohne Nährwerte`); errors++ }
+  }
+// neue Gewürze: im Katalog unter Vorrat
+for (const g of [...Object.values(EXTRA_GROUPS), ...Object.values(EXTRA_INGREDIENT_GROUPS)])
+  for (const n of g.spices ?? []) if (CATALOG[n] !== 'vorrat' || !(g.catalog.vorrat ?? []).includes(n)) { console.error(`extra: Gewürz "${n}" muss in catalog.vorrat derselben Datei stehen`); errors++ }
 // Austausch-Gruppen: alle Mitglieder mit Katalog + Produkt und derselben Vorratseinheit
 for (const [g, names] of Object.entries(SUBSTITUTE_GROUPS)) {
   const units = new Set(names.map((n) => PRODUCTS[n]?.unit))
@@ -133,7 +162,7 @@ for (const n of Object.keys(CATALOG)) if (!used.has(n) && !formNames.has(n)) con
 const by = (k: string) => RAW_RECIPES.filter((r) => r.cuisine === k).length
 const byType: Record<string, number> = {}
 for (const r of RAW_RECIPES) byType[r.type] = (byType[r.type] ?? 0) + 1
-console.log(`${RAW_RECIPES.length} Rezepte – DE ${by('de')}, IT ${by('it')}, AS ${by('as')}, GR ${by('gr')}`, byType)
+console.log(`${RAW_RECIPES.length} Rezepte – DE ${by('de')}, IT ${by('it')}, AS ${by('as')}, GR ${by('gr')}, US ${by('us')}`, byType)
 // Frühstücksziele: satt & leicht
 for (const r of BREAKFASTS) {
   const n = r.nutrition
@@ -143,6 +172,8 @@ for (const r of BREAKFASTS) {
 }
 const byKind = (k: string) => RAW_BASICS.filter((r) => (r.kind ?? 'grundrezept') === k).length
 console.log(`${BREAKFASTS.length} Frühstücke, ${byKind('grundrezept')} Grundrezepte · Backen: ${byKind('dessert')} Desserts, ${byKind('kuchen')} Kuchen, ${byKind('brot')} Brot, ${byKind('gebaeck')} Plätzchen & Cookies (${extraIds.size} aus src/data/extra)`)
+const byBbq = (g: string) => RAW_BASICS.filter((r) => r.bbq === g).length
+console.log(`BBQ: ${byKind('bbq')} Rezepte – Smoker ${byBbq('smoker')}, Grill ${byBbq('grill')}, Dutch Oven ${byBbq('dutch')}, Burger ${byBbq('burger')}, Beilagen ${byBbq('beilage')} · Rubs & Saucen ${byBbq('rub')}`)
 // Geräte-Schritte: bekannte Rezepte, Texte, Einstellungen im gültigen Bereich
 for (const [id, steps] of Object.entries(DEVICE_STEPS)) {
   if (!ids.has(id)) { console.error(`Geräte-Schritte für unbekanntes Rezept: ${id}`); errors++; continue }

@@ -83,3 +83,12 @@ export function seasonOf(recipe: Recipe, month: number): { out: string[]; peak: 
   }
   return { out, peak }
 }
+
+/**
+ * BBQ-Saison (Frühling/Sommer, März–September): nur dann zeigt die Woche die Karte „BBQ-Wetter? Ideen“.
+ * Im Winter bleibt die BBQ-Sparte im Rezepte-Tab zum Stöbern und Einplanen sichtbar.
+ */
+export const BBQ_MONTHS = [3, 4, 5, 6, 7, 8, 9]
+/** liegt der Tag (ISO) bzw. Monat (1–12) in der BBQ-Saison? */
+export const isBbqSeason = (dayOrMonth: string | number): boolean =>
+  BBQ_MONTHS.includes(typeof dayOrMonth === 'number' ? dayOrMonth : Number(dayOrMonth.slice(5, 7)))

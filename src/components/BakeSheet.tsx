@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { BakeEntry, Recipe } from '../types'
-import { isBake } from '../types'
+import { isBbq } from '../types'
+import { doneWord } from '../bbq'
 import { yieldText } from '../bake'
 import { shortDate, weekdayName } from '../store'
 import { Icon } from './Icon'
@@ -39,13 +40,15 @@ export function BakeSheet({ day, entry, recipe, today, plannedDays, startMove, o
   const open = !entry.status
   return (
     <div className="sheet-backdrop" onClick={onClose}>
-      <div className="sheet actions" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={`Backen: ${recipe.title}`}>
+      <div className="sheet actions" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={`${isBbq(recipe) ? 'BBQ' : 'Backen'}: ${recipe.title}`}>
         <div className="act-head">
           <RecipeImage recipe={recipe} className="thumb" />
           <div className="act-head-text">
             <b>{recipe.title}</b>
             <small>
-              Backen · {weekdayName(day, true)} {shortDate(day)}{entry.status === 'baked' ? ' · ✓ gebacken' : ''} · ergibt {yieldText(recipe, entry.amount * recipe.servings)}
+              {isBbq(recipe) ? 'BBQ' : 'Backen'} · {weekdayName(day, true)} {shortDate(day)}{entry.status === 'baked' ? ` · ✓ ${doneWord(recipe)}` : ''}
+              {isBbq(recipe) ? ` · ca. ${(recipe.portions ?? 2) * entry.amount} Portionen` : ''}
+              {recipe.yields ? ` · ${isBbq(recipe) ? 'Rest' : 'ergibt'} ${yieldText(recipe, entry.amount * recipe.servings)}` : ''}
             </small>
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="Schließen"><Icon name="close" size={18} /></button>
@@ -66,7 +69,7 @@ export function BakeSheet({ day, entry, recipe, today, plannedDays, startMove, o
         )}
         <button className="act-row" onClick={onView}><Icon name="book" /> Rezept ansehen</button>
         {open && (
-          <button className="act-row" onClick={onBaked}><Icon name="check" /> {isBake(recipe) ? 'Ja, gebacken' : 'Ja, gemacht'} – Vorrat buchen</button>
+          <button className="act-row" onClick={onBaked}><Icon name="check" /> Ja, {doneWord(recipe)} – {recipe.yields ? 'Vorrat buchen' : 'Zutaten abziehen'}</button>
         )}
         {open && (
           <button className="act-row" aria-expanded={moving} onClick={() => setMoving((m) => !m)}><Icon name="calendar" /> Auf einen anderen Tag verschieben</button>

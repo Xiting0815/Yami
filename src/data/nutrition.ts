@@ -537,7 +537,11 @@ function batchTotals(r: RawRecipe): { n: N; grams: number } {
 // (Gewicht: Brot laut Rezept in g, sonst Rohgewicht der Zutaten, Gebackenes −10 % Backverlust)
 for (const { recipe, name } of EXTRA_YIELDS) {
   const y = recipe.yields!
-  const { n, grams } = batchTotals(recipe)
+  const { n: all, grams: allG } = batchTotals(recipe)
+  // BBQ-Reste: nur der Anteil der Ladung im Vorrat (`share`), Gewicht des Rests steht in `amount` (g)
+  const share = y.share ?? 1
+  const n = all.map((v) => v * share) as N
+  const grams = allG * share
   const weight = y.unit === 'g' || y.unit === 'ml' ? y.amount : grams * (recipe.kind === 'dessert' ? 1 : 0.9)
   if (!GRAMS[name]) GRAMS[name] = y.unit === 'g' ? (recipe.kind === 'brot' ? { Scheibe: SLICE_G } : {}) : y.unit === 'ml' ? {} : { [y.unit]: weight / y.amount }
   if (!NUTRI[name] && weight > 0) NUTRI[name] = n.map((v) => Math.round((v / weight) * 1000) / 10) as N

@@ -9,7 +9,7 @@ const EMOJI: Record<Recipe['type'], string> = {
   brotzeit: '🥨',
 }
 
-const HUE: Record<Recipe['cuisine'], number> = { de: 28, it: 4, as: 340, gr: 205 }
+const HUE: Record<Recipe['cuisine'], number> = { de: 28, it: 4, as: 340, gr: 205, us: 15 }
 
 export function RecipeImage({ recipe, className }: { recipe: Recipe; className?: string }) {
   if (recipe.image) {
@@ -17,7 +17,7 @@ export function RecipeImage({ recipe, className }: { recipe: Recipe; className?:
   }
   const bt = recipe.breakfast?.type
   const h = bt ? 45 : HUE[recipe.cuisine]
-  const emoji = bt ? (bt === 'herzhaft' ? '🍳' : bt === 'warm' ? '🥣' : '🫙') : EMOJI[recipe.type]
+  const emoji = bt ? (bt === 'herzhaft' ? '🍳' : bt === 'warm' ? '🥣' : '🫙') : recipe.kind === 'bbq' ? '🔥' : recipe.bbq === 'rub' ? '🫙' : EMOJI[recipe.type]
   return (
     <div
       className={`${className ?? ''} img-fallback`}

@@ -15,13 +15,12 @@ export interface ExtraProduct {
 }
 
 /**
- * Eine Datei einer Schreib-Gruppe (desserts.ts, kuchen.ts, brot.ts). Jede Gruppe trägt NUR hier ein –
- * neue Zutaten, Rezepte, Geräte-Schritte und Bild-Suchbegriffe. Die Registries (Katalog, Produkte, Nährwerte,
- * Austausch, Geräte, Rezepte) holen sich alles über `src/data/extra/index.ts`.
+ * Neue Zutaten einer Schreib-Gruppe: alles, was eine Zutat braucht (Kategorie, Produkt, Nährwerte, Gewicht …).
+ * Wird zentral in Katalog/Produkte/Nährwerte/Saison/Austausch eingetragen (src/data/extra/index.ts) – die Gruppe
+ * fasst catalog.ts, products.ts und nutrition.ts nie selbst an. Für Rezeptdateien außerhalb von src/data/extra
+ * (z. B. src/data/recipes-us.ts) gibt es dieselbe Form ohne Rezepte.
  */
-export interface ExtraGroup {
-  /** Rezepte, gebaut mit `backen(...)` aus define.ts */
-  recipes: RawRecipe[]
+export interface ExtraIngredients {
   /** NEUE Zutaten je Einkaufslisten-Abschnitt (keine, die es schon gibt) */
   catalog: Partial<Record<ShopCat, string[]>>
   /** Produkt je neuer Zutat */
@@ -36,12 +35,24 @@ export interface ExtraGroup {
   season?: Record<string, number[]>
   /**
    * Austausch: `groups` = Gruppen austauschbarer Zutaten (gleiche Vorratseinheit!; vorhandene Gruppen-Namen werden ergänzt),
-   * `preferred` = Rezeptzutat → selbstgebackene Zutaten, die zuerst genommen werden.
+   * `preferred` = Rezeptzutat → selbstgemachte Zutaten, die zuerst genommen werden (Fond, Brot, BBQ-Sauce, Pulled Pork …).
    */
   substitutes?: { groups?: Record<string, string[]>; preferred?: Record<string, string[]> }
-  /** neue nicht-vegetarische Zutaten außerhalb von „Fleisch & Fisch“ (z. B. Gelatine) */
+  /** neue nicht-vegetarische Zutaten außerhalb von „Fleisch & Fisch“ (z. B. Gelatine, Speck-Rub) */
   nonVeg?: string[]
-  /** Geräte-Schritte je Rezept-ID (Format wie src/data/device-steps, Regeln docs/geraete/regeln.md) */
+  /** neue Gewürze (Kategorie 'vorrat', im Vorrat nur „da“/„alle“ statt Menge), z. B. 'Paprikapulver geräuchert' */
+  spices?: string[]
+}
+
+/**
+ * Eine Datei einer Schreib-Gruppe (desserts.ts, kuchen.ts, brot.ts, bbq/*.ts). Jede Gruppe trägt NUR hier ein –
+ * neue Zutaten, Rezepte, Geräte-Schritte und Bild-Suchbegriffe. Die Registries (Katalog, Produkte, Nährwerte,
+ * Austausch, Geräte, Rezepte) holen sich alles über `src/data/extra/index.ts`.
+ */
+export interface ExtraGroup extends ExtraIngredients {
+  /** Rezepte, gebaut mit `backen(...)` bzw. `bbq(...)` aus define.ts */
+  recipes: RawRecipe[]
+  /** Geräte-Schritte je Rezept-ID (Format wie src/data/device-steps, Regeln docs/geraete/regeln.md, BBQ: docs/bbq-regeln.md) */
   deviceSteps: Record<string, DeviceStep[]>
   /** englischer Suchbegriff fürs Foto (Wikimedia Commons) je Rezept-ID */
   imageQueries: Record<string, string>

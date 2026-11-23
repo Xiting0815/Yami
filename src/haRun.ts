@@ -120,7 +120,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   if (!sharingActive(h0)) {
     const trips0 = tripsOf(s0, today)
     const todo = await syncTodo(d.api, h0, haLocalFor(s0, today, trips0), d.onBought)
-    const cal = await syncCalendar(d.api, h0, plannedDinners(s0.plan, today), remindersOf(s0, trips0), now)
+    const cal = await syncCalendar(d.api, h0, plannedDinners(s0.plan, today, s0.bakePlan), remindersOf(s0, trips0), now)
     const push = await sendAlerts(d.api, h0, pushAlerts(s0, today, now, trips0), now)
     const error = todo.error ?? cal.error ?? push.error
     patchHa({ items: todo.items, done: todo.done, events: cal.events, pushed: push.pushed, lastSync: now.toISOString(), error: errText(error) })
@@ -174,7 +174,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   // Schreibstab: Einkaufsliste (Google Tasks), Abendessen im Familienkalender, Ablauf-Erinnerungen – mit dem zusammengeführten Stand
   const h: HaSettings = { ...h0, items: mapping.items, done: mapping.done, events: mapping.events }
   const todo = await syncTodo(d.api, h, haLocalFor(state, today, trips), d.onBought)
-  const cal = await syncCalendar(d.api, h, plannedDinners(state.plan, today), shared, now)
+  const cal = await syncCalendar(d.api, h, plannedDinners(state.plan, today, state.bakePlan), shared, now)
   error ??= todo.error ?? cal.error
   const sharedEvents = Object.fromEntries(Object.entries(cal.events).filter(([k]) => isShared(k)))
   patchHa({ items: todo.items, done: todo.done, events: withPersonal(sharedEvents), lastSync: now.toISOString(), error: errText(error) })

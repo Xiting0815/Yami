@@ -15,7 +15,7 @@ const days = Array.from({ length: 7 }, (_, i) => addDaysIso('2026-11-16', i))
 const fond = RECIPE_BY_ID['rinderfond-braun']
 
 // ───── Grundrezepte sind keine Abendessen ─────
-ok(BASICS.length >= 2 && BASICS.every((b) => b.basic && b.yields), 'Grundrezepte vorhanden, mit basic + yields')
+ok(BASICS.length >= 2 && BASICS.every((b) => b.basic && (b.yields || b.kind === 'bbq')), 'Grundrezepte vorhanden, mit basic + yields (BBQ: Reste optional)')
 ok(!!fond && fond.basic === true && fond.yields?.name === 'Rinderfond selbstgemacht' && fond.yields.amount === 1500, 'Brauner Rinderfond ergibt 1,5 l Rinderfond selbstgemacht')
 ok(!!RECIPE_BY_ID['kalbsfond-hell'] && RECIPE_BY_ID['kalbsfond-hell'].yields?.name === 'Kalbsfond selbstgemacht', 'Heller Kalbsfond vorhanden')
 ok(BASICS.every((b) => !RECIPES.includes(b)), 'Grundrezepte nicht in RECIPES (Wischstapel, Planung, Abwechslung, Geschmack)')

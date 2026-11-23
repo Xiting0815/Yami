@@ -1,6 +1,8 @@
 import { Fragment, type ReactNode } from 'react'
 import type { BakeEntry, BakePlan, Recipe, WeekPlan } from '../types'
+import { isBbq } from '../types'
 import { bakeLine } from '../bakePlan'
+import { bbqOn } from '../bbq'
 import { RECIPE_BY_ID } from '../data/recipes'
 import { shortDate, weekdayName } from '../store'
 import { formatTime } from '../filter'
@@ -76,9 +78,10 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 
 export function WeekView(props: Props) {
   const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions, planBy, syncSlot, bakes = {}, onBake, bakeSlot, dayAlert } = props
-  const planned = days.filter((d) => plan[d]).length
+  // ein Grillabend (BBQ im Backplan) zählt als Abendessen des Tages
+  const planned = days.filter((d) => plan[d] || bbqOn(bakes, d)).length
   // nur der nächste freie Tag bekommt die Akzentfarbe – die übrigen leeren Tage bleiben ruhig
-  const nextOpen = days.find((d) => d >= today && !plan[d])
+  const nextOpen = days.find((d) => d >= today && !plan[d] && !bbqOn(bakes, d))
 
   return (
     <div className="week">
@@ -142,7 +145,12 @@ export function WeekView(props: Props) {
               return (
                 <li key={day} className={`${cls} ${past ? 'gone' : 'open'}`}>
                   {label}
-                  {past ? (
+                  {bbqOn(bakes, day) ? (
+                    <button className="day-empty bbq-day" onClick={() => (past ? undefined : onSwipeDay(day))} disabled={past}>
+                      <span className="day-empty-text">🔥 Grillabend</span>
+                      <small>statt Abendessen</small>
+                    </button>
+                  ) : past ? (
                     <div className="day-empty past" aria-label="nichts geplant">–</div>
                   ) : (
                     <button className={`day-empty ${day === nextOpen ? 'next' : ''}`} onClick={() => onSwipeDay(day)}>
@@ -209,25 +217,36 @@ export function WeekView(props: Props) {
   }
 }
 
-/** „🍰 Backen: Bienenstich · Dinkelbrötchen“ unter dem Abendessen eines Tages (Antippen: Aktionen) */
+/**
+ * „🍰 Backen: Bienenstich · Dinkelbrötchen“ bzw. „🔥 BBQ: Pulled Pork vom Traeger · Pit Beans“ unter dem Abendessen
+ * eines Tages (Antippen: Aktionen). BBQ steht in einer eigenen Zeile.
+ */
 function BakeRow({ day, list, today, onBake }: { day: string; list?: BakeEntry[]; today: string; onBake?: (day: string, recipeId: string) => void }) {
-  const items = bakeLine(list ?? [])
-  if (!items.length) return null
+  const all = bakeLine(list ?? [])
+  const rows = [
+    { key: 'bbq', lead: '🔥', word: 'BBQ:', items: all.filter((x) => isBbq(x.recipe)) },
+    { key: 'bake', lead: '🍰', word: 'Backen:', items: all.filter((x) => !isBbq(x.recipe)) },
+  ].filter((r) => r.items.length)
+  if (!rows.length) return null
   return (
-    <li className={`day-bakes ${day < today ? 'past' : ''}`}>
-      <span className="bake-lead" aria-hidden>🍰</span>
-      <span className="bake-items">
-        <span className="bake-word">Backen:</span>
-        {items.map(({ entry, recipe }, i) => (
-          <Fragment key={recipe.id}>
-            {i > 0 && <span className="bake-sep" aria-hidden> · </span>}
-            <button className={`bake-item ${entry.status ?? ''} ${!entry.status && day < today ? 'ask' : ''}`} onClick={() => onBake?.(day, recipe.id)}>
-              {entry.status === 'baked' ? '✓ ' : ''}{recipe.title}{entry.amount > 1 ? ` ×${entry.amount}` : ''}
-            </button>
-          </Fragment>
-        ))}
-      </span>
-    </li>
+    <>
+      {rows.map((row) => (
+        <li key={row.key} className={`day-bakes day-${row.key} ${day < today ? 'past' : ''}`}>
+          <span className="bake-lead" aria-hidden>{row.lead}</span>
+          <span className="bake-items">
+            <span className="bake-word">{row.word}</span>
+            {row.items.map(({ entry, recipe }, i) => (
+              <Fragment key={recipe.id}>
+                {i > 0 && <span className="bake-sep" aria-hidden> · </span>}
+                <button className={`bake-item ${entry.status ?? ''} ${!entry.status && day < today ? 'ask' : ''}`} onClick={() => onBake?.(day, recipe.id)}>
+                  {entry.status === 'baked' ? '✓ ' : ''}{recipe.title}{entry.amount > 1 ? ` ×${entry.amount}` : ''}
+                </button>
+              </Fragment>
+            ))}
+          </span>
+        </li>
+      ))}
+    </>
   )
 }
 

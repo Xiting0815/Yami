@@ -1,4 +1,4 @@
-import type { BasicKind, BasicYield, BreakfastType, Cuisine, DishType, Festive, Ingredient } from '../types'
+import type { BasicKind, BasicYield, BbqGroup, BreakfastType, Cuisine, DishType, Festive, Ingredient, ShopCat } from '../types'
 
 /** Erlaubte Einheiten. Die Reihenfolge ist egal, Schreibweise zählt. */
 export const UNITS = [
@@ -26,6 +26,10 @@ export interface RawRecipe {
   kind?: BasicKind
   /** „💡 Leichter:“-Tipp */
   lighter?: string
+  /** BBQ-Sparte: Untergruppe (siehe `bbq()`; Rubs & Saucen: `backen('grundrezept', …, { bbq: 'rub' })`) */
+  bbq?: BbqGroup
+  /** BBQ: Portionen der ganzen Ladung */
+  portions?: number
 }
 
 /**
@@ -129,6 +133,8 @@ export interface BackYield {
   frozen?: number
   /** nur wenn die Berechnung aus den Zutaten nicht passt (z. B. Frittiertes) */
   perPiece?: { kcal: number; protein: number }
+  /** Abschnitt im Katalog (Standard Backwaren); Rubs 'vorrat', Saucen 'konserven' */
+  cat?: ShopCat
 }
 
 /** Optionen für `backen()` */
@@ -142,6 +148,8 @@ export interface BackOptions {
   lighter?: string
   /** Festtags-Fenster (z. B. ['plaetzchen'] für Weihnachtsplätzchen: Backen-Liste sortiert sie in der Saison nach vorn) */
   festive?: Festive[]
+  /** nur Rubs & Saucen für die BBQ-Sparte: `'rub'` (erscheint dann auch im BBQ-Bereich unter „Rubs & Saucen“) */
+  bbq?: BbqGroup
 }
 
 /**
@@ -166,6 +174,86 @@ export function backen(kind: BasicKind, id: string, title: string, o: BackOption
     kind,
     lighter: o.lighter,
     ...(o.festive ? { festive: o.festive } : {}),
+    ...(o.bbq ? { bbq: o.bbq } : {}),
+  }
+}
+
+// ───────────── BBQ (Smoker, Grill, Dutch Oven, Burger, Beilagen) ─────────────
+
+/** Rest einer BBQ-Ladung, der portionsweise vakuumiert eingefroren in den Vorrat kommt (z. B. Pulled Pork) */
+export interface BbqLeftover {
+  /** Name im Vorrat, z. B. „Pulled Pork (vakuumiert)“ – eindeutig; Katalog (Tiefkühl), Produkt und Nährwerte entstehen automatisch */
+  name: string
+  /** Menge des Rests je Ladung, z. B. 1500 (g) */
+  amount: number
+  /** 'g' für Fleisch (Resteessen nehmen es grammweise), 'Portion' für Beilagen/Eintöpfe */
+  unit: 'g' | 'Portion'
+  /** Beutelgröße in `unit`, z. B. 250 → „6 × 250 g vakuumiert“ */
+  portion?: number
+  /** Tage haltbar, so gelagert wie `store` (vakuumiert eingefroren ca. 90) */
+  shelf: number
+  /** Lagerung, Standard „vakuumiert eingefroren“ */
+  store?: string
+}
+
+/** Optionen für `bbq()` */
+export interface BbqOptions {
+  /** Untergruppe: smoker | grill | dutch | burger | beilage */
+  group: Exclude<BbqGroup, 'rub'>
+  /** Gesamtzeit in Minuten inkl. Marinieren über Nacht und Ruhezeit */
+  time: number
+  /** Portionen der ganzen Ladung (Nährwerte je Portion = alle Zutaten ÷ portions) */
+  portions: number
+  /** davon am Grilltag gegessen (Standard 2 = Haushalt); der Rest ist `leftover` */
+  eat?: number
+  /** Rest, der vakuumiert eingefroren in den Vorrat kommt (nur große Stücke: Pulled Pork, Ribs, Brisket, Burnt Ends …) */
+  leftover?: BbqLeftover
+  /** Küche (Bildsuche/Info), Standard 'us' */
+  cuisine?: Cuisine
+  /** „💡 Leichter:“-Tipp (optional) */
+  lighter?: string
+}
+
+/**
+ * BBQ-Rezept: Zutaten für die GANZE Ladung (ein Pulled Pork, ein Rack Ribs, ein Burger-Abend). Kein Abendessen im
+ * Wischstapel, frei „Einplanen für“ einen Tag (Backplan → Einkaufsliste, Kalender als Abendessen des Tages).
+ * „Fertig gegrillt“ zieht die Zutaten ab und legt `leftover` (Anteil (portions − eat) ÷ portions der Ladung) in den Vorrat.
+ *
+ *   bbq('pulled-pork', 'Pulled Pork vom Traeger', { group: 'smoker', time: 840, portions: 8, leftover: { name: 'Pulled Pork (vakuumiert)', amount: 1500, unit: 'g', portion: 250, shelf: 90 } },
+ *     '2500 g Schweinenacken mit Knochen | …', ['Schritt 1 …', 'Schritt 2 …', 'Schritt 3 …'])
+ */
+export function bbq(id: string, title: string, o: BbqOptions, ingredients: string, steps: string[]): RawRecipe {
+  const eat = o.eat ?? 2
+  const l = o.leftover
+  return {
+    id,
+    title,
+    cuisine: o.cuisine ?? 'us',
+    type: 'haupt',
+    time: o.time,
+    ingredients: splitIngredients(ingredients),
+    steps,
+    servings: 1,
+    portions: o.portions,
+    basic: true,
+    kind: 'bbq',
+    bbq: o.group,
+    lighter: o.lighter,
+    ...(l
+      ? {
+          yields: {
+            name: l.name,
+            amount: l.amount,
+            unit: l.unit,
+            shelf: l.shelf,
+            store: l.store ?? 'vakuumiert eingefroren',
+            frozen: l.shelf,
+            cat: 'tk' as const,
+            ...(l.portion ? { portion: l.portion } : {}),
+            share: Math.max(0, o.portions - eat) / o.portions,
+          },
+        }
+      : {}),
   }
 }
 

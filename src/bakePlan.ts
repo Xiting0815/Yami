@@ -14,7 +14,7 @@ import { festiveOf } from './kitchen/insight'
 import { type PantryLot, addDaysIso } from './kitchen/base'
 import { cookBasic } from './kitchen/pantry'
 import type { BakeEntry, BakePlan, BasicKind, PlanEntry, Recipe } from './types'
-import { isBake } from './types'
+import { isBake, isBbq } from './types'
 
 /** so viele Tage nach dem Backtag wird noch nachgefragt – danach gilt der Eintrag als vergessen (kein Vorrat mehr reserviert) */
 export const BAKE_ASK_DAYS = 14
@@ -26,7 +26,7 @@ const WD = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'
 /** Wochentag 0 = Sonntag … 6 = Samstag */
 export const weekdayOf = (iso: string): number => new Date(iso + 'T12:00:00').getDay()
 export const weekdayLabel = (iso: string): string => WD[weekdayOf(iso)]
-const daysBetween = (from: string, to: string) => Math.round((new Date(to + 'T12:00:00').getTime() - new Date(from + 'T12:00:00').getTime()) / 86400000)
+export const daysBetween = (from: string, to: string) => Math.round((new Date(to + 'T12:00:00').getTime() - new Date(from + 'T12:00:00').getTime()) / 86400000)
 
 /** Rezeptmenge prüfen: ganze Zahl 1–12 */
 export const cleanAmount = (n: unknown): number => (typeof n === 'number' && Number.isFinite(n) ? Math.min(MAX_AMOUNT, Math.max(1, Math.round(n))) : 1)
@@ -81,7 +81,8 @@ export function settleBaked(
 ): { pantry: PantryLot[]; bakePlan: BakePlan; baked: BakedRef[] } | null {
   const recipe = RECIPE_BY_ID[recipeId]
   const e = bakesOn(s.bakePlan, day).find((x) => x.recipeId === recipeId)
-  if (!recipe?.yields || !e || e.status) return null
+  // BBQ ohne Reste (Burger, Steak) hat kein Ergebnis – dann werden nur die Zutaten abgezogen
+  if (!recipe || !(recipe.yields || isBbq(recipe)) || !e || e.status) return null
   return {
     pantry: cookBasic(s.pantry, recipe, e.amount * recipe.servings, day).pantry,
     bakePlan: markBaked(s.bakePlan, day, recipeId),
@@ -156,7 +157,7 @@ export function sanitizeBakePlan(x: unknown): BakePlan {
 // ───────────── Lernen ─────────────
 
 const HALF_LIFE = 60
-const decay = (date: string, today: string) => Math.pow(0.5, Math.max(0, daysBetween(date, today)) / HALF_LIFE)
+export const decay = (date: string, today: string) => Math.pow(0.5, Math.max(0, daysBetween(date, today)) / HALF_LIFE)
 
 export type BakeGroup = BasicKind
 export interface BakedRef { date: string; recipeId: string }
@@ -197,7 +198,7 @@ export interface BakeHint {
   kind: HintKind
   action: 'accepted' | 'dismissed'
 }
-export type HintKind = 'brot' | 'plaetzchen' | 'kuchen'
+export type HintKind = 'brot' | 'plaetzchen' | 'kuchen' | 'bbq'
 
 export const HINTS_MAX = 60
 const HINT_MEMORY = 120
@@ -205,7 +206,7 @@ const HINT_MEMORY = 120
 export function sanitizeBakeHints(x: unknown): BakeHint[] {
   if (!Array.isArray(x)) return []
   return x
-    .filter((h): h is BakeHint => !!h && typeof h === 'object' && typeof h.date === 'string' && ISO.test(h.date) && ['brot', 'plaetzchen', 'kuchen'].includes(h.kind) && (h.action === 'accepted' || h.action === 'dismissed'))
+    .filter((h): h is BakeHint => !!h && typeof h === 'object' && typeof h.date === 'string' && ISO.test(h.date) && ['brot', 'plaetzchen', 'kuchen', 'bbq'].includes(h.kind) && (h.action === 'accepted' || h.action === 'dismissed'))
     .map((h) => ({ date: h.date, kind: h.kind, action: h.action }))
     .slice(-HINTS_MAX)
 }
@@ -251,13 +252,13 @@ const cakeNames = (): Set<string> => new Set(BASICS.filter((b) => b.kind === 'ku
 const have = (pantry: PantryLot[], names: Set<string>, today: string) => pantry.some((l) => l.amount > 1e-6 && l.expires >= today && names.has(l.name))
 
 /** nächster Tag ab morgen mit diesem Wochentag */
-function nextWeekday(today: string, wd: number): string {
+export function nextWeekday(today: string, wd: number): string {
   for (let i = 1; i <= 7; i++) if (weekdayOf(addDaysIso(today, i)) === wd) return addDaysIso(today, i)
   return addDaysIso(today, 1)
 }
 
 /** Rezept-Wertung fürs Vorschlagen: Gebackenes (jünger zählt mehr) + Bewertungen; „nicht so“ sperrt, „bald wieder“ hebt */
-function recipeScores(inp: SuggestInput, kind: BasicKind): Map<string, { score: number; last?: string; down: boolean }> {
+export function recipeScores(inp: Pick<SuggestInput, 'baked' | 'bakeRatings' | 'today'>, kind: BasicKind): Map<string, { score: number; last?: string; down: boolean }> {
   const m = new Map<string, { score: number; last?: string; down: boolean }>()
   const get = (id: string) => m.get(id) ?? m.set(id, { score: 0, down: false }).get(id)!
   for (const b of inp.baked) {
@@ -290,10 +291,10 @@ function pickRecipe(inp: SuggestInput, kind: BasicKind, candidates: Recipe[], re
   return best[0]?.r
 }
 
-const plannedWithin = (bp: BakePlan, today: string, days: number, match: (r: Recipe) => boolean) =>
+export const plannedWithin = (bp: BakePlan, today: string, days: number, match: (r: Recipe) => boolean) =>
   Object.entries(bp).some(([d, list]) => d >= today && daysBetween(today, d) <= days && (list ?? []).some((e) => !e.status && match(RECIPE_BY_ID[e.recipeId] ?? ({} as Recipe))))
 
-const bakedWithin = (baked: BakedRef[], today: string, days: number, match: (r: Recipe) => boolean) =>
+export const bakedWithin = (baked: BakedRef[], today: string, days: number, match: (r: Recipe) => boolean) =>
   baked.some((b) => daysBetween(b.date, today) >= 0 && daysBetween(b.date, today) <= days && match(RECIPE_BY_ID[b.recipeId] ?? ({} as Recipe)))
 
 /**

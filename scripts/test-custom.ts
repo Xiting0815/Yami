@@ -58,7 +58,7 @@ ok(t('2 Stk Hackfleisch').unitProblem, 'Stk bei Hackfleisch → Einheit passt ni
 ok(unitWorks('Zwiebel', 'g') && unitWorks('Sahne', 'EL') && !unitWorks('Hackfleisch gemischt', 'Stk'), 'unitWorks')
 ok(toIngredients(lines).length === 7, 'toIngredients')
 const apfelsaft = t('200 ml Apfelsaft')
-ok(!apfelsaft.match, `Apfelsaft wird nicht fälschlich zu Apfel (${apfelsaft.match})`)
+ok(apfelsaft.match !== 'Apfel', `Apfelsaft wird nicht fälschlich zu Apfel (${apfelsaft.match})`)
 ok(parseSteps('1. Zwiebeln anbraten\n2) Hack dazu\nSchritt 3: servieren').join('|') === 'Zwiebeln anbraten|Hack dazu|servieren', 'Schritte: Nummerierung entfernt')
 ok(parseSteps('1. Anbraten 2. Köcheln lassen').length === 2, 'Schritte in einer Zeile')
 

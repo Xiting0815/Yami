@@ -5,6 +5,8 @@ import { findPrep, preppedKeep, preppedText } from '../breakfastPrep'
 import { pantryWishes, portionNote, satietyNote, summarize } from '../learning'
 import { cookTarget } from '../cookDone'
 import { bakesOn } from '../bakePlan'
+import { dinnerToReplace, doneWord } from '../bbq'
+import { isBbq } from '../types'
 import { portionFor } from '../energy'
 import { defaultReviewMonday } from '../review'
 import { addDays, isoDate, parseIso, sharingActive, weekdayName } from '../store'
@@ -70,7 +72,7 @@ export function Sheets({ m }: { m: AppModel }) {
                   run: (servings: number) => act.finishPrep(sheet.recipe, servings),
                 }
               : sheet.recipe.basic
-                ? { run: (servings: number) => act.finishBasic(sheet.recipe, servings, sheet.day) }
+                ? { ...(isBbq(sheet.recipe) ? { label: `Fertig ${doneWord(sheet.recipe)} ✓` } : {}), run: (servings: number) => act.finishBasic(sheet.recipe, servings, sheet.day) }
                 : (() => {
                   const t = cookTarget(state.plan, sheet.recipe.id, today, sheet.day)
                   return {
@@ -81,13 +83,17 @@ export function Sheets({ m }: { m: AppModel }) {
           }
           onOpenRecipe={(r) => ui.setSheet({ recipe: r, mode: 'view' })}
           bakePlanner={
-            sheet.recipe.basic && sheet.recipe.yields
+            sheet.recipe.basic && (sheet.recipe.yields || isBbq(sheet.recipe))
               ? {
                   today,
                   plannedDays: Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => e.recipeId === sheet.recipe.id && !e.status)),
-                  onPlan: (day, amount) => {
-                    act.planBake(sheet.recipe, day, amount)
+                  onPlan: (day, amount, replace) => {
+                    act.planBake(sheet.recipe, day, amount, replace)
                     ui.setSheet(null)
+                  },
+                  dinnerOn: (day) => {
+                    const e = dinnerToReplace(state.plan, day)
+                    return e ? RECIPE_BY_ID[e.recipeId]?.title : undefined
                   },
                 }
               : undefined

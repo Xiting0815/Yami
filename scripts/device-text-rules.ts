@@ -5,7 +5,8 @@ import type { Device, DeviceStep } from '../src/types'
 
 export interface TextFinding { id: string; step: number; msg: string; text: string }
 
-const OVENS: Device[] = ['steamer', 'combair', 'airfryer', 'pizzaofen']
+/** Geräte mit Garraum-/Deckeltemperatur (Text-Temperaturen müssen zur Einstellung passen) */
+const OVENS: Device[] = ['steamer', 'combair', 'airfryer', 'pizzaofen', 'smoker', 'gasgrill']
 
 /** Betriebsart-Wörter im Text → passende Einstellungen */
 const MODE_WORDS: { re: RegExp; label: string; ok: (mode: string, device: Device) => boolean }[] = [
@@ -14,7 +15,10 @@ const MODE_WORDS: { re: RegExp; label: string; ok: (mode: string, device: Device
   { re: /Umluft/i, label: 'Umluft', ok: (m) => /^Hei(ß|ss)luft|Grill-Umluft/.test(m) },
   { re: /PizzaPlus/i, label: 'PizzaPlus', ok: (m) => m === 'PizzaPlus' },
   { re: /\bdämpfen\b|\bgedämpft\b/i, label: 'Dämpfen', ok: (m) => m === 'Dämpfen' },
-  { re: /\bGrill\b(?!-Umluft)|\bgrillen\b|\bgratinieren\b|\büberbacken\b/i, label: 'Grill', ok: (m) => /Grill|Ober-\/Unterhitze|Hei(ß|ss)luft|PizzaPlus/.test(m) },
+  { re: /\bGrill\b(?!-Umluft)|\bgrillen\b|\bgratinieren\b|\büberbacken\b/i, label: 'Grill', ok: (m, d) => /Grill|Ober-\/Unterhitze|Hei(ß|ss)luft|PizzaPlus/.test(m) || d === 'gasgrill' || d === 'smoker' },
+  { re: /Super Smoke/i, label: 'Super Smoke', ok: (m) => m === 'Super Smoke' },
+  { re: /\bindirekt/i, label: 'Indirekt', ok: (m, d) => (d === 'gasgrill' ? m === 'Indirekt' : true) },
+  { re: /\bdirekt(?:e|en)? (?:Hitze|Zone|grillen)/i, label: 'Direkt', ok: (m, d) => (d === 'gasgrill' ? m === 'Direkt' : true) },
   { re: /Kneten langsam|Kneten schnell/i, label: 'Kneten', ok: (m) => m.startsWith('Kneten') },
 ]
 
@@ -25,6 +29,8 @@ const DEVICE_WORDS: { re: RegExp; device: Device | 'ofen' }[] = [
   { re: /Airfryer/i, device: 'airfryer' },
   { re: /\bFamag\b|\bKneter\b|Knetmaschine/i, device: 'kneter' },
   { re: /Witt|Rotante|Pizzaofen/i, device: 'pizzaofen' },
+  { re: /Traeger|\bSmoker\b/i, device: 'smoker' },
+  { re: /Gasgrill/i, device: 'gasgrill' },
   // allgemeiner „Ofen“/„Backofen“ statt des Geräts (die Geräte heißen Combair/CombiSteamer)
   { re: /\b(Back)?[oO]fen\b(?!-?(fest|form|kartoffel|gemüse|frisch|warm|tür|handschuh))/, device: 'ofen' },
 ]
@@ -109,6 +115,16 @@ export function checkStep(id: string, idx: number, st: DeviceStep): TextFinding[
     }
     if (w.device === 'kneter' && sets.length && !sets.some((s) => s.device === 'kneter')) add(`Text nennt ${m[0]}, aber keine Famag-Einstellung`)
   }
+
+  // 3a. Gasgrill: „Brenner 1 und 4“ / „Brenner 1+4“ im Text = eingestellte Brenner
+  const gg = sets.filter((s) => s.device === 'gasgrill' && !s.alt)
+  const bm = text.match(/Brenner (\d)(?:\s*(?:\+|und|,)\s*(\d))?(?:\s*(?:\+|und|,)\s*(\d))?/)
+  if (bm && gg.length) {
+    const named = [bm[1], bm[2], bm[3]].filter(Boolean).sort().join('+')
+    if (!gg.some((s) => (s.burners ?? '').split('+').sort().join('+') === named)) add(`Text nennt Brenner ${named}, Einstellung: ${gg.map((s) => s.burners ?? '–').join('/')}`)
+  }
+  // 3c. Dutch Oven / Vakuumierer genannt, aber keine Einstellung dafür (nur wenn der Schritt überhaupt Einstellungen hat)
+  if (sets.length && /Vakuumierer|vakuumieren/i.test(text) && !sets.some((s) => s.device === 'vakuum') && !/vakuumiert(e|en)?\b/i.test(text)) add('Text vakuumiert, aber keine Vakuumierer-Einstellung')
 
   // 3b. „in zwei Runden“ backen, obwohl die Einstellung zwei Bleche gleichzeitig vorsieht
   if (/in (zwei|mehreren|\d) Runden/i.test(text) && sets.some((s) => /zwei Bleche|1\s*\+\s*3/.test(s.note ?? ''))) add('Text backt in Runden, Einstellung: zwei Bleche gleichzeitig (Ebene 1+3)')

@@ -6,6 +6,7 @@ import { recipesDe } from './recipes-de'
 import { recipesIt } from './recipes-it'
 import { recipesAs } from './recipes-as'
 import { recipesGr } from './recipes-gr'
+import { recipesUs } from './recipes-us'
 import { breakfasts } from './breakfasts'
 import { basicsDe } from './recipes-basic'
 import { nutritionOf } from './nutrition-calc'
@@ -17,10 +18,10 @@ import imageMap from './images.json'
 const images = imageMap as unknown as Record<string, { file: string } | null | undefined>
 
 /** Abendessen (Rohdaten) */
-export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs, ...recipesGr]
+export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs, ...recipesGr, ...recipesUs]
 /** Frühstücke (Rohdaten) */
 export const RAW_BREAKFASTS = breakfasts
-/** Grundrezepte und Backen & Desserts (Rohdaten) – Fonds, Anstellgut, Kuchen, Brot …, keine Abendessen */
+/** Grundrezepte, Backen & Desserts und BBQ (Rohdaten) – Fonds, Anstellgut, Kuchen, Brot, Pulled Pork …, keine Abendessen */
 export const RAW_BASICS: RawRecipe[] = [...basicsDe, ...EXTRA_RECIPES]
 
 function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
@@ -44,8 +45,11 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
     vegetarian: !r.ingredients.some((i) => CATALOG[i.name] === 'fleisch' || NON_VEG.has(i.name)),
     image: images[r.id]?.file,
     festive: r.festive,
-    nutrition: nutritionOf(r.ingredients, servings),
+    // BBQ: Zutaten für die ganze Ladung → Nährwerte je Portion der Ladung
+    nutrition: nutritionOf(r.ingredients, r.portions ?? servings),
     ...(r.basic ? { basic: true as const, yields: withPerPiece(r), kind: r.kind ?? 'grundrezept', lighter: r.lighter } : {}),
+    ...(r.bbq ? { bbq: r.bbq } : {}),
+    ...(r.portions ? { portions: r.portions } : {}),
   }
 }
 
@@ -55,7 +59,8 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
  */
 function withPerPiece(r: RawRecipe): Recipe['yields'] {
   const y = r.yields
-  if (!y || y.perPiece || !r.kind || r.kind === 'grundrezept') return y
+  // BBQ-Reste (vakuumiert, grammweise für Resteessen) haben kein „Stück“
+  if (!y || y.perPiece || !r.kind || r.kind === 'grundrezept' || r.kind === 'bbq') return y
   // Zutaten und `yields` gelten beide für ein ganzes Rezept; Stück = 1 Stk/Portion/Scheibe (bzw. 50 g)
   const st = yieldStock(r.kind, y)
   const units = st.amount / pieceSize(st.unit)
@@ -75,9 +80,9 @@ export const BREAKFASTS: Recipe[] = RAW_BREAKFASTS.map((r) => build(r, 'breakfas
  */
 export const BASICS: Recipe[] = RAW_BASICS.map((r) => build(r, 'dinner'))
 
-/** Back-Rezept (Dessert, Kuchen, Brot), dessen Ergebnis so heißt – für „1 gegessen“ im Vorrat */
+/** Back-Rezept (Dessert, Kuchen, Brot), dessen Ergebnis so heißt – für „1 gegessen“ im Vorrat (BBQ-Reste nicht) */
 export function bakeFor(yieldName: string): Recipe | undefined {
-  return BASICS.find((b) => b.kind && b.kind !== 'grundrezept' && b.yields?.name === yieldName)
+  return BASICS.find((b) => b.kind && b.kind !== 'grundrezept' && b.kind !== 'bbq' && b.yields?.name === yieldName)
 }
 
 /** Grundrezept, das diese Zutat selbst herstellt (Rinderfond → Brauner Rinderfond), sonst undefined */

@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { RECIPE_BY_ID } from '../../data/recipes'
 import { pendingBakes, suggestBake } from '../../bakePlan'
-import { BakeAskCard, BakeHintCard } from '../../components/BakeCards'
-import { pendingRating } from '../../learning'
+import { BakeAskCard, BakeHintCard, BbqIdeasCard } from '../../components/BakeCards'
+import { bbqIdeas } from '../../bbq'
+import { householdPreference, pendingRating } from '../../learning'
 import { targetKcal } from '../../energy'
 import { sharingActive, shortDate, weekdayName } from '../../store'
 import { plannedBy } from '../../sync'
@@ -98,6 +99,14 @@ export function WeekTab({ m }: { m: AppModel }) {
     [onboarding, today, state.pantry, state.baked, state.bakeRatings, state.bakePlan, state.bakeHints],
   )
   const askRecipe = pendingBake ? RECIPE_BY_ID[pendingBake.entry.recipeId] : undefined
+  // BBQ-Wetter (März–September): dezente Ideen-Karte, lernend (Geplantes/Gegrilltes/Bewertetes + Geschmack)
+  const bbq = useMemo(
+    () =>
+      onboarding
+        ? undefined
+        : bbqIdeas({ today, baked: state.baked, bakeRatings: state.bakeRatings, bakePlan: state.bakePlan, hints: state.bakeHints, pref: (r) => householdPreference(m.plan.taste, m.plan.others, r).score }),
+    [onboarding, today, state.baked, state.bakeRatings, state.bakePlan, state.bakeHints, m.plan.taste, m.plan.others],
+  )
 
   // Fehlt etwas? (Vorrat minus Verbrauch der Tage davor, plus kommende Einkäufe) – Warnung, Ersatz, Verschiebungen
   const warnings = useMemo(
@@ -145,6 +154,8 @@ export function WeekTab({ m }: { m: AppModel }) {
           />
         ) : bakeSuggestion && !notice ? (
           <BakeHintCard s={bakeSuggestion} onAccept={() => act.acceptBakeSuggestion(bakeSuggestion)} onDismiss={() => act.dismissBakeSuggestion(bakeSuggestion)} />
+        ) : bbq && !notice ? (
+          <BbqIdeasCard ideas={bbq} onOpen={(r) => ui.setSheet({ recipe: r, mode: 'view', day: bbq.day })} onDismiss={act.dismissBbqIdeas} />
         ) : undefined
       }
       ratingSlot={(() => {

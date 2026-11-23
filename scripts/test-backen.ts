@@ -29,7 +29,7 @@ const anstell = RECIPE_BY_ID['sauerteig-anstellgut']
 // ───── Arten, nicht im Abendessen ─────
 ok(!!tiramisu && tiramisu.kind === 'dessert' && !!bienenstich && bienenstich.kind === 'kuchen' && !!brot && brot.kind === 'brot', 'Beispiele: Tiramisu (Dessert), Bienenstich (Kuchen), Bauernbrot (Brot)')
 ok(anstell?.kind === 'grundrezept' && RECIPE_BY_ID['rinderfond-braun'].kind === 'grundrezept', 'Anstellgut und Fonds sind Grundrezepte')
-ok(BASICS.every((b) => b.basic && b.yields && b.kind), 'alle Grundrezepte/Backrezepte haben basic, yields und kind')
+ok(BASICS.every((b) => b.basic && (b.yields || b.kind === 'bbq') && b.kind), 'alle Grundrezepte/Backrezepte haben basic, yields und kind')
 ok(!RECIPES.some((r) => r.basic || r.kind) && !BREAKFASTS.some((r) => r.basic), 'keine Backrezepte unter Abendessen (Stapel, Plan) oder Frühstück')
 ok(features(bienenstich).join() === 'bake:kuchen' && features(tiramisu).join() === 'bake:dessert', 'Lernen: eigenes Muster bake:<Art>, keine Küche/Hauptzutat')
 ok(isBake(bienenstich) && !isBake(anstell) && !isBake(RECIPES[0]), 'isBake: nur Dessert/Kuchen/Brot')

@@ -532,6 +532,7 @@ function batchCost(r: RawRecipe): number {
 for (const { recipe, name } of EXTRA_YIELDS) {
   if (PRODUCTS[name]) continue
   const st = yieldStock(recipe.kind, recipe.yields!)
-  PRODUCTS[name] = { pack: st.amount, unit: st.unit, price: Math.round(batchCost(recipe) * 100) / 100, shelf: recipe.yields!.shelf }
+  // BBQ-Reste: nur der Anteil der Ladung, der in den Vorrat geht (`share`)
+  PRODUCTS[name] = { pack: st.amount, unit: st.unit, price: Math.round(batchCost(recipe) * (recipe.yields!.share ?? 1) * 100) / 100, shelf: recipe.yields!.shelf }
   if (st.unit === 'Scheibe') CONVERT[name] = { g: 1 / SLICE_G, kg: 1000 / SLICE_G }
 }

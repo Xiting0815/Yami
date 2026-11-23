@@ -3,7 +3,7 @@ import type { Ingredient, Recipe } from '../types'
 import { formatAmount, scale } from '../shopping'
 import { ingredientsForStep, unmatched } from '../cookSteps'
 import { DeviceChips } from './DeviceChip'
-import { isBake } from '../types'
+import { isBake, isBbq } from '../types'
 import { shelfText, yieldText } from '../bake'
 
 /** „Fertig gekocht/gebacken/vorbereitet“ am Ende des Kochmodus */
@@ -27,6 +27,7 @@ function stockText(recipe: Recipe, servings: number): string | undefined {
 /** Haltbarkeit des Ergebnisses für den Hinweis über dem Fertig-Knopf */
 function keepText(recipe: Recipe): string {
   const y = recipe.yields!
+  if (recipe.kind === 'bbq') return `${y.store ?? 'vakuumiert eingefroren'}, hält ca. ${shelfText(y.shelf)}`
   if (recipe.kind === 'grundrezept' && y.shelf >= 60) return `eingefroren, hält ca. ${shelfText(y.shelf)}`
   return `hält ${shelfText(y.shelf)}${y.store ? ` ${y.store}` : ''}`
 }
@@ -35,6 +36,7 @@ function keepText(recipe: Recipe): string {
 function finishLabel(recipe: Recipe): string {
   if (recipe.kind === 'kuchen' || recipe.kind === 'brot' || recipe.kind === 'gebaeck') return 'Fertig gebacken ✓'
   if (recipe.kind === 'dessert') return 'Fertig ✓'
+  if (recipe.kind === 'bbq') return recipe.bbq === 'dutch' ? 'Fertig gekocht ✓' : 'Fertig gegrillt ✓'
   return 'Fertig gekocht ✓'
 }
 
@@ -125,7 +127,9 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
         <div className="cook-title">
           <h2>{recipe.title}</h2>
           <div className="muted small">
-            {isBake(recipe)
+            {isBbq(recipe)
+              ? `Rezept ×${servings} · ca. ${(recipe.portions ?? 2) * servings} Portionen${recipe.yields ? ` · Rest ${yieldText(recipe, servings)} vakuumiert` : ''}`
+              : isBake(recipe)
               ? `Rezept ×${servings} · ergibt ${yieldText(recipe, servings)}`
               : recipe.basic
                 ? `${servings} ${servings === 1 ? 'Ansatz' : 'Ansätze'} · ergibt ${stockText(recipe, servings)}`

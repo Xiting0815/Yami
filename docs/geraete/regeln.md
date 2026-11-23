@@ -124,3 +124,11 @@ Gerätedaten und Unsicherheiten: `famag.md`, `witt.md`. Bausteine: `src/data/dev
 ## 9. Text und Einstellung müssen zusammenpassen
 
 `npx vite-node scripts/check-device-text.ts` (läuft auch in `npm run check-data` als Fehler) meldet Schritte, deren Text etwas anderes sagt als die Einstellung: Temperaturen (Text „180 °C“, Einstellung 160 °C), Betriebsarten (Text „Ober-/Unterhitze“, Einstellung Heißluft), allgemeines „Ofen“/„Backofen“ statt Gerätename, Gerätenamen ohne passende Einstellung, Minuten bzw. Sekunden, die nicht zur eingestellten Dauer passen, und „in zwei Runden“ backen, obwohl zwei Bleche gleichzeitig (Ebene 1+3) eingestellt sind. Bei den Back-Gruppen schreibt `fitText()` den klassischen Satz „Den Ofen auf 180 °C Ober-/Unterhitze vorheizen“ automatisch auf die Einstellung um (z. B. „Den Combair auf 160 °C Heißluft vorheizen (2 Bleche: Ebene 1 + 3)“).
+
+## 10. BBQ-Geräte (Traeger, Gasgrill, Dutch Oven, Vakuumierer)
+
+Zusätzliche Geräte für die BBQ-Sparte und Resteverwertung: `smoker` (Traeger Timberline 850 – `traeger.md`), `gasgrill`
+(4-Brenner-Gasgrill), `dutch` (Dutch Oven auf Gas) und `vakuum` (Vakuumierer) – Daten in `grill-dutch.md`, Schreibregeln
+und Garwerte in `docs/bbq-regeln.md`, Bausteine `traeger()`, `gasgrill()`, `dutch()`, `vakuum()`, `bora()`, `vzug()` in
+`src/data/device-helpers.ts`. Kern bis 98 °C nur bei diesen Geräten (Pulled Pork/Brisket). Sous-vide bleibt der
+CombiSteamer mit `Vacuisine` (30–95 °C).

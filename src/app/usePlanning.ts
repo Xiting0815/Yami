@@ -65,11 +65,12 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
         baked: state.baked,
         snacks: state.snacks,
         bakeRatings: state.bakeRatings,
+        bakePlan: state.bakePlan,
         bfPrepped: state.bfPreps,
         bfRatings: state.bfRatings,
         bfSatiety: state.bfSatiety,
       }),
-    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings, state.bfPreps, state.bfRatings, state.bfSatiety],
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings, state.bakePlan, state.bfPreps, state.bfRatings, state.bfSatiety],
   )
 
   // ───── Familie: Geschmack der anderen Personen (eigene Bewertungen/Wischen, gemeinsamer Plan) ─────
@@ -92,9 +93,10 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
             customRecipes: state.customRecipes,
             baked: p.baked,
             bakeRatings: p.bakeRatings,
+            bakePlan: state.bakePlan,
           }),
         })),
-    [household, state.ha?.me, state.plan, state.wasted, today, state.tasteSince, state.customRecipes],
+    [household, state.ha?.me, state.plan, state.bakePlan, state.wasted, today, state.tasteSince, state.customRecipes],
   )
 
   // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────

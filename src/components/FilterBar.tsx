@@ -33,7 +33,7 @@ export function FilterBar({ filters, onChange, count, inSheet }: Props) {
             className={`chip ${filters.cuisines.includes(c) ? 'on' : ''}`}
             onClick={() => onChange({ ...filters, cuisines: toggle(filters.cuisines, c) })}
           >
-            {c === 'de' ? '🥨' : c === 'it' ? '🇮🇹' : c === 'gr' ? '🇬🇷' : '🥢'} {CUISINE_LABEL[c]}
+            {c === 'de' ? '🥨' : c === 'it' ? '🇮🇹' : c === 'gr' ? '🇬🇷' : c === 'us' ? '🇺🇸' : '🥢'} {CUISINE_LABEL[c]}
           </button>
         ))}
       </div>

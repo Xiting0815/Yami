@@ -11,7 +11,8 @@ import { weighedThisWeek, type WeighIn } from './progress'
 import { forDaysText, formatAmount, isBought, missingPacks, packText, scale } from './shopping'
 import { type HaSettings, isoDate, parseIso, weekDays } from './store'
 import type { BuyItem } from './kitchen'
-import type { WeekPlan } from './types'
+import type { BakePlan, Recipe, WeekPlan } from './types'
+import { isBbq } from './types'
 
 /** Markierung in der Beschreibung: nur Einträge damit gehören Yami */
 export const MARKER = 'Yami'
@@ -360,25 +361,47 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
   return out
 }
 
-/** Geplante Abendessen ab heute für die nächsten 7 Tage (heute + 7) */
-export function plannedDinners(plan: WeekPlan, today: string): Desired[] {
+/**
+ * Geplante Abendessen ab heute für die nächsten 7 Tage (heute + 7). Ein BBQ im Backplan ist das Abendessen des Tages
+ * (ein Eintrag je Tag, Schlüssel `dinner:<Tag>`): Titel „🍽️ 🔥 …“, Zutaten der Ladung; steht zusätzlich noch ein Abendessen
+ * im Plan, wird es in der Beschreibung mitgenannt.
+ */
+export function plannedDinners(plan: WeekPlan, today: string, bakePlan: BakePlan = {}): Desired[] {
   const out: Desired[] = []
   for (let i = 0; i <= 7; i++) {
     const D = addDaysIso(today, i)
     const e = plan[D]
     const r = e && RECIPE_BY_ID[e.recipeId] ? entryRecipe(e) : undefined
-    if (!e || !r || e.status) continue
-    const lines = r.ingredients.map((ing) => {
-      const amt = formatAmount(scale(ing, r.servings, e.servings), ing.unit)
-      return `• ${ing.name}${amt ? ` – ${amt}` : ''}`
-    })
+    const bbqs = (bakePlan[D] ?? []).filter((b) => !b.status && isBbq(RECIPE_BY_ID[b.recipeId]))
+    const dinner = e && r && !e.status ? { e, r } : undefined
+    if (!dinner && !bbqs.length) continue
+    const linesOf = (rec: Recipe, base: number, servings: number) =>
+      rec.ingredients.map((ing) => {
+        const amt = formatAmount(scale(ing, base, servings), ing.unit)
+        return `• ${ing.name}${amt ? ` – ${amt}` : ''}`
+      })
+    if (bbqs.length) {
+      const recs = bbqs.map((b) => ({ b, rec: RECIPE_BY_ID[b.recipeId] }))
+      const desc = recs.map(({ b, rec }) => `🔥 ${rec.title}${b.amount > 1 ? ` ×${b.amount}` : ''} (ca. ${(rec.portions ?? 2) * b.amount} Portionen)\n${linesOf(rec, rec.servings, b.amount * rec.servings).join('\n')}`)
+      if (dinner) desc.push(`Außerdem geplant: ${dinner.r.title}`)
+      out.push({
+        key: `dinner:${D}`,
+        summary: `🍽️ 🔥 ${recs.map(({ rec }) => rec.title).join(' + ')}`,
+        description: desc.join('\n\n'),
+        start: stamp(at(D, 18, 30)),
+        end: stamp(at(D, 19, 30)),
+        sig: `bbq:${bbqs.map((b) => `${b.recipeId}×${b.amount}`).join(',')}${dinner ? `|${dinner.e.recipeId}×${dinner.e.servings}` : ''}`,
+      })
+      continue
+    }
+    const { e: de, r: dr } = dinner!
     out.push({
       key: `dinner:${D}`,
-      summary: `🍽️ ${r.title}`,
-      description: `${e.servings} ${e.servings === 1 ? 'Portion' : 'Portionen'}\n${lines.join('\n')}`,
+      summary: `🍽️ ${dr.title}`,
+      description: `${de.servings} ${de.servings === 1 ? 'Portion' : 'Portionen'}\n${linesOf(dr, dr.servings, de.servings).join('\n')}`,
       start: stamp(at(D, 18, 30)),
       end: stamp(at(D, 19, 30)),
-      sig: `${e.recipeId}×${e.servings}${e.swap ? `|${swapText(e.swap)}` : ''}`,
+      sig: `${de.recipeId}×${de.servings}${de.swap ? `|${swapText(de.swap)}` : ''}`,
     })
   }
   return out

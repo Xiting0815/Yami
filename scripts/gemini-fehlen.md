@@ -42,3 +42,12 @@
 | pizza-teglia-romana | Rechteckige Stücke römische Blechpizza (Pizza in Teglia) mit knusprigem, luftigem Boden, belegt mit hauchdünnen goldbraunen Kartoffelscheiben, Rosmarin, Salsiccia-Stücken und zerlaufenem Mozzarella auf einem dunklen Blech |
 | pinsa-romana | Ovale Pinsa Romana mit knusprigem, großporigem Rand, Tomatensauce und Mozzarella, belegt mit Parmaschinken und frischem Rucola, auf einem Holzbrett |
 | pizza-bianca-mortadella | Goldbraune Pizza Bianca mit Rosmarin und grobem Salz, belegt mit hauchdünn gefalteter Mortadella, zerzupfter cremiger Burrata und gehackten grünen Pistazien, mit Olivenöl beträufelt |
+| jambalaya | Eine flache Pfanne Jambalaya: rötlicher Reis mit Hähnchenstücken, Wurstscheiben, rosa Garnelen, grüner Paprika und Staudensellerie, bestreut mit Frühlingszwiebelringen, Südstaaten-Küchentisch |
+| pulled-pork-quesadillas | Goldbraun gebratene, halbierte Quesadillas mit sichtbarer Füllung aus Pulled Pork, zerlaufenem Cheddar und Mais, daneben ein Schälchen Limetten-Sauerrahm-Dip und Koriander |
+| pulled-pork | Saftiges, gezupftes Pulled Pork mit dunkler, krustiger Bark auf einem Holzbrett, daneben zwei Gabeln und ein Schälchen dunkle BBQ-Sauce, im Hintergrund ein Pellet-Smoker |
+| beer-can-chicken | Ein ganzes, goldbraun glänzendes Hähnchen aufrecht auf einer Bierdose auf dem Rost eines Gasgrills mit offenem Deckel, krosse, rötliche Gewürzhaut |
+| chili-dutch-oven | Ein schwarzer gusseiserner Dutch Oven voller dunkelrotem Chili con Carne mit Rindfleischwürfeln und Kidneybohnen, Holzlöffel, im Freien auf einem Gaskocher |
+| bacon-cheeseburger-grill | Ein Bacon-Cheeseburger mit dickem, gegrilltem Patty mit Grillstreifen, zerlaufenem Cheddar, knusprigem Bacon, Salat, Tomate und roten Zwiebeln im gerösteten Brötchen |
+| pit-beans | Eine gusseiserne Pfanne mit dunklen, glänzenden BBQ-Bohnen mit Speckwürfeln und Paprika, Rauchschwaden, auf dem unteren Rost eines Smokers |
+| kc-bbq-sauce | Ein Schraubglas mit dicker, dunkelroter Kansas-City-BBQ-Sauce, ein Pinsel und ein Löffel daneben, rustikaler Holztisch |
+| memphis-rub | Ein offenes Schraubglas mit rotbraunem BBQ-Gewürz (Rub) aus Paprika, braunem Zucker und Pfeffer, daneben kleine Häufchen der einzelnen Gewürze auf einem Holzbrett |

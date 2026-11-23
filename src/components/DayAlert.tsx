@@ -1,4 +1,5 @@
 import { RECIPE_BY_ID } from '../data/recipes'
+import { isBbq } from '../types'
 import type { ShiftRecord } from '../store'
 import { type UseShortage, wdShort } from '../kitchen'
 import type { StandIn } from '../shortage'
@@ -24,7 +25,7 @@ interface Props {
 
 const what = (w: UseShortage) => {
   const title = RECIPE_BY_ID[w.recipeId]?.title ?? ''
-  return w.kind === 'dinner' ? '' : w.kind === 'breakfast' ? `Frühstück-Prep (${title}): ` : `Backen (${title}): `
+  return w.kind === 'dinner' ? '' : w.kind === 'breakfast' ? `Frühstück-Prep (${title}): ` : `${isBbq(RECIPE_BY_ID[w.recipeId]) ? 'BBQ' : 'Backen'} (${title}): `
 }
 
 /** „⚠️ Es fehlt: Sahne 200 ml“ unter der Tageskarte – mit Noch kaufen / Verschieben / Ersatz; Hinweis nach automatischem Verschieben */

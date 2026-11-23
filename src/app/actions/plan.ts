@@ -1,4 +1,5 @@
-import { isBake, type PlanEntry, type Recipe } from '../../types'
+import { isBake, isBbq, type PlanEntry, type Recipe } from '../../types'
+import { bbqMeal, doneWord } from '../../bbq'
 import { type PortionFeedback, type Rating, portionFactor } from '../../learning'
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
@@ -170,9 +171,11 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
    */
   function finishBasic(recipe: Recipe, servings: number, ctxDay?: string) {
     const y = recipe.yields
-    if (!recipe.basic || !y) return
+    // BBQ ohne Reste (Burger, Steak): nur Zutaten abziehen
+    if (!recipe.basic || !(y || isBbq(recipe))) return
     const snap = snapshot()
     const bake = isBake(recipe)
+    const meal = bbqMeal(recipe, today)
     setState((s) => {
       // eingeplantes Backen: dieser Eintrag gilt damit als gebacken (kein zweites Abziehen, keine Nachfrage mehr)
       const planned = matchBake(s.bakePlan, recipe.id, today, ctxDay)
@@ -181,9 +184,11 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
         pantry: cookBasic(s.pantry, recipe, servings, today).pantry,
         baked: bake ? [...s.baked, { date: today, recipeId: recipe.id }].slice(-200) : s.baked,
         bakePlan: planned ? markBaked(s.bakePlan, planned, recipe.id) : s.bakePlan,
+        // BBQ: eine Portion zählt als Abendessen in die Tagesbilanz
+        snacks: meal ? [...s.snacks, meal].slice(-400) : s.snacks,
       }
     })
-    flash(`${yieldText(recipe, servings)} ${y.name} im Vorrat ✓`, snap)
+    flash(y ? `${yieldText(recipe, servings)} ${y.name} im Vorrat ✓` : `${recipe.title} ${doneWord(recipe)} ✓`, snap)
     ui.setCooking(false)
     ui.setSheet(null)
     if (bake) ui.setRateBake({ recipeId: recipe.id, date: today })

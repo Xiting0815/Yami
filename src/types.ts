@@ -1,4 +1,4 @@
-export type Cuisine = 'de' | 'it' | 'as' | 'gr'
+export type Cuisine = 'de' | 'it' | 'as' | 'gr' | 'us'
 /** Festtags-Fenster: Martinsgans-Zeit (1.–15. Nov.) und Weihnachtszeit (15. Nov.–31. Dez.) */
 export type Festive = 'martini' | 'weihnachten' | 'plaetzchen'
 export type DishType = 'haupt' | 'pasta' | 'eintopf' | 'suppe' | 'auflauf' | 'brotzeit'
@@ -40,7 +40,7 @@ export const SHOP_ICON: Record<ShopSection, string> = {
 /** Kategorien, die eine neue Zutat haben darf (ohne den abgeleiteten Abschnitt „Nudeln & Mehl“) */
 export const INGREDIENT_CATS = SHOP_ORDER.filter((c): c is ShopCat => c !== 'nudeln')
 
-export const CUISINE_LABEL: Record<Cuisine, string> = { de: 'Deutsch', it: 'Italienisch', as: 'Asiatisch', gr: 'Griechisch' }
+export const CUISINE_LABEL: Record<Cuisine, string> = { de: 'Deutsch', it: 'Italienisch', as: 'Asiatisch', gr: 'Griechisch', us: 'Amerikanisch' }
 export const TYPE_LABEL: Record<DishType, string> = {
   haupt: 'Hauptgericht',
   pasta: 'Pasta',
@@ -75,13 +75,25 @@ export interface Nutrition {
  * Alle diese Rezepte haben `basic: true` – sie sind nie im Wischstapel, nie planbar und zählen nicht für Abwechslung,
  * Veggie-Quote oder Abendessen-Geschmack. „Fertig gekocht/gebacken“ legt `yields` in den Vorrat.
  */
-export type BasicKind = 'grundrezept' | 'dessert' | 'kuchen' | 'brot' | 'gebaeck'
+export type BasicKind = 'grundrezept' | 'dessert' | 'kuchen' | 'brot' | 'gebaeck' | 'bbq'
 
-export const KIND_LABEL: Record<BasicKind, string> = { grundrezept: 'Grundrezepte', dessert: 'Desserts', kuchen: 'Kuchen', brot: 'Brot & Brötchen', gebaeck: 'Plätzchen & Cookies' }
-export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', dessert: '🍮', kuchen: '🍰', brot: '🍞', gebaeck: '🍪' }
+export const KIND_LABEL: Record<BasicKind, string> = { grundrezept: 'Grundrezepte', dessert: 'Desserts', kuchen: 'Kuchen', brot: 'Brot & Brötchen', gebaeck: 'Plätzchen & Cookies', bbq: 'BBQ & Grillen' }
+export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', dessert: '🍮', kuchen: '🍰', brot: '🍞', gebaeck: '🍪', bbq: '🔥' }
 
-/** Backen & Desserts (alles außer Grundrezept): Stücke davon zählen beim Essen in die Tagesbilanz */
+/**
+ * Alles außer Grundrezepten (Backen & Desserts und BBQ): wird über den Backplan eingeplant, „Fertig …“ zählt fürs Lernen
+ * (gebacken/gegrillt + „Wie war’s?“). Stücke von Gebackenem zählen beim Essen in die Tagesbilanz (BBQ-Reste nicht, siehe `isBbq`).
+ */
 export const isBake = (r: { kind?: BasicKind } | undefined): boolean => !!r?.kind && r.kind !== 'grundrezept'
+/** BBQ-Sparte (Smoker, Grill, Dutch Oven, Burger, Beilagen): eigener Bereich, nie im Wischstapel, frei einplanbar */
+export const isBbq = (r: { kind?: BasicKind } | undefined): boolean => r?.kind === 'bbq'
+/** Backen & Desserts im engeren Sinn (ohne BBQ) – Backen-Liste, Backvorschläge, „1 gegessen“ */
+export const isBakery = (r: { kind?: BasicKind } | undefined): boolean => isBake(r) && !isBbq(r)
+
+/** Untergruppe in der BBQ-Sparte (Chips im Rezepte-Tab, Lernen) – `rub` = Rubs & Saucen (Grundrezepte) */
+export type BbqGroup = 'smoker' | 'grill' | 'dutch' | 'burger' | 'beilage' | 'rub'
+export const BBQ_GROUP_LABEL: Record<BbqGroup, string> = { smoker: 'Smoker', grill: 'Grill', dutch: 'Dutch Oven', burger: 'Burger', beilage: 'Beilagen', rub: 'Rubs & Saucen' }
+export const BBQ_GROUP_ICON: Record<BbqGroup, string> = { smoker: '💨', grill: '🔥', dutch: '🍲', burger: '🍔', beilage: '🥗', rub: '🫙' }
 
 /** Was ein Ansatz/Blech ergibt – kommt beim „Fertig gekocht/gebacken“ als Posten in den Vorrat */
 export interface BasicYield {
@@ -99,6 +111,12 @@ export interface BasicYield {
   store?: string
   /** Tage haltbar eingefroren (nur Hinweis), z. B. 90 */
   frozen?: number
+  /** Abschnitt im Katalog/Einkauf (Standard: Backwaren; BBQ-Reste vakuumiert eingefroren: 'tk', Rubs 'vorrat', Saucen 'konserven') */
+  cat?: ShopCat
+  /** Beutel-/Portionsgröße in `unit` (BBQ-Reste: „6 × 250 g vakuumiert“) */
+  portion?: number
+  /** Anteil der ganzen Ladung, der als Ergebnis in den Vorrat geht (BBQ: Rest nach dem Grillabend), Standard 1 */
+  share?: number
 }
 
 export interface Recipe {
@@ -148,10 +166,14 @@ export interface Recipe {
   kind?: BasicKind
   /** „💡 Leichter:“-Tipp (Backen & Desserts) */
   lighter?: string
+  /** BBQ-Sparte: Untergruppe (auch bei Rubs & Saucen, die Grundrezepte sind) */
+  bbq?: BbqGroup
+  /** BBQ: Portionen der ganzen Ladung (`nutrition` gilt dann je Portion, `servings` = 1 Ladung) */
+  portions?: number
 }
 
 /** Küchengeräte im Haushalt */
-export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer' | 'kneter' | 'pizzaofen'
+export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer' | 'kneter' | 'pizzaofen' | 'smoker' | 'gasgrill' | 'dutch' | 'vakuum'
 
 /** Eine Geräte-Einstellung zu einem Rezeptschritt */
 export interface DeviceSetting {
@@ -160,7 +182,10 @@ export interface DeviceSetting {
   mode: string
   /** °C */
   temp?: number
-  /** BORA: „1“–„9“, „Power“, „Schmelzen“, „Warmhalten“, „Simmern“; Famag (Kneter): Geschwindigkeitsstufe „1“–„10“ */
+  /**
+   * BORA: „1“–„9“, „Power“, „Schmelzen“, „Warmhalten“, „Simmern“; Famag (Kneter): Geschwindigkeitsstufe „1“–„10“;
+   * Gasgrill und Dutch Oven (Gas): Flamme „niedrig“ | „mittel“ | „hoch“
+   */
   level?: string
   minutes?: number
   /** Sekunden (nur Pizzaofen: Backzeit 30–600 s) */
@@ -169,8 +194,10 @@ export interface DeviceSetting {
   alt?: boolean
   /** Feuchte in % (nur wo das Gerät sie einstellen lässt) */
   humidity?: number
-  /** Kerntemperatur °C (Fühler) */
+  /** Kerntemperatur °C (Fühler/Thermometer) */
   core?: number
+  /** nur Gasgrill: welche der 4 Brenner an sind, z. B. „alle“, „1+4“, „1+2“ (Brenner 1 = links) */
+  burners?: string
   note?: string
 }
 

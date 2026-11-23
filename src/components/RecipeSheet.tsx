@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Recipe } from '../types'
-import { BREAKFAST_LABEL, CUISINE_LABEL, KIND_ICON, KIND_LABEL, TYPE_LABEL, isBake } from '../types'
+import { BBQ_GROUP_LABEL, BREAKFAST_LABEL, CUISINE_LABEL, KIND_ICON, KIND_LABEL, TYPE_LABEL, isBake, isBakery, isBbq } from '../types'
+import { leftoverText } from '../bbq'
 import { pieceName, shelfText, yieldText } from '../bake'
 import { yieldStock } from '../data/define'
 import { NutritionTable } from './NutritionRow'
@@ -48,8 +49,11 @@ interface Props {
   /** klassische Schritte statt Geräte-Schritte zeigen (gemerkt) */
   showClassic?: boolean
   onShowClassic?: (v: boolean) => void
-  /** Backen & Desserts / Grundrezepte: „Einplanen für“ – Tag wählen legt das Rezept (mit der gewählten Rezeptmenge) in den Backplan */
-  bakePlanner?: { today: string; plannedDays: string[]; onPlan: (day: string, amount: number) => void }
+  /**
+   * Backen & Desserts / Grundrezepte / BBQ: „Einplanen für“ – Tag wählen legt das Rezept (mit der gewählten Rezeptmenge) in den Backplan.
+   * BBQ: `replace` = das geplante Abendessen des Tages streichen (BBQ ersetzt es); `dinnerOn` nennt es für die Frage.
+   */
+  bakePlanner?: { today: string; plannedDays: string[]; onPlan: (day: string, amount: number, replace?: boolean) => void; dinnerOn?: (day: string) => string | undefined }
 }
 
 export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onFinish, onCooking, onEdit, onDelete, onOpenRecipe, showClassic, onShowClassic, bakePlanner }: Props) {
@@ -58,7 +62,10 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
   const hasDevice = !!recipe.deviceSteps && !!recipe.classicSteps
   const classic = hasDevice && !!showClassic
   const isBasic = !!recipe.basic && !!recipe.yields
-  const bake = isBake(recipe) && !!recipe.yields
+  const bbq = isBbq(recipe)
+  const bake = isBakery(recipe) && !!recipe.yields
+  // BBQ ersetzt meist das Abendessen des Tages – vorgewählt, abwählbar
+  const [replaceDinner, setReplaceDinner] = useState(true)
   // Grundrezepte/Gebackenes, die eine Zutat dieses Rezepts selbst herstellen (Rinderfond → Brauner Rinderfond,
   // Anstellgut → Sauerteig ansetzen, Vollkornbrot → selbstgebackenes Brot)
   const basicTips = [...new Map(recipe.ingredients.map((i) => basicFor(i.name)).filter((b): b is Recipe => !!b && b.id !== recipe.id).map((b) => [b.id, b])).values()]
@@ -86,7 +93,9 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
           </div>
           <div className="sheet-body">
             <div className="card-tags dark">
-              {isBasic ? (
+              {bbq ? (
+                <span>{KIND_ICON.bbq} BBQ{recipe.bbq ? ` · ${BBQ_GROUP_LABEL[recipe.bbq]}` : ''}</span>
+              ) : isBasic ? (
                 <span>{KIND_ICON[recipe.kind ?? 'grundrezept']} {recipe.kind && recipe.kind !== 'grundrezept' ? KIND_LABEL[recipe.kind] : 'Grundrezept'}</span>
               ) : recipe.breakfast ? (
                 <>
@@ -107,7 +116,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             {insight && <div className="sheet-badges"><InsightBadges ins={insight} /></div>}
 
             <div className="servings">
-              <span>{bake ? 'Rezeptmenge' : isBasic ? 'Ansätze' : 'Portionen'}</span>
+              <span>{bake || bbq ? 'Rezeptmenge' : isBasic ? 'Ansätze' : 'Portionen'}</span>
               <div className="stepper">
                 <button onClick={() => setServings((s) => Math.max(1, s - 1))} aria-label="weniger">−</button>
                 <b>{servings}</b>
@@ -115,13 +124,22 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               </div>
             </div>
 
-            {isBasic && bakePlanner && (
+            {(isBasic || bbq) && bakePlanner && (
               <div className="bake-plan">
                 <div className="bake-plan-head">
                   <b>Einplanen für</b>
-                  <span className="muted small">Zutaten kommen auf die Einkaufsliste</span>
+                  <span className="muted small">Zutaten kommen auf die Einkaufsliste{bbq ? ', der Tag in den Kalender' : ''}</span>
                 </div>
-                <BakeDays today={bakePlanner.today} marked={(d) => bakePlanner.plannedDays.includes(d)} onPick={(d) => bakePlanner.onPlan(d, servings)} />
+                {bbq && (
+                  <label className="small bbq-replace">
+                    <input type="checkbox" checked={replaceDinner} onChange={(e) => setReplaceDinner(e.target.checked)} /> Ersetzt das Abendessen an dem Tag (geplantes Gericht wird gestrichen)
+                  </label>
+                )}
+                <BakeDays
+                  today={bakePlanner.today}
+                  marked={(d) => bakePlanner.plannedDays.includes(d)}
+                  onPick={(d) => bakePlanner.onPlan(d, servings, bbq && replaceDinner && !!bakePlanner.dinnerOn?.(d))}
+                />
               </div>
             )}
 
@@ -131,7 +149,14 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               </p>
             )}
 
-            {bake ? (
+            {bbq ? (
+              <div className="prep-facts bake-facts">
+                <div>{KIND_ICON.bbq} Ladung für ca. <b>{(recipe.portions ?? 2) * servings} Portionen</b> · pro Portion <b>{recipe.nutrition.kcal.toLocaleString('de-DE')} kcal</b> · {String(recipe.nutrition.protein).replace('.', ',')} g Eiweiß</div>
+                {y && <div>❄️ Rest: <b>{leftoverText(recipe, servings)}</b> · hält ca. {shelfText(y.shelf)} – Yami schlägt dann Resteessen vor</div>}
+                {recipe.lighter && <div className="lighter">💡 <b>Leichter:</b> {recipe.lighter}</div>}
+                <div className="muted small">✓ „Fertig gegrillt“ im Kochmodus zieht die Zutaten ab{y ? ' und legt den Rest in den Vorrat' : ''}. Eine Portion zählt als Abendessen in die Tagesbilanz.</div>
+              </div>
+            ) : bake ? (
               <div className="prep-facts bake-facts">
                 <div>{KIND_ICON[recipe.kind!]} Ergibt <b>{yieldText(recipe, servings)}</b> · hält <b>{shelfText(y!.shelf)}</b>{y!.store ? ` ${y!.store}` : ''}</div>
                 {y!.frozen ? <div>❄️ Eingefroren ca. {shelfText(y!.frozen)} haltbar</div> : null}
@@ -180,7 +205,9 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             )}
 
             <p className="muted small cost-line">
-              {isBasic
+              {bbq
+                ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für die Ladung · ${formatEuro(recipeCost(recipe, servings, prices) / ((recipe.portions ?? 2) * servings))} pro Portion (ohne Gewürze)`
+                : isBasic
                 ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für ${yieldText(recipe, servings)} (ohne Gewürze und Grundzutaten)`
                 : `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} · ${formatEuro(recipeCost(recipe, servings, prices) / servings)} pro Portion (ohne Gewürze)`}
             </p>
@@ -206,6 +233,10 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               <button key={b.id} className="basic-tip small" onClick={() => onOpenRecipe?.(b)}>
                 {b.kind === 'brot'
                   ? <>🍞 Tipp: Brot selbst backen – <u>{b.title}</u></>
+                  : isBbq(b)
+                    ? <>🔥 Tipp: Reste vom BBQ (vakuumiert im Vorrat) – <u>{b.title}</u></>
+                  : b.bbq === 'rub'
+                    ? <>🫙 Tipp: selbst gemacht schmeckt’s besser – <u>{b.title}</u></>
                   : isBake(b)
                     ? <>💡 Tipp: selbst gemacht – <u>{b.title}</u></>
                     : b.yields && /fond/i.test(b.yields.name)
