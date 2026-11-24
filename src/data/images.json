@@ -48,6 +48,18 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Penne_Arrabbiata.jpg"
  },
+ "atomic-buffalo-turds ": {
+  "author": "Gemini",
+  "file": "img/atomic-buffalo-turds .webp",
+  "license": "KI",
+  "source": ""
+ },
+ "baby-back-ribs ": {
+  "author": "Gemini",
+  "file": "img/baby-back-ribs .webp",
+  "license": "KI",
+  "source": ""
+ },
  "baci-di-dama": {
   "author": "Gemini",
   "file": "img/baci-di-dama.webp",
@@ -173,6 +185,12 @@
   "license": "KI",
   "source": ""
  },
+ "brisket-burnt-ends": {
+  "author": "Gemini",
+  "file": "img/brisket-burnt-ends.webp",
+  "license": "KI",
+  "source": ""
+ },
  "broccoli-acciughe": {
   "author": "Rocky Masum This work was made by Masum-al-Hasan Rocky and released under the license(s) stated below. Please feel free ",
   "commonsTitle": "File:A plate of red sauce pasta.jpg",
@@ -202,6 +220,12 @@
  "bud-spencer-eintopf": {
   "author": "Gemini",
   "file": "img/bud-spencer-eintopf.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "buffalo-chicken-wraps": {
+  "author": "Gemini",
+  "file": "img/buffalo-chicken-wraps.webp",
   "license": "KI",
   "source": ""
  },
@@ -327,12 +351,36 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chia_Pudding.PNG"
  },
+ "chicken-andouille-gumbo": {
+  "author": "Gemini",
+  "file": "img/chicken-andouille-gumbo.webp",
+  "license": "KI",
+  "source": ""
+ },
  "chicken-burger-leicht": {
   "author": "PattayaPatrol",
   "commonsTitle": "File:DFC 1186 Crispy chicken burger topped with melted cheese and bacon served with fresh lettuce tomato and a side of fries and coleslaw.jpg",
   "file": "img/chicken-burger-leicht.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:DFC_1186_Crispy_chicken_burger_topped_with_melted_cheese_and_bacon_served_with_fresh_lettuce_tomato_and_a_side_of_fries_and_coleslaw.jpg"
+ },
+ "chicken-fried-steak": {
+  "author": "Gemini",
+  "file": "img/chicken-fried-steak.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "chicken-pot-pie": {
+  "author": "Gemini",
+  "file": "img/chicken-pot-pie.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "chicken-wings-smoker": {
+  "author": "Gemini",
+  "file": "img/chicken-wings-smoker.webp",
+  "license": "KI",
+  "source": ""
  },
  "chicoree-gratin": {
   "author": "Jiel Beaumadier",
@@ -829,6 +877,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:J%C3%A4gerschnitzel_DDR.jpg"
  },
+ "jambalaya": {
+  "author": "Gemini",
+  "file": "img/jambalaya.webp",
+  "license": "KI",
+  "source": ""
+ },
  "jiaozi": {
   "author": "David Pursehouse from Kawasaki, Japan",
   "commonsTitle": "File:Chinese dumplings (Jiaozi) (2196005904).jpg",
@@ -1172,6 +1226,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Maultaschensuppe.jpg"
  },
+ "meatloaf-mashed-potatoes": {
+  "author": "Gemini",
+  "file": "img/meatloaf-mashed-potatoes.webp",
+  "license": "KI",
+  "source": ""
+ },
  "merluzzo-livornese": {
   "author": "Gemini",
   "file": "img/merluzzo-livornese.webp",
@@ -1191,6 +1251,12 @@
   "file": "img/moehreneintopf.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Beef_stew_with_potatoes_and_carrots_-_Massachusetts.jpg"
+ },
+ "moink-balls": {
+  "author": "Gemini",
+  "file": "img/moink-balls.webp",
+  "license": "KI",
+  "source": ""
  },
  "moussaka": {
   "author": "Gemini",
@@ -1453,6 +1519,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Beef_Steak_in_Black_Pepper_Sauce.jpg"
  },
+ "philly-cheesesteak": {
+  "author": "Gemini",
+  "file": "img/philly-cheesesteak.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pho-bo": {
   "author": "Andy Li",
   "commonsTitle": "File:Pho Bo by Banh & Mee in Kirkgate Market.jpg",
@@ -1553,9 +1625,39 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Polpette_Al_Sugo_-_Nanninella.jpg"
  },
+ "pork-belly-burnt-ends": {
+  "author": "Gemini",
+  "file": "img/pork-belly-burnt-ends.webp",
+  "license": "KI",
+  "source": ""
+ },
  "porridge-glas": {
   "author": "Gemini",
   "file": "img/porridge-glas.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pulled-pork": {
+  "author": "Gemini",
+  "file": "img/pulled-pork.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pulled-pork-mac-and-cheese": {
+  "author": "Gemini",
+  "file": "img/pulled-pork-mac-and-cheese.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pulled-pork-nachos": {
+  "author": "Gemini",
+  "file": "img/pulled-pork-nachos.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pulled-pork-quesadillas": {
+  "author": "Gemini",
+  "file": "img/pulled-pork-quesadillas.webp",
   "license": "KI",
   "source": ""
  },
@@ -1629,6 +1731,12 @@
   "file": "img/ravioli-salbei.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Ravioli_burro_e_salvia.jpg"
+ },
+ "red-beans-and-rice": {
+  "author": "Gemini",
+  "file": "img/red-beans-and-rice.webp",
+  "license": "KI",
+  "source": ""
  },
  "ribollita": {
   "author": "Ithunn",
@@ -1948,6 +2056,18 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Shoyu_Ramen.jpg"
  },
+ "shrimp-and-grits": {
+  "author": "Gemini",
+  "file": "img/shrimp-and-grits.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "shrimp-etouffee": {
+  "author": "Gemini",
+  "file": "img/shrimp-etouffee.webp",
+  "license": "KI",
+  "source": ""
+ },
  "skyr-birne": {
   "author": "Gemini",
   "file": "img/skyr-birne.webp",
@@ -1957,6 +2077,12 @@
  "skyr-haferflocken-cookies": {
   "author": "Gemini",
   "file": "img/skyr-haferflocken-cookies.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "sloppy-joes": {
+  "author": "Gemini",
+  "file": "img/sloppy-joes.webp",
   "license": "KI",
   "source": ""
  },
@@ -1979,6 +2105,12 @@
   "file": "img/sonntagsbroetchen-kaiser.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Hard_roll_Kaiserbr%C3%B6tchen_Fresh_Buffet_Solaire_23_January_2025_Filipinas30.jpg"
+ },
+ "southern-fried-chicken": {
+  "author": "Gemini",
+  "file": "img/southern-fried-chicken.webp",
+  "license": "KI",
+  "source": ""
  },
  "soutzoukakia": {
   "author": "Perique des Palottes",
@@ -2021,6 +2153,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Spaghetti_and_meatballs_1.jpg"
  },
+ "spareribs-321 ": {
+  "author": "Gemini",
+  "file": "img/spareribs-321 .webp",
+  "license": "KI",
+  "source": ""
+ },
  "spargel-hollandaise": {
   "author": "Benreis",
   "commonsTitle": "File:Spargel Lachs Kartoffeln Sauce hollandaise .jpg",
@@ -2034,6 +2172,12 @@
   "file": "img/spargelcremesuppe.webp",
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:GER_%E2%80%94_BY_%E2%80%94_Oberbayern_%E2%80%94_Landkreis_Traunstein_%E2%80%94_Gemeinde_Obing_%E2%80%94_Obing_Ort_%E2%80%94_Kienberger_Stra%C3%9Fe_12_(Spargelcremesuppe)_2026-05-01_Mattes.jpg"
+ },
+ "spatchcock-chicken": {
+  "author": "Gemini",
+  "file": "img/spatchcock-chicken.webp",
+  "license": "KI",
+  "source": ""
  },
  "speckpfannkuchen": {
   "author": "Xocolatl",
@@ -2142,6 +2286,12 @@
   "file": "img/teriyaki-huhn.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Teriyaki_chicken_and_beef_Yakiniku_with_eggCNE.jpg"
+ },
+ "texas-brisket": {
+  "author": "Gemini",
+  "file": "img/texas-brisket.webp",
+  "license": "KI",
+  "source": ""
  },
  "tiramisu": {
   "author": "Anna.Massini",
