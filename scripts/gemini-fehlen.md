@@ -1,29 +1,7 @@
 | Datei-Name | Gericht |
 |---|---|
-| jambalaya | Eine flache Pfanne Jambalaya: rötlicher Reis mit Hähnchenstücken, Wurstscheiben, rosa Garnelen, grüner Paprika und Staudensellerie, bestreut mit Frühlingszwiebelringen, Südstaaten-Küchentisch |
-| pulled-pork-quesadillas | Goldbraun gebratene, halbierte Quesadillas mit sichtbarer Füllung aus Pulled Pork, zerlaufenem Cheddar und Mais, daneben ein Schälchen Limetten-Sauerrahm-Dip und Koriander |
-| chicken-andouille-gumbo | Dark brown Louisiana chicken and sausage gumbo in a deep bowl with a scoop of white rice in the center, sliced green onions and parsley |
-| red-beans-and-rice | New Orleans red beans and rice with smoked sausage slices, creamy kidney beans over white rice, green onions, bottle of hot sauce nearby |
-| shrimp-and-grits | Shrimp and grits: creamy cheesy yellow grits topped with seared Cajun-spiced shrimp, bacon bits and green onions in a shallow bowl |
-| shrimp-etouffee | Shrimp étouffée, thick reddish-brown Cajun sauce with shrimp over white rice, garnished with green onions and parsley |
-| southern-fried-chicken | Crispy golden Southern fried chicken drumsticks and thighs with craggy crust on a wire rack, side of coleslaw |
-| chicken-fried-steak | Chicken fried steak smothered in white peppery country gravy with mashed potatoes and green beans on a plate, diner style |
-| sloppy-joes | Sloppy joe sandwiches with saucy ground beef filling spilling out of toasted buns, pickles and coleslaw on the side |
-| meatloaf-mashed-potatoes | Sliced American meatloaf with shiny ketchup glaze, mashed potatoes and green beans on a plate |
-| chicken-pot-pie | Individual chicken pot pies in ramekins with golden puff pastry lids, one broken open showing creamy chicken, carrots and peas |
-| philly-cheesesteak | Philly cheesesteak sandwich with thinly sliced beef, onions, peppers, mushrooms and melted provolone in a ciabatta roll |
-| buffalo-chicken-wraps | Buffalo chicken wraps cut in half showing spicy orange chicken strips, lettuce, celery and carrot sticks, with blue cheese dip |
-| pulled-pork-mac-and-cheese | Mac and cheese with broccoli topped with BBQ pulled pork and golden panko crust in a baking dish |
-| pulled-pork-nachos | Sheet pan nachos with homemade tortilla chips, BBQ pulled pork, kidney beans, corn, melted cheddar, pico de gallo and sour cream |
-| pulled-pork | Saftiges, gezupftes Pulled Pork mit dunkler, krustiger Bark auf einem Holzbrett, daneben zwei Gabeln und ein Schälchen dunkle BBQ-Sauce, im Hintergrund ein Pellet-Smoker |
 | spareribs-321 | Two racks of smoked St. Louis cut pork spare ribs with glossy dark red BBQ glaze and pink smoke ring, cut into bones on a wooden board, rustic backyard barbecue |
 | baby-back-ribs | Glazed baby back pork ribs from a pellet smoker, sliced between the bones, sticky caramelized barbecue sauce, wooden cutting board, natural light |
-| pork-belly-burnt-ends | Pork belly burnt ends, caramelized sticky cubes of smoked pork belly in a foil pan with glossy BBQ glaze, toothpicks, close-up |
-| texas-brisket | Sliced Texas style smoked beef brisket with thick black pepper bark and red smoke ring on butcher paper, juicy slices, pickles and white bread on the side |
-| brisket-burnt-ends | Kansas City brisket burnt ends, dark crusty cubes of smoked beef brisket glazed with BBQ sauce in a pan, close-up, rustic |
-| chicken-wings-smoker | Crispy smoked buffalo chicken wings tossed in orange hot sauce, celery sticks and blue cheese dip, on a dark plate |
-| spatchcock-chicken | Golden brown spatchcocked whole chicken with crispy skin fresh from a pellet smoker, lemon halves, on a wooden board |
-| moink-balls | Moink balls: bacon wrapped meatballs glazed with BBQ sauce on toothpicks, smoked, served on a board |
 | atomic-buffalo-turds | Atomic buffalo turds: halved jalapeno peppers stuffed with cream cheese and cheddar, wrapped in crispy bacon, smoked on a grill rack |
 | smoked-salmon | Hot smoked salmon fillet with honey glaze and cracked black pepper, flaky pink flesh, fresh dill and lemon wedges |
 | carolina-pulled-pork | Carolina pulled pork sandwich with vinegar sauce, chopped smoked pork on a soft bun topped with creamy coleslaw |

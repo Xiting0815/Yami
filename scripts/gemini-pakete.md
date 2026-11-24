@@ -1,26 +1,13 @@
 # Gemini – restliche Fotos in Paketen à 8
 
-Pro Paket an Gemini schicken (Text unten). Jedes Bild unter dem Namen in der linken Spalte speichern (z. B. spareribs-321.jpeg) im Ordner yami-ki.
+Noch 59 Fotos. Pro Paket an Gemini schicken. Jedes Bild unter dem fett gedruckten Namen im Ordner yami-ki speichern.
 
 ## Paket 1
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
-1. **---** – ---
-2. **pulled-pork** – Saftiges, gezupftes Pulled Pork mit dunkler, krustiger Bark auf einem Holzbrett, daneben zwei Gabeln und ein Schälchen dunkle BBQ-Sauce, im Hintergrund ein Pellet-Smoker
-3. **spareribs-321** – Two racks of smoked St. Louis cut pork spare ribs with glossy dark red BBQ glaze and pink smoke ring, cut into bones on a wooden board, rustic backyard barbecue
-4. **baby-back-ribs** – Glazed baby back pork ribs from a pellet smoker, sliced between the bones, sticky caramelized barbecue sauce, wooden cutting board, natural light
-5. **pork-belly-burnt-ends** – Pork belly burnt ends, caramelized sticky cubes of smoked pork belly in a foil pan with glossy BBQ glaze, toothpicks, close-up
-6. **texas-brisket** – Sliced Texas style smoked beef brisket with thick black pepper bark and red smoke ring on butcher paper, juicy slices, pickles and white bread on the side
-7. **brisket-burnt-ends** – Kansas City brisket burnt ends, dark crusty cubes of smoked beef brisket glazed with BBQ sauce in a pan, close-up, rustic
-8. **chicken-wings-smoker** – Crispy smoked buffalo chicken wings tossed in orange hot sauce, celery sticks and blue cheese dip, on a dark plate
-
-## Paket 2
-
-Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
-
-1. **spatchcock-chicken** – Golden brown spatchcocked whole chicken with crispy skin fresh from a pellet smoker, lemon halves, on a wooden board
-2. **moink-balls** – Moink balls: bacon wrapped meatballs glazed with BBQ sauce on toothpicks, smoked, served on a board
+1. **spareribs-321** – Two racks of smoked St. Louis cut pork spare ribs with glossy dark red BBQ glaze and pink smoke ring, cut into bones on a wooden board, rustic backyard barbecue
+2. **baby-back-ribs** – Glazed baby back pork ribs from a pellet smoker, sliced between the bones, sticky caramelized barbecue sauce, wooden cutting board, natural light
 3. **atomic-buffalo-turds** – Atomic buffalo turds: halved jalapeno peppers stuffed with cream cheese and cheddar, wrapped in crispy bacon, smoked on a grill rack
 4. **smoked-salmon** – Hot smoked salmon fillet with honey glaze and cracked black pepper, flaky pink flesh, fresh dill and lemon wedges
 5. **carolina-pulled-pork** – Carolina pulled pork sandwich with vinegar sauce, chopped smoked pork on a soft bun topped with creamy coleslaw
@@ -28,7 +15,7 @@ Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto 
 7. **bacon-fatty** – Bacon explosion fatty: woven bacon lattice roll stuffed with sausage meat, cheddar and peppers, sliced showing the spiral
 8. **picanha-reverse-sear** – Reverse seared picanha (top sirloin cap) with crispy scored fat cap, sliced medium rare, coarse salt, on a wooden board
 
-## Paket 3
+## Paket 2
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
@@ -41,7 +28,7 @@ Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto 
 7. **cajun-garnelen-spiesse** – Grilled Cajun shrimp skewers with red bell pepper and red onion, brushed with garlic parsley butter, served on white rice with lemon wedges
 8. **cedar-plank-salmon** – A glazed salmon fillet with caramelized brown sugar mustard crust on a smoking cedar wood plank on a gas grill, garnished with dill and lemon, green beans on the side
 
-## Paket 4
+## Paket 3
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
@@ -54,7 +41,7 @@ Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto 
 7. **peach-cobbler** – Southern peach cobbler in a black cast iron dutch oven with a golden brown cake topping bubbling around cinnamon peach slices, a scoop of vanilla ice cream melting on top
 8. **no-knead-brot** – A crusty round no-knead bread loaf with a deep brown crackly crust and flour dusting, sitting in an open black cast iron dutch oven, one slice cut showing an open airy crumb
 
-## Paket 5
+## Paket 4
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
@@ -67,7 +54,7 @@ Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto 
 7. **oklahoma-onion-burger** – Oklahoma fried onion burger: two thin beef patties with deeply caramelized onions smashed into them, melted cheese, pickles and mustard sauce in a soft steamed bun, daylight, no text
 8. **mushroom-swiss-burger** – Grilled beef burger topped with sautéed brown mushrooms with thyme and melted Swiss cheese, white barbecue sauce and lettuce in a toasted bun, daylight, no text
 
-## Paket 6
+## Paket 5
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
@@ -80,7 +67,7 @@ Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto 
 7. **stovetop-mac-and-cheese** – Creamy stovetop macaroni and cheese with elbow macaroni in a glossy orange cheddar sauce, served in a pot with a wooden spoon, close-up
 8. **creamy-coleslaw** – Creamy American coleslaw with finely shredded white cabbage and grated carrots in a light mayonnaise dressing, glass bowl, barbecue side dish
 
-## Paket 7
+## Paket 6
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
@@ -93,7 +80,7 @@ Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto 
 7. **kc-bbq-sauce** – Ein Schraubglas mit dicker, dunkelroter Kansas-City-BBQ-Sauce, ein Pinsel und ein Löffel daneben, rustikaler Holztisch
 8. **memphis-rub** – Ein offenes Schraubglas mit rotbraunem BBQ-Gewürz (Rub) aus Paprika, braunem Zucker und Pfeffer, daneben kleine Häufchen der einzelnen Gewürze auf einem Holzbrett
 
-## Paket 8
+## Paket 7
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
@@ -106,7 +93,7 @@ Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto 
 7. **burger-sauce** – Small bowl of pinkish-orange Big-Mac-style burger sauce with finely chopped pickles, next to a burger bun, daylight, no text
 8. **chipotle-mayo** – Small bowl of smoky orange chipotle mayonnaise with a lime wedge and a chipotle pepper beside it, daylight, no text
 
-## Paket 9
+## Paket 8
 
 Erstelle für jedes der folgenden Gerichte ein eigenes, realistisches Food-Foto im Querformat 4:3, natürliches Licht, appetitlich angerichtet, ohne Text im Bild:
 
