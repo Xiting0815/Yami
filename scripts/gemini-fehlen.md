@@ -1,10 +1,5 @@
 | Datei-Name | Gericht |
 |---|---|
-| spareribs-321 | Two racks of smoked St. Louis cut pork spare ribs with glossy dark red BBQ glaze and pink smoke ring, cut into bones on a wooden board, rustic backyard barbecue |
-| baby-back-ribs | Glazed baby back pork ribs from a pellet smoker, sliced between the bones, sticky caramelized barbecue sauce, wooden cutting board, natural light |
-| atomic-buffalo-turds | Atomic buffalo turds: halved jalapeno peppers stuffed with cream cheese and cheddar, wrapped in crispy bacon, smoked on a grill rack |
-| smoked-salmon | Hot smoked salmon fillet with honey glaze and cracked black pepper, flaky pink flesh, fresh dill and lemon wedges |
-| carolina-pulled-pork | Carolina pulled pork sandwich with vinegar sauce, chopped smoked pork on a soft bun topped with creamy coleslaw |
 | smoked-meatloaf | Smoked meatloaf with shiny ketchup brown sugar glaze, sliced thick on a cutting board, smoke ring visible |
 | bacon-fatty | Bacon explosion fatty: woven bacon lattice roll stuffed with sausage meat, cheddar and peppers, sliced showing the spiral |
 | picanha-reverse-sear | Reverse seared picanha (top sirloin cap) with crispy scored fat cap, sliced medium rare, coarse salt, on a wooden board |
