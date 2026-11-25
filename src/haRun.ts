@@ -4,10 +4,10 @@
  * geplant hat, landet also im selben Lauf in Google Tasks und im Kalender (siehe Kopf von src/sync.ts).
  */
 import { HaError, haErrorText } from './homeassistant'
-import { type Desired, type HaApi, type LocalItem, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo } from './haSync'
+import { type Desired, type HaApi, type LocalItem, listTodo, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo } from './haSync'
 import type { Trip } from './kitchen'
 import { type AppState, type HaSettings, sharingActive } from './store'
-import { LEASE_MS, type MainDoc, applyRound, familySync, hashOf, leaseDecision, writeMain } from './sync'
+import { LEASE_MS, type MainDoc, PREFIX, applyRound, familySync, hashOf, leaseDecision, parseRemote, writeMain } from './sync'
 import { haTripItems, tripReminderInput, tripsOf } from './tripState'
 import { type PushAlert, pushAlerts } from './shortage'
 import { stamp } from './haSync'
@@ -101,6 +101,28 @@ export async function sendAlerts(api: HaApi, h: Pick<HaSettings, 'notify' | 'pus
   return { pushed: pushed.slice(-60), error, sent }
 }
 
+/** so lange gilt ein Haushalt nach dem letzten Lebenszeichen seines Schreibstabs als aktiv */
+export const HOUSEHOLD_STALE_MS = 14 * 86400_000
+
+/**
+ * Ist auf einem ANDEREN Gerät „Familie teilen“ aktiv? (Schreibstab `yami:v1:main` in der Sync-Liste, von einem anderen
+ * Gerät, in den letzten 14 Tagen.) Günstig: genau ein todo/item/list der Sync-Liste. Fehlt die Liste oder klappt das
+ * Lesen nicht (außer Netzwerk) → kein Haushalt, alles wie bisher.
+ */
+export async function otherHousehold(api: HaApi, h: Pick<HaSettings, 'syncList' | 'device'>, now: number): Promise<{ person: string; t: number } | null> {
+  let todos
+  try {
+    todos = await listTodo(api, h.syncList)
+  } catch (e) {
+    if (e instanceof HaError && e.kind === 'network') throw e
+    return null
+  }
+  if (!todos.some((t) => t.summary === PREFIX + 'main')) return null
+  const main = parseRemote(todos.filter((t) => t.summary === PREFIX + 'main')).main
+  if (!main || main.device === h.device || now - Math.max(main.t, main.until) > HOUSEHOLD_STALE_MS) return null
+  return { person: main.person, t: main.t }
+}
+
 /** Ein ganzer Lauf. Wirft bei Netzwerkfehlern (der Aufrufer zeigt den Fehler und versucht es später wieder). */
 export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   const s0 = d.getState()
@@ -119,16 +141,30 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   // ── ohne Familie teilen: wie bisher alles auf diesem Gerät ──
   if (!sharingActive(h0)) {
     const trips0 = tripsOf(s0, today)
+    // Im Haushalt ist auf einem anderen Gerät „Familie teilen“ an → dieses Gerät hat womöglich einen alten Plan und
+    // darf Google Tasks und den Abendessen-Kalender nicht anfassen (das macht der Schreibstab). Nur rein persönliche
+    // Erinnerungen (Meal-Prep, Auftauen, Wiegen). Nichts, was am geteilten Plan/Vorrat/Einkauf hängt (Läuft ab,
+    // Einkauf freigeben, „Heute fehlt …“) – das wäre hier alter Stand. Die App zeigt einen Hinweis zum Einschalten.
+    const other = await otherHousehold(d.api, h0, now.getTime())
+    if (other) {
+      const isPersonal = (k: string) => /^rem:(prep|thaw|weigh):/.test(k)
+      const own = Object.fromEntries(Object.entries(h0.events).filter(([k]) => isPersonal(k)))
+      const per = await syncReminders(d.api, h0.reminders, own, remindersOf(s0, trips0).filter((r) => isPersonal(r.key)), now)
+      const rest = Object.fromEntries(Object.entries(h0.events).filter(([k]) => !isPersonal(k)))
+      patchHa({ events: { ...rest, ...per.events }, otherShare: other, lastSync: now.toISOString(), error: errText(per.error) })
+      return { again: false, error: per.error, wrote: false }
+    }
     const todo = await syncTodo(d.api, h0, haLocalFor(s0, today, trips0), d.onBought)
     const cal = await syncCalendar(d.api, h0, plannedDinners(s0.plan, today, s0.bakePlan), remindersOf(s0, trips0), now)
     const push = await sendAlerts(d.api, h0, pushAlerts(s0, today, now, trips0), now)
     const error = todo.error ?? cal.error ?? push.error
-    patchHa({ items: todo.items, done: todo.done, events: cal.events, pushed: push.pushed, lastSync: now.toISOString(), error: errText(error) })
+    patchHa({ items: todo.items, done: todo.done, events: cal.events, pushed: push.pushed, otherShare: undefined, lastSync: now.toISOString(), error: errText(error) })
     return { again: false, error, wrote: true }
   }
 
   // ── Familie teilen ──
   const me = h0.me
+  if (h0.otherShare) patchHa({ otherShare: undefined })
   const fam = await familySync(d.api, h0.syncList, s0, me, now, today)
   let error = fam.error
   const state = applyRound(s0, fam.res).state

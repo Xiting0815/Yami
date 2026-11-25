@@ -439,6 +439,23 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   const names = shop().map((i) => i.summary.split(' – ')[0] + (i.summary.match(/\(([^)]+)\)$/)?.[1] ?? ''))
   ok(names.length === new Set(names).size, `keine doppelten Artikel in Google Tasks (${names.length})`)
   ok(h5.items.filter((i) => i.summary === PREFIX + 'main').length === 1, 'nur ein Schreibstab-Eintrag')
+  // Fehler vom 25.11.: zweites Gerät (MacBook) OHNE „Familie teilen“ mit altem Plan → schreibt nichts mehr
+  {
+    const cal = () => h5.events['calendar.familie'] ?? []
+    const before = JSON.stringify(cal())
+    const shopBefore = JSON.stringify(h5.lists['todo.einkaufen'])
+    let mac = sanitize({ onboarding: 'done', plan: { '2026-11-17': { recipeId: B.id, servings: 2 }, '2026-11-18': { recipeId: B.id, servings: 2 } }, trips: { '2026-11-16': { released: 1 } }, ha: { ...newHa('https://x.ui.nabu.casa', 'tok'), enabled: true } })
+    const rmac = await haRound({ api, getState: () => mac, setState: (fn) => (mac = fn(mac)), onBought: () => {}, now: new Date(t + 1000) })
+    ok(!rmac.wrote && JSON.stringify(cal()) === before && JSON.stringify(h5.lists['todo.einkaufen']) === shopBefore, 'MacBook ohne „Familie teilen“: Kalender und Google Tasks unberührt')
+    ok(!!mac.ha!.otherShare, 'MacBook: Hinweis „auf einem anderen Gerät ist Familie teilen aktiv“')
+    // ein fremder Schreiber (alter Stand) hat trotzdem Termine ersetzt → der Stab-Halter repariert beim nächsten Lauf
+    const wedEv = cal().find((e) => e.start.startsWith('2026-11-18'))!
+    h5.events['calendar.familie'] = [...cal().filter((e) => e !== wedEv), { uid: 'foreign', summary: `🍽️ ${B.title}`, start: '2026-11-18T18:30:00' }]
+    await run('Marc', 10 * 60_000)
+    await run('Lisa', 10_000)
+    const wed2 = cal().filter((e) => e.start.startsWith('2026-11-18'))
+    ok(wed2.length === 1 && wed2[0].summary === wedEv.summary && wed2[0].uid !== 'foreign', `Stab-Halter repariert den Kalender ohne lokale Änderung (Mittwoch wieder „${C.title}“)`)
+  }
   // beide übernehmen gleichzeitig → genau einer schreibt
   const h6 = new FakeHa()
   const api6 = h6.api()

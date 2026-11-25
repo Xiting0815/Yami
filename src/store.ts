@@ -69,6 +69,11 @@ export interface HaSettings {
   notify?: string
   /** schon geschickte Sofort-Hinweise (Schlüssel, nur lokal) – nichts doppelt */
   pushed?: string[]
+  /**
+   * Auf einem anderen Gerät ist „Familie teilen“ aktiv (Schreibstab in der Sync-Liste), hier aber nicht → dieses Gerät
+   * schreibt weder Google Tasks noch den Abendessen-Kalender (sonst überschreibt es sie mit altem Stand). Nur lokal.
+   */
+  otherShare?: { person: string; t: number }
 }
 
 /** Familien-Abgleich läuft (verbunden, eingeschaltet, Person gewählt) */
@@ -137,6 +142,8 @@ function sanitizeHa(x: unknown): HaSettings | undefined {
   if (typeof h.notify === 'string' && ENTITY.test(h.notify.trim()) && h.notify.trim().startsWith('notify.')) base.notify = h.notify.trim()
   if (Array.isArray(h.pushed)) base.pushed = h.pushed.filter((k): k is string => typeof k === 'string' && k.length <= 200).slice(-60)
   if (typeof h.me === 'string' && h.me.trim()) base.me = h.me.trim().slice(0, 30)
+  const os = h.otherShare as { person?: unknown; t?: unknown } | undefined
+  if (os && typeof os === 'object' && typeof os.person === 'string' && typeof os.t === 'number' && Number.isFinite(os.t)) base.otherShare = { person: os.person.slice(0, 30), t: os.t }
   // alte Standardziele auf die neuen umstellen (selbst gewählte Ziele bleiben)
   const move: Partial<Pick<HaSettings, 'todo' | 'calendar'>> = {}
   if (base.todo === HA_OLD_DEFAULTS.todo) move.todo = HA_DEFAULTS.todo

@@ -928,6 +928,10 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .sync-notices { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
 .sync-notices .notice { margin: 0; }
 .sync-notice { display: flex; align-items: center; gap: 4px; }
+.share-warn { display: flex; align-items: center; gap: 8px; }
+.share-warn .notice-text { -webkit-line-clamp: unset; display: block; }
+.share-warn .btn { flex-shrink: 0; }
+.share-warn-box { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 8px 0; }
 .sync-notice .notice-text { flex: 1; min-width: 0; }
 .sync-notice .link { min-height: 36px; white-space: nowrap; }
 .sync-x { border: none; background: none; color: var(--muted); min-width: 36px; min-height: 36px; font-size: 14px; }

@@ -6,11 +6,12 @@ import {
   diffDinnerEvents, diffTodo, planMoves, plannedDinners, plannedReminders, syncCalendar, syncTodo, usualWeighDay,
 } from '../src/haSync'
 import { backupBody, parseBackup } from '../src/backup'
-import { sendAlerts } from '../src/haRun'
+import { haRound, otherHousehold, sendAlerts } from '../src/haRun'
+import type { AppState } from '../src/store'
 import { newHa, sanitize, withHaTargets, HA_DEFAULTS } from '../src/store'
-import { RECIPES } from '../src/data/recipes'
+import { RECIPE_BY_ID, RECIPES } from '../src/data/recipes'
 import { compareShop, shopOrderOf, shopSection } from '../src/shopSection'
-import { SHOP_LABEL, SHOP_ORDER } from '../src/types'
+import { SHOP_LABEL, SHOP_ORDER, isBbq } from '../src/types'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -171,7 +172,9 @@ const R = (uid: string, summary: string, status: RemoteTodo['status'] = 'needs_a
 // Attrappe einer HA-Instanz
 class FakeHa implements HaApi {
   todos: (RemoteTodo & { n: number })[] = []
-  events: { uid: string; summary: string; start: string }[] = []
+  events: { uid: string; summary: string; start: string; description?: string }[] = []
+  /** Sync-Liste „Familie teilen“ (todo.yami_sync); undefined = gibt es nicht */
+  syncTodos?: RemoteTodo[]
   calls: { domain: string; service: string; data: Record<string, unknown> }[] = []
   cmds: Record<string, unknown>[] = []
   next = 1
@@ -182,6 +185,10 @@ class FakeHa implements HaApi {
   addOnTop = false
   async command<T>(msg: Record<string, unknown>): Promise<T> {
     this.cmds.push(msg)
+    if (msg.type === 'todo/item/list' && msg.entity_id === 'todo.yami_sync') {
+      if (!this.syncTodos) throw new HaError('failed', 'Entity not found', 'not_found')
+      return { items: this.syncTodos.map((t) => ({ ...t })) } as T
+    }
     if (msg.type === 'todo/item/list') return { items: this.todos.map((t) => ({ uid: t.uid, summary: t.summary, status: t.status, ...(this.noDescription ? {} : { description: t.description }) })) } as T
     if (msg.type === 'todo/item/move') {
       if (!this.moveSupported) throw new HaError('unsupported', 'unknown', 'unknown_command')
@@ -214,14 +221,14 @@ class FakeHa implements HaApi {
         } else if (service === 'remove_item') this.todos = this.todos.filter((x) => x !== t)
       }
     } else if (domain === 'calendar') {
-      this.events.push({ uid: 'e' + this.next++, summary: String(data.summary), start: String(data.start_date_time).replace(' ', 'T') })
+      this.events.push({ uid: 'e' + this.next++, summary: String(data.summary), start: String(data.start_date_time).replace(' ', 'T'), description: data.description as string | undefined })
     }
     return null
   }
   async subscribe(msg: Record<string, unknown>, cb: (e: unknown) => void) {
     this.cmds.push(msg)
     if (!this.calSupported) throw new HaError('unsupported', 'unknown', 'unknown_command')
-    setTimeout(() => cb({ events: this.events.map((e) => ({ uid: e.uid, summary: e.summary, start: e.start })) }), 0)
+    setTimeout(() => cb({ events: this.events.map((e) => ({ uid: e.uid, summary: e.summary, start: e.start, ...(e.description !== undefined ? { description: e.description } : {}) })) }), 0)
     return () => { this.cmds.push({ type: 'unsubscribe_events' }) }
   }
 }
@@ -465,6 +472,137 @@ const plan = (o: Record<string, [string, number]>) => Object.fromEntries(Object.
   const r2 = await syncCalendar(ha2, s2, plannedDinners(p, '2026-11-16'), [], now)
   ok(ha2.events.length === 2 && !r2.error, 'Kalender ohne Suche: nur heute und morgen, ohne Fehlermeldung')
   ok(Object.values(r2.events).every((e) => !e.uid), 'Kalender ohne Suche: keine uids')
+}
+
+// ───── 5b) Kalender = echter Abgleich gegen den tatsächlichen Inhalt (Fehler vom 25.11.: zweites Gerät mit altem Plan) ─────
+{
+  const today = '2026-11-24'
+  const dinnersAll = RECIPES.filter((r) => r.meal === 'dinner')
+  const [chili, leber, cacio, schupf] = dinnersAll
+  const p = plan({ '2026-11-24': [chili.id, 2], '2026-11-25': [leber.id, 2] })
+  const want = plannedDinners(p, today)
+  const tracked = {
+    'dinner:2026-11-24': { sig: want[0].sig, uid: 'jei0oo41@google.com' },
+    'dinner:2026-11-25': { sig: want[1].sig, uid: '3gnln4h9@google.com' },
+  }
+  // anderes Gerät hat unsere Termine gelöscht und seine alten angelegt; dazu ein Schultermin
+  const remote = [
+    { uid: 'r62s', summary: `🍽️ ${cacio.title}`, date: '2026-11-24' },
+    { uid: 'pp9k', summary: `🍽️ ${schupf.title}`, date: '2026-11-25' },
+    { uid: 'school', summary: 'Schule: Elternabend', date: '2026-11-24' },
+  ]
+  const diff = diffDinnerEvents(want, tracked, remote, today)
+  ok(diff.del.flatMap((x) => x.uids).sort().join() === 'pp9k,r62s', 'Abgleich: fremde 🍽️-Termine mit altem Titel werden gelöscht (sig unverändert, gemerkte uid fehlt)')
+  ok(diff.create.map((c) => c.summary).join('|') === `🍽️ ${chili.title}|🍽️ ${leber.title}`, 'Abgleich: richtige Termine werden neu angelegt')
+  ok(!diff.del.some((x) => x.uids.includes('school')), 'Abgleich: Schultermin (ohne 🍽️) bleibt unberührt')
+
+  // ganzer Ablauf mit FakeHa
+  const ha = new FakeHa()
+  const s = { calendar: 'calendar.familie', reminders: 'calendar.yami_erinnerungen', events: {} as Record<string, { uid?: string; sig: string }> }
+  const now = at('2026-11-24 12:00:00')
+  let r = await syncCalendar(ha, s, want, [], now)
+  s.events = r.events
+  ok(ha.events.length === 2, 'Kalender: Chili und Leberkäse angelegt')
+  // Fremdes Gerät: löscht beide und legt seinen alten Stand an; Schule, gestern, und ein BBQ-freier Tag mit Fremdtermin
+  ha.events = [
+    { uid: 'old1', summary: `🍽️ ${cacio.title}`, start: '2026-11-24T18:30:00' },
+    { uid: 'old2', summary: `🍽️ ${schupf.title}`, start: '2026-11-25T18:30:00' },
+    { uid: 'old3', summary: `🍽️ ${cacio.title}`, start: '2026-11-27T18:30:00' },
+    { uid: 'past', summary: `🍽️ ${schupf.title}`, start: '2026-11-23T18:30:00' },
+    { uid: 'school', summary: 'Schule: Elternabend', start: '2026-11-24T19:00:00' },
+    { uid: 'far', summary: `🍽️ ${cacio.title}`, start: '2026-12-02T18:30:00' },
+  ]
+  r = await syncCalendar(ha, s, want, [], now)
+  s.events = r.events
+  const on = (d: string) => ha.events.filter((e) => e.start.startsWith(d))
+  ok(on('2026-11-24').filter((e) => e.summary.startsWith('🍽️')).map((e) => e.summary).join() === `🍽️ ${chili.title}`, 'Reparatur ohne lokale Änderung: 24. wieder Chili, Cacio e Pepe weg')
+  ok(on('2026-11-25').map((e) => e.summary).join() === `🍽️ ${leber.title}`, 'Reparatur: 25. wieder Leberkäse, Schupfnudeln weg')
+  ok(on('2026-11-27').length === 0, 'Tag ohne geplantes Abendessen: alter 🍽️-Termin aufgeräumt')
+  ok(on('2026-11-24').some((e) => e.uid === 'school'), 'Schultermin bleibt')
+  ok(on('2026-11-23').length === 1 && on('2026-12-02').length === 1, 'vergangene Tage und Tage nach dem Planfenster bleiben unberührt')
+  ok(!!s.events['dinner:2026-11-24']?.uid && s.events['dinner:2026-11-24'].uid === on('2026-11-24').find((e) => e.summary.startsWith('🍽️'))!.uid, 'neue uid gemerkt')
+  const n0 = ha.calls.length, d0 = ha.cmds.filter((c) => c.type === 'calendar/event/delete').length
+  r = await syncCalendar(ha, s, want, [], now)
+  s.events = r.events
+  ok(ha.calls.length === n0 && ha.cmds.filter((c) => c.type === 'calendar/event/delete').length === d0, 'danach Ruhe: keine weiteren Änderungen')
+
+  // doppelte Termine: eigener + Kopie mit gleichem Titel → Kopie weg
+  const mineUid = s.events['dinner:2026-11-25'].uid!
+  ha.events.push({ uid: 'dup', summary: `🍽️ ${leber.title}`, start: '2026-11-25T18:30:00', description: want[1].description })
+  r = await syncCalendar(ha, s, want, [], now)
+  s.events = r.events
+  ok(on('2026-11-25').length === 1 && on('2026-11-25')[0].uid === mineUid, 'doppelter 🍽️-Termin: Kopie gelöscht, eigener bleibt')
+
+  // Zuordnung verloren, passender Termin (Titel + Beschreibung) schon da → übernehmen statt neu anlegen
+  const n1 = ha.calls.length
+  r = await syncCalendar(ha, { ...s, events: {} }, want, [], now)
+  ok(ha.calls.length === n1 && r.events['dinner:2026-11-25']?.uid === mineUid && ha.events.filter((e) => e.summary.startsWith('🍽️')).length === 4, 'Zuordnung verloren: passender Termin wird übernommen, nichts doppelt')
+  // gleicher Titel, aber andere Portionen (Beschreibung anders) → ersetzt
+  ha.events = ha.events.map((e) => (e.uid === mineUid ? { ...e, description: '4 Portionen\n• alt' } : e))
+  r = await syncCalendar(ha, { ...s, events: {} }, want, [], now)
+  ok(on('2026-11-25').length === 1 && on('2026-11-25')[0].uid !== mineUid && on('2026-11-25')[0].description === want[1].description, 'fremder Termin mit gleichem Titel, aber anderer Beschreibung → ersetzt')
+
+  // BBQ („🍽️ 🔥 …“) ersetzt ein altes Abendessen am selben Tag
+  const bbq = RECIPE_BY_ID['pulled-pork']
+  ok(isBbq(bbq), 'BBQ-Rezept vorhanden')
+  {
+    const wantB = plannedDinners(p, today, { '2026-11-26': [{ recipeId: bbq.id, amount: 1 }] } as never)
+    ha.events.push({ uid: 'oldbbq', summary: `🍽️ ${cacio.title}`, start: '2026-11-26T18:30:00' })
+    r = await syncCalendar(ha, s, wantB, [], now)
+    ok(on('2026-11-26').map((e) => e.summary).join() === `🍽️ 🔥 ${bbq.title}`, 'BBQ: alter 🍽️-Termin weg, „🍽️ 🔥 …“ genau einmal')
+  }
+
+  // ohne Lesemöglichkeit: vorsichtig wie bisher (nichts Fremdes löschen)
+  const diffBlind = diffDinnerEvents(want, tracked, null, today)
+  ok(diffBlind.create.length === 0 && diffBlind.del.length === 0, 'ohne Lesemöglichkeit: unveränderte Zuordnung → nichts anfassen')
+}
+
+// ───── 5c) Zweites Gerät ohne „Familie teilen“ schreibt nicht, wenn im Haushalt geteilt wird ─────
+{
+  const dinnersAll = RECIPES.filter((r) => r.meal === 'dinner')
+  const mkState = (): AppState => sanitize({
+    onboarding: 'done',
+    plan: { '2026-11-24': { recipeId: dinnersAll[2].id, servings: 2 } },
+    trips: { '2026-11-24': { released: 1 } },
+    ha: { ...newHa('https://x.ui.nabu.casa', 'tok'), enabled: true },
+  })
+  const runOnce = async (ha: FakeHa, st: AppState) => {
+    let cur = st
+    const r = await haRound({ api: ha, getState: () => cur, setState: (fn) => (cur = fn(cur)), onBought: () => {}, now: at('2026-11-24 12:00:00') })
+    return { r, s: cur }
+  }
+  // Einzelgerät, keine Sync-Liste → alles wie bisher
+  const single = new FakeHa()
+  const a = await runOnce(single, mkState())
+  ok(a.r.wrote && single.events.filter((e) => e.summary.startsWith('🍽️')).length === 1 && single.todos.length > 0 && !a.s.ha!.otherShare, 'Einzelgerät ohne Sync-Liste: Kalender und Einkaufsliste wie bisher')
+  ok(single.cmds.filter((c) => c.type === 'todo/item/list' && c.entity_id === 'todo.yami_sync').length === 1, 'Prüfung kostet genau ein todo/item/list der Sync-Liste')
+  // Sync-Liste vorhanden, aber ohne Schreibstab (oder eigener alter Stab) → wie bisher
+  const own = new FakeHa()
+  const st0 = mkState()
+  own.syncTodos = [{ uid: 'm', summary: 'yami:v1:main', status: 'needs_action', description: JSON.stringify({ device: st0.ha!.device, person: 'Marc', t: Date.parse('2026-11-20T10:00:00'), until: Date.parse('2026-11-20T10:05:00') }) }]
+  ok((await runOnce(own, st0)).r.wrote, 'eigener früherer Schreibstab: Gerät schreibt weiter')
+  // anderes Gerät teilt → dieses schreibt weder Google Tasks noch Abendessen-Kalender
+  const fam = new FakeHa()
+  fam.syncTodos = [
+    { uid: 'k', summary: 'yami:v1:kitchen', status: 'needs_action', description: '{"items":{}}' },
+    { uid: 'm', summary: 'yami:v1:main', status: 'needs_action', description: JSON.stringify({ device: 'otherdevice1', person: 'Marc', t: Date.parse('2026-11-24T11:58:00'), until: Date.parse('2026-11-24T12:03:00') }) },
+  ]
+  fam.events.push({ uid: 'chili', summary: '🍽️ Chili con Carne', start: '2026-11-24T18:30:00' })
+  const b = await runOnce(fam, mkState())
+  ok(!b.r.wrote && fam.todos.length === 0 && fam.events.filter((e) => e.summary.startsWith('🍽️')).map((e) => e.uid).join() === 'chili', 'zweites Gerät ohne „Familie teilen“: kein Google Tasks, Kalender unberührt')
+  ok(!fam.calls.some((c) => c.domain === 'todo') && !fam.cmds.some((c) => c.type === 'calendar/event/delete'), 'zweites Gerät: keine Schreibzugriffe auf Einkaufsliste/Kalender')
+  ok(!fam.events.some((e) => e.summary.startsWith('⚠️')), 'zweites Gerät: kein „Heute fehlt …“ aus altem Plan aufs Handy')
+  ok(b.s.ha!.otherShare?.person === 'Marc', 'zweites Gerät: Hinweis „anderes Gerät teilt“ gespeichert')
+  ok(sanitize(JSON.parse(JSON.stringify(b.s))).ha?.otherShare?.person === 'Marc', 'Hinweis übersteht Neuladen')
+  // persönliche Erinnerung (Wiegen) darf es weiter anlegen
+  const withProfile = { ...mkState(), profile: { sex: 'm', age: 40, heightCm: 180, weightKg: 92, activity: 1.3, deficit: 500, lunchKcal: 600 } as AppState['profile'], weighIns: [{ date: '2026-11-18', weight: 92 }] }
+  const fam2 = new FakeHa()
+  fam2.syncTodos = fam.syncTodos
+  const c = await runOnce(fam2, withProfile)
+  ok(!c.r.wrote && fam2.events.some((e) => e.summary.includes('wiegen')) && !fam2.events.some((e) => e.summary.startsWith('🍽️')), 'zweites Gerät: persönliche Erinnerung ja, Abendessen nein')
+  // Haushalt seit über 14 Tagen still → wieder normal
+  ok((await otherHousehold(fam, { syncList: 'todo.yami_sync', device: 'x' }, Date.parse('2026-12-20T12:00:00'))) === null, 'Haushalt seit über 14 Tagen inaktiv → kein Haushalt')
+  ok((await otherHousehold(single, { syncList: 'todo.yami_sync', device: 'x' }, Date.now())) === null, 'Sync-Liste fehlt → kein Haushalt')
 }
 
 // ───── 6) Zustand & Sicherung ─────

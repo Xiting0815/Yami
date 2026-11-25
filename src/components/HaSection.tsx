@@ -134,6 +134,14 @@ export function HaSection({ ha, onChange, onSyncNow, syncing, familyStatus, main
           <p className="muted small">
             Wochenplan, Einkaufsliste, Vorrat, eigene Rezepte und Bewertungen mit den anderen im Haushalt teilen – jede Person mit eigenem Handy und eigenem Token. Profil, Kalorien, Wiegen und Frühstück bleiben auf deinem Gerät.
           </p>
+          {ha.otherShare && !ha.share && (
+            <div className="share-warn-box" role="alert">
+              <p className="bf-note">
+                ⚠ Auf einem anderen Gerät{ha.otherShare.person ? ` (${ha.otherShare.person})` : ''} ist „Familie teilen“ aktiv. Schalte es hier auch ein, sonst überschreibt dieses Gerät den Kalender mit altem Stand. Bis dahin pflegt dieses Gerät Einkaufsliste und Abendessen-Kalender nicht.
+              </p>
+              <button className="btn primary" disabled={!ha.enabled} onClick={() => onChange({ ...ha, share: true, error: undefined })}>Familie teilen hier einschalten</button>
+            </div>
+          )}
           <label className="ha-switch">
             <input type="checkbox" checked={!!ha.share} disabled={!ha.enabled} onChange={(e) => onChange({ ...ha, share: e.target.checked, error: undefined })} />
             <span>{ha.share ? 'Familie teilen ist an' : ha.enabled ? 'Familie teilen ist aus' : 'Erst den Abgleich einschalten'}</span>

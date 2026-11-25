@@ -368,7 +368,7 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
  */
 export function plannedDinners(plan: WeekPlan, today: string, bakePlan: BakePlan = {}): Desired[] {
   const out: Desired[] = []
-  for (let i = 0; i <= 7; i++) {
+  for (let i = 0; i <= DINNER_DAYS; i++) {
     const D = addDaysIso(today, i)
     const e = plan[D]
     const r = e && RECIPE_BY_ID[e.recipeId] ? entryRecipe(e) : undefined
@@ -412,6 +412,8 @@ export interface RemoteEvent {
   summary: string
   /** lokales Datum (ISO) des Beginns */
   date: string
+  /** Beschreibung, falls der Kalender sie liefert */
+  description?: string | null
 }
 
 export interface DinnerDiff {
@@ -420,18 +422,74 @@ export interface DinnerDiff {
   del: { key: string; uids: string[] }[]
   /** Schlüssel, die nicht mehr verfolgt werden sollen */
   forget: string[]
+  /** vorhandener, passender Termin wird (wieder) als eigener gemerkt – nichts anzulegen */
+  keep?: { key: string; uid: string; sig: string }[]
 }
+
+/** Abendessen-Termine von Yami erkennt man am Titel (auch BBQ „🍽️ 🔥 …“); alles andere im Kalender bleibt unberührt */
+export const DINNER_MARK = '🍽️'
+/** so viele Tage nach heute plant der Kalender (heute … heute + DINNER_DAYS) */
+export const DINNER_DAYS = 7
+
+const normText = (s: string | null | undefined) => (s ?? '').replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim()
 
 /**
  * Plan-Kalender abgleichen. `remote` = Einträge aus calendar/event/subscribe, null = Befehl nicht verfügbar
  * (dann nur heute und morgen anlegen und nur Einträge mit bekannter uid löschen).
+ *
+ * Mit `remote` ist es ein echter Abgleich gegen den TATSÄCHLICHEN Kalenderinhalt, Tag für Tag (heute … +7):
+ * Soll = genau ein „🍽️“-Termin mit dem gewünschten Titel. Der gemerkte eigene Termin (uid) bleibt, wenn er noch da ist
+ * und Titel/Signatur passen; sonst wird ein vorhandener Termin mit genau diesem Titel (und, falls lesbar, gleicher
+ * Beschreibung) übernommen; sonst neu angelegt. Alle übrigen „🍽️“-Termine des Tages (alter Stand eines anderen Geräts,
+ * Doppelte) werden gelöscht – auch an Tagen ohne geplantes Abendessen. Termine ohne „🍽️“ (Schule …) und vergangene
+ * Tage werden nie angefasst.
  */
 export function diffDinnerEvents(desired: Desired[], tracked: HaSettings['events'], remote: RemoteEvent[] | null, today: string): DinnerDiff {
+  if (!remote) return diffDinnerBlind(desired, tracked, today)
+  const out: DinnerDiff = { create: [], del: [], forget: [], keep: [] }
+  const want = new Map(desired.map((d) => [d.key, d]))
+  const mine = remote.filter((e) => e.summary.startsWith(DINNER_MARK))
+
+  // vergangene Tage nur vergessen
+  for (const key of Object.keys(tracked)) if (key.startsWith('dinner:') && key.slice(7) < today) out.forget.push(key)
+
+  for (let i = 0; i <= DINNER_DAYS; i++) {
+    const date = addDaysIso(today, i)
+    const key = `dinner:${date}`
+    const w = want.get(key)
+    const t = tracked[key]
+    const evs = mine.filter((e) => e.date === date)
+    if (!w) {
+      // kein Abendessen geplant → alle 🍽️-Termine des Tages weg
+      if (evs.length) out.del.push({ key, uids: evs.map((e) => e.uid) })
+      else if (t) out.forget.push(key)
+      continue
+    }
+    const same = !!t && t.sig === w.sig
+    const titled = evs.filter((e) => e.summary === w.summary)
+    // 1) eigener gemerkter Termin, unverändert
+    let keep = same && t!.uid ? titled.find((e) => e.uid === t!.uid) : undefined
+    // 2) früher ohne uid gemerkt → über den Titel
+    if (!keep && same && !t!.uid) keep = titled[0]
+    // 3) fremder/verlorener Termin mit genau diesem Titel: nur übernehmen, wenn die Beschreibung passt
+    //    (oder nicht lesbar ist und sich am Gericht nichts geändert hat)
+    if (!keep)
+      keep = titled.find((e) => (e.description != null ? normText(e.description) === normText(w.description) : !t || same))
+    const extra = evs.filter((e) => e !== keep)
+    if (extra.length) out.del.push({ key, uids: extra.map((e) => e.uid) })
+    if (keep) {
+      if (!t || t.uid !== keep.uid || t.sig !== w.sig) out.keep!.push({ key, uid: keep.uid, sig: w.sig })
+    } else out.create.push(w)
+  }
+  // gemerkte Tage nach +7 (gibt es normalerweise nicht) bleiben, wie sie sind
+  return out
+}
+
+/** ohne Lesemöglichkeit: vorsichtig – nur heute/morgen anlegen, nur über bekannte uid löschen */
+function diffDinnerBlind(desired: Desired[], tracked: HaSettings['events'], today: string): DinnerDiff {
   const out: DinnerDiff = { create: [], del: [], forget: [] }
   const tomorrow = addDaysIso(today, 1)
-  const want = new Map((remote ? desired : desired.filter((d) => d.start.slice(0, 10) <= tomorrow)).map((d) => [d.key, d]))
-  const remoteOn = (date: string) => (remote ?? []).filter((e) => e.date === date && e.summary.startsWith('🍽️'))
-
+  const want = new Map(desired.filter((d) => d.start.slice(0, 10) <= tomorrow).map((d) => [d.key, d]))
   for (const [key, t] of Object.entries(tracked)) {
     if (!key.startsWith('dinner:')) continue
     const date = key.slice(7)
@@ -440,24 +498,12 @@ export function diffDinnerEvents(desired: Desired[], tracked: HaSettings['events
       out.forget.push(key)
       continue
     }
-    if (w && w.sig === t.sig) {
-      // unverändert – war der Eintrag in HA weg (z. B. von Hand gelöscht), neu anlegen
-      if (remote && !remoteOn(date).length) out.create.push(w)
-      continue
-    }
-    const uids = t.uid ? [t.uid] : remoteOn(date).map((e) => e.uid)
-    if (uids.length) out.del.push({ key, uids })
+    if (w && w.sig === t.sig) continue
+    if (t.uid) out.del.push({ key, uids: [t.uid] })
     else out.forget.push(key)
     if (w) out.create.push(w)
   }
-  for (const w of want.values()) {
-    if (!tracked[w.key] && !out.create.includes(w)) {
-      // am Tag evtl. noch ein Eintrag aus früherem Stand (Verfolgung verloren) → vorher entfernen
-      const stale = remoteOn(w.key.slice(7))
-      if (stale.length) out.del.push({ key: w.key, uids: stale.map((e) => e.uid) })
-      out.create.push(w)
-    }
-  }
+  for (const w of want.values()) if (!tracked[w.key]) out.create.push(w)
   return out
 }
 
@@ -486,9 +532,9 @@ export async function listEvents(api: HaApi, entity: string, from: string, to: s
     ])
     const list = Array.isArray(ev) ? ev : (ev as { events?: unknown[] } | null)?.events ?? []
     const out: RemoteEvent[] = []
-    for (const x of list as { uid?: string; summary?: string; start?: unknown }[]) {
+    for (const x of list as { uid?: string; summary?: string; start?: unknown; description?: unknown }[]) {
       const date = eventDate(x.start)
-      if (x.uid && date) out.push({ uid: String(x.uid), summary: String(x.summary ?? ''), date })
+      if (x.uid && date) out.push({ uid: String(x.uid), summary: String(x.summary ?? ''), date, ...(typeof x.description === 'string' ? { description: x.description } : {}) })
     }
     return out
   } finally {
@@ -584,6 +630,8 @@ export async function syncCalendar(
     }
     if (ok) delete events[d.key]
   }
+  // passender Termin schon da (z. B. Zuordnung verloren) → nur wieder als eigenen merken
+  for (const k of diff.keep ?? []) events[k.key] = { sig: k.sig, uid: k.uid }
   for (const d of diff.create) {
     if (await attempt(() => create(ha.calendar, d))) events[d.key] = { sig: d.sig }
   }

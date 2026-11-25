@@ -78,6 +78,8 @@ export function WeekTab({ m }: { m: AppModel }) {
   const startSteps = shared ? allSteps.slice(2) : allSteps
   const notices = shared ? (state.sync?.notices ?? []).slice(-3).reverse() : []
   const askWho = !!state.ha?.share && !state.ha.me
+  // auf einem anderen Gerät ist „Familie teilen“ an, hier nicht → dieses Gerät schreibt Einkaufsliste/Kalender nicht
+  const otherShare = state.ha?.enabled && !state.ha.share ? state.ha.otherShare : undefined
 
   // höchstens ein Hinweis über dem Plan: Vorrat läuft ab > Vorschlag > Wiegetag
   const notice: Notice | undefined = status.justFinished
@@ -176,8 +178,24 @@ export function WeekTab({ m }: { m: AppModel }) {
       plan={state.plan}
       planBy={(d) => plannedBy(state, d)}
       syncSlot={
-        notices.length || askWho ? (
+        notices.length || askWho || otherShare ? (
           <div className="sync-notices">
+            {otherShare && (
+              <div className="notice warn share-warn" role="alert">
+                <span className="notice-text">
+                  👨‍👩 Auf einem anderen Gerät{otherShare.person ? ` (${otherShare.person})` : ''} ist „Familie teilen“ aktiv. Schalte es hier auch ein, sonst überschreibt dieses Gerät den Kalender mit altem Stand.
+                </span>
+                <button
+                  className="btn primary"
+                  onClick={() => {
+                    setState((s) => (s.ha ? { ...s, ha: { ...s.ha, share: true, error: undefined } } : s))
+                    ui.setShowProfile(true, 'ha')
+                  }}
+                >
+                  Einschalten
+                </button>
+              </div>
+            )}
             {askWho && (
               <button className="notice" onClick={() => ui.setShowProfile(true, 'ha')}>
                 <span className="notice-text">👨‍👩 Familie teilen: Wer bist du? Bitte einmal auswählen.</span>
