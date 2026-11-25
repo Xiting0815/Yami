@@ -24,6 +24,7 @@ images = json.load(open(MAP))
 done = 0
 for name in sorted(os.listdir(src)):
     rid, ext = os.path.splitext(name)
+    rid = rid.strip()  # Leerzeichen im Dateinamen (z. B. "texas-chili .jpeg") ignorieren
     if ext.lower() not in ('.png', '.jpg', '.jpeg', '.webp'):
         continue
     im = Image.open(os.path.join(src, name)).convert('RGB')

@@ -1,10 +1,4 @@
 {
- " smoked-salmon": {
-  "author": "Gemini",
-  "file": "img/ smoked-salmon.webp",
-  "license": "KI",
-  "source": ""
- },
  "acqua-pazza": {
   "author": "Syced",
   "commonsTitle": "File:Acqua Pazza in Ebisu.jpg",
@@ -2284,9 +2278,9 @@
   "license": "KI",
   "source": ""
  },
- "smash-burger-plancha ": {
+ "smash-burger-plancha": {
   "author": "Gemini",
-  "file": "img/smash-burger-plancha .webp",
+  "file": "img/smash-burger-plancha.webp",
   "license": "KI",
   "source": ""
  },
@@ -2305,6 +2299,12 @@
  "smoked-meatloaf": {
   "author": "Gemini",
   "file": "img/smoked-meatloaf.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "smoked-salmon": {
+  "author": "Gemini",
+  "file": "img/smoked-salmon.webp",
   "license": "KI",
   "source": ""
  },
@@ -2448,9 +2448,9 @@
   "license": "KI",
   "source": ""
  },
- "stovetop-mac-and-cheese ": {
+ "stovetop-mac-and-cheese": {
   "author": "Gemini",
-  "file": "img/stovetop-mac-and-cheese .webp",
+  "file": "img/stovetop-mac-and-cheese.webp",
   "license": "KI",
   "source": ""
  },
@@ -2521,9 +2521,9 @@
   "license": "KI",
   "source": ""
  },
- "texas-chili ": {
+ "texas-chili": {
   "author": "Gemini",
-  "file": "img/texas-chili .webp",
+  "file": "img/texas-chili.webp",
   "license": "KI",
   "source": ""
  },
