@@ -1,4 +1,10 @@
 {
+ " smoked-salmon": {
+  "author": "Gemini",
+  "file": "img/ smoked-salmon.webp",
+  "license": "KI",
+  "source": ""
+ },
  "acqua-pazza": {
   "author": "Syced",
   "commonsTitle": "File:Acqua Pazza in Ebisu.jpg",
@@ -80,6 +86,18 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Smashburger_BBQ_bacon_cheddar_burger_with_deep-fried_onions.jpg"
  },
+ "bacon-cheeseburger-grill": {
+  "author": "Gemini",
+  "file": "img/bacon-cheeseburger-grill.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "bacon-fatty": {
+  "author": "Gemini",
+  "file": "img/bacon-fatty.webp",
+  "license": "KI",
+  "source": ""
+ },
  "baked-oats-apfel": {
   "author": "JamieS93",
   "commonsTitle": "File:Apple Goodie crisp.JPG",
@@ -116,6 +134,18 @@
  "bauernsalat-speck": {
   "author": "Gemini",
   "file": "img/bauernsalat-speck.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "bbq-bacon-burger-onion-rings": {
+  "author": "Gemini",
+  "file": "img/bbq-bacon-burger-onion-rings.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "beer-can-chicken": {
+  "author": "Gemini",
+  "file": "img/beer-can-chicken.webp",
   "license": "KI",
   "source": ""
  },
@@ -185,6 +215,12 @@
   "license": "KI",
   "source": ""
  },
+ "brisket-burger": {
+  "author": "Gemini",
+  "file": "img/brisket-burger.webp",
+  "license": "KI",
+  "source": ""
+ },
  "brisket-burnt-ends": {
   "author": "Gemini",
   "file": "img/brisket-burnt-ends.webp",
@@ -214,6 +250,12 @@
  "brotzeitbrett": {
   "author": "Gemini",
   "file": "img/brotzeitbrett.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "brunswick-stew": {
+  "author": "Gemini",
+  "file": "img/brunswick-stew.webp",
   "license": "KI",
   "source": ""
  },
@@ -250,6 +292,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Butterkuchen_traditionell.jpg"
  },
+ "buttermilk-biscuits": {
+  "author": "Gemini",
+  "file": "img/buttermilk-biscuits.webp",
+  "license": "KI",
+  "source": ""
+ },
  "butterplaetzchen": {
   "author": "Gemini",
   "file": "img/butterplaetzchen.webp",
@@ -268,6 +316,12 @@
   "file": "img/cacio-e-pepe.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Spaghetti,_cacio_e_pepe_%26_bitter_leaf_salad_-_Tutto_2024-04-04.jpg"
+ },
+ "cajun-garnelen-spiesse": {
+  "author": "Gemini",
+  "file": "img/cajun-garnelen-spiesse.webp",
+  "license": "KI",
+  "source": ""
  },
  "calzone": {
   "author": "Deryck Chan",
@@ -303,12 +357,24 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Espaguetis_carbonara.jpg"
  },
+ "carolina-pulled-pork": {
+  "author": "Gemini",
+  "file": "img/carolina-pulled-pork.webp",
+  "license": "KI",
+  "source": ""
+ },
  "cashew-huhn": {
   "author": "Simon Law from Montréal, QC, Canada",
   "commonsTitle": "File:Cashewchickenphoto.jpg",
   "file": "img/cashew-huhn.webp",
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cashewchickenphoto.jpg"
+ },
+ "cedar-plank-salmon": {
+  "author": "Gemini",
+  "file": "img/cedar-plank-salmon.webp",
+  "license": "KI",
+  "source": ""
  },
  "champignoncremesuppe": {
   "author": "Redeemer|Vodesnet",
@@ -376,6 +442,12 @@
   "license": "KI",
   "source": ""
  },
+ "chicken-thighs-alabama": {
+  "author": "Gemini",
+  "file": "img/chicken-thighs-alabama.webp",
+  "license": "KI",
+  "source": ""
+ },
  "chicken-wings-smoker": {
   "author": "Gemini",
   "file": "img/chicken-wings-smoker.webp",
@@ -392,6 +464,12 @@
  "chili-con-carne": {
   "author": "Gemini",
   "file": "img/chili-con-carne.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "chili-dutch-oven": {
+  "author": "Gemini",
+  "file": "img/chili-dutch-oven.webp",
   "license": "KI",
   "source": ""
  },
@@ -436,6 +514,18 @@
   "file": "img/cotoletta.webp",
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cotoletta_e_patate_al_forno.jpg"
+ },
+ "cowboy-beans": {
+  "author": "Gemini",
+  "file": "img/cowboy-beans.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "creamy-coleslaw": {
+  "author": "Gemini",
+  "file": "img/creamy-coleslaw.webp",
+  "license": "KI",
+  "source": ""
  },
  "crostata-marmellata": {
   "author": "Gemini",
@@ -492,6 +582,12 @@
  "eiermuffins-spinat-feta": {
   "author": "Gemini",
   "file": "img/eiermuffins-spinat-feta.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "elote": {
+  "author": "Gemini",
+  "file": "img/elote.webp",
   "license": "KI",
   "source": ""
  },
@@ -631,6 +727,12 @@
   "file": "img/gemista.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Gemista.jpg"
+ },
+ "german-potato-salad-bacon": {
+  "author": "Gemini",
+  "file": "img/german-potato-salad-bacon.webp",
+  "license": "KI",
+  "source": ""
  },
  "germknoedel": {
   "author": "Takeaway",
@@ -876,6 +978,12 @@
   "file": "img/jaegerschnitzel.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:J%C3%A4gerschnitzel_DDR.jpg"
+ },
+ "jalapeno-popper-burger": {
+  "author": "Gemini",
+  "file": "img/jalapeno-popper-burger.webp",
+  "license": "KI",
+  "source": ""
  },
  "jambalaya": {
   "author": "Gemini",
@@ -1271,6 +1379,18 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chocolate_coffee_mousse.jpg"
  },
+ "mushroom-swiss-burger": {
+  "author": "Gemini",
+  "file": "img/mushroom-swiss-burger.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "nashville-hot-chicken-burger": {
+  "author": "Gemini",
+  "file": "img/nashville-hot-chicken-burger.webp",
+  "license": "KI",
+  "source": ""
+ },
  "nasi-goreng": {
   "author": "Wiki Farazi",
   "commonsTitle": "File:Nasi goreng pattaya 20231028 120535.jpg",
@@ -1291,6 +1411,12 @@
   "file": "img/niu-rou-mian.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Beef_Noodles_soup_from_Jinyi_Beef_Noodle_Soup_Inn_in_Shenzhen.jpg"
+ },
+ "no-knead-brot": {
+  "author": "Gemini",
+  "file": "img/no-knead-brot.webp",
+  "license": "KI",
+  "source": ""
  },
  "nussecken": {
   "author": "SKopp",
@@ -1345,6 +1471,12 @@
  "ochsenbaeckchen-spaetburgunder": {
   "author": "Gemini",
   "file": "img/ochsenbaeckchen-spaetburgunder.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "oklahoma-onion-burger": {
+  "author": "Gemini",
+  "file": "img/oklahoma-onion-burger.webp",
   "license": "KI",
   "source": ""
  },
@@ -1478,6 +1610,12 @@
   "license": "KI",
   "source": ""
  },
+ "peach-cobbler": {
+  "author": "Gemini",
+  "file": "img/peach-cobbler.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pellkartoffeln-kraeuterquark": {
   "author": "abnehmen.net",
   "commonsTitle": "File:Kartoffeln-quark.jpg",
@@ -1532,6 +1670,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Pho_Bo_by_Banh_%26_Mee_in_Kirkgate_Market.jpg"
  },
+ "picanha-reverse-sear": {
+  "author": "Gemini",
+  "file": "img/picanha-reverse-sear.webp",
+  "license": "KI",
+  "source": ""
+ },
  "piccata": {
   "author": "Xocolatl (talk) 23:42, 27 June 2017 (UTC)",
   "commonsTitle": "File:Piccata Milanese 2017.jpg",
@@ -1549,6 +1693,12 @@
  "pinsa-romana": {
   "author": "Gemini",
   "file": "img/pinsa-romana.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pit-beans": {
+  "author": "Gemini",
+  "file": "img/pit-beans.webp",
   "license": "KI",
   "source": ""
  },
@@ -1637,9 +1787,27 @@
   "license": "KI",
   "source": ""
  },
+ "pot-roast": {
+  "author": "Gemini",
+  "file": "img/pot-roast.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pulled-chicken-dutch": {
+  "author": "Gemini",
+  "file": "img/pulled-chicken-dutch.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pulled-pork": {
   "author": "Gemini",
   "file": "img/pulled-pork.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pulled-pork-burger": {
+  "author": "Gemini",
+  "file": "img/pulled-pork-burger.webp",
   "license": "KI",
   "source": ""
  },
@@ -1735,6 +1903,12 @@
  "red-beans-and-rice": {
   "author": "Gemini",
   "file": "img/red-beans-and-rice.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "ribeye-reverse-sear": {
+  "author": "Gemini",
+  "file": "img/ribeye-reverse-sear.webp",
   "license": "KI",
   "source": ""
  },
@@ -1870,6 +2044,12 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Prawns_and_Ladyfinger_curry_(16263691317).jpg"
  },
+ "rumpsteak-gasgrill": {
+  "author": "Gemini",
+  "file": "img/rumpsteak-gasgrill.webp",
+  "license": "KI",
+  "source": ""
+ },
  "salsiccia-patate": {
   "author": "Benreis",
   "commonsTitle": "File:Malga Daiano Platte.jpg",
@@ -1936,6 +2116,12 @@
   "file": "img/schaschlik-pfanne.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Grilled_shashlik.jpg"
+ },
+ "schichtfleisch": {
+  "author": "Gemini",
+  "file": "img/schichtfleisch.webp",
+  "license": "KI",
+  "source": ""
  },
  "schinkennudel-auflauf": {
   "author": "Sam Bailey",
@@ -2049,6 +2235,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Shakshouka_-_Jonny%27s_2026-01-06.jpg"
  },
+ "shish-kebab": {
+  "author": "Gemini",
+  "file": "img/shish-kebab.webp",
+  "license": "KI",
+  "source": ""
+ },
  "shoyu-ramen": {
   "author": "Guilhem Vellut",
   "commonsTitle": "File:Shoyu Ramen.jpg",
@@ -2065,6 +2257,12 @@
  "shrimp-etouffee": {
   "author": "Gemini",
   "file": "img/shrimp-etouffee.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "skillet-cornbread": {
+  "author": "Gemini",
+  "file": "img/skillet-cornbread.webp",
   "license": "KI",
   "source": ""
  },
@@ -2086,9 +2284,27 @@
   "license": "KI",
   "source": ""
  },
+ "smash-burger-plancha ": {
+  "author": "Gemini",
+  "file": "img/smash-burger-plancha .webp",
+  "license": "KI",
+  "source": ""
+ },
  "smashed-burger": {
   "author": "Gemini",
   "file": "img/smashed-burger.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "smoked-mac-and-cheese": {
+  "author": "Gemini",
+  "file": "img/smoked-mac-and-cheese.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "smoked-meatloaf": {
+  "author": "Gemini",
+  "file": "img/smoked-meatloaf.webp",
   "license": "KI",
   "source": ""
  },
@@ -2109,6 +2325,12 @@
  "southern-fried-chicken": {
   "author": "Gemini",
   "file": "img/southern-fried-chicken.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "southern-potato-salad": {
+  "author": "Gemini",
+  "file": "img/southern-potato-salad.webp",
   "license": "KI",
   "source": ""
  },
@@ -2226,6 +2448,12 @@
   "license": "KI",
   "source": ""
  },
+ "stovetop-mac-and-cheese ": {
+  "author": "Gemini",
+  "file": "img/stovetop-mac-and-cheese .webp",
+  "license": "KI",
+  "source": ""
+ },
  "straccetti-rucola": {
   "author": "Gemini",
   "file": "img/straccetti-rucola.webp",
@@ -2293,6 +2521,12 @@
   "license": "KI",
   "source": ""
  },
+ "texas-chili ": {
+  "author": "Gemini",
+  "file": "img/texas-chili .webp",
+  "license": "KI",
+  "source": ""
+ },
  "tiramisu": {
   "author": "Anna.Massini",
   "commonsTitle": "File:Dolce Tiramisù monoporzione.jpg",
@@ -2348,6 +2582,12 @@
   "file": "img/vanillekipferl.webp",
   "license": "CC BY 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Vanillekipferl-Nahaufnahme.jpg"
+ },
+ "vinegar-slaw": {
+  "author": "Gemini",
+  "file": "img/vinegar-slaw.webp",
+  "license": "KI",
+  "source": ""
  },
  "vongole": {
   "author": "Flickr user: [2], retouched by AM",
