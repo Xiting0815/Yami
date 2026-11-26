@@ -20,6 +20,12 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Spaghetti_al_pomodoro_-_Pomodoro,_Worthing_2026-06-26.jpg"
  },
+ "alabama-white-sauce": {
+  "author": "Gemini",
+  "file": "img/alabama-white-sauce.webp",
+  "license": "KI",
+  "source": ""
+ },
  "alla-norma": {
   "author": "Paoletta S.",
   "commonsTitle": "File:Pasta alla Norma (2563876877).jpg",
@@ -272,6 +278,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Bulgogi_3.jpg"
  },
+ "burger-sauce": {
+  "author": "Gemini",
+  "file": "img/burger-sauce.webp",
+  "license": "KI",
+  "source": ""
+ },
  "burrito": {
   "author": "Andy Li",
   "commonsTitle": "File:Chorizo breakfast burrito - 17 GRAMS 2024-02-05.jpg",
@@ -317,6 +329,12 @@
   "license": "KI",
   "source": ""
  },
+ "cajun-gewuerz": {
+  "author": "Gemini",
+  "file": "img/cajun-gewuerz.webp",
+  "license": "KI",
+  "source": ""
+ },
  "calzone": {
   "author": "Deryck Chan",
   "commonsTitle": "File:Wikimania 2016 Deryck day 0 - 07 calzone.jpg",
@@ -351,9 +369,21 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Espaguetis_carbonara.jpg"
  },
+ "carolina-gold-sauce": {
+  "author": "Gemini",
+  "file": "img/carolina-gold-sauce.webp",
+  "license": "KI",
+  "source": ""
+ },
  "carolina-pulled-pork": {
   "author": "Gemini",
   "file": "img/carolina-pulled-pork.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "carolina-vinegar-sauce": {
+  "author": "Gemini",
+  "file": "img/carolina-vinegar-sauce.webp",
   "license": "KI",
   "source": ""
  },
@@ -464,6 +494,12 @@
  "chili-dutch-oven": {
   "author": "Gemini",
   "file": "img/chili-dutch-oven.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "chipotle-mayo": {
+  "author": "Gemini",
+  "file": "img/chipotle-mayo.webp",
   "license": "KI",
   "source": ""
  },
@@ -796,6 +832,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pasta_alla_Gricia.jpg"
  },
+ "grill-baked-potatoes": {
+  "author": "Gemini",
+  "file": "img/grill-baked-potatoes.webp",
+  "license": "KI",
+  "source": ""
+ },
  "grissini": {
   "author": "SarKaLay",
   "commonsTitle": "File:Grissini Sticks.jpg",
@@ -924,6 +966,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Red_braised_pork_(20141106191221).JPG"
  },
+ "hot-honey": {
+  "author": "Gemini",
+  "file": "img/hot-honey.webp",
+  "license": "KI",
+  "source": ""
+ },
  "huehnereintopf": {
   "author": "Nichijyou123",
   "commonsTitle": "File:Chicken Noodle Soup US.jpg",
@@ -951,6 +999,12 @@
   "file": "img/hui-guo-rou.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Twice_cooked_pork_of_Gyoza-no-Manshu.jpg"
+ },
+ "hush-puppies": {
+  "author": "Gemini",
+  "file": "img/hush-puppies.webp",
+  "license": "KI",
+  "source": ""
  },
  "ingwer-huhn": {
   "author": "T.Tseng",
@@ -1105,6 +1159,12 @@
   "file": "img/katsu-curry.webp",
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Pumpkin_Katsu_Curry_and_Chicken_Katsu_Curry_-_Sunoso.jpg"
+ },
+ "kc-bbq-sauce": {
+  "author": "Gemini",
+  "file": "img/kc-bbq-sauce.webp",
+  "license": "KI",
+  "source": ""
  },
  "keftedes-reis": {
   "author": "Miansari66",
@@ -1286,6 +1346,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Steamed_minced_pork_rice_for_breakfast.jpg"
  },
+ "magic-dust": {
+  "author": "Gemini",
+  "file": "img/magic-dust.webp",
+  "license": "KI",
+  "source": ""
+ },
  "mais-suppe": {
   "author": "David",
   "commonsTitle": "File:Southern Chinese style chicken soup with mushrooms and corn.jpg",
@@ -1331,6 +1397,12 @@
  "meatloaf-mashed-potatoes": {
   "author": "Gemini",
   "file": "img/meatloaf-mashed-potatoes.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "memphis-rub": {
+  "author": "Gemini",
+  "file": "img/memphis-rub.webp",
   "license": "KI",
   "source": ""
  },
@@ -1684,6 +1756,12 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pichelsteiner_Eintopf.jpg"
  },
+ "pickled-red-onions": {
+  "author": "Gemini",
+  "file": "img/pickled-red-onions.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pinsa-romana": {
   "author": "Gemini",
   "file": "img/pinsa-romana.webp",
@@ -1886,6 +1964,12 @@
   "file": "img/rahmschnitzel.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kaiserschnitzel_Waldviertlerhof_2020_(Wien).jpg"
+ },
+ "ranch-dressing": {
+  "author": "Gemini",
+  "file": "img/ranch-dressing.webp",
+  "license": "KI",
+  "source": ""
  },
  "ravioli-salbei": {
   "author": "10Rosso",
@@ -2328,6 +2412,12 @@
   "license": "KI",
   "source": ""
  },
+ "southern-greens": {
+  "author": "Gemini",
+  "file": "img/southern-greens.webp",
+  "license": "KI",
+  "source": ""
+ },
  "southern-potato-salad": {
   "author": "Gemini",
   "file": "img/southern-potato-salad.webp",
@@ -2524,6 +2614,12 @@
  "texas-chili": {
   "author": "Gemini",
   "file": "img/texas-chili.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "texas-spg": {
+  "author": "Gemini",
+  "file": "img/texas-spg.webp",
   "license": "KI",
   "source": ""
  },
