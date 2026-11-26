@@ -482,7 +482,7 @@ export const CONVERT: Record<string, Record<string, number>> = {
   Zwiebel: { g: 1 / 100, kg: 10 },
   Möhre: { g: 1 / 100 },
   Butter: { EL: 15 },
-  Butterschmalz: { EL: 15 },
+  Butterschmalz: { EL: 13 },
   Haferflocken: { EL: 10 },
   Backkakao: { TL: 1 / 3 },
   Kidneybohnen: { Dose: 250 },

@@ -185,7 +185,7 @@ export const esZutaten: ExtraIngredients = {
     // Bacalao: gesalzener, getrockneter Kabeljau (Lomos), vor dem Kochen 36–48 h wässern
     Klippfisch: prod(400, 'g', 9.99, 180, 7, 'Pck'),
     'Dorade ganz': prod(400, 'g', 5.99, 2, 1, 'Stk'),
-    'Thunfischsteak TK': prod(250, 'g', 5.99, 180, 1, 'Pck'),
+    'Thunfischsteak TK': prod(250, 'g', 5.99, 180, 180, 'Pck'),
     'Meersalz grob': prod(1000, 'g', 0.99, 1460, 1460, 'Pck'),
   },
   // je 100 g: kcal, Eiweiß, Fett, Kohlenhydrate, Ballaststoffe

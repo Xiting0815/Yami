@@ -35,8 +35,8 @@ export const zutatenEs: ExtraIngredients = {
     'Serrano-Schinken': prod(100, 'g', 2.49, 30, 5, 'Pck'),
     Kaninchenkeule: prod(500, 'g', 6.99, 3, 1, 'Pck'),
     'Pulpo gekocht': prod(300, 'g', 7.99, 14, 2, 'Pck'),
-    'Riesengarnelen mit Kopf TK': prod(800, 'g', 11.99, 180, 1, 'Pck'),
-    'Tintenfischringe TK': prod(500, 'g', 4.99, 180, 1, 'Pck'),
+    'Riesengarnelen mit Kopf TK': prod(800, 'g', 11.99, 180, 180, 'Pck'),
+    'Tintenfischringe TK': prod(500, 'g', 4.99, 180, 180, 'Pck'),
     'Ñoras getrocknet': prod(30, 'g', 3.99, 365, 365, 'Tüte'),
   },
   // je 100 g/ml: kcal, Eiweiß, Fett, Kohlenhydrate, Ballaststoffe (BLS bzw. Herstellerangaben, gerundet)

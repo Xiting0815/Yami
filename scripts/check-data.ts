@@ -60,6 +60,11 @@ for (const [base, forms] of Object.entries(BROTH_FORMS)) {
   }
 }
 for (const n of Object.keys(CATALOG)) if (CATALOG[n] === 'vorrat' && !PRODUCTS[canonical(n)]) { console.error(`Grundzutat "${n}": kein Produkt`); errors++ }
+// Tiefkühlware: der Rest einer angebrochenen Packung kommt zurück ins Gefrierfach – „angebrochen 1 Tag“ wäre ein falscher Verderb-Alarm
+for (const n of Object.keys(CATALOG)) {
+  const pr = PRODUCTS[n]
+  if (CATALOG[n] === 'tk' && pr?.opened != null && pr.opened < 30) { console.error(`TK-Produkt "${n}": angebrochen ${pr.opened} Tage – Rest bleibt gefroren (opened weglassen oder wie shelf)`); errors++ }
+}
 // Grundrezepte: Ergebnis (z. B. „Rinderfond selbstgemacht“) braucht Katalog, Produkt in derselben Einheit und Nährwerte;
 // sie dürfen nicht unter den Abendessen landen
 const yieldNames = new Set<string>()
