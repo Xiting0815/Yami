@@ -32,7 +32,8 @@ const unseenEintopf = RECIPE_BY_ID[eintopfIds[eintopfIds.length - 1]]
 const pE = preference(m, unseenEintopf)
 console.log(`  nie gekochter Eintopf (${unseenEintopf.title}): ${pE.score.toFixed(2)} ${pE.reason ?? ''}`)
 ok(pE.score > 0.5, 'Muster: auch ein nie gewählter Eintopf rückt nach vorne')
-const unseenFish = RECIPE_BY_ID[fishIds[fishIds.length - 1]]
+// ein Fisch-Gericht, das kein Eintopf ist (sonst wirkt das gelernte Eintopf-Muster dagegen)
+const unseenFish = RECIPE_BY_ID[[...fishIds].reverse().find((id) => RECIPE_BY_ID[id].type !== 'eintopf')!]
 const pF = preference(m, unseenFish)
 console.log(`  nie gesehener Fisch (${unseenFish.title}): ${pF.score.toFixed(2)}`)
 ok(pF.score < 0, 'Muster: Fisch (oft weggewischt) rückt nach hinten')
