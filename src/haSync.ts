@@ -565,10 +565,13 @@ export async function syncReminders(
   tracked: HaSettings['events'],
   reminders: Desired[],
   now: Date,
-): Promise<{ events: HaSettings['events']; error?: string; changed: number }> {
+): Promise<{ events: HaSettings['events']; error?: string; changed: number; net?: HaError }> {
   const events: HaSettings['events'] = Object.fromEntries(Object.entries(tracked).filter(([k]) => k.startsWith('rem:')))
   let error: string | undefined
   let changed = 0
+  // Netz weg: nicht werfen, sondern mit dem bisher Angelegten zurückkehren (`net`) – der Aufrufer merkt sich die
+  // schon angelegten Erinnerungen und wirft danach; sonst würden sie beim nächsten Lauf doppelt angelegt
+  let net: HaError | undefined
   for (const r of reminders) {
     if (events[r.key]) continue
     try {
@@ -576,14 +579,23 @@ export async function syncReminders(
       events[r.key] = { sig: r.sig }
       changed++
     } catch (e) {
-      if (e instanceof HaError && e.kind === 'network') throw e
+      if (e instanceof HaError && e.kind === 'network') {
+        net = e
+        break
+      }
       error ??= e instanceof Error ? e.message : String(e)
     }
   }
   const cutoff = addDaysIso(isoDate(now), -3)
   for (const k of Object.keys(events)) if (k.slice(-10) < cutoff) delete events[k]
-  return { events, error, changed }
+  return { events, error, changed, ...(net ? { net } : {}) }
 }
+
+/** nur die Erinnerungen in `events` ersetzen (Abendessen-Termine bleiben) */
+export const withReminders = (events: HaSettings['events'], rem: HaSettings['events']): HaSettings['events'] => ({
+  ...Object.fromEntries(Object.entries(events).filter(([k]) => !k.startsWith('rem:'))),
+  ...rem,
+})
 
 export interface CalendarSyncResult {
   events: HaSettings['events']
@@ -617,7 +629,9 @@ export async function syncCalendar(
     api.callService('calendar', 'create_event', { summary: d.summary, description: d.description, start_date_time: d.start, end_date_time: d.end }, { entity_id: entity })
 
   // Erinnerungen: nur neue, die in den nächsten 48 h beginnen (Yami löscht nie Erinnerungen)
+  // (haRun legt sie vorher einzeln an und gibt hier [] mit, damit ein Netzfehler danach nichts doppelt anlegen lässt)
   const rem = await syncReminders(api, ha.reminders, events, reminders, now)
+  if (rem.net) throw rem.net
   Object.keys(events).forEach((k) => k.startsWith('rem:') && delete events[k])
   Object.assign(events, rem.events)
   error ??= rem.error
@@ -640,7 +654,9 @@ export async function syncCalendar(
     for (const uid of d.uids) {
       if (!(await attempt(() => api.command({ type: 'calendar/event/delete', entity_id: ha.calendar, uid })))) ok = false
     }
-    if (ok) delete events[d.key]
+    // nur vergessen, wenn der gemerkte Termin selbst gelöscht wurde (nicht, wenn nur Doppelte daneben weg sind)
+    const t = events[d.key]
+    if (ok && (!t?.uid || d.uids.includes(t.uid))) delete events[d.key]
   }
   // passender Termin schon da (z. B. Zuordnung verloren) → nur wieder als eigenen merken
   for (const k of diff.keep ?? []) events[k.key] = { sig: k.sig, uid: k.uid }

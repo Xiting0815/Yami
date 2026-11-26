@@ -4,7 +4,7 @@
  * geplant hat, landet also im selben Lauf in Google Tasks und im Kalender (siehe Kopf von src/sync.ts).
  */
 import { HaError, haErrorText } from './homeassistant'
-import { type Desired, type HaApi, type LocalItem, listTodo, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo } from './haSync'
+import { type Desired, type HaApi, type LocalItem, listTodo, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo, withReminders } from './haSync'
 import type { Trip } from './kitchen'
 import { type AppState, type HaSettings, sharingActive } from './store'
 import { LEASE_MS, type MainDoc, PREFIX, applyRound, familySync, hashOf, leaseDecision, parseRemote, writeMain } from './sync'
@@ -78,10 +78,12 @@ export const ALERT_LEAD_MIN = 16
  * call_service; ohne als Termin im Erinnerungs-Kalender 16 Min. in der Zukunft (die HA-Automation „Yami: Erinnerung aufs
  * Handy“ schickt ihn zum Beginn – Termine, die früher beginnen, verpasst der Kalender-Auslöser evtl.).
  */
-export async function sendAlerts(api: HaApi, h: Pick<HaSettings, 'notify' | 'pushed' | 'reminders'>, alerts: PushAlert[], now: Date): Promise<{ pushed: string[]; error?: string; sent: number }> {
+export async function sendAlerts(api: HaApi, h: Pick<HaSettings, 'notify' | 'pushed' | 'reminders'>, alerts: PushAlert[], now: Date): Promise<{ pushed: string[]; error?: string; sent: number; net?: HaError }> {
   const pushed = [...(h.pushed ?? [])]
   let error: string | undefined
   let sent = 0
+  // Netz weg: das bisher Gesendete zurückgeben (`net`), damit kein Hinweis beim nächsten Lauf doppelt kommt
+  let net: HaError | undefined
   for (const a of alerts) {
     if (pushed.includes(a.key)) continue
     try {
@@ -94,11 +96,14 @@ export async function sendAlerts(api: HaApi, h: Pick<HaSettings, 'notify' | 'pus
       pushed.push(a.key)
       sent++
     } catch (e) {
-      if (e instanceof HaError && e.kind === 'network') throw e
+      if (e instanceof HaError && e.kind === 'network') {
+        net = e
+        break
+      }
       error ??= e instanceof Error ? e.message : String(e)
     }
   }
-  return { pushed: pushed.slice(-60), error, sent }
+  return { pushed: pushed.slice(-60), error, sent, ...(net ? { net } : {}) }
 }
 
 /** so lange gilt ein Haushalt nach dem letzten Lebenszeichen seines Schreibstabs als aktiv */
@@ -152,12 +157,24 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
       const per = await syncReminders(d.api, h0.reminders, own, remindersOf(s0, trips0).filter((r) => isPersonal(r.key)), now)
       const rest = Object.fromEntries(Object.entries(h0.events).filter(([k]) => !isPersonal(k)))
       patchHa({ events: { ...rest, ...per.events }, otherShare: other, lastSync: now.toISOString(), error: errText(per.error) })
+      if (per.net) throw per.net
       return { again: false, error: per.error, wrote: false }
     }
+    // Schritt für Schritt merken: bricht das Netz mitten im Lauf ab, wird beim nächsten Mal nichts doppelt angelegt/geschickt
     const todo = await syncTodo(d.api, h0, haLocalFor(s0, today, trips0), d.onBought)
-    const cal = await syncCalendar(d.api, h0, plannedDinners(s0.plan, today, s0.bakePlan), remindersOf(s0, trips0), now)
+    patchHa({ items: todo.items, done: todo.done })
+    const rem = await syncReminders(d.api, h0.reminders, h0.events, remindersOf(s0, trips0), now)
+    const events1 = withReminders(h0.events, rem.events)
+    patchHa({ events: events1 })
+    if (rem.net) throw rem.net
+    const cal = await syncCalendar(d.api, { ...h0, events: events1 }, plannedDinners(s0.plan, today, s0.bakePlan), [], now)
+    patchHa({ events: cal.events })
     const push = await sendAlerts(d.api, h0, pushAlerts(s0, today, now, trips0), now)
-    const error = todo.error ?? cal.error ?? push.error
+    if (push.net) {
+      patchHa({ pushed: push.pushed })
+      throw push.net
+    }
+    const error = todo.error ?? rem.error ?? cal.error ?? push.error
     patchHa({ items: todo.items, done: todo.done, events: cal.events, pushed: push.pushed, otherShare: undefined, lastSync: now.toISOString(), error: errText(error) })
     return { again: false, error, wrote: true }
   }
@@ -181,11 +198,15 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   // persönliche Erinnerungen: jedes Gerät für seine Person, unabhängig vom Schreibstab (nie fremde anfassen)
   const per = await syncReminders(d.api, h0.reminders, personalOf(h0.events, me), personal, now)
   error ??= per.error
+  const withPersonal = (events: HaSettings['events']) => ({ ...Object.fromEntries(Object.entries(events).filter(([k]) => !k.startsWith(`rem:${me}:`))), ...per.events })
+  // gleich merken (ein Netzfehler weiter unten soll keine Erinnerung doppelt anlegen lassen)
+  if (per.changed || per.net) patchHa({ events: withPersonal(d.getState().ha?.events ?? h0.events) })
+  if (per.net) throw per.net
   // Sofort-Hinweise: auch persönlich (jedes Gerät seiner Person), unabhängig vom Schreibstab
   const push = await sendAlerts(d.api, h0, pushAlerts(state, today, now, trips), now)
   error ??= push.error
   if (push.sent) patchHa({ pushed: push.pushed })
-  const withPersonal = (events: HaSettings['events']) => ({ ...Object.fromEntries(Object.entries(events).filter(([k]) => !k.startsWith(`rem:${me}:`))), ...per.events })
+  if (push.net) throw push.net
 
   const dec = leaseDecision(fam.res.remote, h0.device, now.getTime())
   if (!dec.holder && !dec.claim) {
@@ -210,8 +231,15 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   // Schreibstab: Einkaufsliste (Google Tasks), Abendessen im Familienkalender, Ablauf-Erinnerungen – mit dem zusammengeführten Stand
   const h: HaSettings = { ...h0, items: mapping.items, done: mapping.done, events: mapping.events }
   const todo = await syncTodo(d.api, h, haLocalFor(state, today, trips), d.onBought)
-  const cal = await syncCalendar(d.api, h, plannedDinners(state.plan, today, state.bakePlan), shared, now)
-  error ??= todo.error ?? cal.error
+  const rem = await syncReminders(d.api, h0.reminders, h.events, shared, now)
+  const events1 = withReminders(h.events, rem.events)
+  if (rem.net) {
+    // schon angelegte „Läuft morgen ab“ merken (Zuordnung im Stab folgt beim nächsten Lauf)
+    patchHa({ items: todo.items, done: todo.done, events: withPersonal(Object.fromEntries(Object.entries(events1).filter(([k]) => isShared(k)))) })
+    throw rem.net
+  }
+  const cal = await syncCalendar(d.api, { ...h, events: events1 }, plannedDinners(state.plan, today, state.bakePlan), [], now)
+  error ??= todo.error ?? rem.error ?? cal.error
   const sharedEvents = Object.fromEntries(Object.entries(cal.events).filter(([k]) => isShared(k)))
   patchHa({ items: todo.items, done: todo.done, events: withPersonal(sharedEvents), lastSync: now.toISOString(), error: errText(error) })
   const next = mappingOf({ items: todo.items, done: todo.done, events: sharedEvents })

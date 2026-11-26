@@ -656,5 +656,44 @@ const plan = (o: Record<string, [string, number]>) => Object.fromEntries(Object.
   ok(!('notify' in newHa()), 'notify-Dienst: Standard leer')
 }
 
+// Netz bricht mitten im Lauf ab → beim nächsten Lauf nichts doppelt (Erinnerungen, Handy-Hinweise)
+{
+  class FlakyHa extends FakeHa {
+    down = false
+    async callService(domain: string, service: string, data: Record<string, unknown> = {}) {
+      if (domain === 'notify' && this.down) throw new HaError('network', 'weg')
+      return super.callService(domain, service, data)
+    }
+  }
+  const flaky = new FlakyHa()
+  flaky.down = true
+  const dinner = RECIPES.filter((r) => r.meal === 'dinner')[2]
+  let cur: AppState = sanitize({
+    onboarding: 'done',
+    plan: { '2026-11-24': { recipeId: dinner.id, servings: 2 } },
+    pantry: [{ id: 'l1', name: 'Sahne', amount: 200, unit: 'ml', expires: '2026-11-25' }],
+    ha: { ...newHa('https://x.ui.nabu.casa', 'tok'), enabled: true, notify: 'notify.mobile_app_x' },
+  })
+  const run = () => haRound({ api: flaky, getState: () => cur, setState: (fn) => (cur = fn(cur)), onBought: () => {}, now: new Date('2026-11-24T12:00:00') })
+  const err = await rejects(run())
+  ok(err instanceof HaError && err.kind === 'network', 'Netzfehler beim Handy-Hinweis: Lauf meldet Netzfehler')
+  ok(!!cur.ha!.events['rem:exp:2026-11-24'] && !!cur.ha!.events['dinner:2026-11-24'], 'Netzfehler: schon angelegte Erinnerung und Abendessen-Termin sind gemerkt')
+  flaky.down = false
+  await run()
+  ok(flaky.events.filter((e) => e.summary.startsWith('⏰')).length === 1, 'nach dem Netzfehler: „Läuft morgen ab“ nicht doppelt im Kalender')
+  ok(flaky.calls.filter((c) => c.domain === 'notify').length >= 1 && new Set(flaky.calls.filter((c) => c.domain === 'notify').map((c) => c.data.title)).size === flaky.calls.filter((c) => c.domain === 'notify').length, 'nach dem Netzfehler: jeder Handy-Hinweis genau einmal')
+}
+// doppelter 🍽️-Termin neben dem eigenen: Doppelten löschen, eigenen weiter gemerkt lassen
+{
+  const fh = new FakeHa()
+  fh.events = [
+    { uid: 'e1', summary: '🍽️ Gulasch', start: '2026-11-27T18:30:00', description: 'x' },
+    { uid: 'e2', summary: '🍽️ Gulasch', start: '2026-11-27T18:30:00', description: 'x' },
+  ]
+  const w: Desired = { key: 'dinner:2026-11-27', summary: '🍽️ Gulasch', description: 'x', start: '2026-11-27 18:30:00', end: '2026-11-27 19:30:00', sig: 's1' }
+  const r = await syncCalendar(fh, { calendar: 'calendar.familie', reminders: 'calendar.yami_erinnerungen', events: { 'dinner:2026-11-27': { sig: 's1', uid: 'e1' } } }, [w], [], new Date('2026-11-26T10:00:00'))
+  ok(fh.events.length === 1 && fh.events[0].uid === 'e1' && r.events['dinner:2026-11-27']?.uid === 'e1', 'Kalender: Doppelter gelöscht, eigener Termin bleibt gemerkt')
+}
+
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')
 process.exit(fails ? 1 : 0)
