@@ -96,6 +96,16 @@ const cooked = cookNow({}, [bought, home], today, { recipeId: bfDish.id, serving
 ok(cooked.pantry.find((l) => l.id === 'vk')!.amount === 10 && cooked.pantry.find((l) => l.id === 'hb')!.amount < 20, 'Abziehen: Scheibe vom selbstgebackenen Brot, gekauftes bleibt')
 ok(basicFor('Vollkornbrot')?.kind === 'brot', 'Tipp im Frühstück: Vollkornbrot → Brot selbst backen')
 
+// ───── Selbstgebackener Toast: Scheiben à 25 g wie gekaufter Toast ─────
+ok(near(PRODUCTS['Toastbrot selbstgebacken']?.pack, 820 / 25) && PRODUCTS['Toastbrot selbstgebacken'].unit === 'Scheibe', 'Toastbrot selbstgebacken: 820 g → 32,8 Scheiben à 25 g')
+ok(PRODUCTS['Bauernbrot selbstgebacken'].pack === 20, 'andere Brote bleiben bei 50-g-Scheiben')
+const ragout = RECIPE_BY_ID['ragout-fin']
+const toastNeed = ragout.ingredients.find((i) => i.name === 'Toastbrot')!.amount!
+const homeToast: PantryLot = { id: 'ht', name: 'Toastbrot selbstgebacken', amount: 10, unit: 'Scheibe', expires: addDaysIso(today, 3) }
+const tc = cookNow({}, [homeToast], today, { recipeId: 'ragout-fin', servings: 2 })
+ok(near(tc.pantry.find((l) => l.id === 'ht')?.amount ?? 0, 10 - toastNeed), `Ragout fin: ${toastNeed} gekaufte Toastscheiben = ${toastNeed} selbstgebackene (nicht doppelt so viel)`)
+ok(near(RECIPE_BY_ID['toastbrot-klassisch'].yields!.perPiece!.kcal, Math.round(RECIPE_BY_ID['toastbrot-klassisch'].yields!.perPiece!.kcal)) && RECIPE_BY_ID['toastbrot-klassisch'].yields!.perPiece!.kcal < 100, 'Nährwerte je Toastscheibe (25 g) unter 100 kcal')
+
 // ───── Speichern, Sicherung ─────
 const dirty = sanitize({
   snacks: [e.snack, { date: 'gestern', name: 'x', kcal: 1, protein: 0 }, { date: today, name: 'Kuchen', kcal: 'viel', protein: 0 }, null],

@@ -599,6 +599,8 @@ export const bbqSmoker: ExtraGroup = {
         time: 330,
         portions: 2,
         eat: 2,
+        // Lake wird abgespült: vom Zucker bleibt nur ein kleiner Teil am Fisch
+        eaten: { Salz: 0.1, 'Brauner Zucker': 0.1 },
       },
       '500 g Lachsfilet | 50 g Salz | 50 g Brauner Zucker | 1 TL Pfeffer schwarz grob | 1 EL Honig | 1 Bund Dill | 1 Stk Zitrone',
       steps('smoked-salmon')),

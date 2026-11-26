@@ -1,4 +1,4 @@
-import type { Recipe } from '../types'
+import type { Festive, Recipe } from '../types'
 import { gramsOf } from './nutrition-calc'
 import { EXTRA_SEASON } from './extra'
 
@@ -92,3 +92,41 @@ export const BBQ_MONTHS = [3, 4, 5, 6, 7, 8, 9]
 /** liegt der Tag (ISO) bzw. Monat (1–12) in der BBQ-Saison? */
 export const isBbqSeason = (dayOrMonth: string | number): boolean =>
   BBQ_MONTHS.includes(typeof dayOrMonth === 'number' ? dayOrMonth : Number(dayOrMonth.slice(5, 7)))
+
+/** Ostersonntag eines Jahres als „MM-TT“ (gregorianisch, anonymer Algorithmus nach Meeus/Jones/Butcher) */
+export function easterSunday(year: number): string {
+  const a = year % 19
+  const b = Math.floor(year / 100)
+  const c = year % 100
+  const d = Math.floor(b / 4)
+  const e = b % 4
+  const f = Math.floor((b + 8) / 25)
+  const g = Math.floor((b - f + 1) / 3)
+  const h = (19 * a + b - d - g + 15) % 30
+  const i = Math.floor(c / 4)
+  const k = c % 4
+  const l = (32 + 2 * e + 2 * i - h - k) % 7
+  const m = Math.floor((a + 11 * h + 22 * l) / 451)
+  const month = Math.floor((h + l - 7 * m + 114) / 31)
+  const day = ((h + l - 7 * m + 114) % 31) + 1
+  return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+/** „MM-TT“ um `days` Tage verschoben (innerhalb desselben Jahres) */
+function shiftMd(year: number, md: string, days: number): string {
+  const t = new Date(Date.UTC(year, Number(md.slice(0, 2)) - 1, Number(md.slice(3, 5)) + days))
+  return `${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')}`
+}
+
+/**
+ * Festtags-Fenster als [Monat-Tag von, bis] (inklusive) im angegebenen Jahr. Ostern ist beweglich:
+ * Passionszeit bis Ostermontag (zwei Wochen vor Ostersonntag bis einen Tag danach – Karwoche/Semana Santa).
+ */
+export function festiveWindow(w: Festive, year: number): [string, string] {
+  switch (w) {
+    case 'martini': return ['11-01', '11-30']
+    case 'weihnachten': return ['12-01', '12-26']
+    case 'plaetzchen': return ['11-15', '12-26']
+    case 'ostern': { const e = easterSunday(year); return [shiftMd(year, e, -14), shiftMd(year, e, 1)] }
+  }
+}

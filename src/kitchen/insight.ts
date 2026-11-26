@@ -1,5 +1,5 @@
 /** Küchenlogik – Empfehlungen: Bewertung eines Rezepts nach Vorrat, Preis, Saison und Abwechslung. */
-import { seasonOf } from '../data/season'
+import { festiveWindow, seasonOf } from '../data/season'
 import type { Festive, Recipe, WeekPlan } from '../types'
 import { type PantryLot, type PriceOverrides, daysUntil, minIso, productFor, needsOf, recipeCost } from './base'
 import { lotsFor } from './pantry'
@@ -52,13 +52,8 @@ const PERISHABLE_DAYS = 7
 /** Alltagsprodukte, deren Rest im Haushalt praktisch immer aufgebraucht wird (oder sich einfrieren lässt) */
 const WASTE_EXEMPT = new Set(['Milch', 'Vollkornbrot', 'Toastbrot', 'Weißbrot', 'Brötchen vom Vortag', 'Ciabatta', 'Zitrone', 'Limette'])
 
-/** Festtags-Fenster als [Monat-Tag von, bis] (inklusive) */
-const FESTIVE_WINDOW: Record<Festive, [string, string]> = {
-  martini: ['11-01', '11-30'],
-  weihnachten: ['12-01', '12-26'],
-  plaetzchen: ['11-15', '12-26'],
-}
-const FESTIVE_BADGE: Record<Festive, string> = { martini: '🪿 Martinsgans-Zeit', weihnachten: '🎄 Passt zur Weihnachtszeit', plaetzchen: '🎄 Plätzchenzeit' }
+/** Festtags-Fenster: siehe `festiveWindow` in src/data/season.ts (Ostern beweglich) */
+const FESTIVE_BADGE: Record<Festive, string> = { martini: '🪿 Martinsgans-Zeit', weihnachten: '🎄 Passt zur Weihnachtszeit', plaetzchen: '🎄 Plätzchenzeit', ostern: '🐣 Osterzeit' }
 /** Bonus im Festtags-Fenster / Abzug außerhalb */
 export const FESTIVE_BOOST = 11
 export const FESTIVE_PENALTY = 4
@@ -67,7 +62,11 @@ export const FESTIVE_PENALTY = 4
 export function festiveOf(recipe: Recipe, iso: string): { active: boolean; label?: string } | undefined {
   if (!recipe.festive?.length) return undefined
   const md = iso.slice(5, 10)
-  const hit = recipe.festive.find((w) => md >= FESTIVE_WINDOW[w][0] && md <= FESTIVE_WINDOW[w][1])
+  const year = Number(iso.slice(0, 4))
+  const hit = recipe.festive.find((w) => {
+    const [from, to] = festiveWindow(w, year)
+    return md >= from && md <= to
+  })
   return hit ? { active: true, label: FESTIVE_BADGE[hit] } : { active: false }
 }
 

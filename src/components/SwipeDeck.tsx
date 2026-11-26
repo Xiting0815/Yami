@@ -80,7 +80,13 @@ export function SwipeDeck({ deck, insights, pantryMode, onTake, onReject, onInfo
     if (leaving || !top) return
     setLeaving(dir)
     const card = top
-    window.setTimeout(() => (dir === 'right' ? onTake(card) : onReject(card)), 260)
+    window.setTimeout(() => {
+      if (dir === 'right') onTake(card)
+      else onReject(card)
+      // bleibt dieselbe Karte oben (nur eine passt zu den Filtern), muss sie wieder erscheinen – sonst hängt der Stapel
+      setLeaving(null)
+      setDrag({ dx: 0, dy: 0, active: false })
+    }, 260)
   }
 
   useEffect(() => {

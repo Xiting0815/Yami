@@ -157,6 +157,14 @@ const bacon = [{ name: 'Bacon', amount: 100, unit: 'g' }, { name: 'BBQ-Sauce', a
 ok(nutritionOf(bacon, 1, 0.4).fat === Math.round((nutritionOf(bacon, 1).fat - 37 * 0.4) * 10) / 10 && nutritionOf(bacon, 1, 0.9).fat === nutritionOf(bacon, 1, 0.4).fat, 'Fettverlust nur am Fleisch, höchstens 40 %')
 ok((NUTRI['Brisket (vakuumiert)']?.[2] ?? 99) < 25 && (NUTRI['Pulled Pork (vakuumiert)']?.[0] ?? 0) > 100, 'Reste-Nährwerte berücksichtigen den Fettverlust')
 
+// ───── 10) Lake wird abgespült (`eaten`): Zucker der Lake zählt nur zu 10 % ─────
+const salmon = RECIPE_BY_ID['smoked-salmon']
+const salmonRaw = salmon && nutritionOf(salmon.ingredients, salmon.portions!)
+ok(!!salmon && !!salmonRaw && salmonRaw.kcal - salmon.nutrition.kcal >= 80 && salmon.nutrition.carbs < 15,
+  `Heißgeräucherter Lachs: Lake-Zucker nicht voll gezählt (${salmonRaw?.kcal} → ${salmon?.nutrition.kcal} kcal, ${salmon?.nutrition.carbs} g KH)`)
+const sugar = [{ name: 'Zucker', amount: 100, unit: 'g' }, { name: 'Honig', amount: 100, unit: 'g' }]
+ok(nutritionOf(sugar, 1, undefined, { Zucker: 0.1 }).carbs === Math.round((10 + NUTRI['Honig'][3]) * 10) / 10, 'eaten wirkt nur auf die genannte Zutat')
+
 if (fails) {
   console.error(`${fails} Test(s) fehlgeschlagen`)
   process.exit(1)

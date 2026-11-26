@@ -237,8 +237,8 @@ export const brot: ExtraGroup = {
     backen('brot', 'toastbrot-klassisch', 'Klassisches Toastbrot',
       {
         time: 240,
-        yields: { name: 'Toastbrot selbstgebacken', amount: 820, unit: 'g', shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
-        lighter: 'Butter auf 15 g und Zucker auf 10 g verringern – spart rund 15 kcal pro 50 g; wer 25-g-Scheiben toastet, halbiert zusätzlich die Kalorien pro Scheibe.',
+        yields: { name: 'Toastbrot selbstgebacken', amount: 820, unit: 'g', slice: 25, shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
+        lighter: 'Butter auf 15 g und Zucker auf 10 g verringern – spart rund 8 kcal pro Scheibe (25 g).',
       },
       '500 g Weizenmehl | 10 g Salz | 15 g Hefe frisch | 20 g Zucker | 40 g Butter | 150 ml Milch',
       [
@@ -253,7 +253,7 @@ export const brot: ExtraGroup = {
     backen('brot', 'dinkel-vollkorntoast', 'Dinkel-Vollkorntoast',
       {
         time: 230,
-        yields: { name: 'Dinkel-Vollkorntoast selbstgebacken', amount: 830, unit: 'g', shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
+        yields: { name: 'Dinkel-Vollkorntoast selbstgebacken', amount: 830, unit: 'g', slice: 25, shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
         lighter: 'Die Butter weglassen und die Milch durch Wasser ersetzen – spart rund 20 kcal pro 50 g; die Krume wird etwas fester.',
       },
       '300 g Dinkelvollkornmehl | 200 g Dinkelmehl | 10 g Salz | 15 g Hefe frisch | 15 g Honig | 30 g Butter | 200 ml Milch',
@@ -270,8 +270,8 @@ export const brot: ExtraGroup = {
     backen('brot', 'milchtoast-hokkaido', 'Hokkaido-Milchtoast (Buttertoast)',
       {
         time: 250,
-        yields: { name: 'Milchtoast selbstgebacken', amount: 760, unit: 'g', shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
-        lighter: 'Zucker auf 20 g und Butter auf 20 g verringern – spart rund 15 kcal pro 50 g, der Toast bleibt dank Tangzhong trotzdem weich.',
+        yields: { name: 'Milchtoast selbstgebacken', amount: 760, unit: 'g', slice: 25, shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
+        lighter: 'Zucker auf 20 g und Butter auf 20 g verringern – spart rund 8 kcal pro Scheibe (25 g), der Toast bleibt dank Tangzhong trotzdem weich.',
       },
       '400 g Weizenmehl | 8 g Salz | 10 g Hefe frisch | 40 g Zucker | 40 g Butter | 260 ml Milch | 1 Stk Ei',
       [
@@ -436,7 +436,7 @@ export const brot: ExtraGroup = {
       ciabatta: ['Ciabatta selbstgebacken'],
       // Brötchen (Stk): selbstgebackene vor „Brötchen vom Vortag“; Laugengebäck deckt Laugenbrezeln
       broetchen: ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken', 'Quarkbrötchen selbstgebacken', 'Körnerbrötchen selbstgebacken', 'Wasserweck selbstgebacken'],
-      // Toastbrot (Scheiben): selbstgebackener Toast vor dem gekauften. Achtung: eine Vorrats-Scheibe = 50 g, gekaufte Toastscheibe ≈ 25 g
+      // Toastbrot (Scheiben): selbstgebackener Toast vor dem gekauften; Toast liegt wie gekaufter in 25-g-Scheiben im Vorrat (`slice: 25`)
       toast: ['Toastbrot', 'Toastbrot selbstgebacken', 'Dinkel-Vollkorntoast selbstgebacken', 'Milchtoast selbstgebacken'],
       laugen: ['Laugenbrezel', 'Laugenbrötchen selbstgebacken'],
       // Burger-Brötchen (Stk): selbstgebackene Buns vor den gekauften

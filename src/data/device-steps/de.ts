@@ -1215,7 +1215,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [{ device: 'bora', mode: 'Kochzone', level: '3', minutes: 45, note: 'Deckel drauf' }],
     },
     {
-      text: 'In den letzten 30 Minuten die Kartoffeln schälen (kleine ganz lassen, große halbieren) und im CombiSteamer dämpfen. Den restlichen Zucker in einer Pfanne hellbraun schmelzen lassen, die gut abgetropften Kartoffeln darin schwenken, bis sie rundum glänzend überzogen sind, und dazu servieren.',
+      text: 'In den letzten 30 Minuten die Kartoffeln schälen (kleine ganz lassen, große halbieren) und im CombiSteamer dämpfen. Den restlichen Zucker in einer Pfanne hellbraun schmelzen lassen, die Butter einrühren, die gut abgetropften Kartoffeln darin schwenken, bis sie rundum glänzend überzogen sind, und dazu servieren.',
       settings: [
         { device: 'steamer', mode: 'Dämpfen', temp: 100, minutes: 25, note: 'gelocht' },
         { device: 'bora', mode: 'Kochzone', level: '5', minutes: 5, note: 'karamellisieren' },

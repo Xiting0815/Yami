@@ -1,5 +1,5 @@
 import { RECIPE_BY_ID } from '../../data/recipes'
-import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, moveBake, removeBake, setBakeAmount, settleBaked, tapasFactor } from '../../bakePlan'
+import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, moveBake, removeBake, setBakeAmount, settleBaked, skipBakes, tapasFactor } from '../../bakePlan'
 import { yieldText } from '../../bake'
 import { weekdayName } from '../../store'
 import type { Recipe } from '../../types'
@@ -123,6 +123,21 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     flash(`${RECIPE_BY_ID[recipeId]?.title ?? 'Backen'} entfernt`, snap)
   }
 
+  /** Nachfrage „Nein, nicht gemacht“: Eintrag bleibt als „nicht gemacht“ stehen (Lernsignal), statt gelöscht zu werden */
+  function skipBakeEntry(day: string, recipeId: string) {
+    const snap = snapshot()
+    const r = RECIPE_BY_ID[recipeId]
+    setState((s) => ({ ...s, bakePlan: skipBakes(s.bakePlan, day, (e) => e.recipeId === recipeId) }))
+    flash(`${r ? `${planWord(r)}: ${shortTitle(r.title)}` : 'Backen'} – nicht ${doneWord(r)}`, snap)
+  }
+
+  /** Nachfrage zum Tapas-Abend „Nein“: alle offenen Tapas des Tages als „nicht gemacht“ */
+  function skipTapas(day: string) {
+    const snap = snapshot()
+    setState((s) => ({ ...s, bakePlan: skipBakes(s.bakePlan, day, (e) => isTapa(RECIPE_BY_ID[e.recipeId])) }))
+    flash('🫒 Tapas-Abend – nicht gemacht', snap)
+  }
+
   function changeBakeAmount(day: string, recipeId: string, amount: number) {
     setState((s) => ({ ...s, bakePlan: setBakeAmount(s.bakePlan, day, recipeId, amount) }))
   }
@@ -162,5 +177,5 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     setState((st) => ({ ...st, bakeHints: dismissSuggestion(st.bakeHints, s, today) }))
   }
 
-  return { planBake, planTapas, moveTapas, removeTapas, finishTapa, confirmTapasEvening, dismissBbqIdeas, moveBakeTo, removeBakeEntry, changeBakeAmount, confirmBaked, acceptBakeSuggestion, dismissBakeSuggestion }
+  return { planBake, planTapas, moveTapas, removeTapas, skipBakeEntry, skipTapas, finishTapa, confirmTapasEvening, dismissBbqIdeas, moveBakeTo, removeBakeEntry, changeBakeAmount, confirmBaked, acceptBakeSuggestion, dismissBakeSuggestion }
 }

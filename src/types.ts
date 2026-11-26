@@ -1,6 +1,6 @@
 export type Cuisine = 'de' | 'it' | 'as' | 'gr' | 'us' | 'es'
-/** Festtags-Fenster: Martinsgans-Zeit (1.–15. Nov.) und Weihnachtszeit (15. Nov.–31. Dez.) */
-export type Festive = 'martini' | 'weihnachten' | 'plaetzchen'
+/** Festtags-Fenster (Daten siehe `festiveWindow` in src/data/season.ts): Martinsgans-Zeit, Weihnachtszeit, Plätzchenzeit, Osterzeit (beweglich) */
+export type Festive = 'martini' | 'weihnachten' | 'plaetzchen' | 'ostern'
 export type DishType = 'haupt' | 'pasta' | 'eintopf' | 'suppe' | 'auflauf' | 'brotzeit'
 
 /** Zutaten-Kategorie im Katalog (src/data/catalog.ts, Rezepte, Lernen, check-data) */
@@ -149,6 +149,8 @@ export interface BasicYield {
   portion?: number
   /** Anteil der ganzen Ladung, der als Ergebnis in den Vorrat geht (BBQ: Rest nach dem Grillabend), Standard 1 */
   share?: number
+  /** Brot (Ergebnis in g): Gramm je Vorrats-Scheibe, Standard 50 (Toast 25 wie gekaufte Toastscheiben) */
+  slice?: number
 }
 
 export interface Recipe {

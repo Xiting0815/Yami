@@ -3,6 +3,7 @@ import { BREAKFAST_LABEL, type BreakfastType } from '../../types'
 import { portionFor } from '../../energy'
 import { shortDate, weekdayName } from '../../store'
 import { MealToggle } from '../../components/MealToggle'
+import { useActiveChipInView } from '../../components/FilterBar'
 import { PrepDayChip } from '../../components/PrepDayChip'
 import { SwipeDeck } from '../../components/SwipeDeck'
 import { dayRangeText } from '../dates'
@@ -14,6 +15,8 @@ export function SwipeTab({ m }: { m: AppModel }) {
   const { days } = cal
   const { meal, swipeDay, pantryMode } = ui
   const { picks } = bf
+  // gewählte Frühstücksart bleibt beim Tabwechsel gesetzt → beim Öffnen sichtbar scrollen
+  const bRow = useActiveChipInView<HTMLDivElement>(meal)
   return (
     <div className="swipe-screen">
       <MealToggle meal={meal} onChange={ui.setMeal} />
@@ -37,7 +40,7 @@ export function SwipeTab({ m }: { m: AppModel }) {
           <p className="muted small swipe-note">
             Wähle 1–2 Frühstücke zum Vorbereiten. Das kürzer haltbare kommt an die ersten Tage, das länger haltbare ans Ende.
           </p>
-          <div className="chips-row">
+          <div className="chips-row" ref={bRow}>
             <button className={`chip ${ui.bPantryOnly ? 'on' : ''}`} onClick={() => ui.setBPantryOnly((v) => !v)}>
               🧺 Nur mit Vorrat
             </button>

@@ -1,29 +1,41 @@
 import { finishable, isBake, isTapa, type PlanEntry, type Recipe } from '../../types'
-import { bbqMeal, doneWord } from '../../bbq'
+import { bbqMeal, doneWord, eveningOn } from '../../bbq'
 import { tapasMeal } from '../../tapas'
-import { type PortionFeedback, type Rating, portionFactor } from '../../learning'
+import { type PortionFeedback, type Rating, addReject, portionFactor } from '../../learning'
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
 import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
 import { householdFeedback } from '../../sync'
 import { yieldText } from '../../bake'
 import { markBaked, matchBake, tapasFactor } from '../../bakePlan'
+import type { AppState } from '../../store'
 import type { ActionContext } from './context'
+
+/**
+ * Abendessen eines Tages setzen bzw. leeren. Ein schon abgezogenes Gericht gibt seine Zutaten zurück.
+ * Kommt ein ANDERES Gericht auf den Tag (oder wird er geleert), gehören Bewertung, Portions-Rückmeldung und
+ * „Wie war’s?“-Wegklicken des alten Gerichts nicht mehr zum Tag – sonst lernt die App sie fürs neue Gericht.
+ */
+export function withDinner<S extends Pick<AppState, 'plan' | 'pantry' | 'ratings' | 'portionFeedback' | 'ratingDismissed'>>(s: S, day: string, entry: PlanEntry | undefined): S {
+  const plan = { ...s.plan }
+  const old = plan[day]
+  const pantry = old?.status === 'cooked' ? uncook(old, s.pantry) : s.pantry
+  if (entry) plan[day] = entry
+  else delete plan[day]
+  if (!old || old.recipeId === entry?.recipeId) return { ...s, plan, pantry }
+  const ratings = { ...s.ratings }
+  delete ratings[day]
+  const portionFeedback = { ...s.portionFeedback }
+  delete portionFeedback[day]
+  return { ...s, plan, pantry, ratings, portionFeedback, ratingDismissed: s.ratingDismissed.filter((d) => d !== day) }
+}
 
 /** Abendessen planen: Wischen, Nehmen/Wegwischen, Tage leeren, gekocht/nicht gekocht, Bewertung, Woche wechseln */
 export function planActions({ state, setState, cal, ui, flash, setToast, snapshot }: ActionContext) {
   const { today, days, monday, setMonday } = cal
 
   function setEntry(day: string, entry: PlanEntry | undefined) {
-    setState((s) => {
-      const plan = { ...s.plan }
-      const old = plan[day]
-      // ein bereits abgezogenes Gericht wird ersetzt → Zutaten zurück in den Vorrat
-      const pantry = old?.status === 'cooked' ? uncook(old, s.pantry) : s.pantry
-      if (entry) plan[day] = entry
-      else delete plan[day]
-      return { ...s, plan, pantry }
-    })
+    setState((s) => withDinner(s, day, entry))
   }
 
   function startSwipe(day: string) {
@@ -54,7 +66,8 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
       return
     }
     const idx = days.indexOf(day)
-    const nextEmpty = [...days.slice(idx + 1), ...days.slice(0, idx)].find((d) => d !== day && !state.plan[d] && d >= today)
+    // ein Tapas- oder Grillabend belegt den Tag schon (ist das Abendessen) → nicht als „frei“ anspringen
+    const nextEmpty = [...days.slice(idx + 1), ...days.slice(0, idx)].find((d) => d !== day && !state.plan[d] && !eveningOn(state.bakePlan, d) && d >= today)
     if (nextEmpty) {
       flash(`${weekdayName(day)}: ${recipe.title} ✓`, snap)
       ui.setSwipeDay(nextEmpty)
@@ -76,7 +89,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
   function reject(r: Recipe) {
     const snap = snapshot()
     ui.setRejected((x) => [...x.filter((id) => id !== r.id), r.id])
-    setState((s) => ({ ...s, rejects: [...s.rejects, { id: r.id, date: today }].slice(-400) }))
+    setState((s) => ({ ...s, rejects: addReject(s.rejects, r.id, today) }))
     flash(`Übersprungen: ${r.title}`, snap)
   }
 

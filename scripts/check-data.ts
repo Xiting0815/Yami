@@ -1,6 +1,6 @@
 // Prüft die Rezeptdatenbank: eindeutige IDs, bekannte Zutaten, gültige Einheiten
 import { RAW_BASICS, RAW_BREAKFASTS, RAW_RECIPES, BREAKFASTS, RECIPES } from '../src/data/recipes'
-import { NUTRI } from '../src/data/nutrition'
+import { GRAMS, NUTRI } from '../src/data/nutrition'
 import { gramsOf } from '../src/data/nutrition-calc'
 import { BROTH_FORMS, CATALOG, EXTRA_DUPLICATES, SPICES } from '../src/data/catalog'
 import { EXTRA_PRODUCT_DUPLICATES, PRODUCTS } from '../src/data/products'
@@ -22,12 +22,17 @@ for (const r of [...RAW_RECIPES, ...RAW_BREAKFASTS, ...RAW_BASICS]) {
   if (ids.has(r.id)) { console.error('Doppelte ID:', r.id); errors++ }
   ids.add(r.id)
   if (r.steps.length < 3) { console.error('Zu wenige Schritte:', r.id); errors++ }
+  for (const [n, f] of Object.entries(r.eaten ?? {})) {
+    if (!r.ingredients.some((i) => i.name === n) || !(f >= 0 && f <= 1)) { console.error(`${r.id}: eaten „${n}“ = ${f} – Zutat fehlt oder Anteil nicht 0–1`); errors++ }
+  }
   for (const i of r.ingredients) {
     used.add(i.name)
     if (!CATALOG[i.name]) { console.error(`Unbekannte Zutat in ${r.id}: "${i.name}"`); errors++ }
     if (/^\d/.test(i.name)) { console.error(`Einheit nicht erkannt in ${r.id}: "${i.name}"`); errors++ }
     if (!NUTRI[i.name]) { console.error(`Keine Nährwerte für "${i.name}"`); errors++ }
     if (i.amount != null && gramsOf(i.name, i.amount, i.unit) == null) { console.error(`Gewicht unbekannt: ${i.unit} "${i.name}" (${r.id})`); errors++ }
+    // Packungs-Einheiten sind je Zutat sehr verschieden (1 Pck Backpulver 15 g, Vanillezucker 8 g) – kein Standardgewicht
+    if (i.amount != null && ['Pck', 'Dose', 'Glas', 'Becher'].includes(i.unit) && GRAMS[i.name]?.[i.unit] == null) { console.error(`Gewicht je ${i.unit} fehlt für "${i.name}" (${r.id}) – in GRAMS eintragen`); errors++ }
     const name = canonical(i.name)
     // Mengen-Grundzutaten (Öl, Brühe, Mehl …) und Gewürze brauchen jetzt ebenfalls ein Produkt (Packung, Preis, Haltbarkeit);
     // nur Gewürze werden nicht umgerechnet (sie kennen nur „da“ / „alle“)

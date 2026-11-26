@@ -1,7 +1,8 @@
 // Logiktest Saisonkalender:  npx vite-node scripts/test-season.ts
 import { CATALOG } from '../src/data/catalog'
 import { productFor, insight } from '../src/kitchen'
-import { SEASON, inSeason, seasonOf } from '../src/data/season'
+import { SEASON, easterSunday, festiveWindow, inSeason, seasonOf } from '../src/data/season'
+import { festiveOf } from '../src/kitchen'
 import { RECIPE_BY_ID } from '../src/data/recipes'
 
 let fails = 0
@@ -53,6 +54,17 @@ ok(productFor('Kartoffeln festkochend', {}, 11)!.price === productFor('Kartoffel
   const dIn = sc(duck, '2026-12-20').score, dOut = sc(duck, '2026-03-10').score
   ok(dIn - dOut >= 10, `Ente: Score im Fenster (${dIn.toFixed(1)}) mindestens 10 über außerhalb (${dOut.toFixed(1)})`)
   ok(sc(plain, '2026-12-20').festive === undefined, 'Normales Gericht ohne Festtagsbezug')
+}
+
+// Osterzeit (beweglich): Ostersonntag nach Gauß/Meeus, Fenster 2 Wochen vorher bis Ostermontag
+{
+  ok(easterSunday(2024) === '03-31' && easterSunday(2025) === '04-20' && easterSunday(2026) === '04-05' && easterSunday(2027) === '03-28' && easterSunday(2038) === '04-25' && easterSunday(2008) === '03-23', 'Ostersonntag 2008/2024–2027/2038 richtig')
+  ok(festiveWindow('ostern', 2026).join() === '03-22,04-06' && festiveWindow('ostern', 2027).join() === '03-14,03-29', 'Osterfenster 2026: 22.3.–6.4., 2027: 14.3.–29.3.')
+  ok(festiveWindow('martini', 2026).join() === '11-01,11-30', 'feste Fenster unverändert')
+  const tor = RECIPE_BY_ID['torrijas']
+  ok(!!tor?.festive?.includes('ostern'), 'Torrijas sind ein Ostergericht')
+  ok(festiveOf(tor, '2026-04-02')?.active === true && festiveOf(tor, '2026-04-02')?.label === '🐣 Osterzeit', 'Torrijas am Gründonnerstag 2026: Osterzeit-Badge')
+  ok(festiveOf(tor, '2026-03-21')?.active === false && festiveOf(tor, '2026-04-07')?.active === false && festiveOf(tor, '2027-04-02')?.active === false, 'außerhalb der Osterzeit (auch 2027, wenn Ostern früher liegt)')
 }
 
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')

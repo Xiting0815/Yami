@@ -89,6 +89,7 @@ export const dessertsEs: ExtraGroup = {
         cuisine: 'es',
         time: 50,
         yields: { name: 'Torrijas (selbstgemacht)', amount: 4, unit: 'Portion', shelf: 2, store: 'im Kühlschrank (abgedeckt)' },
+        festive: ['ostern'],
         lighter: 'Die Torrijas nur mit 1 EL Öl bepinselt im Airfryer backen statt in der Pfanne auszubraten und mit fettarmer Milch tränken – spart rund 100 kcal pro Portion.',
       },
       '1 Stk Ciabatta | 500 ml Milch | 1 Stk Zimtstange | 0.5 Stk Zitrone unbehandelt | 110 g Zucker | 2 Stk Ei | 4 EL Olivenöl | 1 TL Zimt gemahlen',

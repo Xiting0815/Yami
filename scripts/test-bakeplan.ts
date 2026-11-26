@@ -11,9 +11,11 @@ import { planWeek } from '../src/kitchen'
 import { haLocalFor } from '../src/haRun'
 import {
   acceptSuggestion, addBake, bakeEntriesOf, bakeHabits, bakesOn, dismissSuggestion, habitDay, hintBlocked, markBaked, matchBake, moveBake, pendingBakes,
-  removeBake, sanitizeBakePlan, settleBaked, suggestBake, type BakeHint, type SuggestInput,
+  removeBake, sanitizeBakePlan, settleBaked, skipBakes, suggestBake, type BakeHint, type SuggestInput,
 } from '../src/bakePlan'
-import { buildModel } from '../src/learning'
+import { buildModel, preference } from '../src/learning'
+import { eveningOn } from '../src/bbq'
+import { isTapa } from '../src/types'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -225,6 +227,23 @@ ok(bakesOn(marc.bakePlan, '2026-11-28').length === 0, 'Entfernen (Grabstein) kom
 // Einkaufsliste bei beiden gleich
 const needs = (s: AppState) => planWeek(s.plan, week, s.pantry, {}, TODAY, {}, formatAmount, {}, 11, {}, addBake({}, '2026-11-21', BIENEN, 1)).buy.map((b) => b.name).sort().join()
 ok(needs(marc) === needs(lisa), 'gleicher Stand → gleiche Einkaufsliste')
+
+// ───── „Nein, nicht gemacht“: Eintrag bleibt als „nicht gemacht“ (Lernsignal −1), wird nicht mehr nachgefragt/reserviert ─────
+{
+  const BBQ = 'beer-can-chicken'
+  const tapas = RECIPES.filter((r) => isTapa(r)).slice(0, 3).map((r) => r.id)
+  let sp = addBake({}, '2026-11-20', BBQ, 1)
+  for (const t of tapas) sp = addBake(sp, '2026-11-19', t, 1)
+  sp = skipBakes(sp, '2026-11-20', (e) => e.recipeId === BBQ)
+  sp = skipBakes(sp, '2026-11-19', (e) => isTapa(RECIPE_BY_ID[e.recipeId]))
+  ok(bakesOn(sp, '2026-11-20')[0]?.status === 'skipped' && bakesOn(sp, '2026-11-19').every((e) => e.status === 'skipped'), 'Nein: Einträge als „nicht gemacht“ markiert, nicht gelöscht')
+  ok(pendingBakes(sp, TODAY).length === 0 && bakeEntriesOf(sp, TODAY).length === 0, 'Nein: keine Nachfrage, kein Einkauf mehr')
+  ok(!eveningOn(sp, '2026-11-20') && !eveningOn(sp, '2026-11-19'), 'Nein: Tag gilt nicht mehr als Grill-/Tapas-Abend')
+  const base = { plan: {}, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: {}, today: TODAY }
+  const planned = buildModel({ ...base, bakePlan: addBake({}, '2026-11-20', BBQ, 1) })
+  const skipped = buildModel({ ...base, bakePlan: sp })
+  ok(preference(skipped, RECIPE_BY_ID[BBQ]).score < 0 && preference(planned, RECIPE_BY_ID[BBQ]).score > 0, 'Lernen: nicht gegrillt zählt negativ, eingeplant positiv')
+}
 
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')
 if (fails) process.exit(1)

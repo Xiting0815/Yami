@@ -20,6 +20,7 @@ import { formatAmount } from '../shopping'
 import { FilterBar } from './FilterBar'
 import { RecipeImage } from './RecipeImage'
 import { searchIngredients } from '../customIngredients'
+import { norm, searchRecipes } from '../recipeSearch'
 
 interface Props {
   filters: Filters
@@ -60,10 +61,6 @@ const todayIso = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function norm(s: string) {
-  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-}
-
 export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, onMeal, custom, onNew, bakePref, tapasPick = [], onTapasPick, onPlanTapas, tapasIdeas = [] }: Props) {
   const [q, setQ] = useState('')
   const [mine, setMine] = useState(false)
@@ -89,7 +86,6 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
     }
   }
   const list = useMemo(() => {
-    const nq = norm(q.trim())
     const base = tapas
       ? tapasSection(tapas === 'alle' ? undefined : tapas)
       : salat
@@ -104,12 +100,8 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
           ? BREAKFASTS
           : RECIPES.filter((r) => matches(r, filters, perPortion.get(r.id)))
     const pool = base.filter((r) => basics || area || !mine || r.custom)
-    const exact = pool.filter((r) => !nq || norm(r.title).includes(nq) || r.ingredients.some((i) => norm(i.name).includes(nq)))
-    // nichts gefunden (z. B. Tippfehler „Tunfisch“) → über ähnlich geschriebene Zutaten suchen
-    const fuzzy = exact.length || nq.length < 3 ? [] : (() => {
-      const names = new Set(searchIngredients(q, 6))
-      return pool.filter((r) => r.ingredients.some((i) => names.has(i.name)))
-    })()
+    // Titel-Treffer vor Zutaten-Treffern; Tippfehler („Tortila“, „Spagetti“) über ähnlich geschriebene Titel/Zutaten
+    const rank = searchRecipes(pool, q, () => searchIngredients(q, 6))
     const byTitle = (a: Recipe, b: Recipe) => a.title.localeCompare(b.title, 'de')
     // Backen: was du gern bäckst und isst, kommt nach vorn (gelernt)
     // Saisongebäck (Plätzchen) steht in seiner Zeit ganz oben, danach folgt die gelernte Vorliebe
@@ -124,7 +116,9 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
           ])
         : [],
     )
-    return (exact.length ? exact : fuzzy).sort((a, b) => (score.get(b.id) ?? 0) - (score.get(a.id) ?? 0) || byTitle(a, b))
+    return pool
+      .filter((r) => rank.has(r.id))
+      .sort((a, b) => rank.get(a.id)! - rank.get(b.id)! || (score.get(b.id) ?? 0) - (score.get(a.id) ?? 0) || byTitle(a, b))
   }, [q, filters, perPortion, meal, mine, custom, basics, bake, bbq, tapas, salat, area, bakePref])
   const picked = tapasPick.map((id) => BASICS.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
   const togglePick = (id: string) =>

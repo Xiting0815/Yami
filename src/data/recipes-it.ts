@@ -320,7 +320,7 @@ export const recipesIt = [
     ], 'Risotto zucca'),
 
   r('saltimbocca', 'Saltimbocca alla Romana mit Rosmarinkartoffeln', 'it', 'haupt', 40,
-    '4 Stk Kalbsschnitzel klein | 4 Scheibe Parmaschinken | 4 Blatt Salbei | 2 EL Weizenmehl | 100 ml Weißwein | 30 g Butter | 500 g Kartoffeln festkochend | 2 Zweig Rosmarin | 3 EL Olivenöl | Salz | Pfeffer',
+    '300 g Kalbsschnitzel klein | 4 Scheibe Parmaschinken | 4 Blatt Salbei | 2 EL Weizenmehl | 100 ml Weißwein | 30 g Butter | 500 g Kartoffeln festkochend | 2 Zweig Rosmarin | 3 EL Olivenöl | Salz | Pfeffer',
     [
       'Kartoffeln würfeln, mit Olivenöl, Rosmarin und Salz mischen und bei 200 °C 35 Minuten im Ofen rösten.',
       'Schnitzel dünn klopfen, pfeffern, mit je einer Scheibe Parmaschinken und einem Salbeiblatt belegen und mit einem Zahnstocher feststecken.',
@@ -347,7 +347,7 @@ export const recipesIt = [
     ], 'Pollo alla cacciatora'),
 
   r('scaloppine-limone', 'Scaloppine al Limone mit Spinat', 'it', 'haupt', 30,
-    '4 Stk Kalbsschnitzel klein | 2 EL Weizenmehl | 1 Stk Zitrone | 50 ml Weißwein | 40 g Butter | 1 EL Kapern | 400 g Blattspinat frisch | 1 Zehe Knoblauch | 1 EL Olivenöl | 1 Stk Ciabatta | Salz | Pfeffer',
+    '300 g Kalbsschnitzel klein | 2 EL Weizenmehl | 1 Stk Zitrone | 50 ml Weißwein | 40 g Butter | 1 EL Kapern | 400 g Blattspinat frisch | 1 Zehe Knoblauch | 1 EL Olivenöl | 1 Stk Ciabatta | Salz | Pfeffer',
     [
       'Schnitzel dünn klopfen, salzen, pfeffern und mehlieren.',
       'In der Hälfte der Butter 1 Minute je Seite braten und herausnehmen.',
@@ -428,7 +428,7 @@ export const recipesIt = [
     ], 'Pizza bianca mortadella'),
 
   r('piccata', 'Piccata Milanese mit Tomatenspaghetti', 'it', 'haupt', 35,
-    '4 Stk Schweineschnitzel klein | 2 Stk Ei | 50 g Parmigiano Reggiano | 2 EL Weizenmehl | 2 EL Olivenöl | 200 g Spaghetti | 1 Dose Geschälte Tomaten | 1 Zehe Knoblauch | 0.5 Bund Basilikum | Salz | Pfeffer',
+    '300 g Schweineschnitzel klein | 2 Stk Ei | 50 g Parmigiano Reggiano | 2 EL Weizenmehl | 2 EL Olivenöl | 200 g Spaghetti | 1 Dose Geschälte Tomaten | 1 Zehe Knoblauch | 0.5 Bund Basilikum | Salz | Pfeffer',
     [
       'Tomatensauce aus Knoblauch, Olivenöl und Tomaten 15 Minuten köcheln lassen und mit Basilikum abschmecken.',
       'Eier mit geriebenem Parmesan verquirlen.',

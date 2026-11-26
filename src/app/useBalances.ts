@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { RECIPE_BY_ID } from '../data/recipes'
-import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor, targetKcal, DEFAULT_BREAKFAST_KCAL } from '../energy'
+import { type DayBalance, type Portion, dayBalance, isWorkday, portionFor } from '../energy'
 import type { AppState } from '../store'
 
 /** Kalorienbilanz (Mo–Fr) und Portionsgröße je Tag */
@@ -23,7 +23,7 @@ export function useBalances(state: AppState, days: string[]) {
   /** Abendbudget für einen Tag (auch wenn dort noch nichts geplant ist) */
   const dinnerBudgetFor = (day: string) =>
     profile && isWorkday(day)
-      ? Math.max(0, targetKcal(profile) - (RECIPE_BY_ID[state.breakfast[day]?.recipeId ?? '']?.nutrition.kcal ?? DEFAULT_BREAKFAST_KCAL) - profile.lunchKcal)
+      ? dayBalance(profile, state.breakfast[day], undefined, undefined, day).dinnerBudget
       : undefined
   return { balances, portions, dinnerBudgetFor }
 }

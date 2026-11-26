@@ -155,7 +155,7 @@ export function WeekTab({ m }: { m: AppModel }) {
             titles={(state.bakePlan[pendingBake.day] ?? []).filter((e) => !e.status && isTapa(RECIPE_BY_ID[e.recipeId])).map((e) => tapaTitle(RECIPE_BY_ID[e.recipeId].title))}
             onYes={() => act.confirmTapasEvening(pendingBake.day)}
             onMove={() => ui.setTapasSheet({ day: pendingBake.day, move: true })}
-            onNo={() => act.removeTapas(pendingBake.day)}
+            onNo={() => act.skipTapas(pendingBake.day)}
           />
         ) : pendingBake && askRecipe ? (
           <BakeAskCard
@@ -163,7 +163,7 @@ export function WeekTab({ m }: { m: AppModel }) {
             day={pendingBake.day}
             onYes={() => act.confirmBaked(pendingBake.day, pendingBake.entry.recipeId)}
             onMove={() => ui.setBakeSheet({ day: pendingBake.day, recipeId: pendingBake.entry.recipeId, move: true })}
-            onNo={() => act.removeBakeEntry(pendingBake.day, pendingBake.entry.recipeId)}
+            onNo={() => act.skipBakeEntry(pendingBake.day, pendingBake.entry.recipeId)}
           />
         ) : bakeSuggestion && !notice ? (
           <BakeHintCard s={bakeSuggestion} onAccept={() => act.acceptBakeSuggestion(bakeSuggestion)} onDismiss={() => act.dismissBakeSuggestion(bakeSuggestion)} />

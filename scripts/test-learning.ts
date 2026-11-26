@@ -1,8 +1,9 @@
 // Logiktest lernende Vorlieben:  npx vite-node scripts/test-learning.ts
 import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { addDaysIso } from '../src/kitchen'
-import { buildModel, satietyBonus, satietyIndex, satietyLean, satietyNote, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
+import { addReject, buildModel, satietyBonus, satietyIndex, satietyLean, satietyNote, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
 import type { WeekPlan } from '../src/types'
+import { withDinner } from '../src/app/actions/plan'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -122,6 +123,39 @@ ok(portionNote(1) === undefined && portionNote(1.1) === 'ihr braucht eher etwas 
   ok(BREAKFASTS.every((r) => satietyBonus(r, 0, BREAKFASTS) === 0), 'Sättigung: ohne Rückmeldung keine Verschiebung')
   ok(satietyBonus(RECIPES[0], hungry, BREAKFASTS) === 0, 'Sättigung: gilt nur fürs Frühstück')
   ok(!satietyNote(0) && !!satietyNote(hungry)?.includes('sättigendere') && !!satietyNote(full)?.includes('leichtere'), 'Sättigung: Text für „Das habe ich gelernt“')
+}
+
+// Wegwischen: dasselbe Gericht zählt höchstens einmal pro Tag (mehrmals durch den Stapel wischen)
+{
+  let rj: RejectEvent[] = []
+  for (let i = 0; i < 4; i++) rj = addReject(rj, 'rindergulasch', today)
+  rj = addReject(rj, 'rindergulasch', addDaysIso(today, 1))
+  rj = addReject(rj, 'frikadellen', today)
+  ok(rj.length === 3, `Wegwischen: 4× am selben Tag zählt einmal (${rj.length} Signale)`)
+  const once = buildModel({ plan: {}, breakfast: {}, breakfastPicks: {}, rejects: addReject([], 'rindergulasch', today), ratings: {}, today })
+  const many = buildModel({ plan: {}, breakfast: {}, breakfastPicks: {}, rejects: [0, 1, 2].reduce<RejectEvent[]>((a) => addReject(a, 'rindergulasch', today), []), ratings: {}, today })
+  ok(preference(once, RECIPE_BY_ID['rindergulasch']).score === preference(many, RECIPE_BY_ID['rindergulasch']).score, 'Wegwischen: mehrfaches Wischen am selben Tag wertet nicht stärker ab')
+}
+
+// Anderes Gericht auf einen bewerteten Tag: Bewertung/Portion des alten Gerichts gehen nicht aufs neue über
+{
+  const day = addDaysIso(today, -1)
+  const s0 = {
+    plan: { [day]: { recipeId: 'hackbraten', servings: 2, status: 'cooked' as const, consumed: [] } } as WeekPlan,
+    pantry: [],
+    ratings: { [day]: 'down' as const },
+    portionFeedback: { [day]: 1 as PortionFeedback },
+    ratingDismissed: [day],
+  }
+  const swapped = withDinner(s0, day, { recipeId: 'frikadellen', servings: 2 })
+  ok(swapped.plan[day]?.recipeId === 'frikadellen' && !swapped.ratings[day] && swapped.portionFeedback[day] === undefined && !swapped.ratingDismissed.includes(day), 'Tag neu belegt: alte Bewertung, Portion und Wegklicken entfernt')
+  const m1 = buildModel({ plan: swapped.plan, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: swapped.ratings, today })
+  const m0 = buildModel({ plan: swapped.plan, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: s0.ratings, today })
+  ok(preference(m1, RECIPE_BY_ID['frikadellen']).score > preference(m0, RECIPE_BY_ID['frikadellen']).score, 'Frikadellen erben das 👎 des Hackbratens nicht')
+  const same = withDinner(s0, day, { recipeId: 'hackbraten', servings: 3 })
+  ok(same.ratings[day] === 'down' && same.portionFeedback[day] === 1, 'gleiches Gericht (z. B. Portionen geändert): Bewertung bleibt')
+  const cleared = withDinner(s0, day, undefined)
+  ok(!cleared.plan[day] && !cleared.ratings[day], 'Tag geleert: Bewertung entfernt')
 }
 
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }

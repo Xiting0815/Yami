@@ -37,6 +37,18 @@ export interface RejectEvent {
   date: string
 }
 
+/** so viele Wegwisch-Signale werden gespeichert */
+export const REJECTS_MAX = 400
+
+/**
+ * Wegwischen merken – dasselbe Gericht zählt höchstens einmal pro Tag (wer den Stapel mehrmals durchwischt,
+ * soll ein Gericht nicht drei- oder viermal abwerten; bei wenigen Frühstücken passiert das schnell).
+ */
+export function addReject(rejects: RejectEvent[], id: string, date: string): RejectEvent[] {
+  if (rejects.some((r) => r.id === id && r.date === date)) return rejects
+  return [...rejects, { id, date }].slice(-REJECTS_MAX)
+}
+
 const HALF_LIFE = 60
 const W = { waste: -0.3, take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3, eaten: 0.3 }
 /** Frühstück: Sättigung „bis mittags satt?“ (−1 zu wenig · 0 passt · 1 zu viel) als Signal fürs Rezept */

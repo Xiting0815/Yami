@@ -95,6 +95,15 @@ export function markBaked(bp: BakePlan, day: string, recipeId: string): BakePlan
 }
 
 /**
+ * „Nein, nicht gemacht“ auf die Nachfrage: offene Einträge des Tages (nur `recipeId` bzw. alle, die `match` erfüllen) als
+ * „nicht gemacht“ markieren statt sie zu löschen – so bleibt das Lernsignal erhalten (BBQ, Tapas, Salate: −1 wie
+ * „nicht gekocht“, siehe learning.ts). Reserviert keinen Vorrat mehr, wird nicht mehr gezeigt oder nachgefragt.
+ */
+export function skipBakes(bp: BakePlan, day: string, match: (e: BakeEntry) => boolean): BakePlan {
+  return put(bp, day, bakesOn(bp, day).map((e) => (!e.status && match(e) ? { ...e, status: 'skipped' as const } : e)))
+}
+
+/**
  * „Ja, gebacken“ auf einen offenen Eintrag: Zutaten abziehen, Ergebnis (ab Backtag haltbar) in den Vorrat, Eintrag gebacken,
  * Gebackenes vermerken. Ein bereits beantworteter oder fehlender Eintrag ändert nichts (`null`) – nie zweimal abziehen.
  */

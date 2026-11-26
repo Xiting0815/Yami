@@ -108,7 +108,10 @@ button:focus:not(:focus-visible) { outline: none; }
 
 .content { flex: 1; padding: 4px 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
 /* Wischen: füllt genau den Platz zwischen Kopfzeile und Tabbar (siehe .swipe-screen) */
-.content.swipe { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+.content.swipe { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  /* die weggewischte Karte fliegt seitlich hinaus: abschneiden, sonst wird die Seite kurz breiter
+     (Handy zoomt heraus, Tab-Leiste springt). clip statt hidden: kein eigener Scrollbereich */
+  overflow-x: clip; }
 
 /* ───── Buttons ───── */
 .btn { border: none; border-radius: 14px; padding: 12px 18px; font-weight: 700; min-height: var(--tap); min-width: var(--tap); }
@@ -204,6 +207,9 @@ button:focus:not(:focus-visible) { outline: none; }
 .filterbar .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; align-items: center; }
 .filterbar .chips::-webkit-scrollbar { display: none; }
 .count { font-size: 12px; color: var(--muted); white-space: nowrap; margin-left: auto; padding-left: 6px; }
+/* gesetzte Filter immer sichtbar (umbrechend statt seitlich scrollend) */
+.filter-active { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.filter-active .count { margin-left: 0; padding-left: 0; font-size: 12.5px; }
 /* im Filter-Sheet: alles sichtbar statt seitlich scrollen */
 .filterbar.wrap { margin: 0; gap: 6px; }
 .filterbar.wrap .chips { flex-wrap: wrap; overflow: visible; }
@@ -301,7 +307,8 @@ li.done .item-name, li.done .item-amt { text-decoration: line-through; color: va
 }
 .toast.has-undo { padding-right: 2px; }
 /* bis zu zwei Zeilen, damit der Text neben dem Knopf lesbar bleibt */
-.toast-msg { min-width: 0; line-height: 1.25; max-height: 2.5em; overflow: hidden; }
+/* längerer Text endet mit „…“ statt mitten im Wort abgeschnitten zu werden */
+.toast-msg { min-width: 0; line-height: 1.25; max-height: 2.5em; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
 .toast-undo {
   flex-shrink: 0; min-height: var(--tap); padding: 0 16px; border: none; border-radius: 999px;
   background: var(--accent); color: var(--accent-ink); font-weight: 800;
@@ -974,12 +981,12 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .alert-line.shift { font-weight: 600; }
 .alert-line .link { min-height: 28px; min-width: 28px; }
 .alert-btns { display: flex; flex-wrap: wrap; gap: 6px; }
-.alert-btns .chip { min-height: 34px; padding: 0 11px; font-size: 12.5px; white-space: normal; text-align: left; }
+.alert-btns .chip { min-height: 40px; padding: 0 11px; font-size: 12.5px; white-space: normal; text-align: left; }
 .forgot { color: var(--red-ink); font-weight: 700; font-size: 11.5px; margin-left: 6px; white-space: nowrap; }
 
 /* Toast mit Auswahl („Warum?“) */
 .toast.has-choices { flex-direction: column; align-items: stretch; border-radius: 18px; padding: 10px 12px; gap: 8px; width: auto; }
-.toast.has-choices .toast-msg { max-height: none; }
+.toast.has-choices .toast-msg { max-height: none; display: block; }
 .toast-choices { display: flex; flex-wrap: wrap; gap: 6px; }
 .toast-choice { min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--bg) 45%, transparent); background: transparent; color: var(--bg); font-weight: 700; font-size: 13px; }
 .toast-choice.on { background: var(--bg); color: var(--text); }
@@ -1003,7 +1010,7 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .trip-suggest { background: var(--surface-2); border-radius: var(--radius); padding: 10px 14px; }
 .trip-suggest p { margin: 0; }
 .trip-day { margin: 14px 0 6px; }
-.trip-day select { font: inherit; padding: 4px 6px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--text); }
+.trip-day select { font: inherit; min-height: var(--tap); padding: 4px 6px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--text); }
 .trip-review .review-item { background: var(--surface); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-card); margin: 8px 0; }
 .trip-review h3 { margin: 2px 0; font-size: 24px; letter-spacing: -0.3px; }
 .trip-review .review-amt { margin: 0 0 6px; font-weight: 700; }

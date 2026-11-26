@@ -10,7 +10,7 @@
  * yields – Packung „ergibt“ die Menge (Brühpulver: 1 Glas ergibt 7,5 l fertige Brühe); pack ist dann die fertige Menge
  */
 import { SHOP_ALIAS } from './catalog'
-import { SLICE_G, yieldStock, type RawRecipe } from './define'
+import { sliceG, yieldStock, type RawRecipe } from './define'
 import { EXTRA_CONVERT, EXTRA_PRODUCTS, EXTRA_YIELDS } from './extra'
 
 export interface Product {
@@ -534,5 +534,5 @@ for (const { recipe, name } of EXTRA_YIELDS) {
   const st = yieldStock(recipe.kind, recipe.yields!)
   // BBQ-Reste: nur der Anteil der Ladung, der in den Vorrat geht (`share`)
   PRODUCTS[name] = { pack: st.amount, unit: st.unit, price: Math.round(batchCost(recipe) * (recipe.yields!.share ?? 1) * 100) / 100, shelf: recipe.yields!.shelf }
-  if (st.unit === 'Scheibe') CONVERT[name] = { g: 1 / SLICE_G, kg: 1000 / SLICE_G }
+  if (st.unit === 'Scheibe') CONVERT[name] = { g: 1 / sliceG(recipe.yields), kg: 1000 / sliceG(recipe.yields) }
 }

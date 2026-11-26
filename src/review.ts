@@ -161,6 +161,9 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
     wasted: state.wasted,
     today,
     since: state.tasteSince,
+    // dieselben Signale wie „Das habe ich gelernt“ (usePlanning): eigene Rezepte, eingeplante BBQ/Tapas/Salate
+    customRecipes: state.customRecipes,
+    bakePlan: state.bakePlan,
     baked: state.baked,
     snacks: state.snacks,
     bakeRatings: state.bakeRatings,

@@ -10,8 +10,11 @@ export function gramsOf(name: string, amount: number, unit: string): number | nu
   return d != null ? amount * d : null
 }
 
-/** Nährwerte pro Portion (`fatLoss`: BBQ – Anteil des Fleischfetts, der beim Smoken abtropft, siehe `bbq()`) */
-export function nutritionOf(ingredients: Ingredient[], servings: number, fatLoss?: number): Nutrition {
+/**
+ * Nährwerte pro Portion (`fatLoss`: BBQ – Anteil des Fleischfetts, der beim Smoken abtropft, siehe `bbq()`;
+ * `eaten`: verzehrter Anteil einzelner Zutaten wie Lake oder Marinade, siehe `RawRecipe.eaten`)
+ */
+export function nutritionOf(ingredients: Ingredient[], servings: number, fatLoss?: number, eaten?: Record<string, number>): Nutrition {
   const sum: Nutrition = { kcal: 0, protein: 0, fat: 0, carbs: 0, fiber: 0 }
   for (const ing of ingredients) {
     if (ing.amount == null) continue
@@ -20,6 +23,9 @@ export function nutritionOf(ingredients: Ingredient[], servings: number, fatLoss
     if (!n || g == null) continue
     // Ausbackfett: nur ein Teil wird aufgenommen
     if (FRYING_FATS.has(ing.name) && g > 60) g *= ing.name === 'Frittieröl' ? 0.1 : 0.4
+    // Lake/Marinade: nur der verzehrte Anteil zählt
+    const share = eaten?.[ing.name]
+    if (share != null) g *= Math.min(1, Math.max(0, share))
     const f = g / 100
     sum.kcal += n[0] * f
     sum.protein += n[1] * f

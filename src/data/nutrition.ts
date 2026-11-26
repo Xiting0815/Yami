@@ -4,7 +4,7 @@
  *
  * Fleisch mit Knochen/Muscheln mit Schale sind auf das Einkaufsgewicht bezogen (essbarer Anteil eingerechnet).
  */
-import { SLICE_G, type RawRecipe } from './define'
+import { sliceG, type RawRecipe } from './define'
 import { CATALOG, SHOP_ALIAS } from './catalog'
 import { EXTRA_GRAMS, EXTRA_NUTRI, EXTRA_YIELDS } from './extra'
 
@@ -488,7 +488,7 @@ export const GRAMS: Record<string, Record<string, number>> = {
   Fischsauce: { EL: 18 }, 'Kecap Manis': { EL: 18 }, Gochujang: { EL: 18 }, Doubanjiang: { EL: 18 },
   Zuckerrübensirup: { EL: 20 }, Garnelenpaste: { TL: 5 }, Sesampaste: { EL: 15 },
   'Paprikapulver edelsüß': { EL: 7, TL: 2.5 }, 'Paprikapulver rosenscharf': { EL: 7, TL: 2.5 }, Currypulver: { EL: 6, TL: 2 },
-  'Zimt gemahlen': { TL: 2.5 }, Backpulver: { TL: 4 },
+  'Zimt gemahlen': { TL: 2.5 }, Backpulver: { TL: 4, Pck: 15 },
 }
 
 /** Standard-Gramm je Einheit, wenn nichts Zutatenspezifisches hinterlegt ist */
@@ -533,8 +533,10 @@ function batchTotals(r: RawRecipe): { n: N; grams: number } {
   for (const i of r.ingredients) {
     if (i.amount == null) continue
     const v = NUTRI[i.name] ?? NUTRI[SHOP_ALIAS[i.name] ?? '']
-    const g = gramsLocal(i.name, i.amount, i.unit)
-    if (g == null) continue
+    const g0 = gramsLocal(i.name, i.amount, i.unit)
+    if (g0 == null) continue
+    // Lake/Marinade (`eaten`): nur der verzehrte Anteil zählt für Gewicht und Nährwerte
+    const g = g0 * Math.min(1, Math.max(0, r.eaten?.[i.name] ?? 1))
     grams += g
     if (!v) continue
     for (let k = 0; k < 5; k++) n[k] += (v[k] * g) / 100
@@ -555,6 +557,6 @@ for (const { recipe, name } of EXTRA_YIELDS) {
   const n = all.map((v) => v * share) as N
   const grams = allG * share
   const weight = y.unit === 'g' || y.unit === 'ml' ? y.amount : grams * (recipe.kind === 'dessert' || recipe.kind === 'salat' ? 1 : 0.9)
-  if (!GRAMS[name]) GRAMS[name] = y.unit === 'g' ? (recipe.kind === 'brot' ? { Scheibe: SLICE_G } : {}) : y.unit === 'ml' ? {} : { [y.unit]: weight / y.amount }
+  if (!GRAMS[name]) GRAMS[name] = y.unit === 'g' ? (recipe.kind === 'brot' ? { Scheibe: sliceG(y) } : {}) : y.unit === 'ml' ? {} : { [y.unit]: weight / y.amount }
   if (!NUTRI[name] && weight > 0) NUTRI[name] = n.map((v) => Math.round((v / weight) * 1000) / 10) as N
 }

@@ -53,7 +53,13 @@ export function useUi(days: string[], weekKey: string) {
   const [pantryChooser, setPantryChooser] = useState(false)
   const [pantryMode, setPantryMode] = useState(false)
 
-  useEffect(() => setRejected([]), [weekKey])
+  useEffect(() => {
+    setRejected([])
+    // Wochenwechsel (auch automatisch, wenn die App über das Wochenende offen bleibt): der Wisch-Tag gehört zur gezeigten
+    // Woche – sonst landet „nehmen“ in der alten Woche, ohne dass ein Tag markiert ist
+    setSwipeDay((d) => (days.includes(d) ? d : days[0]))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weekKey])
   // Vorrats-Modus endet mit dem Tab-Wechsel
   useEffect(() => {
     if (tab !== 'wischen' || meal !== 'dinner') setPantryMode(false)

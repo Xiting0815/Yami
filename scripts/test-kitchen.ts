@@ -1,7 +1,7 @@
 // Logiktest für Vorrat, Einkauf & Empfehlungen:  npx vite-node scripts/test-kitchen.ts
 import { RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { formatAmount } from '../src/shopping'
-import { cookDue, uncook, insight, lastSeenMap, planWeek, uid, addDaysIso, pantryAmount, type PantryLot, type BoughtMap } from '../src/kitchen'
+import { needsOf, cookDue, uncook, insight, lastSeenMap, planWeek, uid, addDaysIso, pantryAmount, type PantryLot, type BoughtMap } from '../src/kitchen'
 import type { WeekPlan } from '../src/types'
 
 let fails = 0
@@ -98,5 +98,11 @@ ok(costs[100] > 1 && costs[100] < 6, 'Median-Kosten pro Portion plausibel')
   ok(sp.packs === 2 && sp.bought === 500, `Portionen 8: 2 Pck nötig, 1 gekauft (bought ${sp.bought})`)
 }
 
+// Kleine Schnitzel (Saltimbocca, Scaloppine, Piccata): Einkauf in normalen Schnitzeln à 150 g, nicht 1 kleines = 1 großes
+{
+  const need = (id: string, n: string) => needsOf(RECIPE_BY_ID[id], 2).find((x) => x.name === n)
+  ok(need('saltimbocca', 'Kalbsschnitzel')?.amount === 2 && need('scaloppine-limone', 'Kalbsschnitzel')?.amount === 2, 'Saltimbocca/Scaloppine: 2 Kalbsschnitzel (1 Packung) statt 4')
+  ok(need('piccata', 'Schweineschnitzel')?.amount === 2, 'Piccata: 2 Schweineschnitzel statt 4')
+}
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }
 console.log('Alle Tests OK')

@@ -32,6 +32,11 @@ export interface RawRecipe {
   portions?: number
   /** BBQ: Anteil des Fleischfetts, der beim Smoken abtropft (0–0,4; siehe `BbqOptions.fatLoss`) */
   fatLoss?: number
+  /**
+   * Verzehrter Anteil einzelner Zutaten (0–1), z. B. Lake oder Marinade, die abgespült/abgegossen wird:
+   * `{ 'Brauner Zucker': 0.1 }`. Zählt nur für die Nährwerte; Einkauf und Vorrat ziehen die volle Menge ab.
+   */
+  eaten?: Record<string, number>
   /** Tapas: Untergruppe (siehe `tapa()`; Tapas-Grundsaucen: `backen('grundrezept', …, { tapas: 'sauce' })`) */
   tapas?: TapasGroup
   /** Tapas: kalt, lauwarm oder heiß servieren (Ablaufplan im Kochmodus „Tapas-Abend“) */
@@ -127,6 +132,8 @@ export function basic(id: string, title: string, time: number, yields: BasicYiel
 
 /** Gewicht einer Brotscheibe in g: Brotlaibe (Ergebnis in g) liegen im Vorrat in Scheiben, „1 Scheibe gegessen“ */
 export const SLICE_G = 50
+/** Gewicht einer Vorrats-Scheibe dieses Brots (Toast: 25 g, sonst `SLICE_G`) */
+export const sliceG = (y: { slice?: number } | undefined): number => (y?.slice && y.slice > 0 ? y.slice : SLICE_G)
 
 /** Ergebnis eines Back-Rezepts: Menge je Rezept (Blech, Form, Ansatz) */
 export interface BackYield {
@@ -145,6 +152,8 @@ export interface BackYield {
   perPiece?: { kcal: number; protein: number }
   /** Abschnitt im Katalog (Standard Backwaren); Rubs 'vorrat', Saucen 'konserven' */
   cat?: ShopCat
+  /** nur Brot (Ergebnis in g): Gewicht einer Vorrats-Scheibe, Standard `SLICE_G` (50 g); Toast 25 g wie eine gekaufte Toastscheibe */
+  slice?: number
 }
 
 /** Optionen für `backen()` */
@@ -231,6 +240,8 @@ export interface BbqOptions {
    * Nacken/Ribs 0,25–0,3, Hähnchen mit Haut 0,2–0,25, Hack/Speck-Gerichte 0,15–0,25, Fisch 0.
    */
   fatLoss?: number
+  /** Verzehrter Anteil einzelner Zutaten (Lake, Marinade), siehe `RawRecipe.eaten` */
+  eaten?: Record<string, number>
 }
 
 /**
@@ -259,6 +270,7 @@ export function bbq(id: string, title: string, o: BbqOptions, ingredients: strin
     bbq: o.group,
     lighter: o.lighter,
     ...(o.fatLoss ? { fatLoss: Math.min(0.4, Math.max(0, o.fatLoss)) } : {}),
+    ...(o.eaten ? { eaten: o.eaten } : {}),
     ...(l
       ? {
           yields: {
@@ -379,8 +391,8 @@ export function salat(id: string, title: string, o: SalatOptions, ingredients: s
 }
 
 /** Wie ein Ergebnis im Vorrat liegt: Brotlaib (g) in Scheiben, sonst in der eigenen Einheit */
-export function yieldStock(kind: BasicKind | undefined, y: { amount: number; unit: string }): { amount: number; unit: string } {
-  if (kind === 'brot' && y.unit === 'g') return { amount: y.amount / SLICE_G, unit: 'Scheibe' }
+export function yieldStock(kind: BasicKind | undefined, y: { amount: number; unit: string; slice?: number }): { amount: number; unit: string } {
+  if (kind === 'brot' && y.unit === 'g') return { amount: y.amount / sliceG(y), unit: 'Scheibe' }
   return { amount: y.amount, unit: y.unit }
 }
 

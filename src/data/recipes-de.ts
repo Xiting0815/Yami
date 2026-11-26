@@ -4,7 +4,7 @@ import { fest, r } from './define'
 export const recipesDe = [
   // ───────────── Hauptgerichte ─────────────
   r('rinderrouladen', 'Rinderrouladen mit Rotkohl und Klößen', 'de', 'haupt', 150,
-    '2 Stk Rinderroulade | 2 TL Senf mittelscharf | 4 Scheibe Bacon | 2 Stk Gewürzgurke | 2 Stk Zwiebel | 1 Stk Möhre | 100 g Knollensellerie | 1 EL Tomatenmark | 150 ml Rotwein | 300 ml Rinderfond | 2 EL Butterschmalz | 500 g Rotkohl | 1 Stk Apfel | 2 EL Rotweinessig | 1 EL Zucker | 1 Blatt Lorbeerblatt | 2 Stk Nelke | 500 g Kartoffeln mehligkochend | 40 g Speisestärke | Salz | Pfeffer',
+    '2 Stk Rinderroulade | 2 TL Senf mittelscharf | 4 Scheibe Bacon | 2 Stk Gewürzgurke | 2 Stk Zwiebel | 1 Stk Möhre | 100 g Knollensellerie | 1 EL Tomatenmark | 150 ml Rotwein | 300 ml Rinderfond | 2 EL Butterschmalz | 500 g Rotkohl | 1 Stk Apfel | 2 EL Rotweinessig | 1 EL Zucker | 1 Blatt Lorbeerblatt | 2 Stk Nelke | 500 g Kartoffeln mehligkochend | 40 g Speisestärke | Muskatnuss | Salz | Pfeffer',
     [
       'Rouladen flach klopfen, salzen, pfeffern und mit Senf bestreichen. Mit je 2 Scheiben Bacon, einer längs geviertelten Gewürzgurke und einer halben Zwiebel in Streifen belegen, aufrollen und mit Rouladennadeln oder Küchengarn fixieren.',
       'Butterschmalz im Bräter erhitzen, Rouladen rundum kräftig anbraten und herausnehmen. Restliche Zwiebel, Möhre und Sellerie gewürfelt anrösten, Tomatenmark kurz mitrösten, mit Rotwein ablöschen und einkochen lassen.',
@@ -440,7 +440,7 @@ export const recipesDe = [
     ], 'Pannfisch'),
 
   r('gruenkohl', 'Grünkohl mit Kasseler und Pinkel', 'de', 'haupt', 120,
-    '800 g Grünkohl | 2 Stk Zwiebel | 2 EL Schweineschmalz | 2 Stk Pinkelwurst | 300 g Kasseler Nacken | 2 EL Haferflocken | 500 ml Gemüsebrühe | 1 EL Senf mittelscharf | 600 g Kartoffeln festkochend | 1 EL Zucker | Salz | Pfeffer',
+    '800 g Grünkohl | 2 Stk Zwiebel | 2 EL Schweineschmalz | 2 Stk Pinkelwurst | 300 g Kasseler Nacken | 2 EL Haferflocken | 500 ml Gemüsebrühe | 1 EL Senf mittelscharf | 600 g Kartoffeln festkochend | 1 EL Butter | 1 EL Zucker | Salz | Pfeffer',
     [
       'Grünkohl von den Strünken zupfen, waschen, kurz blanchieren und grob hacken.',
       'Zwiebeln im Schmalz andünsten, Grünkohl und Brühe zugeben und 1 Stunde zugedeckt schmoren.',
