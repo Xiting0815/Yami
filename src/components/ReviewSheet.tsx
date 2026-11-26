@@ -115,8 +115,10 @@ export function ReviewSheet({ review: r, canNext, onWeek, onClose }: Props) {
                 ≈ <b>{formatEuro(r.food.waste.euro)}</b> weggeworfen ({r.food.waste.count} Posten)
                 {r.food.waste.top ? `, am meisten: ${r.food.waste.top}` : ''}
               </p>
-            ) : (
+            ) : r.hasData ? (
               <p className="good">Nichts weggeworfen 🎉</p>
+            ) : (
+              <p className="muted">Noch nichts erfasst.</p>
             )}
           </section>
 

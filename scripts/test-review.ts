@@ -4,6 +4,7 @@ import { DEFAULT_PROFILE, type Profile } from '../src/energy'
 import { amountValue, discardWaste, moveExpired, needsOf, type PantryLot } from '../src/kitchen'
 import { buildModel, preference } from '../src/learning'
 import { defaultReviewMonday, weekReview } from '../src/review'
+import { reviewStats } from '../src/components/ReviewCard'
 import { RECIPE_BY_ID, BREAKFASTS } from '../src/data/recipes'
 import { sanitize, weekDays, parseIso, type AppState } from '../src/store'
 import { PRODUCTS } from '../src/data/products'
@@ -88,6 +89,11 @@ ok(preference(m2, high[0]).score === preference(m0, high[0]).score, 'Lernen: and
 // Woche ohne Daten
 const empty = weekReview(sanitize({}), weekDays(parseIso('2026-10-05')), TODAY)
 ok(!empty.hasData && empty.tip.kind === 'empty' && empty.spending.total === 0 && empty.nutrition.days === 0 && empty.food.waste.count === 0, 'Leere Woche → neutral, ohne Fehler')
+{
+  const st = reviewStats(empty)
+  ok(st.waste === '–' && !st.wasteSub.includes('🎉'), 'Leere Woche: kein „0 € weggeworfen 🎉“ (nichts erfasst)')
+  ok(reviewStats(r).waste === '0 €' || r.food.waste.count > 0, 'Woche mit Daten: 0 € weggeworfen wird gezeigt')
+}
 ok(empty.weight.delta === undefined && empty.highlights.rated.length === 0, 'Leere Woche: keine Gewichts-/Bewertungsangaben')
 
 // Standard-Woche für den Link

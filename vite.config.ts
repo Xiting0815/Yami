@@ -28,6 +28,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // neue Version übernimmt nach „Neu laden“ sofort alle offenen Fenster
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,png,webp,jpg,json}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },

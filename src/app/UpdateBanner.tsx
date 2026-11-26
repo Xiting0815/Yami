@@ -14,7 +14,11 @@ export function initServiceWorker() {
   const update = registerSW({
     immediate: true,
     onNeedRefresh() {
-      apply = () => void update(true)
+      apply = () => {
+        void update(true)
+        // Sicherheitsnetz: lädt die Seite nicht von selbst neu (z. B. noch nicht vom Service Worker gesteuert)
+        window.setTimeout(() => window.location.reload(), 3000)
+      }
       listeners.forEach((f) => f())
     },
     onRegisteredSW(_url, reg) {

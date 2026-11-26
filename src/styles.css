@@ -289,7 +289,7 @@ li.done .item-name, li.done .item-amt { text-decoration: line-through; color: va
 .tile { border: none; background: var(--surface); border-radius: 16px; overflow: hidden; padding: 0; text-align: left; box-shadow: var(--shadow-card); display: flex; flex-direction: column; }
 .tile-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
 .tile-text { padding: 8px 10px 10px; }
-.tile-title { font-weight: 700; font-size: 14px; line-height: 1.25; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tile-title { font-weight: 700; font-size: 14px; line-height: 1.25; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
 
 /* ───── Tabbar ───── */
 .tabbar {
@@ -947,7 +947,7 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .share-warn-box { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 8px 0; }
 .sync-notice .notice-text { flex: 1; min-width: 0; }
 .sync-notice .link { min-height: 36px; white-space: nowrap; }
-.sync-x { border: none; background: none; color: var(--muted); min-width: 36px; min-height: 36px; font-size: 14px; }
+.sync-x { border: none; background: none; color: var(--muted); min-width: var(--tap); min-height: var(--tap); font-size: 14px; }
 .sheet.profile .sheet-footer:has(.btn.ghost) { display: flex; gap: 8px; }
 .sheet.profile .sheet-footer:has(.btn.ghost) .btn.ghost { flex-shrink: 0; }
 

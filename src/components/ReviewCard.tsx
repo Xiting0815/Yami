@@ -21,8 +21,9 @@ export function reviewStats(r: WeekReview) {
     kcalSub: r.nutrition.target != null ? `Ø kcal, Ziel ${r.nutrition.target.toLocaleString('de-DE')}` : 'Ø kcal Mo–Fr',
     spend: r.spending.total > 0 ? `≈ ${formatEuro(r.spending.total)}` : '–',
     spendSub: 'Einkauf',
-    waste: r.food.waste.count > 0 ? `≈ ${formatEuro(r.food.waste.euro)}` : '0 €',
-    wasteSub: r.food.waste.count > 0 ? 'weggeworfen' : 'weggeworfen 🎉',
+    // ohne Daten (z. B. erste Woche) nicht „0 € weggeworfen 🎉“ feiern
+    waste: r.food.waste.count > 0 ? `≈ ${formatEuro(r.food.waste.euro)}` : r.hasData ? '0 €' : '–',
+    wasteSub: r.food.waste.count > 0 ? 'weggeworfen' : r.hasData ? 'weggeworfen 🎉' : 'weggeworfen',
   }
 }
 

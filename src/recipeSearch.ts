@@ -32,7 +32,17 @@ function lev(a: string, b: string): number {
   return d[b.length]
 }
 
-const words = (s: string) => norm(s).split(/[^a-z0-9ßäöü]+/).filter((w) => w.length >= 3).map(fold)
+const toWords = (s: string) => norm(s).split(/[^a-z0-9ßäöü]+/).filter((w) => w.length >= 3).map(fold)
+/** Titel und Zutatennamen wiederholen sich bei jedem Tastendruck → zerlegte Wörter merken */
+const wordCache = new Map<string, string[]>()
+const words = (s: string) => {
+  let w = wordCache.get(s)
+  if (!w) {
+    w = toWords(s)
+    if (wordCache.size < 20000) wordCache.set(s, w)
+  }
+  return w
+}
 
 /**
  * Abstand der Suchwörter zum Text: Summe der kleinsten Tippfehler-Abstände je Suchwort
@@ -72,7 +82,7 @@ export function searchRecipes(pool: Recipe[], query: string, similarIngredients:
     else if (r.ingredients.some((i) => norm(i.name).includes(nq))) out.set(r.id, 1)
   }
   if (out.size || nq.length < 3) return out
-  const qw = words(nq)
+  const qw = toWords(nq)
   if (!qw.length) return out
   const names = new Set(similarIngredients())
   for (const r of pool) {
