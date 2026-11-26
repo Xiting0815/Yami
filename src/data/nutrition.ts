@@ -554,7 +554,7 @@ for (const { recipe, name } of EXTRA_YIELDS) {
   const share = y.share ?? 1
   const n = all.map((v) => v * share) as N
   const grams = allG * share
-  const weight = y.unit === 'g' || y.unit === 'ml' ? y.amount : grams * (recipe.kind === 'dessert' ? 1 : 0.9)
+  const weight = y.unit === 'g' || y.unit === 'ml' ? y.amount : grams * (recipe.kind === 'dessert' || recipe.kind === 'salat' ? 1 : 0.9)
   if (!GRAMS[name]) GRAMS[name] = y.unit === 'g' ? (recipe.kind === 'brot' ? { Scheibe: SLICE_G } : {}) : y.unit === 'ml' ? {} : { [y.unit]: weight / y.amount }
   if (!NUTRI[name] && weight > 0) NUTRI[name] = n.map((v) => Math.round((v / weight) * 1000) / 10) as N
 }

@@ -5,8 +5,10 @@ import { DEVICE_STEPS as it } from './it'
 import { DEVICE_STEPS as as } from './as'
 import { DEVICE_STEPS as gr } from './gr'
 import { DEVICE_STEPS as us } from './us'
+import { DEVICE_STEPS as es } from './es'
+import { DEVICE_STEPS as es2 } from './es2'
 import { DEVICE_STEPS as bf } from './bf'
 import { EXTRA_DEVICE_STEPS } from '../extra'
 
-/** Alle Geräte-Schritte: Rezept-ID → Schritte (de, it, as, gr, us = Abendessen; bf = Frühstück; Backen & Desserts aus src/data/extra) */
-export const DEVICE_STEPS: Record<string, DeviceStep[]> = { ...de, ...de2, ...it, ...as, ...gr, ...us, ...bf, ...EXTRA_DEVICE_STEPS }
+/** Alle Geräte-Schritte: Rezept-ID → Schritte (de, it, as, gr, us, es = Abendessen; bf = Frühstück; Backen & Desserts, BBQ, Tapas, Salate aus src/data/extra) */
+export const DEVICE_STEPS: Record<string, DeviceStep[]> = { ...de, ...de2, ...it, ...as, ...gr, ...us, ...es, ...es2, ...bf, ...EXTRA_DEVICE_STEPS }

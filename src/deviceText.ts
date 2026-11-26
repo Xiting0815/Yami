@@ -12,6 +12,8 @@ export const DEVICE_NAME: Record<Device, string> = {
   gasgrill: 'Gasgrill',
   dutch: 'Dutch Oven',
   vakuum: 'Vakuumierer',
+  paella: 'Paellapfanne',
+  plancha: 'Plancha',
 }
 
 /**
@@ -79,7 +81,25 @@ const GASGRILL_SPECS: Record<string, ModeSpec> = {
   'Indirekt': { min: 90, max: 260, minutes: [1, 600] },
 }
 
-const SPECS: Partial<Record<Device, Record<string, ModeSpec>>> = { steamer: STEAMER_SPECS, combair: COMBAIR_SPECS, smoker: SMOKER_SPECS, gasgrill: GASGRILL_SPECS }
+/**
+ * Paellapfanne (docs/geraete/paella-plancha.md): 32 cm auf dem BORA (Brücke), 46 cm auf dem Gasgrill (Deckel offen).
+ * Keine Temperatur – Stufe (BORA) bzw. Flamme + Brenner (Gasgrill); „Ruhen“ = vom Feuer, ohne Stufe.
+ */
+const PAELLA_SPECS: Record<string, ModeSpec> = {
+  'Vorheizen': { noTemp: true, minutes: [1, 15] },
+  'Anbraten': { noTemp: true, minutes: [1, 30] },
+  'Sofrito': { noTemp: true, minutes: [1, 30] },
+  'Köcheln': { noTemp: true, minutes: [1, 40] },
+  'Socarrat': { noTemp: true, minutes: [1, 5] },
+  'Ruhen': { noTemp: true, minutes: [1, 15] },
+}
+/** Plancha/Gusseisen: Oberflächentemperatur optional (Infrarot-Thermometer) */
+const PLANCHA_SPECS: Record<string, ModeSpec> = {
+  'Vorheizen': { min: 150, max: 350, minutes: [1, 20] },
+  'Braten': { min: 150, max: 350, minutes: [1, 30] },
+}
+
+const SPECS: Partial<Record<Device, Record<string, ModeSpec>>> = { steamer: STEAMER_SPECS, combair: COMBAIR_SPECS, smoker: SMOKER_SPECS, gasgrill: GASGRILL_SPECS, paella: PAELLA_SPECS, plancha: PLANCHA_SPECS }
 
 /** erlaubte Betriebsarten je Gerät (Namen wie am Gerät, siehe docs/geraete) */
 export const DEVICE_MODES: Record<Device, string[]> = {
@@ -97,6 +117,10 @@ export const DEVICE_MODES: Record<Device, string[]> = {
   dutch: ['Anbraten', 'Schmoren', 'Köcheln'],
   // Vakuumierer (Modell offen): Marinieren/Einfrieren, Beutel für Vacuisine (CombiSteamer)
   vakuum: ['Vakuumieren', 'Vakuumieren feucht', 'Verschweißen'],
+  // Paellapfanne 32 cm (BORA mit Brücke) / 46 cm (Gasgrill), docs/geraete/paella-plancha.md
+  paella: Object.keys(PAELLA_SPECS),
+  // Plancha/Gusseisenpfanne auf BORA oder Gasgrill
+  plancha: Object.keys(PLANCHA_SPECS),
 }
 
 /** Flamme bei Gasgrill und Dutch Oven (Gas) */
@@ -152,6 +176,16 @@ function mainText(s: DeviceSetting): string {
     return `${DEVICE_NAME[s.device]} · ${parts.join(' · ')}`
   }
   if (s.device === 'vakuum') return `${DEVICE_NAME[s.device]} · ${s.mode}`
+  if (s.device === 'paella' || s.device === 'plancha') {
+    // „Paellapfanne 32 cm · BORA Brücke · Köcheln · Stufe 6 · 10 Min.“, „Plancha · Gasgrill · Braten 280 °C · Brenner alle hoch · 3 Min.“
+    const gas = s.on === 'gasgrill'
+    const head = s.device === 'paella' ? `${DEVICE_NAME.paella}${s.pan ? ` ${s.pan} cm` : ''}` : DEVICE_NAME.plancha
+    parts.push(gas ? 'Gasgrill' : s.device === 'paella' ? 'BORA Brücke' : 'BORA')
+    parts.push(s.temp != null ? `${s.mode} ${s.temp} °C` : s.mode)
+    if (s.level) parts.push(gas ? (s.burners ? `Brenner ${s.burners} ${s.level}` : `Flamme ${s.level}`) : boraLevel(s.level))
+    if (s.minutes != null) parts.push(durationText(s.minutes))
+    return `${head} · ${parts.join(' · ')}`
+  }
   if (s.device === 'gasgrill' || s.device === 'dutch') {
     // „Gasgrill · Indirekt 160 °C · Brenner 1+4 mittel · 90 Min. · Kern 72 °C“, „Dutch Oven · Schmoren · Flamme niedrig · 3 Std.“
     parts.push(s.temp != null ? `${s.mode} ${s.temp} °C` : s.mode)
@@ -199,7 +233,7 @@ export function validateSetting(s: DeviceSetting): string[] {
   // BBQ (Pulled Pork, Brisket) braucht Kern bis 96 °C – Thermometer/Fühler, kein Gerätelimit
   const coreHi = BBQ_DEVICES.includes(s.device) ? 98 : 95
   if (s.core != null && !inRange(s.core, 40, coreHi)) err.push(`Kerntemperatur ${s.core} außerhalb 40–${coreHi}`)
-  if (s.burners != null && s.device !== 'gasgrill') err.push(`${name}: Brenner nur beim Gasgrill`)
+  if (s.burners != null && s.device !== 'gasgrill' && s.on !== 'gasgrill') err.push(`${name}: Brenner nur beim Gasgrill`)
   if (s.humidity != null && !inRange(s.humidity, 0, 100)) err.push(`Feuchte ${s.humidity} außerhalb 0–100`)
   if (s.device === 'steamer' || s.device === 'combair') {
     if (s.humidity != null) err.push(`${name}: Feuchte ist nicht in % einstellbar (nur über die Betriebsart)`)
@@ -240,6 +274,21 @@ export function validateSetting(s: DeviceSetting): string[] {
     if (s.temp != null) err.push('Dutch Oven (Gas): keine Temperatur, nur Flamme (niedrig, mittel, hoch)')
     if (!s.level || !FLAME_LEVELS.includes(s.level)) err.push(`Dutch Oven: Flamme "${s.level}" ungültig (niedrig, mittel, hoch)`)
     if (s.humidity != null) err.push('Dutch Oven: keine Feuchte')
+  } else if (s.device === 'paella' || s.device === 'plancha') {
+    const gas = s.on === 'gasgrill'
+    if (s.device === 'paella') {
+      if (s.pan !== '32' && s.pan !== '46') err.push('Paellapfanne: Größe „32“ oder „46“ angeben (paella() aus device-helpers)')
+      else if (s.on !== (s.pan === '32' ? 'bora' : 'gasgrill')) err.push(`Paellapfanne ${s.pan} cm gehört auf ${s.pan === '32' ? 'den BORA (Brücke)' : 'den Gasgrill'}`)
+      if (s.temp != null) err.push('Paellapfanne: keine Temperatur, nur Stufe bzw. Flamme')
+    } else if (s.on !== 'bora' && s.on !== 'gasgrill') err.push('Plancha: Hitzequelle (on) „bora“ oder „gasgrill“ angeben')
+    else if (spec && s.temp != null && !inRange(s.temp, spec.min!, spec.max!)) err.push(`Plancha ${mode} ${s.temp} °C außerhalb ${spec.min}–${spec.max} (Oberfläche)`)
+    if (s.device === 'paella' && mode === 'Ruhen') {
+      if (s.level != null || s.burners != null) err.push('Paella ruhen: vom Feuer, keine Stufe/Brenner')
+    } else if (gas) {
+      if (!s.level || !FLAME_LEVELS.includes(s.level)) err.push(`${name} auf dem Gasgrill: Flamme "${s.level}" ungültig (niedrig, mittel, hoch)`)
+      if (s.burners != null && !BURNERS_RE.test(s.burners)) err.push(`${name}: Brenner "${s.burners}" ungültig („alle“ oder z. B. „2+3“)`)
+    } else if (!s.level || !BORA_LEVELS.includes(s.level)) err.push(`${name} auf dem BORA: Stufe "${s.level}" ungültig`)
+    if (s.core != null || s.humidity != null) err.push(`${name}: keine Kerntemperatur/Feuchte`)
   } else if (s.device === 'vakuum') {
     if (s.temp != null || s.minutes != null || s.core != null || s.level != null || s.humidity != null) err.push('Vakuumierer: nur Betriebsart (und Notiz)')
   }

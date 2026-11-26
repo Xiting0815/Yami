@@ -14,7 +14,8 @@ import { festiveOf } from './kitchen/insight'
 import { type PantryLot, addDaysIso } from './kitchen/base'
 import { cookBasic } from './kitchen/pantry'
 import type { BakeEntry, BakePlan, BasicKind, PlanEntry, Recipe } from './types'
-import { isBake, isBbq } from './types'
+import { finishable, isBake, isTapa } from './types'
+import { TAPAS_STD } from './data/define'
 
 /** so viele Tage nach dem Backtag wird noch nachgefragt – danach gilt der Eintrag als vergessen (kein Vorrat mehr reserviert) */
 export const BAKE_ASK_DAYS = 14
@@ -65,6 +66,29 @@ export function moveBake(bp: BakePlan, from: string, recipeId: string, to: strin
   return addBake(without, to, recipeId, Math.max(e.amount, there && !there.status ? there.amount : 0))
 }
 
+// ───────────── Tapas-Abend: Portionen je Tapa ─────────────
+
+/** Tapas eines Tages (ohne „nicht gemacht“) – zusammen sind sie der Tapas-Abend */
+export const tapasEntries = (bp: BakePlan, day: string): BakeEntry[] =>
+  bakesOn(bp, day).filter((e) => e.status !== 'skipped' && isTapa(RECIPE_BY_ID[e.recipeId]))
+
+/**
+ * Mengenfaktor je Tapa an einem Tapas-Abend: Rezepte sind ein Teller für 2 als eine von TAPAS_STD (5) Tapas –
+ * bei 4 Tapas wird jede ×1,25 größer, bei 6 ×0,83 kleiner (mindestens 3 Tapas gerechnet). So bleibt der Abend
+ * (Einkauf, kcal) etwa gleich groß, egal wie viele Tapas gewählt sind.
+ */
+export function tapasFactorFor(count: number): number {
+  return Math.round((TAPAS_STD / Math.max(3, count)) * 100) / 100
+}
+export const tapasFactor = (bp: BakePlan, day: string): number => tapasFactorFor(tapasEntries(bp, day).length)
+
+/** Portionen eines Backplan-Eintrags (Rezeptmenge × Basis-Portionen; Tapas mit dem Faktor des Abends) */
+export function entryServings(bp: BakePlan, day: string, e: BakeEntry): number {
+  const r = RECIPE_BY_ID[e.recipeId]
+  if (!r) return 0
+  return e.amount * r.servings * (isTapa(r) ? tapasFactor(bp, day) : 1)
+}
+
 /** als gebacken markieren (Vorrat wurde schon gebucht – kein zweites Abziehen) */
 export function markBaked(bp: BakePlan, day: string, recipeId: string): BakePlan {
   return put(bp, day, bakesOn(bp, day).map((e) => (e.recipeId === recipeId ? { ...e, status: 'baked' as const } : e)))
@@ -81,10 +105,10 @@ export function settleBaked(
 ): { pantry: PantryLot[]; bakePlan: BakePlan; baked: BakedRef[] } | null {
   const recipe = RECIPE_BY_ID[recipeId]
   const e = bakesOn(s.bakePlan, day).find((x) => x.recipeId === recipeId)
-  // BBQ ohne Reste (Burger, Steak) hat kein Ergebnis – dann werden nur die Zutaten abgezogen
-  if (!recipe || !(recipe.yields || isBbq(recipe)) || !e || e.status) return null
+  // BBQ ohne Reste (Burger, Steak) und Tapas haben kein Ergebnis – dann werden nur die Zutaten abgezogen
+  if (!recipe || !finishable(recipe) || !e || e.status) return null
   return {
-    pantry: cookBasic(s.pantry, recipe, e.amount * recipe.servings, day).pantry,
+    pantry: cookBasic(s.pantry, recipe, entryServings(s.bakePlan, day, e), day).pantry,
     bakePlan: markBaked(s.bakePlan, day, recipeId),
     baked: isBake(recipe) ? [...s.baked, { date: day, recipeId }].slice(-200) : s.baked,
   }
@@ -121,7 +145,7 @@ export function bakeEntriesOf(bp: BakePlan, today: string): [string, PlanEntry][
     for (const e of bp[day] ?? []) {
       const r = RECIPE_BY_ID[e.recipeId]
       if (!r || e.status) continue
-      out.push([day, { recipeId: e.recipeId, servings: e.amount * r.servings }])
+      out.push([day, { recipeId: e.recipeId, servings: entryServings(bp, day, e) }])
     }
   }
   return out

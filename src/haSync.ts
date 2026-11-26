@@ -12,7 +12,9 @@ import { forDaysText, formatAmount, isBought, missingPacks, packText, scale } fr
 import { type HaSettings, isoDate, parseIso, weekDays } from './store'
 import type { BuyItem } from './kitchen'
 import type { BakePlan, Recipe, WeekPlan } from './types'
-import { isBbq } from './types'
+import { isBbq, isSalat, isTapa, replacesDinner } from './types'
+import { tapasEntries, tapasFactorFor } from './bakePlan'
+import { shortTitle } from './tapas'
 
 /** Markierung in der Beschreibung: nur Einträge damit gehören Yami */
 export const MARKER = 'Yami'
@@ -362,9 +364,13 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
 }
 
 /**
- * Geplante Abendessen ab heute für die nächsten 7 Tage (heute + 7). Ein BBQ im Backplan ist das Abendessen des Tages
- * (ein Eintrag je Tag, Schlüssel `dinner:<Tag>`): Titel „🍽️ 🔥 …“, Zutaten der Ladung; steht zusätzlich noch ein Abendessen
- * im Plan, wird es in der Beschreibung mitgenannt.
+ * Geplante Abendessen ab heute für die nächsten 7 Tage (heute + 7), ein Termin je Tag (Schlüssel `dinner:<Tag>`):
+ *   – Tapas-Abend (Tapas im Backplan): „🍽️ 🫒 Tapas-Abend: Gambas al ajillo, Tortilla de patatas, …“, Zutaten je Tapa
+ *     (mit der Menge für die Anzahl der Tapas des Abends)
+ *   – Grillabend (BBQ im Backplan, ohne Beilagen): „🍽️ 🔥 …“, Zutaten der Ladung
+ *   – sonst das Abendessen aus dem Plan
+ * Steht zusätzlich noch ein Abendessen im Plan, wird es in der Beschreibung mitgenannt; Salate & Beilagen des Tages
+ * (Zusatz, ersetzen nichts) stehen als „Dazu: …“ in der Beschreibung.
  */
 export function plannedDinners(plan: WeekPlan, today: string, bakePlan: BakePlan = {}): Desired[] {
   const out: Desired[] = []
@@ -372,37 +378,43 @@ export function plannedDinners(plan: WeekPlan, today: string, bakePlan: BakePlan
     const D = addDaysIso(today, i)
     const e = plan[D]
     const r = e && RECIPE_BY_ID[e.recipeId] ? entryRecipe(e) : undefined
-    const bbqs = (bakePlan[D] ?? []).filter((b) => !b.status && isBbq(RECIPE_BY_ID[b.recipeId]))
+    const open = (bakePlan[D] ?? []).filter((b) => !b.status && RECIPE_BY_ID[b.recipeId])
+    const tapas = open.filter((b) => isTapa(RECIPE_BY_ID[b.recipeId]))
+    const bbqs = open.filter((b) => isBbq(RECIPE_BY_ID[b.recipeId]) && replacesDinner(RECIPE_BY_ID[b.recipeId]))
+    const sides = open.filter((b) => isSalat(RECIPE_BY_ID[b.recipeId]) || (isBbq(RECIPE_BY_ID[b.recipeId]) && !replacesDinner(RECIPE_BY_ID[b.recipeId])))
     const dinner = e && r && !e.status ? { e, r } : undefined
-    if (!dinner && !bbqs.length) continue
+    if (!dinner && !bbqs.length && !tapas.length) continue
     const linesOf = (rec: Recipe, base: number, servings: number) =>
       rec.ingredients.map((ing) => {
         const amt = formatAmount(scale(ing, base, servings), ing.unit)
         return `• ${ing.name}${amt ? ` – ${amt}` : ''}`
       })
+    const sideText = sides.length ? `Dazu: ${sides.map((b) => RECIPE_BY_ID[b.recipeId].title).join(', ')}` : ''
+    const sideSig = sides.length ? `|+${sides.map((b) => `${b.recipeId}×${b.amount}`).join(',')}` : ''
+    const event = (summary: string, desc: string[], sig: string) =>
+      out.push({ key: `dinner:${D}`, summary, description: [...desc, ...(sideText ? [sideText] : [])].join('\n\n'), start: stamp(at(D, 18, 30)), end: stamp(at(D, 19, 30)), sig: sig + sideSig })
+    if (tapas.length) {
+      const f = tapasFactorFor(tapasEntries(bakePlan, D).length)
+      const recs = tapas.map((b) => RECIPE_BY_ID[b.recipeId])
+      const desc = recs.map((rec) => `🫒 ${rec.title}\n${linesOf(rec, rec.servings, rec.servings * f).join('\n')}`)
+      if (bbqs.length) desc.push(`Außerdem geplant: ${bbqs.map((b) => RECIPE_BY_ID[b.recipeId].title).join(', ')}`)
+      if (dinner) desc.push(`Außerdem geplant: ${dinner.r.title}`)
+      event(`🍽️ 🫒 Tapas-Abend: ${recs.map((rec) => shortTitle(rec.title)).join(', ')}`, desc, `tapas:${tapas.map((b) => b.recipeId).join(',')}×${f}${dinner ? `|${dinner.e.recipeId}×${dinner.e.servings}` : ''}`)
+      continue
+    }
     if (bbqs.length) {
       const recs = bbqs.map((b) => ({ b, rec: RECIPE_BY_ID[b.recipeId] }))
       const desc = recs.map(({ b, rec }) => `🔥 ${rec.title}${b.amount > 1 ? ` ×${b.amount}` : ''} (ca. ${(rec.portions ?? 2) * b.amount} Portionen)\n${linesOf(rec, rec.servings, b.amount * rec.servings).join('\n')}`)
       if (dinner) desc.push(`Außerdem geplant: ${dinner.r.title}`)
-      out.push({
-        key: `dinner:${D}`,
-        summary: `🍽️ 🔥 ${recs.map(({ rec }) => rec.title).join(' + ')}`,
-        description: desc.join('\n\n'),
-        start: stamp(at(D, 18, 30)),
-        end: stamp(at(D, 19, 30)),
-        sig: `bbq:${bbqs.map((b) => `${b.recipeId}×${b.amount}`).join(',')}${dinner ? `|${dinner.e.recipeId}×${dinner.e.servings}` : ''}`,
-      })
+      event(`🍽️ 🔥 ${recs.map(({ rec }) => rec.title).join(' + ')}`, desc, `bbq:${bbqs.map((b) => `${b.recipeId}×${b.amount}`).join(',')}${dinner ? `|${dinner.e.recipeId}×${dinner.e.servings}` : ''}`)
       continue
     }
     const { e: de, r: dr } = dinner!
-    out.push({
-      key: `dinner:${D}`,
-      summary: `🍽️ ${dr.title}`,
-      description: `${de.servings} ${de.servings === 1 ? 'Portion' : 'Portionen'}\n${linesOf(dr, dr.servings, de.servings).join('\n')}`,
-      start: stamp(at(D, 18, 30)),
-      end: stamp(at(D, 19, 30)),
-      sig: `${de.recipeId}×${de.servings}${de.swap ? `|${swapText(de.swap)}` : ''}`,
-    })
+    event(
+      `🍽️ ${dr.title}`,
+      [`${de.servings} ${de.servings === 1 ? 'Portion' : 'Portionen'}\n${linesOf(dr, dr.servings, de.servings).join('\n')}`],
+      `${de.recipeId}×${de.servings}${de.swap ? `|${swapText(de.swap)}` : ''}`,
+    )
   }
   return out
 }
@@ -426,7 +438,7 @@ export interface DinnerDiff {
   keep?: { key: string; uid: string; sig: string }[]
 }
 
-/** Abendessen-Termine von Yami erkennt man am Titel (auch BBQ „🍽️ 🔥 …“); alles andere im Kalender bleibt unberührt */
+/** Abendessen-Termine von Yami erkennt man am Titel (auch BBQ „🍽️ 🔥 …“ und Tapas-Abend „🍽️ 🫒 …“); alles andere im Kalender bleibt unberührt */
 export const DINNER_MARK = '🍽️'
 /** so viele Tage nach heute plant der Kalender (heute … heute + DINNER_DAYS) */
 export const DINNER_DAYS = 7

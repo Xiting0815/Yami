@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 import { RECIPE_BY_ID } from '../../data/recipes'
 import { pendingBakes, suggestBake } from '../../bakePlan'
-import { BakeAskCard, BakeHintCard, BbqIdeasCard } from '../../components/BakeCards'
+import { BakeAskCard, BakeHintCard, BbqIdeasCard, TapasAskCard } from '../../components/BakeCards'
+import { isTapa } from '../../types'
+import { shortTitle as tapaTitle } from '../../tapas'
 import { bbqIdeas } from '../../bbq'
 import { householdPreference, pendingRating } from '../../learning'
 import { targetKcal } from '../../energy'
@@ -145,8 +147,17 @@ export function WeekTab({ m }: { m: AppModel }) {
       }
       bakes={state.bakePlan}
       onBake={(day, recipeId) => ui.setBakeSheet({ day, recipeId })}
+      onTapas={(day) => ui.setTapasSheet({ day })}
       bakeSlot={
-        pendingBake && askRecipe ? (
+        pendingBake && askRecipe && isTapa(askRecipe) ? (
+          <TapasAskCard
+            day={pendingBake.day}
+            titles={(state.bakePlan[pendingBake.day] ?? []).filter((e) => !e.status && isTapa(RECIPE_BY_ID[e.recipeId])).map((e) => tapaTitle(RECIPE_BY_ID[e.recipeId].title))}
+            onYes={() => act.confirmTapasEvening(pendingBake.day)}
+            onMove={() => ui.setTapasSheet({ day: pendingBake.day, move: true })}
+            onNo={() => act.removeTapas(pendingBake.day)}
+          />
+        ) : pendingBake && askRecipe ? (
           <BakeAskCard
             recipe={askRecipe}
             day={pendingBake.day}

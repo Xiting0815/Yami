@@ -3,7 +3,7 @@ import type { Ingredient, Recipe } from '../types'
 import { formatAmount, scale } from '../shopping'
 import { ingredientsForStep, unmatched } from '../cookSteps'
 import { DeviceChips } from './DeviceChip'
-import { isBake, isBbq } from '../types'
+import { isBake, isBbq, isTapa } from '../types'
 import { shelfText, yieldText } from '../bake'
 
 /** „Fertig gekocht/gebacken/vorbereitet“ am Ende des Kochmodus */
@@ -35,7 +35,7 @@ function keepText(recipe: Recipe): string {
 /** Beschriftung des Fertig-Knopfs: Kuchen/Brot „Fertig gebacken“, Dessert „Fertig“, sonst „Fertig gekocht“ */
 function finishLabel(recipe: Recipe): string {
   if (recipe.kind === 'kuchen' || recipe.kind === 'brot' || recipe.kind === 'gebaeck') return 'Fertig gebacken ✓'
-  if (recipe.kind === 'dessert') return 'Fertig ✓'
+  if (recipe.kind === 'dessert' || recipe.kind === 'tapas' || recipe.kind === 'salat') return 'Fertig ✓'
   if (recipe.kind === 'bbq') return recipe.bbq === 'dutch' ? 'Fertig gekocht ✓' : 'Fertig gegrillt ✓'
   return 'Fertig gekocht ✓'
 }
@@ -127,7 +127,9 @@ export function CookMode({ recipe, servings, finish, onClose }: Props) {
         <div className="cook-title">
           <h2>{recipe.title}</h2>
           <div className="muted small">
-            {isBbq(recipe)
+            {isTapa(recipe)
+              ? `Tapa · Teller für 2${servings > 1 ? ` ×${servings}` : ''}`
+              : isBbq(recipe)
               ? `Rezept ×${servings} · ca. ${(recipe.portions ?? 2) * servings} Portionen${recipe.yields ? ` · Rest ${yieldText(recipe, servings)} vakuumiert` : ''}`
               : isBake(recipe)
               ? `Rezept ×${servings} · ergibt ${yieldText(recipe, servings)}`

@@ -1,4 +1,4 @@
-import type { BasicKind, BasicYield, BbqGroup, BreakfastType, Cuisine, DishType, Festive, Ingredient, ShopCat } from '../types'
+import type { BasicKind, BasicYield, BbqGroup, BreakfastType, Cuisine, DishType, Festive, Ingredient, SalatGroup, ShopCat, TapasGroup, TapasServe } from '../types'
 
 /** Erlaubte Einheiten. Die Reihenfolge ist egal, Schreibweise zählt. */
 export const UNITS = [
@@ -32,6 +32,14 @@ export interface RawRecipe {
   portions?: number
   /** BBQ: Anteil des Fleischfetts, der beim Smoken abtropft (0–0,4; siehe `BbqOptions.fatLoss`) */
   fatLoss?: number
+  /** Tapas: Untergruppe (siehe `tapa()`; Tapas-Grundsaucen: `backen('grundrezept', …, { tapas: 'sauce' })`) */
+  tapas?: TapasGroup
+  /** Tapas: kalt, lauwarm oder heiß servieren (Ablaufplan im Kochmodus „Tapas-Abend“) */
+  serve?: TapasServe
+  /** Tapas: was sich vorher erledigen lässt (Ablaufplan „Vorher“) */
+  ahead?: string
+  /** Salate & Beilagen: Untergruppe (siehe `salat()`) */
+  salat?: SalatGroup
 }
 
 /**
@@ -152,6 +160,8 @@ export interface BackOptions {
   festive?: Festive[]
   /** nur Rubs & Saucen für die BBQ-Sparte: `'rub'` (erscheint dann auch im BBQ-Bereich unter „Rubs & Saucen“) */
   bbq?: BbqGroup
+  /** nur Tapas-Grundsaucen (Alioli, Salsa brava, Romesco, Mojo): `'sauce'` (erscheint dann im Tapas-Bereich unter „Saucen“) */
+  tapas?: 'sauce'
 }
 
 /**
@@ -177,6 +187,7 @@ export function backen(kind: BasicKind, id: string, title: string, o: BackOption
     lighter: o.lighter,
     ...(o.festive ? { festive: o.festive } : {}),
     ...(o.bbq ? { bbq: o.bbq } : {}),
+    ...(o.tapas ? { tapas: o.tapas } : {}),
   }
 }
 
@@ -263,6 +274,107 @@ export function bbq(id: string, title: string, o: BbqOptions, ingredients: strin
           },
         }
       : {}),
+  }
+}
+
+// ───────────── Tapas (src/data/extra/tapas/) ─────────────
+
+/**
+ * Tapas-Standard: Zutaten einer Tapa sind EIN Teller für 2 Personen, wenn der Abend aus so vielen Tapas besteht.
+ * Bei weniger Tapas wird jede größer, bei mehr kleiner (Faktor = TAPAS_STD ÷ Anzahl, siehe `tapasFactor` in src/bakePlan.ts).
+ */
+export const TAPAS_STD = 5
+
+/** Optionen für `tapa()` */
+export interface TapaOptions {
+  /** Untergruppe: fisch (Fisch & Meeresfrüchte) | fleisch (Fleisch & Wurst) | gemuese | ei (Ei & Kartoffel) | brot (Brot & Dips) */
+  group: Exclude<TapasGroup, 'sauce'>
+  /** Gesamtzeit in Minuten (ohne Ziehzeit über Nacht, die steht in `ahead`) */
+  time: number
+  /** wann sie auf den Tisch kommt: kalt (vorher fertig), lauwarm (Tortilla), heiß (Gambas – ganz zuletzt) */
+  serve: TapasServe
+  /** was sich vorher erledigen lässt, ein kurzer Satz (Ablaufplan „Vorher“), z. B. „Pulpo am Vortag kochen“ */
+  ahead?: string
+  /** Küche (Bildsuche/Info), Standard 'es' */
+  cuisine?: Cuisine
+  /** „💡 Leichter:“-Tipp (optional) */
+  lighter?: string
+}
+
+/**
+ * Tapa (spanische kleine Portion): Zutaten = ein Teller für 2 Personen als eine von ca. 5 Tapas eines Abends (TAPAS_STD).
+ * Nie im Wischstapel und nie allein eingeplant: Im Rezepte-Tab „🫒 Tapas“ 4–6 auswählen → „Tapas-Abend“ auf einen Tag
+ * (ersetzt das Abendessen). Nährwerte = je Person (Teller ÷ 2). Kein Ergebnis im Vorrat (Reste isst man am Abend).
+ *
+ *   tapa('gambas-al-ajillo', 'Gambas al ajillo', { group: 'fisch', time: 15, serve: 'heiss' },
+ *     '200 g Garnelen roh TK | 4 Zehe Knoblauch | …', ['Schritt 1 …', 'Schritt 2 …', 'Schritt 3 …'])
+ */
+export function tapa(id: string, title: string, o: TapaOptions, ingredients: string, steps: string[]): RawRecipe {
+  return {
+    id,
+    title,
+    cuisine: o.cuisine ?? 'es',
+    type: 'haupt',
+    time: o.time,
+    ingredients: splitIngredients(ingredients),
+    steps,
+    servings: 1,
+    portions: 2,
+    basic: true,
+    kind: 'tapas',
+    tapas: o.group,
+    serve: o.serve,
+    ...(o.ahead ? { ahead: o.ahead } : {}),
+    lighter: o.lighter,
+  }
+}
+
+// ───────────── Salate & Beilagen (src/data/extra/salate/) ─────────────
+
+/** Optionen für `salat()` */
+export interface SalatOptions {
+  /** Untergruppe: nudel | kartoffel | reis | bohnen | gemuese */
+  group: SalatGroup
+  /** Küche (Info/Bildsuche): de, it, es, gr, us … – die Kategorie gilt für alle Küchen */
+  cuisine: Cuisine
+  /** Gesamtzeit in Minuten inkl. Durchziehen */
+  time: number
+  /** Beilagen-Portionen je Rezept (Grillabend/Gäste: meist 4–6) */
+  portions: number
+  /** Name im Vorrat, z. B. „Nudelsalat (selbstgemacht)“ – eindeutig; Katalog/Produkt/Nährwerte entstehen automatisch */
+  name: string
+  /** Tage haltbar im Kühlschrank (Mayo/Ei 2, Essig-Öl 3–4) */
+  shelf: number
+  /** Lagerung, Standard „im Kühlschrank (Dose mit Deckel)“ */
+  store?: string
+  /** „💡 Leichter:“-Tipp, ein Satz (Pflicht) */
+  lighter: string
+}
+
+/**
+ * Salat/Beilage für alle Küchen (Nudelsalat, Kartoffelsalat, Ensaladilla rusa …): Mengen für 1 Rezept = `portions` Portionen.
+ * Nicht im Wischstapel; frei „Einplanen für“ einen Tag als ZUSATZ zum Abendessen (Grillabend, Gäste, Mitbringsel).
+ * „Fertig“ zieht die Zutaten ab und legt alle Portionen in den Vorrat (Kühlschrank, `shelf` Tage) – dort „1 Portion gegessen“.
+ *
+ *   salat('nudelsalat-klassisch', 'Nudelsalat klassisch', { group: 'nudel', cuisine: 'de', time: 40, portions: 6,
+ *     name: 'Nudelsalat (selbstgemacht)', shelf: 2, lighter: '…' }, '250 g Fusilli | …', ['Schritt 1 …', '…', '…'])
+ */
+export function salat(id: string, title: string, o: SalatOptions, ingredients: string, steps: string[]): RawRecipe {
+  return {
+    id,
+    title,
+    cuisine: o.cuisine,
+    type: 'haupt',
+    time: o.time,
+    ingredients: splitIngredients(ingredients),
+    steps,
+    servings: 1,
+    portions: o.portions,
+    basic: true,
+    kind: 'salat',
+    salat: o.group,
+    lighter: o.lighter,
+    yields: { name: o.name, amount: o.portions, unit: 'Portion', shelf: o.shelf, store: o.store ?? 'im Kühlschrank (Dose mit Deckel)', cat: 'molkerei' },
   }
 }
 

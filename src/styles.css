@@ -1019,3 +1019,54 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .bbq-ideas .notice-text .link { padding: 0; }
 .day-empty.bbq-day { border-style: solid; color: var(--text); }
 .day-empty.bbq-day small { color: var(--muted); }
+
+/* ───── Rezepte: sechs Bereiche (Frühstück, Abendessen, Backen, BBQ, Tapas, Salate) in 2 Reihen ───── */
+.segmented.six { grid-template-columns: repeat(3, 1fr); row-gap: 3px; }
+.segmented.six button { padding: 5px 2px; min-height: 38px; font-size: 13.5px; line-height: 1.15; }
+
+/* ───── Tapas: Mehrfachauswahl für den Tapas-Abend ───── */
+.tapa-tile { position: relative; }
+.tapa-tile .tile-open { border: none; background: none; padding: 0; text-align: left; color: inherit; display: flex; flex-direction: column; width: 100%; }
+.tapa-tile.picked { box-shadow: 0 0 0 2.5px var(--accent), var(--shadow-card); }
+.tapa-pick {
+  position: absolute; top: 8px; right: 8px; min-width: var(--tap); height: var(--tap); padding: 0 10px; border-radius: 999px;
+  border: 2px solid #fff; background: rgba(20, 10, 5, .55); color: #fff; font-weight: 800; font-size: 16px;
+}
+.tapa-tile.picked .tapa-pick { background: var(--accent); color: var(--accent-ink); }
+.tapas-bar {
+  position: sticky; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 8px); z-index: 5; margin: 12px 0 0;
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 16px; background: var(--surface); box-shadow: 0 4px 18px rgba(0,0,0,.18);
+}
+.tapas-bar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.tapas-bar-text small { color: var(--muted); font-size: 12px; }
+.tapas-bar .btn { padding: 10px 12px; }
+.tapas-ideas { background: var(--accent-soft); border-radius: 14px; padding: 8px 12px; margin: 0 0 10px; }
+.tapas-ideas h3 { margin: 4px 0 4px; font-size: 15px; }
+.tapas-idea { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.tapas-idea:first-of-type { border-top: none; }
+.tapas-idea-text { flex: 1; min-width: 0; line-height: 1.3; }
+.tapas-idea-why { display: block; margin-top: 2px; }
+.tapas-idea .btn { padding: 8px 10px; flex: none; }
+.tapas-head-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; font-size: 24px; flex: none; }
+.tapas-pick-list { list-style: none; margin: 0 0 6px; padding: 0; }
+.tapas-pick-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding: 2px 0 2px 4px; font-size: 15px; }
+.tapas-plan .bake-plan-head { margin-top: 6px; }
+.act-row .tapas-thumb { width: 36px; height: 36px; border-radius: 8px; flex: none; object-fit: cover; }
+.act-row .tapas-thumb.img-fallback span { font-size: 18px; }
+.bake-word.link-word { border: none; background: none; padding: 5px 0; min-height: 28px; font-size: 13px; color: var(--muted); text-decoration: underline dotted; }
+.day-empty.tapas-day { color: var(--text); }
+
+/* Kochmodus „Tapas-Abend“: Ablaufplan */
+.tapas-phase h3 { margin: 0; font-size: 17px; }
+.tapas-phase > p { margin: 2px 0 8px; }
+.tapas-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.tapas-ahead { background: var(--surface); border-radius: 12px; padding: 10px 12px; font-size: 15px; line-height: 1.4; }
+.tapas-ahead .link { min-height: 0; padding: 0; display: inline; }
+.tapas-item { background: var(--surface); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow-card); }
+.tapas-item.done { opacity: .8; }
+.tapas-item-head { border: none; background: none; padding: 0; text-align: left; color: inherit; display: flex; flex-direction: column; gap: 2px; min-height: var(--tap); justify-content: center; }
+.tapas-item-title { font-weight: 700; font-size: 17px; line-height: 1.25; }
+.tapas-item-body .steps { margin: 8px 0 0; padding-left: 20px; }
+.tapas-item-body .steps li { margin-bottom: 8px; line-height: 1.45; }
+.tapas-done { align-self: flex-start; min-height: 44px; }
+.tapas-rate { margin: 0; }

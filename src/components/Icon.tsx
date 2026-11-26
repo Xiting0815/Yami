@@ -32,6 +32,8 @@ const PATHS = {
   dutch: <><path d="M4.5 10.5h15v5.5a4 4 0 0 1-4 4h-7a4 4 0 0 1-4-4zM3 10.5h18M7 10.5a5 3 0 0 1 10 0M12 6V4.5M2.5 13h2M19.5 13h2" /></>,
   vakuum: <><rect x="4" y="5" width="16" height="7" rx="2" /><path d="M7 12v6.5a1.5 1.5 0 0 0 1.5 1.5h7a1.5 1.5 0 0 0 1.5-1.5V12M7 8.5h10M10.5 15.5h3" /></>,
   trend: <path d="M4 16.5l5-5 4 4 7-7M15 8.5h5v5" />,
+  paella: <><ellipse cx="12" cy="13" rx="8.5" ry="4.5" /><path d="M3.5 13h-2M22.5 13h-2M8 12.5h.1M12 11.5h.1M15.5 13h.1M10.5 14.5h.1" /></>,
+  plancha: <><rect x="3" y="9" width="18" height="7" rx="1.5" /><path d="M6 12.5h12M7 16v3M17 16v3M9 6.5c-1-1 1-1.6 0-2.6M15 6.5c-1-1 1-1.6 0-2.6" /></>,
 } as const
 
 export type IconName = keyof typeof PATHS

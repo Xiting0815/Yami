@@ -1,8 +1,9 @@
 /**
- * Backen & Desserts und BBQ: Daten der Schreib-Gruppen zusammenführen. Jede Gruppe bearbeitet nur ihre eigene Datei
- * (desserts.ts, kuchen.ts, brot.ts, gebaeck.ts, bbq/*.ts); die Registries in src/data lesen die zusammengeführten Werte von hier.
+ * Backen & Desserts, BBQ, Tapas und Salate: Daten der Schreib-Gruppen zusammenführen. Jede Gruppe bearbeitet nur ihre eigene Datei
+ * (desserts.ts, kuchen.ts, brot.ts, gebaeck.ts, desserts-es.ts, bbq/*.ts, tapas/*.ts, salate/*.ts); die Registries in src/data lesen die zusammengeführten Werte von hier.
  * Dazu kommen Zutaten-Gruppen ohne eigene Rezepte hier (`EXTRA_INGREDIENT_GROUPS`, z. B. die neuen Zutaten der Küche
- * „Amerikanisch“ aus src/data/recipes-us.ts).
+ * „Amerikanisch“ aus src/data/recipes-us.ts, „Spanisch“ aus recipes-es.ts/recipes-es2.ts und die gemeinsamen Spanien-Zutaten
+ * zutaten-es.ts).
  * Diese Datei importiert nur Daten (keine Registries) – so gibt es keine Import-Zyklen.
  */
 import type { DeviceStep, ShopCat } from '../../types'
@@ -13,14 +14,20 @@ import { kuchen } from './kuchen'
 import { brot } from './brot'
 import { gebaeck } from './gebaeck'
 import { BBQ_GROUPS } from './bbq'
+import { TAPAS_GROUPS } from './tapas'
+import { SALAT_GROUPS } from './salate'
+import { dessertsEs } from './desserts-es'
+import { zutatenEs } from './zutaten-es'
 import { usZutaten } from '../recipes-us'
+import { esZutaten } from '../recipes-es'
+import { es2Zutaten } from '../recipes-es2'
 
 export type { ExtraGroup, ExtraIngredients } from './types'
 
 /** Gruppen mit Rezepten (Schlüssel = Dateiname für Meldungen von check-data; BBQ: „bbq/…“) */
-export const EXTRA_GROUPS: Record<string, ExtraGroup> = { desserts, kuchen, brot, gebaeck, ...BBQ_GROUPS }
+export const EXTRA_GROUPS: Record<string, ExtraGroup> = { desserts, kuchen, brot, gebaeck, 'desserts-es': dessertsEs, ...BBQ_GROUPS, ...TAPAS_GROUPS, ...SALAT_GROUPS }
 /** Gruppen nur mit neuen Zutaten (Rezepte liegen woanders, z. B. Küche „Amerikanisch“ in src/data/recipes-us.ts) */
-export const EXTRA_INGREDIENT_GROUPS: Record<string, ExtraIngredients> = { 'recipes-us': usZutaten }
+export const EXTRA_INGREDIENT_GROUPS: Record<string, ExtraIngredients> = { 'zutaten-es': zutatenEs, 'recipes-us': usZutaten, 'recipes-es': esZutaten, 'recipes-es2': es2Zutaten }
 const recipeGroups = Object.values(EXTRA_GROUPS)
 const groups: ExtraIngredients[] = [...recipeGroups, ...Object.values(EXTRA_INGREDIENT_GROUPS)]
 

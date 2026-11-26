@@ -7,6 +7,8 @@ import { recipesIt } from './recipes-it'
 import { recipesAs } from './recipes-as'
 import { recipesGr } from './recipes-gr'
 import { recipesUs } from './recipes-us'
+import { recipesEs } from './recipes-es'
+import { recipesEs2 } from './recipes-es2'
 import { breakfasts } from './breakfasts'
 import { basicsDe } from './recipes-basic'
 import { nutritionOf } from './nutrition-calc'
@@ -18,10 +20,10 @@ import imageMap from './images.json'
 const images = imageMap as unknown as Record<string, { file: string } | null | undefined>
 
 /** Abendessen (Rohdaten) */
-export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs, ...recipesGr, ...recipesUs]
+export const RAW_RECIPES = [...recipesDe, ...recipesIt, ...recipesAs, ...recipesGr, ...recipesUs, ...recipesEs, ...recipesEs2]
 /** Frühstücke (Rohdaten) */
 export const RAW_BREAKFASTS = breakfasts
-/** Grundrezepte, Backen & Desserts und BBQ (Rohdaten) – Fonds, Anstellgut, Kuchen, Brot, Pulled Pork …, keine Abendessen */
+/** Grundrezepte, Backen & Desserts, BBQ, Tapas und Salate (Rohdaten) – Fonds, Kuchen, Pulled Pork, Gambas, Nudelsalat …, keine Abendessen */
 export const RAW_BASICS: RawRecipe[] = [...basicsDe, ...EXTRA_RECIPES]
 
 function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
@@ -45,11 +47,15 @@ function build(r: RawRecipe, meal: Recipe['meal']): Recipe {
     vegetarian: !r.ingredients.some((i) => CATALOG[i.name] === 'fleisch' || NON_VEG.has(i.name)),
     image: images[r.id]?.file,
     festive: r.festive,
-    // BBQ: Zutaten für die ganze Ladung → Nährwerte je Portion der Ladung
+    // BBQ: Zutaten für die ganze Ladung → Nährwerte je Portion der Ladung (Tapas: je Person, Salate: je Portion)
     nutrition: nutritionOf(r.ingredients, r.portions ?? servings, r.fatLoss),
     ...(r.basic ? { basic: true as const, yields: withPerPiece(r), kind: r.kind ?? 'grundrezept', lighter: r.lighter } : {}),
     ...(r.bbq ? { bbq: r.bbq } : {}),
     ...(r.portions ? { portions: r.portions } : {}),
+    ...(r.tapas ? { tapas: r.tapas } : {}),
+    ...(r.serve ? { serve: r.serve } : {}),
+    ...(r.ahead ? { ahead: r.ahead } : {}),
+    ...(r.salat ? { salat: r.salat } : {}),
   }
 }
 

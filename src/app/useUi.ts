@@ -42,6 +42,14 @@ export function useUi(days: string[], weekKey: string) {
   const [rateBf, setRateBf] = useState<{ recipeId: string; date: string } | null>(null)
   /** Backen-Aktionen (Antippen in der Wochenansicht): Tag + Rezept, `move` = gleich den Tag zum Verschieben wählen */
   const [bakeSheet, setBakeSheet] = useState<{ day: string; recipeId: string; move?: boolean } | null>(null)
+  /** Tapas-Auswahl im Rezepte-Tab (Mehrfachauswahl für den Tapas-Abend, bleibt beim Öffnen eines Rezepts erhalten) */
+  const [tapasPick, setTapasPick] = useState<string[]>([])
+  /** Sheet „Tapas-Abend einplanen“ (Tag wählen) */
+  const [tapasPlanOpen, setTapasPlanOpen] = useState(false)
+  /** Kochmodus „Tapas-Abend“: Tag des Abends (null = zu) */
+  const [tapasDay, setTapasDay] = useState<string | null>(null)
+  /** Aktionen zum Tapas-Abend (Antippen in der Wochenansicht): Tag, `move` = gleich den Tag zum Verschieben wählen */
+  const [tapasSheet, setTapasSheet] = useState<{ day: string; move?: boolean } | null>(null)
   const [pantryChooser, setPantryChooser] = useState(false)
   const [pantryMode, setPantryMode] = useState(false)
 
@@ -68,6 +76,9 @@ export function useUi(days: string[], weekKey: string) {
     [rateBake !== null, () => setRateBake(null)],
     [rateBf !== null, () => setRateBf(null)],
     [!!bakeSheet, () => setBakeSheet(null)],
+    [tapasPlanOpen, () => setTapasPlanOpen(false)],
+    [!!tapasSheet, () => setTapasSheet(null)],
+    [tapasDay !== null, () => setTapasDay(null)],
   ]
   const open = layers.filter(([on]) => on)
   useBackStack(open.length, (target) => open.slice(target).forEach(([, close]) => close()))
@@ -93,6 +104,10 @@ export function useUi(days: string[], weekKey: string) {
     rateBake, setRateBake,
     rateBf, setRateBf,
     bakeSheet, setBakeSheet,
+    tapasPick, setTapasPick,
+    tapasPlanOpen, setTapasPlanOpen,
+    tapasDay, setTapasDay,
+    tapasSheet, setTapasSheet,
     pantryMode, setPantryMode,
   }
 }

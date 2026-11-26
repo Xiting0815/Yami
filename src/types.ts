@@ -1,4 +1,4 @@
-export type Cuisine = 'de' | 'it' | 'as' | 'gr' | 'us'
+export type Cuisine = 'de' | 'it' | 'as' | 'gr' | 'us' | 'es'
 /** Festtags-Fenster: Martinsgans-Zeit (1.–15. Nov.) und Weihnachtszeit (15. Nov.–31. Dez.) */
 export type Festive = 'martini' | 'weihnachten' | 'plaetzchen'
 export type DishType = 'haupt' | 'pasta' | 'eintopf' | 'suppe' | 'auflauf' | 'brotzeit'
@@ -40,7 +40,9 @@ export const SHOP_ICON: Record<ShopSection, string> = {
 /** Kategorien, die eine neue Zutat haben darf (ohne den abgeleiteten Abschnitt „Nudeln & Mehl“) */
 export const INGREDIENT_CATS = SHOP_ORDER.filter((c): c is ShopCat => c !== 'nudeln')
 
-export const CUISINE_LABEL: Record<Cuisine, string> = { de: 'Deutsch', it: 'Italienisch', as: 'Asiatisch', gr: 'Griechisch', us: 'Amerikanisch' }
+export const CUISINE_LABEL: Record<Cuisine, string> = { de: 'Deutsch', it: 'Italienisch', as: 'Asiatisch', gr: 'Griechisch', us: 'Amerikanisch', es: 'Spanisch' }
+/** Symbol je Küche (Filter, Editor) */
+export const CUISINE_ICON: Record<Cuisine, string> = { de: '🥨', it: '🇮🇹', as: '🥢', gr: '🇬🇷', us: '🇺🇸', es: '🇪🇸' }
 export const TYPE_LABEL: Record<DishType, string> = {
   haupt: 'Hauptgericht',
   pasta: 'Pasta',
@@ -71,29 +73,59 @@ export interface Nutrition {
 }
 
 /**
- * Art eines Rezepts außerhalb der Abendessen: Grundrezept (Fond, Anstellgut …) oder „Backen & Desserts“.
- * Alle diese Rezepte haben `basic: true` – sie sind nie im Wischstapel, nie planbar und zählen nicht für Abwechslung,
- * Veggie-Quote oder Abendessen-Geschmack. „Fertig gekocht/gebacken“ legt `yields` in den Vorrat.
+ * Art eines Rezepts außerhalb der Abendessen: Grundrezept (Fond, Anstellgut …), „Backen & Desserts“, BBQ, Tapas oder
+ * „Salate & Beilagen“. Alle diese Rezepte haben `basic: true` – sie sind nie im Wischstapel und zählen nicht für
+ * Abwechslung, Veggie-Quote oder Abendessen-Geschmack. Eingeplant wird über den Backplan; „Fertig …“ legt `yields` in den Vorrat.
  */
-export type BasicKind = 'grundrezept' | 'dessert' | 'kuchen' | 'brot' | 'gebaeck' | 'bbq'
+export type BasicKind = 'grundrezept' | 'dessert' | 'kuchen' | 'brot' | 'gebaeck' | 'bbq' | 'tapas' | 'salat'
 
-export const KIND_LABEL: Record<BasicKind, string> = { grundrezept: 'Grundrezepte', dessert: 'Desserts', kuchen: 'Kuchen', brot: 'Brot & Brötchen', gebaeck: 'Plätzchen & Cookies', bbq: 'BBQ & Grillen' }
-export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', dessert: '🍮', kuchen: '🍰', brot: '🍞', gebaeck: '🍪', bbq: '🔥' }
+export const KIND_LABEL: Record<BasicKind, string> = {
+  grundrezept: 'Grundrezepte', dessert: 'Desserts', kuchen: 'Kuchen', brot: 'Brot & Brötchen', gebaeck: 'Plätzchen & Cookies', bbq: 'BBQ & Grillen',
+  tapas: 'Tapas', salat: 'Salate & Beilagen',
+}
+export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', dessert: '🍮', kuchen: '🍰', brot: '🍞', gebaeck: '🍪', bbq: '🔥', tapas: '🫒', salat: '🥗' }
 
 /**
- * Alles außer Grundrezepten (Backen & Desserts und BBQ): wird über den Backplan eingeplant, „Fertig …“ zählt fürs Lernen
- * (gebacken/gegrillt + „Wie war’s?“). Stücke von Gebackenem zählen beim Essen in die Tagesbilanz (BBQ-Reste nicht, siehe `isBbq`).
+ * Alles außer Grundrezepten (Backen & Desserts, BBQ, Tapas, Salate): wird über den Backplan eingeplant, „Fertig …“ zählt
+ * fürs Lernen (gebacken/gegrillt/gemacht + „Wie war’s?“). Stücke von Gebackenem und Salat-Portionen zählen beim Essen in die
+ * Tagesbilanz (BBQ-Reste nicht, siehe `isBbq`).
  */
 export const isBake = (r: { kind?: BasicKind } | undefined): boolean => !!r?.kind && r.kind !== 'grundrezept'
 /** BBQ-Sparte (Smoker, Grill, Dutch Oven, Burger, Beilagen): eigener Bereich, nie im Wischstapel, frei einplanbar */
 export const isBbq = (r: { kind?: BasicKind } | undefined): boolean => r?.kind === 'bbq'
-/** Backen & Desserts im engeren Sinn (ohne BBQ) – Backen-Liste, Backvorschläge, „1 gegessen“ */
-export const isBakery = (r: { kind?: BasicKind } | undefined): boolean => isBake(r) && !isBbq(r)
+/** Tapas (kleine Portionen, nur zusammen als „Tapas-Abend“ geplant, siehe src/tapas.ts) */
+export const isTapa = (r: { kind?: BasicKind } | undefined): boolean => r?.kind === 'tapas'
+/** „Salate & Beilagen“ (Nudel-, Kartoffel-, Reissalat …): Zusatz zum Abendessen, Reste kommen in den Vorrat */
+export const isSalat = (r: { kind?: BasicKind } | undefined): boolean => r?.kind === 'salat'
+/** Backen & Desserts im engeren Sinn (ohne BBQ, Tapas, Salate) – Backen-Liste, Backvorschläge */
+export const isBakery = (r: { kind?: BasicKind } | undefined): boolean =>
+  r?.kind === 'dessert' || r?.kind === 'kuchen' || r?.kind === 'brot' || r?.kind === 'gebaeck'
+/** Ergibt Portionen/Stücke für den Vorrat, von denen man „1 gegessen“ tippt (Backen & Desserts, Salate) */
+export const isStockDish = (r: { kind?: BasicKind } | undefined): boolean => isBakery(r) || isSalat(r)
+/** Ersetzt das Abendessen des Tages (Grillabend, Tapas-Abend): BBQ ohne die Beilagen und Tapas. Beilagen und Salate sind Zusatz. */
+export const replacesDinner = (r: { kind?: BasicKind; bbq?: BbqGroup } | undefined): boolean => (isBbq(r) && r!.bbq !== 'beilage') || isTapa(r)
+/** „Fertig …“ ist möglich: Ergebnis für den Vorrat oder ein Gericht, das nur Zutaten abzieht (BBQ, Tapas) */
+export const finishable = (r: { basic?: true; yields?: unknown; kind?: BasicKind } | undefined): boolean => !!r?.basic && (!!r.yields || isBbq(r) || isTapa(r))
 
 /** Untergruppe in der BBQ-Sparte (Chips im Rezepte-Tab, Lernen) – `rub` = Rubs & Saucen (Grundrezepte) */
 export type BbqGroup = 'smoker' | 'grill' | 'dutch' | 'burger' | 'beilage' | 'rub'
 export const BBQ_GROUP_LABEL: Record<BbqGroup, string> = { smoker: 'Smoker', grill: 'Grill', dutch: 'Dutch Oven', burger: 'Burger', beilage: 'Beilagen', rub: 'Rubs & Saucen' }
 export const BBQ_GROUP_ICON: Record<BbqGroup, string> = { smoker: '💨', grill: '🔥', dutch: '🍲', burger: '🍔', beilage: '🥗', rub: '🫙' }
+
+/**
+ * Untergruppe der Tapas (Chips, Lernen, „Tapas-Abend-Ideen“: je eine aus Fisch, Fleisch, Gemüse, Ei/Kartoffel, Brot/Dip) –
+ * `sauce` = Tapas-Grundsaucen (Alioli, Salsa brava, Romesco, Mojo …), das sind Grundrezepte.
+ */
+export type TapasGroup = 'fisch' | 'fleisch' | 'gemuese' | 'ei' | 'brot' | 'sauce'
+export const TAPAS_GROUP_LABEL: Record<TapasGroup, string> = { fisch: 'Fisch & Meeresfrüchte', fleisch: 'Fleisch & Wurst', gemuese: 'Gemüse', ei: 'Ei & Kartoffel', brot: 'Brot & Dips', sauce: 'Saucen' }
+export const TAPAS_GROUP_ICON: Record<TapasGroup, string> = { fisch: '🦐', fleisch: '🥓', gemuese: '🫑', ei: '🥚', brot: '🥖', sauce: '🫙' }
+/** Wann eine Tapa auf den Tisch kommt – ordnet den gemeinsamen Ablaufplan im Kochmodus „Tapas-Abend“ */
+export type TapasServe = 'kalt' | 'lauwarm' | 'heiss'
+
+/** Untergruppe „Salate & Beilagen“ (Chips, Lernen) */
+export type SalatGroup = 'nudel' | 'kartoffel' | 'reis' | 'bohnen' | 'gemuese'
+export const SALAT_GROUP_LABEL: Record<SalatGroup, string> = { nudel: 'Nudelsalate', kartoffel: 'Kartoffelsalate', reis: 'Reis & Getreide', bohnen: 'Bohnen & Linsen', gemuese: 'Gemüse & Blatt' }
+export const SALAT_GROUP_ICON: Record<SalatGroup, string> = { nudel: '🍝', kartoffel: '🥔', reis: '🍚', bohnen: '🫘', gemuese: '🥗' }
 
 /** Was ein Ansatz/Blech ergibt – kommt beim „Fertig gekocht/gebacken“ als Posten in den Vorrat */
 export interface BasicYield {
@@ -168,12 +200,20 @@ export interface Recipe {
   lighter?: string
   /** BBQ-Sparte: Untergruppe (auch bei Rubs & Saucen, die Grundrezepte sind) */
   bbq?: BbqGroup
-  /** BBQ: Portionen der ganzen Ladung (`nutrition` gilt dann je Portion, `servings` = 1 Ladung) */
+  /** BBQ: Portionen der ganzen Ladung (`nutrition` gilt dann je Portion, `servings` = 1 Ladung); Tapas: 2 (Teller für 2); Salate: Portionen */
   portions?: number
+  /** Tapas: Untergruppe (auch bei den Tapas-Grundsaucen `sauce`) */
+  tapas?: TapasGroup
+  /** Tapas: kalt, lauwarm oder heiß servieren (Ablaufplan Tapas-Abend) */
+  serve?: TapasServe
+  /** Tapas: was sich vorher erledigen lässt (Ablaufplan „Vorher“), z. B. „Marinade am Vortag ansetzen“ */
+  ahead?: string
+  /** Salate & Beilagen: Untergruppe */
+  salat?: SalatGroup
 }
 
 /** Küchengeräte im Haushalt */
-export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer' | 'kneter' | 'pizzaofen' | 'smoker' | 'gasgrill' | 'dutch' | 'vakuum'
+export type Device = 'steamer' | 'combair' | 'bora' | 'airfryer' | 'kneter' | 'pizzaofen' | 'smoker' | 'gasgrill' | 'dutch' | 'vakuum' | 'paella' | 'plancha'
 
 /** Eine Geräte-Einstellung zu einem Rezeptschritt */
 export interface DeviceSetting {
@@ -196,8 +236,12 @@ export interface DeviceSetting {
   humidity?: number
   /** Kerntemperatur °C (Fühler/Thermometer) */
   core?: number
-  /** nur Gasgrill: welche der 4 Brenner an sind, z. B. „alle“, „1+4“, „1+2“ (Brenner 1 = links) */
+  /** Gasgrill (auch Paellapfanne 46 cm und Plancha auf dem Gasgrill): welche der 4 Brenner an sind, z. B. „alle“, „1+4“ (Brenner 1 = links) */
   burners?: string
+  /** nur Paellapfanne: Größe „32“ (BORA mit Brücke, 2–3 Portionen) oder „46“ (Gasgrill, 6+ Portionen), siehe docs/geraete/paella-plancha.md */
+  pan?: '32' | '46'
+  /** Paellapfanne/Plancha: Hitzequelle (BORA-Kochfeld oder Gasgrill) */
+  on?: 'bora' | 'gasgrill'
   note?: string
 }
 

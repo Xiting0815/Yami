@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { Cuisine, DishType } from '../types'
-import { CUISINE_LABEL, TYPE_LABEL } from '../types'
+import { CUISINE_ICON, CUISINE_LABEL, TYPE_LABEL } from '../types'
 import type { Filters } from '../store'
 import { EMPTY_FILTERS } from '../store'
 
@@ -33,7 +33,7 @@ export function FilterBar({ filters, onChange, count, inSheet }: Props) {
             className={`chip ${filters.cuisines.includes(c) ? 'on' : ''}`}
             onClick={() => onChange({ ...filters, cuisines: toggle(filters.cuisines, c) })}
           >
-            {c === 'de' ? '🥨' : c === 'it' ? '🇮🇹' : c === 'gr' ? '🇬🇷' : c === 'us' ? '🇺🇸' : '🥢'} {CUISINE_LABEL[c]}
+            {CUISINE_ICON[c]} {CUISINE_LABEL[c]}
           </button>
         ))}
       </div>

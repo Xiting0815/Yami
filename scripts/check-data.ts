@@ -58,7 +58,9 @@ for (const n of Object.keys(CATALOG)) if (CATALOG[n] === 'vorrat' && !PRODUCTS[c
 // Grundrezepte: Ergebnis (z. B. „Rinderfond selbstgemacht“) braucht Katalog, Produkt in derselben Einheit und Nährwerte;
 // sie dürfen nicht unter den Abendessen landen
 const yieldNames = new Set<string>()
-const KINDS = ['grundrezept', 'dessert', 'kuchen', 'brot', 'gebaeck', 'bbq']
+const KINDS = ['grundrezept', 'dessert', 'kuchen', 'brot', 'gebaeck', 'bbq', 'tapas', 'salat']
+const TAPAS_GROUPS = ['fisch', 'fleisch', 'gemuese', 'ei', 'brot']
+const SALAT_GROUPS = ['nudel', 'kartoffel', 'reis', 'bohnen', 'gemuese']
 const BBQ_GROUPS = ['smoker', 'grill', 'dutch', 'burger', 'beilage']
 for (const r of RAW_BASICS) {
   const y = r.yields
@@ -77,7 +79,27 @@ for (const r of RAW_BASICS) {
       if (!/vakuum/i.test(y.name)) console.warn(`${r.id}: BBQ-Rest „${y.name}“ – Name mit „(vakuumiert)“?`)
     }
     if (!y) continue
+  } else if (r.kind === 'tapas') {
+    // Tapas: Teller für 2 (portions 2), Untergruppe, kalt/lauwarm/heiß; kein Ergebnis im Vorrat; Nährwerte je Person
+    if (!r.basic || !r.tapas || !TAPAS_GROUPS.includes(r.tapas)) { console.error(`${r.id}: Tapa ohne gültige Gruppe (tapa() aus define.ts)`); errors++ }
+    if (!r.serve || !['kalt', 'lauwarm', 'heiss'].includes(r.serve)) { console.error(`${r.id}: Tapa ohne serve (kalt/lauwarm/heiss)`); errors++ }
+    if (r.portions !== 2) { console.error(`${r.id}: Tapa = ein Teller für 2 (portions 2)`); errors++ }
+    if (y) { console.error(`${r.id}: Tapas legen kein Ergebnis in den Vorrat`); errors++ }
+    if (r.cuisine !== 'es') console.warn(`${r.id}: Tapa mit Küche „${r.cuisine}“?`)
+    if (!/\(.+\)/.test(r.title)) console.warn(`${r.id}: Titel ohne deutsche Erklärung in Klammern („Gambas al ajillo (Knoblauchgarnelen …)“)`)
+    const built = BASICS.find((b) => b.id === r.id)
+    const kcal = built?.nutrition.kcal ?? 0
+    if (!(kcal >= 50 && kcal <= 400)) { console.error(`${r.id}: Tapa mit ${kcal} kcal je Person – Ziel ca. 120–200 (ein Teller für 2 als eine von ca. 5 Tapas)`); errors++ }
+    else if (kcal > 260) console.warn(`${r.id}: Tapa mit ${kcal} kcal je Person – eher 120–200 (kleinerer Teller?)`)
+    continue
   } else if (!r.basic || !y) { console.error(`Grundrezept ${r.id} ohne basic/yields`); errors++; continue }
+  if (r.kind === 'salat') {
+    if (!r.salat || !SALAT_GROUPS.includes(r.salat)) { console.error(`${r.id}: Salat ohne gültige Gruppe (salat() aus define.ts)`); errors++ }
+    if (y.unit !== 'Portion' || y.amount !== r.portions) { console.error(`${r.id}: Salat-Ergebnis in Portionen (= portions)`); errors++ }
+    if (y.shelf > 5) { console.error(`${r.id}: Salat hält im Kühlschrank höchstens 5 Tage (shelf ${y.shelf})`); errors++ }
+  }
+  if (r.tapas && r.tapas !== 'sauce' && r.kind !== 'tapas') { console.error(`${r.id}: Tapas-Gruppe „${r.tapas}“ nur mit tapa()`); errors++ }
+  if (r.tapas === 'sauce' && r.kind !== 'grundrezept') { console.error(`${r.id}: Tapas-Saucen sind Grundrezepte`); errors++ }
   if (r.bbq && r.bbq !== 'rub' && r.kind !== 'bbq') { console.error(`${r.id}: bbq-Gruppe „${r.bbq}“ nur mit bbq()`); errors++ }
   if (r.bbq === 'rub' && r.kind !== 'grundrezept') { console.error(`${r.id}: Rubs & Saucen sind Grundrezepte`); errors++ }
   if (!y) continue
@@ -106,7 +128,11 @@ for (const r of RAW_BASICS) {
   if (y.cat && CATALOG[y.name] !== y.cat) { console.error(`${r.id}: Ergebnis „${y.name}“ steht nicht unter ${y.cat}`); errors++ }
 }
 // src/data/extra: nichts doppelt anlegen, Geräte-Schritte und Bildsuche für jedes Rezept
-for (const n of EXTRA_DUPLICATES) { console.error(`extra: Zutat "${n}" gibt es schon im Katalog – nicht neu anlegen`); errors++ }
+for (const n of EXTRA_DUPLICATES) {
+  // parallel schreibende Gruppen: zeigen, in welchen Dateien die Zutat steht (die zuerst eingetragene gilt)
+  const files = Object.entries({ ...EXTRA_GROUPS, ...EXTRA_INGREDIENT_GROUPS }).filter(([, g]) => Object.values(g.catalog).some((l) => l?.includes(n))).map(([f]) => f)
+  console.error(`extra: Zutat "${n}" gibt es schon im Katalog – nicht neu anlegen${files.length ? ` (angelegt in: ${files.join(', ')})` : ''}`); errors++
+}
 for (const n of EXTRA_PRODUCT_DUPLICATES) { console.error(`extra: Produkt "${n}" gibt es schon – nicht neu anlegen`); errors++ }
 for (const n of EXTRA_NUTRI_DUPLICATES) { console.error(`extra: Nährwerte für "${n}" gibt es schon – nicht neu anlegen`); errors++ }
 const extraIds = new Set<string>()
@@ -118,9 +144,14 @@ for (const [file, g] of Object.entries(EXTRA_GROUPS)) {
     // BBQ-Dateien (bbq/…) enthalten nur BBQ-Rezepte bzw. Rubs & Saucen
     if (file.startsWith('bbq/') && r.kind !== 'bbq' && r.bbq !== 'rub') { console.error(`extra/${file}: ${r.id} ist kein BBQ-Rezept (bbq() bzw. backen('grundrezept', …, { bbq: 'rub' }))`); errors++ }
     if (!file.startsWith('bbq/') && (r.kind === 'bbq' || r.bbq)) { console.error(`extra/${file}: BBQ-Rezept ${r.id} gehört nach src/data/extra/bbq/`); errors++ }
+    // Tapas-Dateien (tapas/…) nur Tapas bzw. Tapas-Saucen, Salat-Dateien (salate/…) nur Salate – und umgekehrt
+    if (file.startsWith('tapas/') && r.kind !== 'tapas' && r.tapas !== 'sauce') { console.error(`extra/${file}: ${r.id} ist keine Tapa (tapa() bzw. backen('grundrezept', …, { tapas: 'sauce' }))`); errors++ }
+    if (!file.startsWith('tapas/') && (r.kind === 'tapas' || r.tapas)) { console.error(`extra/${file}: Tapa ${r.id} gehört nach src/data/extra/tapas/`); errors++ }
+    if (file.startsWith('salate/') !== (r.kind === 'salat')) { console.error(`extra/${file}: ${r.id} – Salate (salat()) gehören genau nach src/data/extra/salate/`); errors++ }
+    if (file === 'desserts-es' && r.cuisine !== 'es') { console.error(`extra/${file}: ${r.id} braucht cuisine: 'es'`); errors++ }
     // Kuchen und Brot brauchen Geräte-Schritte (Ofen); Desserts/Grundrezepte ohne Hitze dürfen ohne auskommen
     if (!g.deviceSteps[r.id]?.length) {
-      if (r.kind === 'kuchen' || r.kind === 'brot' || r.kind === 'gebaeck' || (r.kind === 'bbq' && r.bbq !== 'beilage')) { console.error(`extra/${file}: ${r.id} ohne Geräte-Schritte (deviceSteps)`); errors++ }
+      if (r.kind === 'kuchen' || r.kind === 'brot' || r.kind === 'gebaeck' || (r.kind === 'bbq' && r.bbq !== 'beilage') || (r.kind === 'tapas' && r.serve !== 'kalt')) { console.error(`extra/${file}: ${r.id} ohne Geräte-Schritte (deviceSteps)`); errors++ }
       else console.warn(`extra/${file}: ${r.id} ohne Geräte-Schritte`)
     }
     if (!g.imageQueries[r.id]) { console.error(`extra/${file}: ${r.id} ohne Bild-Suchbegriff (imageQueries)`); errors++ }
@@ -162,7 +193,8 @@ for (const n of Object.keys(CATALOG)) if (!used.has(n) && !formNames.has(n)) con
 const by = (k: string) => RAW_RECIPES.filter((r) => r.cuisine === k).length
 const byType: Record<string, number> = {}
 for (const r of RAW_RECIPES) byType[r.type] = (byType[r.type] ?? 0) + 1
-console.log(`${RAW_RECIPES.length} Rezepte – DE ${by('de')}, IT ${by('it')}, AS ${by('as')}, GR ${by('gr')}, US ${by('us')}`, byType)
+console.log(`${RAW_RECIPES.length} Rezepte – DE ${by('de')}, IT ${by('it')}, AS ${by('as')}, GR ${by('gr')}, US ${by('us')}, ES ${by('es')}`, byType)
+for (const r of RAW_RECIPES.filter((x) => x.cuisine === 'es')) if (!/\(.+\)/.test(r.title)) console.warn(`${r.id}: spanischer Titel ohne deutsche Erklärung in Klammern`)
 // Frühstücksziele: satt & leicht
 for (const r of BREAKFASTS) {
   const n = r.nutrition
@@ -173,6 +205,9 @@ for (const r of BREAKFASTS) {
 const byKind = (k: string) => RAW_BASICS.filter((r) => (r.kind ?? 'grundrezept') === k).length
 console.log(`${BREAKFASTS.length} Frühstücke, ${byKind('grundrezept')} Grundrezepte · Backen: ${byKind('dessert')} Desserts, ${byKind('kuchen')} Kuchen, ${byKind('brot')} Brot, ${byKind('gebaeck')} Plätzchen & Cookies (${extraIds.size} aus src/data/extra)`)
 const byBbq = (g: string) => RAW_BASICS.filter((r) => r.bbq === g).length
+const byTapas = (g: string) => RAW_BASICS.filter((r) => r.tapas === g).length
+const bySalat = (g: string) => RAW_BASICS.filter((r) => r.salat === g).length
+console.log(`Tapas: ${byKind('tapas')} – Fisch ${byTapas('fisch')}, Fleisch ${byTapas('fleisch')}, Gemüse ${byTapas('gemuese')}, Ei & Kartoffel ${byTapas('ei')}, Brot & Dips ${byTapas('brot')} · Saucen ${byTapas('sauce')} · Salate & Beilagen: ${byKind('salat')} – Nudel ${bySalat('nudel')}, Kartoffel ${bySalat('kartoffel')}, Reis ${bySalat('reis')}, Bohnen ${bySalat('bohnen')}, Gemüse ${bySalat('gemuese')} · Spanische Desserts: ${RAW_BASICS.filter((r) => r.cuisine === 'es' && (r.kind === 'dessert' || r.kind === 'kuchen' || r.kind === 'gebaeck')).length}`)
 console.log(`BBQ: ${byKind('bbq')} Rezepte – Smoker ${byBbq('smoker')}, Grill ${byBbq('grill')}, Dutch Oven ${byBbq('dutch')}, Burger ${byBbq('burger')}, Beilagen ${byBbq('beilage')} · Rubs & Saucen ${byBbq('rub')}`)
 // Geräte-Schritte: bekannte Rezepte, Texte, Einstellungen im gültigen Bereich
 for (const [id, steps] of Object.entries(DEVICE_STEPS)) {

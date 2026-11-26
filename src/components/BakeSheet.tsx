@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { BakeEntry, Recipe } from '../types'
 import { isBbq } from '../types'
-import { doneWord } from '../bbq'
+import { doneWord, planWord } from '../bbq'
 import { yieldText } from '../bake'
 import { shortDate, weekdayName } from '../store'
 import { Icon } from './Icon'
@@ -40,13 +40,13 @@ export function BakeSheet({ day, entry, recipe, today, plannedDays, startMove, o
   const open = !entry.status
   return (
     <div className="sheet-backdrop" onClick={onClose}>
-      <div className="sheet actions" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={`${isBbq(recipe) ? 'BBQ' : 'Backen'}: ${recipe.title}`}>
+      <div className="sheet actions" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={`${planWord(recipe)}: ${recipe.title}`}>
         <div className="act-head">
           <RecipeImage recipe={recipe} className="thumb" />
           <div className="act-head-text">
             <b>{recipe.title}</b>
             <small>
-              {isBbq(recipe) ? 'BBQ' : 'Backen'} · {weekdayName(day, true)} {shortDate(day)}{entry.status === 'baked' ? ` · ✓ ${doneWord(recipe)}` : ''}
+              {planWord(recipe)} · {weekdayName(day, true)} {shortDate(day)}{entry.status === 'baked' ? ` · ✓ ${doneWord(recipe)}` : ''}
               {isBbq(recipe) ? ` · ca. ${(recipe.portions ?? 2) * entry.amount} Portionen` : ''}
               {recipe.yields ? ` · ${isBbq(recipe) ? 'Rest' : 'ergibt'} ${yieldText(recipe, entry.amount * recipe.servings)}` : ''}
             </small>

@@ -8,6 +8,9 @@
  *   Gerichte einer Woche, die eine weggeworfene Zutat brauchen −0,3 (höchstens 1× pro Tag)
  *   Backen & Desserts: gebacken +0,8 · ein Stück gegessen +0,3 · Bewertung wie oben
  *   BBQ: eingeplant +1 · gegrillt +0,8 · Portion gegessen +0,3 · Bewertung wie oben (Muster „bbq:smoker“, „bbqprotein:Schwein“)
+ *   Tapas: eingeplant (Tapas-Abend) +1 · gemacht +0,8 · gegessen +0,3 · Bewertung je Tapa (Muster „tapas:fisch“, „tapasprotein:Fisch“);
+ *     Kombinationen und „Tapas-Abend-Ideen“ siehe src/tapas.ts
+ *   Salate & Beilagen: eingeplant +1 · gemacht +0,8 · Portion gegessen +0,3 · Bewertung (Muster „salat:nudel“)
  *   Frühstück: pro Woche gewählt +1 · fertig vorbereitet +0,8 · Bewertung nach dem Vorbereiten wie oben ·
  *   Sättigung „bis mittags satt?“ zu wenig −0,6 · passt +0,3 · zu viel −0,2 (dazu Sättigungs-Neigung, siehe unten)
  *   (eigenes Muster „bake:kuchen“ usw. – Abendessen-Muster wie Küche oder Hauptzutat bleiben davon unberührt)
@@ -25,7 +28,7 @@ import { gramsOf } from './data/nutrition-calc'
 import { isWorkday } from './energy'
 import { type WastedItem, canonical, daysUntil, needsOf } from './kitchen'
 import { isoDate, mondayOf, parseIso } from './store'
-import { BBQ_GROUP_LABEL, BREAKFAST_LABEL, CUISINE_LABEL, KIND_LABEL, TYPE_LABEL, type BakePlan, type BasicKind, type BbqGroup, type Recipe, type WeekPlan } from './types'
+import { BBQ_GROUP_LABEL, BREAKFAST_LABEL, CUISINE_LABEL, KIND_LABEL, SALAT_GROUP_LABEL, TAPAS_GROUP_LABEL, TYPE_LABEL, type BakePlan, type BasicKind, type BbqGroup, type Recipe, type SalatGroup, type TapasGroup, type WeekPlan } from './types'
 
 export type Rating = 'up' | 'again' | 'down'
 
@@ -46,14 +49,15 @@ const PRIOR_FEATURE = 4
 
 const PROTEIN_RULES: [RegExp, string][] = [
   [/hack/i, 'Hackfleisch'],
-  [/lachs|kabeljau|seelachs|dorade|scholle|matjes|rollmops|garnel|krabben|muschel|thunfisch|sardell/i, 'Fisch'],
+  [/lachs|kabeljau|seelachs|dorade|scholle|matjes|rollmops|garnel|krabben|muschel|thunfisch|sardell|pulpo|tintenfisch|sepia|calamar|bacalao|seehecht|boquer|sardin/i, 'Fisch'],
+  [/kaninchen/i, 'Kaninchen'],
   [/hähnchen|huhn|ente|gans|gänse/i, 'Geflügel'],
   [/rind|tafelspitz|rumpsteak|suppenfleisch|corned|ochs|roastbeef/i, 'Rind'],
   [/kalb/i, 'Kalb'],
   [/lamm/i, 'Lamm'],
   [/gyros/i, 'Schwein'],
-  [/wurst|würstchen|mettend|cabanossi|salami|salsiccia|leberkäse|pinkel|bockwurst/i, 'Wurst'],
-  [/schwein|kasseler|speck|bacon|schinken|guanciale|pancetta|bauch|haxe|schäufele/i, 'Schwein'],
+  [/wurst|würstchen|mettend|cabanossi|salami|salsiccia|leberkäse|pinkel|bockwurst|chorizo|morcilla|sobrasada|fuet/i, 'Wurst'],
+  [/schwein|kasseler|speck|bacon|schinken|guanciale|pancetta|bauch|haxe|schäufele|jamón|lomo/i, 'Schwein'],
 ]
 
 /** Hauptzutat eines Gerichts (größte Fleisch-/Fischmenge), sonst „vegetarisch“ */
@@ -61,7 +65,7 @@ export function mainProtein(r: Recipe): string {
   let best = ''
   let bestG = 0
   for (const i of r.ingredients) {
-    if (CATALOG[i.name] !== 'fleisch' && !/Garnelen|Thunfisch|Sardellen|Corned/.test(i.name)) continue
+    if (CATALOG[i.name] !== 'fleisch' && !/Garnelen|Thunfisch|Sardellen|Corned|Tintenfisch/.test(i.name)) continue
     const g = i.amount != null ? gramsOf(i.name, i.amount, i.unit) ?? 50 : 20
     if (g > bestG) {
       bestG = g
@@ -79,6 +83,9 @@ export function features(r: Recipe, day?: string): string[] {
   // Backen & Desserts / Grundrezepte: nur das eigene Muster (sonst würde Tiramisu „Italienisch“ für Abendessen hochziehen)
   // BBQ: eigenes Muster je Gruppe (Smoker, Grill …) und Hauptzutat – getrennt von den Abendessen-Mustern
   if (r.kind === 'bbq') return ['bake:bbq', ...(r.bbq ? [`bbq:${r.bbq}`] : []), `bbqprotein:${mainProtein(r)}`]
+  // Tapas und Salate: eigene Muster je Gruppe (und Hauptzutat bei Tapas) – getrennt von den Abendessen-Mustern
+  if (r.kind === 'tapas') return ['bake:tapas', ...(r.tapas ? [`tapas:${r.tapas}`] : []), `tapasprotein:${mainProtein(r)}`]
+  if (r.kind === 'salat') return ['bake:salat', ...(r.salat ? [`salat:${r.salat}`] : [])]
   if (r.basic) return [`bake:${r.kind ?? 'grundrezept'}`]
   if (r.breakfast) return [`bf:${r.breakfast.type}`, `protein:${mainProtein(r)}`]
   const f = [`cuisine:${r.cuisine}`, `type:${r.type}`, `protein:${mainProtein(r)}`]
@@ -95,6 +102,9 @@ export function featureLabel(key: string): string {
   if (kind === 'bake') return KIND_LABEL[value as BasicKind] ?? value
   if (kind === 'bbq') return `BBQ: ${BBQ_GROUP_LABEL[value as BbqGroup] ?? value}`
   if (kind === 'bbqprotein') return value === 'vegetarisch' ? 'BBQ vegetarisch' : `BBQ mit ${value}`
+  if (kind === 'tapas') return `Tapas: ${TAPAS_GROUP_LABEL[value as TapasGroup] ?? value}`
+  if (kind === 'tapasprotein') return value === 'vegetarisch' ? 'Vegetarische Tapas' : `Tapas mit ${value}`
+  if (kind === 'salat') return SALAT_GROUP_LABEL[value as SalatGroup] ?? value
   if (kind === 'bf') return `Frühstück ${BREAKFAST_LABEL[value as keyof typeof BREAKFAST_LABEL]}`
   if (kind === 'speed') {
     const [s, when] = value.split('@')
@@ -136,7 +146,7 @@ export interface TasteInput {
   snacks?: { date: string; recipeId?: string }[]
   /** Backen & Desserts: Bewertung, Schlüssel `Datum:Rezept-ID` */
   bakeRatings?: Record<string, Rating>
-  /** Backplan: eingeplantes BBQ zählt wie „geplant“ (+1), „nicht gemacht“ wie nicht gekocht (−1) */
+  /** Backplan: eingeplantes BBQ, Tapas und Salate zählen wie „geplant“ (+1), „nicht gemacht“ wie nicht gekocht (−1) */
   bakePlan?: BakePlan
   /** Frühstück: fertig vorbereitet (+0,8) */
   bfPrepped?: { date: string; recipeId: string }[]
@@ -184,9 +194,10 @@ export function buildModel(inp: TasteInput): TasteModel {
   for (const b of inp.baked ?? []) add(b.recipeId, b.date, W.cooked)
   for (const s of inp.snacks ?? []) if (s.recipeId) add(s.recipeId, s.date, W.eaten)
   for (const [key, v] of Object.entries(inp.bakeRatings ?? {})) add(key.slice(11), key.slice(0, 10), W[v])
-  // BBQ: eingeplant (auch ohne Grillen) zeigt Lust darauf; „nicht gemacht“ leicht abwerten
+  // BBQ, Tapas-Abend, Salate: eingeplant (auch ohne Machen) zeigt Lust darauf; „nicht gemacht“ leicht abwerten
+  const PLANNED: (BasicKind | undefined)[] = ['bbq', 'tapas', 'salat']
   for (const [day, list] of Object.entries(inp.bakePlan ?? {}))
-    for (const e of list ?? []) if (RECIPE_BY_ID[e.recipeId]?.kind === 'bbq') add(e.recipeId, day, e.status === 'skipped' ? W.skipped : W.take)
+    for (const e of list ?? []) if (PLANNED.includes(RECIPE_BY_ID[e.recipeId]?.kind)) add(e.recipeId, day, e.status === 'skipped' ? W.skipped : W.take)
   // Frühstück: vorbereitet, bewertet, satt gemacht?
   for (const p of inp.bfPrepped ?? []) add(p.recipeId, p.date, W.cooked)
   for (const [key, v] of Object.entries(inp.bfRatings ?? {})) add(key.slice(11), key.slice(0, 10), W[v])

@@ -18,7 +18,7 @@ import {
   recipeScores, weekdayLabel,
 } from './bakePlan'
 import type { BakePlan, BbqGroup, PlanEntry, Recipe } from './types'
-import { isBbq } from './types'
+import { isBbq, isSalat, isTapa, replacesDinner } from './types'
 import type { Snack } from './energy'
 
 /** so viele Ideen zeigt die Karte */
@@ -108,6 +108,19 @@ export const doneWord = (r: Recipe | undefined): string =>
   isBbq(r) ? (r!.bbq === 'dutch' ? 'gekocht' : 'gegrillt') : r?.kind === 'kuchen' || r?.kind === 'brot' || r?.kind === 'gebaeck' ? 'gebacken' : 'gemacht'
 
 
-/** steht an dem Tag ein BBQ im Plan (nicht „nicht gemacht“)? Dann ist das Abendessen des Tages vergeben. */
+/** steht an dem Tag ein Grillabend im Plan (BBQ ohne die Beilagen, nicht „nicht gemacht“)? Dann ist das Abendessen vergeben. */
 export const bbqOn = (bp: BakePlan, day: string): boolean =>
-  (bp[day] ?? []).some((e) => e.status !== 'skipped' && isBbq(RECIPE_BY_ID[e.recipeId]))
+  (bp[day] ?? []).some((e) => e.status !== 'skipped' && isBbq(RECIPE_BY_ID[e.recipeId]) && replacesDinner(RECIPE_BY_ID[e.recipeId]))
+
+/**
+ * Abend, der das Abendessen ersetzt: Tapas-Abend (Tapas im Backplan) oder Grillabend (BBQ ohne Beilagen); sonst undefined.
+ * Salate & Beilagen sind nur Zusatz und belegen den Tag nicht.
+ */
+export function eveningOn(bp: BakePlan, day: string): 'tapas' | 'bbq' | undefined {
+  const list = (bp[day] ?? []).filter((e) => e.status !== 'skipped')
+  if (list.some((e) => isTapa(RECIPE_BY_ID[e.recipeId]))) return 'tapas'
+  return list.some((e) => replacesDinner(RECIPE_BY_ID[e.recipeId])) ? 'bbq' : undefined
+}
+
+/** Wort für einen Backplan-Eintrag in Hinweisen: „BBQ“, „Tapas-Abend“, „Salat“, „Backen“ */
+export const planWord = (r: Recipe | undefined): string => (isBbq(r) ? 'BBQ' : isTapa(r) ? 'Tapas-Abend' : isSalat(r) ? 'Salat' : 'Backen')

@@ -122,3 +122,56 @@ export const vzug = (
   ...(o.note ? { note: o.note } : {}),
   ...(o.alt ? { alt: true } : {}),
 })
+
+// ───────────── Spanien: Paellapfanne und Plancha (docs/geraete/paella-plancha.md, docs/spanien-regeln.md) ─────────────
+
+/** Abschnitte einer Paella: Vorheizen · Anbraten (Fleisch/Meeresfrüchte) · Sofrito · Köcheln (Brühe + Reis, nicht mehr rühren) · Socarrat · Ruhen */
+export type PaellaMode = 'Vorheizen' | 'Anbraten' | 'Sofrito' | 'Köcheln' | 'Socarrat' | 'Ruhen'
+
+/**
+ * Paellapfanne in zwei Größen:
+ *   '32' = 32 cm (2–3 Portionen) auf dem BORA, beide Zonen mit der Brücke gekoppelt → `level` = BORA-Stufe '1'–'9' | 'Power'
+ *   '46' = 46 cm (6+ Portionen) auf dem 4-Brenner-Gasgrill, Deckel OFFEN → `level` = Flamme niedrig | mittel | hoch,
+ *          `burners` = Brenner-Muster (Standard „alle“; z. B. „2+3“, wenn die Mitte nachgaren soll)
+ * „Ruhen“ = Pfanne vom Feuer, ohne Stufe. Mit dem Gasgrill: vorher `gasgrill('Vorheizen', …)` (Deckel zu), dann Deckel auf.
+ * `alt: true` = Ausweichweg/zweite Größe als „oder …“-Chip (z. B. die große Pfanne für Gäste neben der kleinen).
+ *   paella('32', 'Köcheln', { level: '6', minutes: 10 })
+ *   paella('46', 'Köcheln', { level: 'mittel', burners: 'alle', minutes: 10, note: 'Pfanne alle 2–3 Min. eine Vierteldrehung' })
+ */
+export const paella = (
+  pan: '32' | '46',
+  mode: PaellaMode,
+  o: { level?: string; burners?: string; minutes?: number; note?: string; alt?: boolean } = {},
+): DeviceSetting => ({
+  device: 'paella',
+  mode,
+  pan,
+  on: pan === '32' ? 'bora' : 'gasgrill',
+  ...(o.level ? { level: o.level } : {}),
+  ...(pan === '46' && mode !== 'Ruhen' ? { burners: o.burners ?? 'alle' } : {}),
+  ...(o.minutes != null ? { minutes: o.minutes } : {}),
+  ...(o.note ? { note: o.note } : {}),
+  ...(o.alt ? { alt: true } : {}),
+})
+
+/**
+ * Plancha / Gusseisenpfanne (Gambas a la plancha, Pimientos de Padrón, Pulpo) auf dem BORA (`level` = Stufe) oder dem
+ * Gasgrill (`level` = Flamme, `burners` Standard „alle“). `temp` = Oberfläche mit dem Infrarot-Thermometer (optional, 150–350 °C).
+ *   plancha('bora', 'Braten', { level: '8', minutes: 3 })
+ *   plancha('gasgrill', 'Vorheizen', { level: 'hoch', temp: 280, minutes: 10 })
+ */
+export const plancha = (
+  on: 'bora' | 'gasgrill',
+  mode: 'Vorheizen' | 'Braten',
+  o: { level: string; burners?: string; temp?: number; minutes?: number; note?: string; alt?: boolean },
+): DeviceSetting => ({
+  device: 'plancha',
+  mode,
+  on,
+  level: o.level,
+  ...(on === 'gasgrill' ? { burners: o.burners ?? 'alle' } : {}),
+  ...(o.temp != null ? { temp: o.temp } : {}),
+  ...(o.minutes != null ? { minutes: o.minutes } : {}),
+  ...(o.note ? { note: o.note } : {}),
+  ...(o.alt ? { alt: true } : {}),
+})

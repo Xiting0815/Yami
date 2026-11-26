@@ -3,7 +3,7 @@ import { defaultReviewMonday, weekReview } from '../review'
 import { suggestion as weightSuggestion, weighedThisWeek } from '../progress'
 import { type AppState, addDays, isoDate, parseIso, sharingActive, weekDays } from '../store'
 import { daysUntil } from '../kitchen'
-import { bbqOn } from '../bbq'
+import { eveningOn } from '../bbq'
 import type { SetAppState } from './types'
 import type { Calendar } from './useCalendar'
 import type { Ui } from './useUi'
@@ -24,9 +24,9 @@ export function useStatus(
 
   // ───── Start-Checkliste (nur beim allerersten Benutzen) ─────
   const onboarding = !state.onboarding
-  // ein Grillabend (BBQ im Backplan) zählt als Abendessen des Tages
-  const plannedCount = days.filter((d) => state.plan[d] || bbqOn(state.bakePlan, d)).length
-  const openDay = days.find((d) => !state.plan[d] && !bbqOn(state.bakePlan, d) && d >= today)
+  // ein Grillabend oder Tapas-Abend (im Backplan) zählt als Abendessen des Tages
+  const plannedCount = days.filter((d) => state.plan[d] || eveningOn(state.bakePlan, d)).length
+  const openDay = days.find((d) => !state.plan[d] && !eveningOn(state.bakePlan, d) && d >= today)
   const dinnersDone = plannedCount > 0 && !openDay
   const somethingPlanned = plannedCount > 0 || picks.length > 0
   const listDone = !!state.onboardingListSeen

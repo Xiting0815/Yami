@@ -1,10 +1,11 @@
 import { RECIPE_BY_ID } from '../../data/recipes'
-import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, moveBake, removeBake, setBakeAmount, settleBaked } from '../../bakePlan'
+import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, moveBake, removeBake, setBakeAmount, settleBaked, tapasFactor } from '../../bakePlan'
 import { yieldText } from '../../bake'
 import { weekdayName } from '../../store'
 import type { Recipe } from '../../types'
-import { isBake, isBbq } from '../../types'
-import { bbqHint, bbqMeal, dinnerToReplace, doneWord } from '../../bbq'
+import { finishable, isBake, isBbq, isTapa, replacesDinner } from '../../types'
+import { bbqHint, bbqMeal, dinnerToReplace, doneWord, planWord } from '../../bbq'
+import { moveTapasEvening, planTapasEvening, removeTapasEvening, shortTitle, tapasMeal } from '../../tapas'
 import { isBbqSeason } from '../../data/season'
 import type { ActionContext } from './context'
 
@@ -21,7 +22,8 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     if (!recipe.basic) return
     const snap = snapshot()
     const bbq = isBbq(recipe)
-    const dropped = bbq && replaceDinner ? dinnerToReplace(state.plan, day) : undefined
+    // nur Grillabende ersetzen das Abendessen; Beilagen und Salate sind Zusatz
+    const dropped = replacesDinner(recipe) && replaceDinner ? dinnerToReplace(state.plan, day) : undefined
     setState((s) => {
       const plan = { ...s.plan }
       if (dropped && dinnerToReplace(plan, day)) delete plan[day]
@@ -29,11 +31,77 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
         ...s,
         plan,
         bakePlan: addBake(s.bakePlan, day, recipe.id, amount),
-        bakeHints: bbq && isBbqSeason(today) ? bbqHint(s.bakeHints, today, 'accepted') : s.bakeHints,
+        bakeHints: bbq && recipe.bbq !== 'beilage' && isBbqSeason(today) ? bbqHint(s.bakeHints, today, 'accepted') : s.bakeHints,
       }
     })
     const dropTitle = dropped ? RECIPE_BY_ID[dropped.recipeId]?.title : undefined
-    flash(`${bbq ? 'BBQ' : 'Backen'}: ${recipe.title} → ${weekdayName(day)} ✓${dropTitle ? ` (statt ${dropTitle})` : ''}`, snap)
+    flash(`${planWord(recipe)}: ${recipe.title} → ${weekdayName(day)} ✓${dropTitle ? ` (statt ${dropTitle})` : ''}`, snap)
+  }
+
+  /**
+   * Tapas-Abend einplanen: die gewählten Tapas zusammen auf einen Tag (die Auswahl ersetzt einen vorher für den Tag
+   * geplanten Tapas-Abend). `replaceDinner` (vorgewählt) streicht das offene Abendessen des Tages; Rückgängig über den Toast.
+   */
+  function planTapas(day: string, ids: string[], replaceDinner = true) {
+    if (!ids.length) return
+    const snap = snapshot()
+    const r0 = planTapasEvening(state, day, ids, replaceDinner)
+    setState((s) => {
+      const r = planTapasEvening(s, day, ids, replaceDinner)
+      return { ...s, plan: r.plan, bakePlan: r.bakePlan }
+    })
+    const dropTitle = r0.dropped ? RECIPE_BY_ID[r0.dropped.recipeId]?.title : undefined
+    flash(`🫒 Tapas-Abend (${ids.length} Tapas) → ${weekdayName(day)} ✓${dropTitle ? ` (statt ${dropTitle})` : ''}`, snap)
+    ui.setTapasPick([])
+  }
+
+  /** ganzen Tapas-Abend verschieben bzw. entfernen (nur noch offene Tapas) */
+  function moveTapas(from: string, to: string) {
+    if (from === to) return
+    const snap = snapshot()
+    setState((s) => ({ ...s, bakePlan: moveTapasEvening(s, from, to) }))
+    flash(`🫒 Tapas-Abend → ${weekdayName(to)} verschoben`, snap)
+  }
+  function removeTapas(day: string) {
+    const snap = snapshot()
+    setState((s) => ({ ...s, bakePlan: removeTapasEvening(s.bakePlan, day) }))
+    flash('🫒 Tapas-Abend entfernt', snap)
+  }
+
+  /**
+   * „Fertig“ einer Tapa (Kochmodus Tapas-Abend oder Nachfrage): Zutaten mit der Menge des Abends abziehen, ihr Anteil zählt
+   * in die Tagesbilanz; danach „Wie war’s?“ für genau diese Tapa (`rate` = false: ohne Bewertungs-Sheet, z. B. im Kochmodus).
+   */
+  function finishTapa(day: string, recipeId: string, rate = false) {
+    const recipe = RECIPE_BY_ID[recipeId]
+    const entry = bakesOn(state.bakePlan, day).find((e) => e.recipeId === recipeId)
+    if (!recipe || !isTapa(recipe) || !entry || entry.status) return
+    const snap = snapshot()
+    setState((s) => {
+      const meal = tapasMeal(recipe, day, tapasFactor(s.bakePlan, day))
+      const r = settleBaked(s, day, recipeId)
+      return r ? { ...s, ...r, snacks: meal ? [...s.snacks, meal].slice(-400) : s.snacks } : s
+    })
+    flash(`${shortTitle(recipe.title)} gemacht ✓`, snap)
+    if (rate) ui.setRateBake({ recipeId, date: day })
+  }
+
+  /** „Ja, gemacht“ für den ganzen Tapas-Abend: alle offenen Tapas des Tages */
+  function confirmTapasEvening(day: string) {
+    const open = bakesOn(state.bakePlan, day).filter((e) => isTapa(RECIPE_BY_ID[e.recipeId]) && !e.status)
+    if (!open.length) return
+    const snap = snapshot()
+    setState((s) => {
+      const f = tapasFactor(s.bakePlan, day)
+      let cur = s
+      for (const e of open) {
+        const r = settleBaked(cur, day, e.recipeId)
+        const meal = tapasMeal(RECIPE_BY_ID[e.recipeId], day, f)
+        if (r) cur = { ...cur, ...r, snacks: meal ? [...cur.snacks, meal].slice(-400) : cur.snacks }
+      }
+      return cur
+    })
+    flash(`🫒 Tapas-Abend gemacht ✓ – ${open.length} Tapas abgezogen`, snap)
   }
 
   /** BBQ-Ideen-Karte wegklicken (ruht dann länger, wie Backvorschläge) */
@@ -66,7 +134,8 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
   function confirmBaked(day: string, recipeId: string) {
     const recipe = RECIPE_BY_ID[recipeId]
     const entry = bakesOn(state.bakePlan, day).find((e) => e.recipeId === recipeId)
-    if (!recipe || !(recipe.yields || isBbq(recipe)) || !entry || entry.status) return
+    if (!recipe || !finishable(recipe) || !entry || entry.status) return
+    if (isTapa(recipe)) return finishTapa(day, recipeId, true)
     const snap = snapshot()
     const servings = entry.amount * recipe.servings
     const meal = bbqMeal(recipe, day)
@@ -93,5 +162,5 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     setState((st) => ({ ...st, bakeHints: dismissSuggestion(st.bakeHints, s, today) }))
   }
 
-  return { planBake, dismissBbqIdeas, moveBakeTo, removeBakeEntry, changeBakeAmount, confirmBaked, acceptBakeSuggestion, dismissBakeSuggestion }
+  return { planBake, planTapas, moveTapas, removeTapas, finishTapa, confirmTapasEvening, dismissBbqIdeas, moveBakeTo, removeBakeEntry, changeBakeAmount, confirmBaked, acceptBakeSuggestion, dismissBakeSuggestion }
 }

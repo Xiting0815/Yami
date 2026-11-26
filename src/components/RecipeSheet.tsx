@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Recipe } from '../types'
-import { BBQ_GROUP_LABEL, BREAKFAST_LABEL, CUISINE_LABEL, KIND_ICON, KIND_LABEL, TYPE_LABEL, isBake, isBakery, isBbq } from '../types'
+import { BBQ_GROUP_LABEL, BREAKFAST_LABEL, CUISINE_LABEL, KIND_ICON, KIND_LABEL, SALAT_GROUP_LABEL, TAPAS_GROUP_LABEL, TYPE_LABEL, isBake, isBbq, isSalat, isStockDish, isTapa, replacesDinner } from '../types'
 import { leftoverText } from '../bbq'
 import { pieceName, shelfText, yieldText } from '../bake'
 import { yieldStock } from '../data/define'
@@ -63,7 +63,11 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
   const classic = hasDevice && !!showClassic
   const isBasic = !!recipe.basic && !!recipe.yields
   const bbq = isBbq(recipe)
-  const bake = isBakery(recipe) && !!recipe.yields
+  const bake = isStockDish(recipe) && !!recipe.yields
+  const tapa = isTapa(recipe)
+  const salat = isSalat(recipe)
+  // ersetzt das Abendessen (Grillabend) – BBQ-Beilagen und Salate sind Zusatz
+  const replaces = replacesDinner(recipe)
   // BBQ ersetzt meist das Abendessen des Tages – vorgewählt, abwählbar
   const [replaceDinner, setReplaceDinner] = useState(true)
   // Grundrezepte/Gebackenes, die eine Zutat dieses Rezepts selbst herstellen (Rinderfond → Brauner Rinderfond,
@@ -95,6 +99,16 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             <div className="card-tags dark">
               {bbq ? (
                 <span>{KIND_ICON.bbq} BBQ{recipe.bbq ? ` · ${BBQ_GROUP_LABEL[recipe.bbq]}` : ''}</span>
+              ) : tapa ? (
+                <>
+                  <span>{KIND_ICON.tapas} Tapas{recipe.tapas ? ` · ${TAPAS_GROUP_LABEL[recipe.tapas]}` : ''}</span>
+                  {recipe.vegetarian && <span>🌱 Veggie</span>}
+                </>
+              ) : salat ? (
+                <>
+                  <span>{KIND_ICON.salat} {recipe.salat ? SALAT_GROUP_LABEL[recipe.salat] : KIND_LABEL.salat}</span>
+                  <span>{CUISINE_LABEL[recipe.cuisine]}</span>
+                </>
               ) : isBasic ? (
                 <span>{KIND_ICON[recipe.kind ?? 'grundrezept']} {recipe.kind && recipe.kind !== 'grundrezept' ? KIND_LABEL[recipe.kind] : 'Grundrezept'}</span>
               ) : recipe.breakfast ? (
@@ -116,7 +130,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             {insight && <div className="sheet-badges"><InsightBadges ins={insight} /></div>}
 
             <div className="servings">
-              <span>{bake || bbq ? 'Rezeptmenge' : isBasic ? 'Ansätze' : 'Portionen'}</span>
+              <span>{tapa ? 'Teller (für 2)' : bake || bbq ? 'Rezeptmenge' : isBasic ? 'Ansätze' : 'Portionen'}</span>
               <div className="stepper">
                 <button onClick={() => setServings((s) => Math.max(1, s - 1))} aria-label="weniger">−</button>
                 <b>{servings}</b>
@@ -128,9 +142,9 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               <div className="bake-plan">
                 <div className="bake-plan-head">
                   <b>Einplanen für</b>
-                  <span className="muted small">Zutaten kommen auf die Einkaufsliste{bbq ? ', der Tag in den Kalender' : ''}</span>
+                  <span className="muted small">Zutaten kommen auf die Einkaufsliste{replaces ? ', der Tag in den Kalender' : salat || bbq ? ' – als Zusatz zum Abendessen' : ''}</span>
                 </div>
-                {bbq && (
+                {replaces && (
                   <label className="small bbq-replace">
                     <input type="checkbox" checked={replaceDinner} onChange={(e) => setReplaceDinner(e.target.checked)} /> Ersetzt das Abendessen an dem Tag (geplantes Gericht wird gestrichen)
                   </label>
@@ -138,7 +152,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                 <BakeDays
                   today={bakePlanner.today}
                   marked={(d) => bakePlanner.plannedDays.includes(d)}
-                  onPick={(d) => bakePlanner.onPlan(d, servings, bbq && replaceDinner && !!bakePlanner.dinnerOn?.(d))}
+                  onPick={(d) => bakePlanner.onPlan(d, servings, replaces && replaceDinner && !!bakePlanner.dinnerOn?.(d))}
                 />
               </div>
             )}
@@ -149,7 +163,14 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
               </p>
             )}
 
-            {bbq ? (
+            {tapa ? (
+              <div className="prep-facts bake-facts">
+                <div>{KIND_ICON.tapas} Ein Teller für 2 – als eine von ca. 5 Tapas · je Person <b>{recipe.nutrition.kcal.toLocaleString('de-DE')} kcal</b> · {String(recipe.nutrition.protein).replace('.', ',')} g Eiweiß</div>
+                <div>🍽️ Kommt {recipe.serve === 'kalt' ? 'kalt' : recipe.serve === 'lauwarm' ? 'lauwarm' : 'heiß, ganz zum Schluss'} auf den Tisch{recipe.ahead ? ` · Vorher: ${recipe.ahead}` : ''}</div>
+                {recipe.lighter && <div className="lighter">💡 <b>Leichter:</b> {recipe.lighter}</div>}
+                <div className="muted small">Tapas planst du zusammen: im Rezepte-Tab „🫒 Tapas“ 4–6 auswählen → „Planen“. Die Mengen passt Yami an die Zahl der Tapas an.</div>
+              </div>
+            ) : bbq ? (
               <div className="prep-facts bake-facts">
                 <div>{KIND_ICON.bbq} Ladung für ca. <b>{(recipe.portions ?? 2) * servings} Portionen</b> · pro Portion <b>{recipe.nutrition.kcal.toLocaleString('de-DE')} kcal</b> · {String(recipe.nutrition.protein).replace('.', ',')} g Eiweiß</div>
                 {y && <div>❄️ Rest: <b>{leftoverText(recipe, servings)}</b> · hält ca. {shelfText(y.shelf)} – Yami schlägt dann Resteessen vor</div>}
@@ -164,7 +185,11 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                   <div>🔥 Pro {piece}: <b>{y!.perPiece.kcal.toLocaleString('de-DE')} kcal</b> · {String(y!.perPiece.protein).replace('.', ',')} g Eiweiß</div>
                 )}
                 {recipe.lighter && <div className="lighter">💡 <b>Leichter:</b> {recipe.lighter}</div>}
-                <div className="muted small">✓ „{recipe.kind === 'dessert' ? 'Fertig' : 'Fertig gebacken'}“ im Kochmodus legt alles in den Vorrat. Dort „1 gegessen“ tippen – das Stück zählt in die Tagesbilanz.</div>
+                <div className="muted small">
+                  {salat
+                    ? '✓ „Fertig“ im Kochmodus legt alle Portionen in den Vorrat (Kühlschrank). Dort „1 Portion gegessen“ tippen – sie zählt in die Tagesbilanz.'
+                    : `✓ „${recipe.kind === 'dessert' ? 'Fertig' : 'Fertig gebacken'}“ im Kochmodus legt alles in den Vorrat. Dort „1 gegessen“ tippen – das Stück zählt in die Tagesbilanz.`}
+                </div>
               </div>
             ) : isBasic ? (
               <div className="prep-facts">
@@ -205,7 +230,9 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
             )}
 
             <p className="muted small cost-line">
-              {bbq
+              {tapa
+                ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für ${servings === 1 ? 'den Teller' : `${servings} Teller`} (2 Personen, ohne Gewürze)`
+                : bbq
                 ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für die Ladung · ${formatEuro(recipeCost(recipe, servings, prices) / ((recipe.portions ?? 2) * servings))} pro Portion (ohne Gewürze)`
                 : isBasic
                 ? `Warenwert ≈ ${formatEuro(recipeCost(recipe, servings, prices))} für ${yieldText(recipe, servings)} (ohne Gewürze und Grundzutaten)`
@@ -235,7 +262,7 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                   ? <>🍞 Tipp: Brot selbst backen – <u>{b.title}</u></>
                   : isBbq(b)
                     ? <>🔥 Tipp: Reste vom BBQ (vakuumiert im Vorrat) – <u>{b.title}</u></>
-                  : b.bbq === 'rub'
+                  : b.bbq === 'rub' || b.tapas === 'sauce'
                     ? <>🫙 Tipp: selbst gemacht schmeckt’s besser – <u>{b.title}</u></>
                   : isBake(b)
                     ? <>💡 Tipp: selbst gemacht – <u>{b.title}</u></>

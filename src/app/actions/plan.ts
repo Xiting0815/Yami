@@ -1,12 +1,13 @@
-import { isBake, isBbq, type PlanEntry, type Recipe } from '../../types'
+import { finishable, isBake, isTapa, type PlanEntry, type Recipe } from '../../types'
 import { bbqMeal, doneWord } from '../../bbq'
+import { tapasMeal } from '../../tapas'
 import { type PortionFeedback, type Rating, portionFactor } from '../../learning'
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
 import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
 import { householdFeedback } from '../../sync'
 import { yieldText } from '../../bake'
-import { markBaked, matchBake } from '../../bakePlan'
+import { markBaked, matchBake, tapasFactor } from '../../bakePlan'
 import type { ActionContext } from './context'
 
 /** Abendessen planen: Wischen, Nehmen/Wegwischen, Tage leeren, gekocht/nicht gekocht, Bewertung, Woche wechseln */
@@ -171,17 +172,20 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
    */
   function finishBasic(recipe: Recipe, servings: number, ctxDay?: string) {
     const y = recipe.yields
-    // BBQ ohne Reste (Burger, Steak): nur Zutaten abziehen
-    if (!recipe.basic || !(y || isBbq(recipe))) return
+    // BBQ ohne Reste (Burger, Steak) und Tapas: nur Zutaten abziehen
+    if (!finishable(recipe)) return
     const snap = snapshot()
     const bake = isBake(recipe)
-    const meal = bbqMeal(recipe, today)
+    const tapaDay = isTapa(recipe) ? matchBake(state.bakePlan, recipe.id, today, ctxDay) : undefined
+    // Tapa vom Tapas-Abend: Menge des Abends; sonst ein Teller (Faktor 1)
+    const f = tapaDay ? tapasFactor(state.bakePlan, tapaDay) : 1
+    const meal = isTapa(recipe) ? tapasMeal(recipe, today, f) : bbqMeal(recipe, today)
     setState((s) => {
       // eingeplantes Backen: dieser Eintrag gilt damit als gebacken (kein zweites Abziehen, keine Nachfrage mehr)
       const planned = matchBake(s.bakePlan, recipe.id, today, ctxDay)
       return {
         ...s,
-        pantry: cookBasic(s.pantry, recipe, servings, today).pantry,
+        pantry: cookBasic(s.pantry, recipe, servings * f, today).pantry,
         baked: bake ? [...s.baked, { date: today, recipeId: recipe.id }].slice(-200) : s.baked,
         bakePlan: planned ? markBaked(s.bakePlan, planned, recipe.id) : s.bakePlan,
         // BBQ: eine Portion zählt als Abendessen in die Tagesbilanz

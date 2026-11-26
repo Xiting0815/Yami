@@ -572,11 +572,13 @@ export function sanitize(parsed: unknown): AppState {
   }
   if (typeof saved.lastBackup !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(saved.lastBackup)) delete saved.lastBackup
   const state: AppState = { ...INITIAL, ...(saved as Partial<AppState>), filters: { ...EMPTY_FILTERS, ...(saved.filters as object) } }
-  // Neue Küchen („Griechisch“, „Amerikanisch“): wer alle bisherigen Küchen gewählt hatte, soll sie ebenfalls sehen
+  // Neue Küchen („Griechisch“, „Amerikanisch“, „Spanisch“): wer alle bisherigen Küchen gewählt hatte, soll sie ebenfalls sehen
   if (Array.isArray(state.filters.cuisines)) {
     let cs = state.filters.cuisines
     if (cs.includes('de') && cs.includes('it') && cs.includes('as') && !cs.includes('gr')) cs = [...cs, 'gr']
     if (cs.includes('de') && cs.includes('it') && cs.includes('as') && cs.includes('gr') && !cs.includes('us')) cs = [...cs, 'us']
+    // „Spanisch“: wer alle übrigen Küchen gewählt hatte, bekommt sie dazu
+    if (cs.includes('de') && cs.includes('it') && cs.includes('as') && cs.includes('gr') && cs.includes('us') && !cs.includes('es')) cs = [...cs, 'es']
     if (cs !== state.filters.cuisines) state.filters = { ...state.filters, cuisines: cs }
   }
   // zusammengeführte Zutaten (z. B. „Tomaten reif“ → „Tomate“) umbenennen, bevor eigene Rezepte geprüft werden

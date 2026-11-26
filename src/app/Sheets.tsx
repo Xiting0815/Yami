@@ -6,7 +6,10 @@ import { pantryWishes, portionNote, satietyNote, summarize } from '../learning'
 import { cookTarget } from '../cookDone'
 import { bakesOn } from '../bakePlan'
 import { dinnerToReplace, doneWord } from '../bbq'
-import { isBbq } from '../types'
+import { isBbq, isTapa } from '../types'
+import { shortTitle } from '../tapas'
+import { TapasEveningSheet, TapasPlanSheet } from '../components/TapasSheets'
+import { TapasCook } from '../components/TapasCook'
 import { portionFor } from '../energy'
 import { defaultReviewMonday } from '../review'
 import { addDays, isoDate, parseIso, sharingActive, weekdayName } from '../store'
@@ -107,7 +110,16 @@ export function Sheets({ m }: { m: AppModel }) {
           }}
           onDelete={() => act.deleteCustom(sheet.recipe.id)}
           action={
-            sheet.recipe.breakfast
+            isTapa(sheet.recipe)
+              ? {
+                  label: ui.tapasPick.includes(sheet.recipe.id) ? '✓ In der Tapas-Auswahl – abwählen' : `🫒 Zur Tapas-Auswahl (${ui.tapasPick.length} gewählt)`,
+                  onClick: () => {
+                    const id = sheet.recipe.id
+                    ui.setTapasPick(ui.tapasPick.includes(id) ? ui.tapasPick.filter((x) => x !== id) : [...ui.tapasPick, id])
+                    ui.setSheet(null)
+                  },
+                }
+              : sheet.recipe.breakfast
               ? sheet.mode === 'take' || sheet.mode === 'pick'
                 ? {
                     label: bf.picks.includes(sheet.recipe.id) ? '✓ Schon gewählt' : '☀️ Fürs Frühstück Mo–Fr wählen',
@@ -189,6 +201,86 @@ export function Sheets({ m }: { m: AppModel }) {
               ui.setBakeSheet(null)
               act.removeBakeEntry(day, recipeId)
             }}
+          />
+        )
+      })()}
+
+      {ui.tapasPlanOpen && (
+        <TapasPlanSheet
+          picks={ui.tapasPick.map((id) => RECIPE_BY_ID[id]).filter(Boolean)}
+          today={today}
+          plannedDays={Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => !e.status && isTapa(RECIPE_BY_ID[e.recipeId])))}
+          dinnerOn={(day) => {
+            const e = dinnerToReplace(state.plan, day)
+            return e ? RECIPE_BY_ID[e.recipeId]?.title : undefined
+          }}
+          onRemove={(id) => ui.setTapasPick(ui.tapasPick.filter((x) => x !== id))}
+          onPlan={(day, replace) => {
+            act.planTapas(day, ui.tapasPick, replace)
+            ui.setTapasPlanOpen(false)
+          }}
+          onClose={() => ui.setTapasPlanOpen(false)}
+        />
+      )}
+
+      {ui.tapasSheet && (() => {
+        const { day, move } = ui.tapasSheet
+        const entries = bakesOn(state.bakePlan, day).filter((e) => e.status !== 'skipped' && isTapa(RECIPE_BY_ID[e.recipeId])).map((entry) => ({ entry, recipe: RECIPE_BY_ID[entry.recipeId] }))
+        if (!entries.length) return null
+        return (
+          <TapasEveningSheet
+            key={day}
+            day={day}
+            today={today}
+            entries={entries}
+            startMove={move}
+            plannedDays={Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => !e.status && isTapa(RECIPE_BY_ID[e.recipeId])))}
+            onCook={() => {
+              ui.setTapasSheet(null)
+              ui.setTapasDay(day)
+            }}
+            onView={(r) => {
+              ui.setTapasSheet(null)
+              ui.setSheet({ recipe: r, day, mode: 'view' })
+            }}
+            onDone={() => {
+              ui.setTapasSheet(null)
+              act.confirmTapasEvening(day)
+            }}
+            onMove={(to) => {
+              ui.setTapasSheet(null)
+              act.moveTapas(day, to)
+            }}
+            onRemove={() => {
+              ui.setTapasSheet(null)
+              act.removeTapas(day)
+            }}
+            onClose={() => ui.setTapasSheet(null)}
+          />
+        )
+      })()}
+
+      {ui.tapasDay && (() => {
+        const day = ui.tapasDay
+        const entries = bakesOn(state.bakePlan, day).filter((e) => e.status !== 'skipped' && isTapa(RECIPE_BY_ID[e.recipeId])).map((entry) => ({ entry, recipe: RECIPE_BY_ID[entry.recipeId] }))
+        if (!entries.length) return null
+        return (
+          <TapasCook
+            day={day}
+            today={today}
+            entries={entries}
+            pantry={state.pantry}
+            ratings={state.bakeRatings}
+            onFinish={(id) => act.finishTapa(day, id)}
+            onRate={(id, v) => {
+              act.setBakeRating(day, id, v)
+              if (v) m.flash(`${shortTitle(RECIPE_BY_ID[id]?.title ?? '')}: gemerkt ✓`)
+            }}
+            onOpenRecipe={(r) => {
+              ui.setTapasDay(null)
+              ui.setSheet({ recipe: r, mode: 'view' })
+            }}
+            onClose={() => ui.setTapasDay(null)}
           />
         )
       })()}

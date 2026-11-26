@@ -132,3 +132,11 @@ Zusätzliche Geräte für die BBQ-Sparte und Resteverwertung: `smoker` (Traeger 
 und Garwerte in `docs/bbq-regeln.md`, Bausteine `traeger()`, `gasgrill()`, `dutch()`, `vakuum()`, `bora()`, `vzug()` in
 `src/data/device-helpers.ts`. Kern bis 98 °C nur bei diesen Geräten (Pulled Pork/Brisket). Sous-vide bleibt der
 CombiSteamer mit `Vacuisine` (30–95 °C).
+
+## 11. Spanien: Paellapfanne und Plancha
+
+Für die Küche „Spanisch“ und die Tapas: `paella` (Paellapfanne **32 cm** auf dem BORA mit Brücke bzw. **46 cm** auf dem
+Gasgrill, Deckel offen) und `plancha` (Gusseisen-Platte/-Pfanne auf BORA oder Gasgrill) – Daten in `paella-plancha.md`,
+Bausteine `paella('32' | '46', mode, { level, burners, minutes })` und `plancha('bora' | 'gasgrill', mode, { level, temp, minutes })`
+in `src/data/device-helpers.ts`, Schreibregeln in `docs/spanien-regeln.md`. Paella: keine Temperatur, nach der Reiszugabe
+nicht rühren (check-data prüft das), große Pfanne als `alt: true`.

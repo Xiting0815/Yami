@@ -28,7 +28,7 @@ import { type AppState, type ShiftRecord, type TripState, SHIFTS_MAX, mondayOf, 
 import { householdFeedback } from './sync'
 import { releaseTrip, tripsOf } from './tripState'
 import type { Recipe, WeekPlan } from './types'
-import { isBbq } from './types'
+import { planWord } from './bbq'
 
 /** so weit voraus wird gewarnt / verschoben */
 export const SHORT_HORIZON = 13
@@ -254,7 +254,7 @@ export function pushAlerts(s: AppState, today: string, now: Date, trips?: Trip[]
     if (u.day === today && now.getHours() >= 21) continue
     const names = u.missing.map((m) => m.name).sort()
     const title = RECIPE_BY_ID[u.recipeId]?.title ?? 'Gericht'
-    const what = u.kind === 'dinner' ? title : u.kind === 'breakfast' ? `Frühstück-Prep (${title})` : `${isBbq(RECIPE_BY_ID[u.recipeId]) ? 'BBQ' : 'Backen'} (${title})`
+    const what = u.kind === 'dinner' ? title : u.kind === 'breakfast' ? `Frühstück-Prep (${title})` : `${planWord(RECIPE_BY_ID[u.recipeId])} (${title})`
     out.push({
       key: `miss:${u.day}:${u.kind}:${u.recipeId}:${names.join(',')}`,
       title: `⚠️ ${when(u.day)} fehlt: ${namesText(names)}`,

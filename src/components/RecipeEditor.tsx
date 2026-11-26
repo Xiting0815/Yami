@@ -7,7 +7,7 @@ import { ingredientText, parseIngredientText, searchIngredients, titleCase, unit
 import { shrinkImage } from '../imageResize'
 import { uid } from '../kitchen'
 import {
-  BREAKFAST_LABEL, CUISINE_LABEL, INGREDIENT_CATS, SHOP_LABEL, TYPE_LABEL,
+  BREAKFAST_LABEL, CUISINE_ICON, CUISINE_LABEL, INGREDIENT_CATS, SHOP_LABEL, TYPE_LABEL,
   type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type ShopCat,
 } from '../types'
 
@@ -227,7 +227,7 @@ export function RecipeEditor({ initial, defaultMeal, onSave, onCreateIngredient,
               <div className="ed-chips">
                 {(Object.keys(CUISINE_LABEL) as Cuisine[]).map((c) => (
                   <button key={c} className={`chip ${cuisine === c ? 'on' : ''}`} onClick={() => setCuisine(c)}>
-                    {CUISINE_LABEL[c]}
+                    {CUISINE_ICON[c]} {CUISINE_LABEL[c]}
                   </button>
                 ))}
               </div>

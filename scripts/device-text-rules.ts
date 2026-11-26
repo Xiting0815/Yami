@@ -6,7 +6,7 @@ import type { Device, DeviceStep } from '../src/types'
 export interface TextFinding { id: string; step: number; msg: string; text: string }
 
 /** Geräte mit Garraum-/Deckeltemperatur (Text-Temperaturen müssen zur Einstellung passen) */
-const OVENS: Device[] = ['steamer', 'combair', 'airfryer', 'pizzaofen', 'smoker', 'gasgrill']
+const OVENS: Device[] = ['steamer', 'combair', 'airfryer', 'pizzaofen', 'smoker', 'gasgrill', 'plancha']
 
 /** Betriebsart-Wörter im Text → passende Einstellungen */
 const MODE_WORDS: { re: RegExp; label: string; ok: (mode: string, device: Device) => boolean }[] = [
@@ -117,7 +117,7 @@ export function checkStep(id: string, idx: number, st: DeviceStep): TextFinding[
   }
 
   // 3a. Gasgrill: „Brenner 1 und 4“ / „Brenner 1+4“ im Text = eingestellte Brenner
-  const gg = sets.filter((s) => s.device === 'gasgrill' && !s.alt)
+  const gg = sets.filter((s) => (s.device === 'gasgrill' || s.on === 'gasgrill') && !s.alt && s.burners)
   const bm = text.match(/Brenner (\d)(?:\s*(?:\+|und|,)\s*(\d))?(?:\s*(?:\+|und|,)\s*(\d))?/)
   if (bm && gg.length) {
     const named = [bm[1], bm[2], bm[3]].filter(Boolean).sort().join('+')
@@ -125,6 +125,21 @@ export function checkStep(id: string, idx: number, st: DeviceStep): TextFinding[
   }
   // 3c. Dutch Oven / Vakuumierer genannt, aber keine Einstellung dafür (nur wenn der Schritt überhaupt Einstellungen hat)
   if (sets.length && /Vakuumierer|vakuumieren/i.test(text) && !sets.some((s) => s.device === 'vakuum') && !/vakuumiert(e|en)?\b/i.test(text)) add('Text vakuumiert, aber keine Vakuumierer-Einstellung')
+
+  // 3d. Paellapfanne / Plancha genannt, aber keine Einstellung dafür (nur wenn der Schritt überhaupt Einstellungen hat)
+  //     (eine Plancha auf dem Gasgrill/BORA mit deren Einstellung – wie bei den Burgern – ist auch richtig)
+  if (sets.length && /Paella-?pfanne/i.test(text) && !sets.some((s) => s.device === 'paella')) add('Text nennt die Paellapfanne, aber keine paella()-Einstellung')
+  if (sets.length && /\bPlancha\b/i.test(text) && !sets.some((s) => s.device === 'plancha' || s.device === 'gasgrill' || s.device === 'bora')) add('Text nennt die Plancha, aber keine plancha()-Einstellung')
+  // 3e. Paella: Größe im Text = Pfanne der Einstellung; großer Pfanne auf dem Gasgrill: Deckel offen; Reis nach Zugabe nicht rühren
+  const pa = sets.filter((s) => s.device === 'paella' && !s.alt)
+  if (pa.length) {
+    const cm = text.match(/\b(32|46)\s*cm/)
+    if (cm && !sets.some((s) => s.device === 'paella' && s.pan === cm[1])) add(`Text nennt ${cm[1]} cm, Paellapfanne der Einstellung: ${pa.map((s) => s.pan).join('/')} cm`)
+    if (pa.some((s) => s.on === 'gasgrill') && /Deckel (zu|schließen|geschlossen)|geschlossene[nm]? Deckel/i.test(text) && !sets.some((s) => s.device === 'gasgrill' && s.mode === 'Vorheizen'))
+      add('Paella auf dem Gasgrill: Deckel bleibt offen')
+    if (pa.some((s) => s.mode === 'Köcheln' || s.mode === 'Socarrat') && /\b(um)?rühren\b|\bgerührt\b/i.test(text) && !/nicht (mehr )?(um)?rühren|nicht mehr gerührt|ohne (zu )?(um)?rühren|nie(mals)? (mehr )?(um)?rühren|kein(en)? (Um)?[Rr]ühren/i.test(text))
+      add('Paella: nach der Reiszugabe nicht mehr rühren (Text sagt „rühren“)')
+  }
 
   // 3b. „in zwei Runden“ backen, obwohl die Einstellung zwei Bleche gleichzeitig vorsieht
   if (/in (zwei|mehreren|\d) Runden/i.test(text) && sets.some((s) => /zwei Bleche|1\s*\+\s*3/.test(s.note ?? ''))) add('Text backt in Runden, Einstellung: zwei Bleche gleichzeitig (Ebene 1+3)')

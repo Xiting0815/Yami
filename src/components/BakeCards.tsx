@@ -22,6 +22,24 @@ export function BakeAskCard({ recipe, day, onYes, onMove, onNo }: { recipe: Reci
   )
 }
 
+/** „Hattet ihr den Tapas-Abend?“ – am Tag nach dem geplanten Tapas-Abend, bis beantwortet (alle Tapas zusammen) */
+export function TapasAskCard({ titles, day, onYes, onMove, onNo }: { titles: string[]; day: string; onYes: () => void; onMove: () => void; onNo: () => void }) {
+  return (
+    <section className="rate-card bake-ask" aria-label="Tapas-Abend nachfragen">
+      <div className="rate-head">
+        <span>
+          Hattet ihr den <b>🫒 Tapas-Abend</b> ({titles.join(', ')})? <small className="muted">(geplant für {weekdayLabel(day)}, {day.slice(8)}.{day.slice(5, 7)}.)</small>
+        </span>
+      </div>
+      <div className="rate-btns">
+        <button onClick={onYes}><span aria-hidden>✅</span> Ja</button>
+        <button onClick={onMove}><span aria-hidden>📅</span> Verschieben</button>
+        <button onClick={onNo}><span aria-hidden>🗑️</span> Nein, entfernen</button>
+      </div>
+    </section>
+  )
+}
+
 /** sanfter Vorschlag zum Backen (höchstens einer, wegklickbar) */
 export function BakeHintCard({ s, onAccept, onDismiss }: { s: BakeSuggestion; onAccept: () => void; onDismiss: () => void }) {
   return (
