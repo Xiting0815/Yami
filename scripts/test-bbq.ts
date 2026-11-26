@@ -13,7 +13,7 @@ import { EMPTY_FILTERS, parseIso, weekDays } from '../src/store'
 import { formatAmount } from '../src/shopping'
 import { cookBasic, insight, planWeek } from '../src/kitchen'
 import { addBake, bakeEntriesOf, hintBlocked, settleBaked, suggestBake, type BakeHint } from '../src/bakePlan'
-import { bbqHint, bbqIdeas, bbqMeal, bbqOn, bbqSection, dinnerToReplace, doneWord, leftoverText, type BbqInput } from '../src/bbq'
+import { bbqHint, bbqIdeas, bbqMeal, bbqOn, bbqSection, dinnerToReplace, doneWord, leftoverText, moveBakeEntry, type BbqInput } from '../src/bbq'
 import { buildModel, featureLabel, features } from '../src/learning'
 import { plannedDinners } from '../src/haSync'
 import { settingText, validateSetting } from '../src/deviceText'
@@ -164,6 +164,19 @@ ok(!!salmon && !!salmonRaw && salmonRaw.kcal - salmon.nutrition.kcal >= 80 && sa
   `Heißgeräucherter Lachs: Lake-Zucker nicht voll gezählt (${salmonRaw?.kcal} → ${salmon?.nutrition.kcal} kcal, ${salmon?.nutrition.carbs} g KH)`)
 const sugar = [{ name: 'Zucker', amount: 100, unit: 'g' }, { name: 'Honig', amount: 100, unit: 'g' }]
 ok(nutritionOf(sugar, 1, undefined, { Zucker: 0.1 }).carbs === Math.round((10 + NUTRI['Honig'][3]) * 10) / 10, 'eaten wirkt nur auf die genannte Zutat')
+
+// ───── BBQ verschieben: Abendessen des Zieltags wird ersetzt (wie beim Einplanen) ─────
+{
+  const SUN = '2026-06-14'
+  const st = { plan: { [SUN]: { recipeId: jamb.id, servings: 2 } }, bakePlan: addBake({}, SAT, PP, 1) }
+  const mv = moveBakeEntry(st, SAT, PP, SUN)
+  ok(!mv.plan[SUN] && mv.dropped?.recipeId === jamb.id && (mv.bakePlan[SUN] ?? []).some((e) => e.recipeId === PP) && !(mv.bakePlan[SAT] ?? []).length, 'BBQ verschieben: Abendessen des Zieltags ersetzt')
+  const side = BASICS.find((r) => isBbq(r) && r.bbq === 'beilage')
+  if (side) {
+    const st2 = { plan: { [SUN]: { recipeId: jamb.id, servings: 2 } }, bakePlan: addBake({}, SAT, side.id, 1) }
+    ok(!!moveBakeEntry(st2, SAT, side.id, SUN).plan[SUN], 'Beilage verschieben: Abendessen bleibt')
+  }
+}
 
 if (fails) {
   console.error(`${fails} Test(s) fehlgeschlagen`)

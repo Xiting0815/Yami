@@ -10,7 +10,7 @@ import type { BreakfastPlan } from '../useBreakfastPlan'
 import type { ActionContext } from './context'
 
 /** Frühstück: 1–2 Rezepte wählen, Prep-Tag, Prep-Liste abhaken */
-export function breakfastActions({ state, setState, cal, ui, flash, snapshot }: ActionContext, { picks, prep, covered }: Pick<BreakfastPlan, 'picks' | 'prep' | 'covered'>) {
+export function breakfastActions({ state, setState, cal, ui, flash, snapshot }: ActionContext, { picks, prep, prepLate, covered }: Pick<BreakfastPlan, 'picks' | 'prep' | 'prepLate' | 'covered'>) {
   const { today, days, weekKey } = cal
 
   /** Frühstücke für die Woche festlegen und auf die Tage nach dem Prep-Tag verteilen (Tage davor bekommen keins) */
@@ -18,9 +18,14 @@ export function breakfastActions({ state, setState, cal, ui, flash, snapshot }: 
     setState((s) => {
       // schon gegessene Tage bleiben (auch ihr Abzug im Vorrat)
       const breakfast = applyBreakfastPicks(s.breakfast, ids, days, prepDay, today)
-      // Der gewählte Prep-Tag wird gemerkt – daraus lernt die App den üblichen Wochentag
-      const prepDays = ids.length || s.prepDays[weekKey] ? { ...s.prepDays, [weekKey]: prepDay } : s.prepDays
-      return { ...s, breakfast, prepDays, breakfastPicks: { ...s.breakfastPicks, [weekKey]: ids } }
+      // Der gewählte Prep-Tag wird gemerkt – daraus lernt die App den üblichen Wochentag.
+      // Später Einstieg („heute vorbereiten“, nicht selbst gewählt): auch gemerkt (Verteilung bleibt stehen), aber als
+      // `prepLate` – er verrät nichts über den üblichen Tag und zählt nicht fürs Lernen.
+      const store = !!ids.length || !!s.prepDays[weekKey]
+      const prepDays = store ? { ...s.prepDays, [weekKey]: prepDay } : s.prepDays
+      const late = store && prepLate && prepDay === prep
+      const prepLateWeeks = late ? [...new Set([...s.prepLate, weekKey])] : s.prepLate.filter((w) => w !== weekKey || !store)
+      return { ...s, breakfast, prepDays, prepLate: prepLateWeeks, breakfastPicks: { ...s.breakfastPicks, [weekKey]: ids } }
     })
   }
 
@@ -29,7 +34,8 @@ export function breakfastActions({ state, setState, cal, ui, flash, snapshot }: 
     if (iso === prep) return
     const snap = snapshot()
     setPicks(picks, iso)
-    if (!picks.length) setState((s) => ({ ...s, prepDays: { ...s.prepDays, [weekKey]: iso } }))
+    // selbst gewählt → zählt fürs Lernen (kein später Einstieg mehr)
+    if (!picks.length) setState((s) => ({ ...s, prepDays: { ...s.prepDays, [weekKey]: iso }, prepLate: s.prepLate.filter((w) => w !== weekKey) }))
     const n = Object.keys(assignBreakfasts(picks, days, iso).days).length
     flash(
       picks.length

@@ -1,5 +1,5 @@
 // Logiktest Meal-Prep-Frühstück:  npx vite-node scripts/test-breakfast.ts
-import { applyBreakfastPicks, assignBreakfasts, coveredDays, learnedPrepWeekday, prepPlan, resolvePrepDay } from '../src/breakfast'
+import { applyBreakfastPicks, assignBreakfasts, coveredDays, learnedPrepWeekday, prepDayInfo, prepDayText, prepPlan, resolvePrepDay } from '../src/breakfast'
 import { containerText, finishPrep, openPrepDays, pendingSatiety, prepKey, prepRatingKey, prepWeek, preppedText, undoPrep, type PrepState } from '../src/breakfastPrep'
 import { addDaysIso, allNeedsOf, planWeek, type PantryLot } from '../src/kitchen'
 import { RECIPE_BY_ID } from '../src/data/recipes'
@@ -92,9 +92,30 @@ ok(learnedPrepWeekday({ '2026-11-09': '2026-11-09', '2026-11-02': '2026-11-02', 
 ok(learnedPrepWeekday({ '2026-01-05': '2026-01-05', '2025-12-29': '2025-12-29' }, today) === 0, 'Lernen: alte Wochen (> 8) zählen nicht')
 const learnedDays = { '2026-11-09': '2026-11-09', '2026-11-02': '2026-11-02' }
 ok(resolvePrepDay(learnedDays, days, today) === mon, 'resolvePrepDay: gelernt Montag → Montag der Woche')
-ok(resolvePrepDay({}, days, today) === sun, 'resolvePrepDay: Standard Sonntag davor')
+ok(resolvePrepDay({}, days, sun) === sun, 'resolvePrepDay: Standard Sonntag davor')
 ok(resolvePrepDay({ [mon]: wed }, days, today) === wed, 'resolvePrepDay: gespeicherter Tag gewinnt')
-ok(resolvePrepDay({ [mon]: addDaysIso(mon, 5) }, days, today) === sun, 'resolvePrepDay: ungültiger Tag (Sa) wird ignoriert')
+ok(resolvePrepDay({ [mon]: addDaysIso(mon, 5) }, days, sun) === sun, 'resolvePrepDay: ungültiger Tag (Sa) wird ignoriert')
+
+// ───── Später Einstieg mitten in der Woche: vergangener Prep-Tag → heute vorbereiten ─────
+{
+  const late = prepDayInfo({}, days, thu)
+  ok(late.day === thu && late.late, 'später Einstieg (Do): Prep-Tag heute statt vergangenem Sonntag')
+  ok(coveredDays(days, late.day).join() === fri, 'später Einstieg (Do): deckt nur noch Fr ab')
+  const a2 = assignBreakfasts(['eiermuffins-spinat-feta'], days, late.day)
+  ok(!a2.frozen.length && !a2.notes.some((n) => /einfrieren/.test(n)), 'später Einstieg: kein „Portionen für Fr am Sonntag einfrieren“')
+  ok(prepDayText(thu, thu).startsWith('heute (') && prepDayText(sun, thu) === 'So, 15.11.', `Text: „${prepDayText(thu, thu)}“`)
+  ok(prepDayInfo({}, days, thu, { preps: [{ week: mon, date: tue }] }).day === tue, 'schon vorbereitet (Di) → Tag der Vorbereitung, kein „heute“')
+  ok(prepDayInfo({}, days, addDaysIso(mon, 4)).day === sun, 'Freitag: kein Prep-Tag mehr möglich → bleibt beim üblichen Tag')
+  ok(!prepDayInfo({}, days, sun).late, 'am Sonntag selbst: kein später Einstieg')
+  ok(prepDayInfo({}, days, thu, { picks: { [mon]: ['chia-beeren'] } }).day === sun, 'schon gewählt (ohne gespeicherten Tag) → üblicher Tag bleibt')
+  // gemerkt als später Einstieg → bleibt stehen, zählt aber nicht fürs Lernen
+  ok(prepDayInfo({ [mon]: thu }, days, fri, { late: [mon] }).day === thu, 'gespeicherter später Einstieg bleibt (Verteilung stabil)')
+  const hist = { '2026-11-02': '2026-11-01', '2026-11-09': '2026-11-08', [mon]: thu, '2026-11-23': '2026-11-26' }
+  ok(learnedPrepWeekday(hist, '2026-11-26', [mon, '2026-11-23']) === 0, 'Lernen: späte Einstiege (Do) zählen nicht – weiter Sonntag')
+  ok(learnedPrepWeekday(hist, '2026-11-26') === 4, '(Gegenprobe: ohne Vermerk würde Donnerstag gelernt)')
+  const st = sanitize({ prepDays: { [mon]: thu }, prepLate: [mon, '2026-11-30', 5] as unknown as string[] })
+  ok(st.prepLate.join() === mon, 'Speicher: prepLate nur für Wochen mit gespeichertem Prep-Tag')
+}
 
 
 // ───── „Fertig vorbereitet“: Prep abhaken, Portionen in den Vorrat, keine Doppelbuchung ─────

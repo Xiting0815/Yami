@@ -51,7 +51,7 @@ export function shortUses(s: AppState, today: string, end = addDaysIso(today, SH
   }
   for (const [d, e] of Object.entries(s.breakfast)) {
     if (!e || e.status || e.prep || d < today || d > end || !RECIPE_BY_ID[e.recipeId]) continue
-    const p = resolvePrepDay(s.prepDays, weekDays(mondayOf(parseIso(d))), today)
+    const p = resolvePrepDay(s.prepDays, weekDays(mondayOf(parseIso(d))), today, { preps: s.bfPreps, late: s.prepLate, picks: s.breakfastPicks })
     if (p < today) continue
     out.push({ day: p, kind: 'breakfast', recipeId: e.recipeId, servings: e.servings })
   }

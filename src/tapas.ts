@@ -84,11 +84,17 @@ export function removeTapasEvening(bp: BakePlan, day: string): BakePlan {
 }
 
 /** Tapas-Abend verschieben: alle offenen Tapas des Tages auf einen anderen Tag (dort vorhandene offene Tapas werden ersetzt) */
-export function moveTapasEvening(s: { plan: WeekPlan; bakePlan: BakePlan }, from: string, to: string): BakePlan {
-  if (from === to) return s.bakePlan
+export function moveTapasEvening(
+  s: { plan: WeekPlan; bakePlan: BakePlan },
+  from: string,
+  to: string,
+  replaceDinner = true,
+): { plan: WeekPlan; bakePlan: BakePlan; dropped?: PlanEntry } {
+  if (from === to) return { plan: s.plan, bakePlan: s.bakePlan }
   const ids = bakesOn(s.bakePlan, from).filter((e) => isTapa(RECIPE_BY_ID[e.recipeId]) && !e.status).map((e) => e.recipeId)
-  if (!ids.length) return s.bakePlan
-  return planTapasEvening({ plan: s.plan, bakePlan: removeTapasEvening(s.bakePlan, from) }, to, ids, false).bakePlan
+  if (!ids.length) return { plan: s.plan, bakePlan: s.bakePlan }
+  // wie beim Einplanen: der Tapas-Abend ist das Abendessen → das offene Abendessen des Zieltags wird gestrichen
+  return planTapasEvening({ plan: s.plan, bakePlan: removeTapasEvening(s.bakePlan, from) }, to, ids, replaceDinner)
 }
 
 /**

@@ -168,6 +168,8 @@ export interface AppState {
   breakfastPicks: Record<string, string[]>
   /** Prep-Tag (ISO) je Woche (Schlüssel = Montag); fehlt er, gilt der gelernte Wochentag, sonst der Sonntag davor */
   prepDays: Record<string, string>
+  /** Wochen (Montag), deren Prep-Tag ein später Einstieg war („heute vorbereiten“) – zählen nicht für den gelernten Wochentag */
+  prepLate: string[]
   /** abgehakte Prep-Schritte je Woche */
   prepChecked: Record<string, string[]>
   /** erledigte Frühstücks-Vorbereitungen („Fertig vorbereitet“): Portionen im Vorrat, entnommene Zutaten (persönlich) */
@@ -366,6 +368,7 @@ const INITIAL: AppState = {
   breakfast: {},
   breakfastPicks: {},
   prepDays: {},
+  prepLate: [],
   prepChecked: {},
   bfPreps: [],
   bfRatings: {},
@@ -610,6 +613,7 @@ export function sanitize(parsed: unknown): AppState {
   state.prepDays = Object.fromEntries(
     Object.entries(state.prepDays).filter(([k, v]) => ISO.test(k) && typeof v === 'string' && ISO.test(v) && v < addDaysIso(k, 4) && v >= addDaysIso(k, -1)),
   )
+  state.prepLate = Array.isArray(state.prepLate) ? [...new Set(state.prepLate.filter((k): k is string => typeof k === 'string' && !!state.prepDays[k]))] : []
   const validWaste = (w: unknown): w is WastedItem => {
     const x = w as Partial<WastedItem> | null
     return (

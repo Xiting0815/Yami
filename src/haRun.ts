@@ -27,7 +27,7 @@ export interface HaRunDeps {
   getState: () => AppState
   setState: (fn: (s: AppState) => AppState) => void
   /** in HA abgehakt → in Yami als gekauft markieren */
-  onBought: (keys: string[]) => void
+  onBought: (keys: string[]) => string[] | void
   now: Date
 }
 
@@ -139,7 +139,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   const errText = (e?: string) => (e ? `Nicht alles ließ sich abgleichen: ${e}` : undefined)
   const remindersOf = (state: AppState, trips: Trip[]) =>
     plannedReminders(
-      { breakfastPicks: state.breakfastPicks, prepDays: state.prepDays, weighIns: state.weighIns, hasProfile: !!state.profile, pantry: state.pantry, trips: tripReminderInput(trips, state.trips, today) },
+      { breakfastPicks: state.breakfastPicks, prepDays: state.prepDays, prepLate: state.prepLate, bfPreps: state.bfPreps, weighIns: state.weighIns, hasProfile: !!state.profile, pantry: state.pantry, trips: tripReminderInput(trips, state.trips, today) },
       now,
     )
 

@@ -1,10 +1,10 @@
 import { RECIPE_BY_ID } from '../../data/recipes'
-import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, moveBake, removeBake, setBakeAmount, settleBaked, skipBakes, tapasFactor } from '../../bakePlan'
+import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, removeBake, setBakeAmount, settleBaked, skipBakes, tapasFactor } from '../../bakePlan'
 import { yieldText } from '../../bake'
 import { weekdayName } from '../../store'
 import type { Recipe } from '../../types'
 import { finishable, isBake, isBbq, isTapa, replacesDinner } from '../../types'
-import { bbqHint, bbqMeal, dinnerToReplace, doneWord, planWord } from '../../bbq'
+import { bbqHint, bbqMeal, dinnerToReplace, doneWord, moveBakeEntry, planWord } from '../../bbq'
 import { moveTapasEvening, planTapasEvening, removeTapasEvening, shortTitle, tapasMeal } from '../../tapas'
 import { isBbqSeason } from '../../data/season'
 import type { ActionContext } from './context'
@@ -59,8 +59,14 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
   function moveTapas(from: string, to: string) {
     if (from === to) return
     const snap = snapshot()
-    setState((s) => ({ ...s, bakePlan: moveTapasEvening(s, from, to) }))
-    flash(`🫒 Tapas-Abend → ${weekdayName(to)} verschoben`, snap)
+    // wie beim Einplanen: das offene Abendessen des Zieltags wird ersetzt (Rückgängig über den Toast)
+    const dropped = moveTapasEvening(state, from, to).dropped
+    setState((s) => {
+      const r = moveTapasEvening(s, from, to)
+      return { ...s, plan: r.plan, bakePlan: r.bakePlan }
+    })
+    const dropTitle = dropped ? RECIPE_BY_ID[dropped.recipeId]?.title : undefined
+    flash(`🫒 Tapas-Abend → ${weekdayName(to)} verschoben${dropTitle ? ` (statt ${dropTitle})` : ''}`, snap)
   }
   function removeTapas(day: string) {
     const snap = snapshot()
@@ -113,8 +119,14 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     const r = RECIPE_BY_ID[recipeId]
     if (!r || from === to) return
     const snap = snapshot()
-    setState((s) => ({ ...s, bakePlan: moveBake(s.bakePlan, from, recipeId, to) }))
-    flash(`${r.title} → ${weekdayName(to)} verschoben`, snap)
+    // Grillabend: das offene Abendessen des Zieltags wird ersetzt (wie beim Einplanen; Rückgängig über den Toast)
+    const dropped = moveBakeEntry(state, from, recipeId, to).dropped
+    setState((s) => {
+      const m = moveBakeEntry(s, from, recipeId, to)
+      return { ...s, plan: m.plan, bakePlan: m.bakePlan }
+    })
+    const dropTitle = dropped ? RECIPE_BY_ID[dropped.recipeId]?.title : undefined
+    flash(`${r.title} → ${weekdayName(to)} verschoben${dropTitle ? ` (statt ${dropTitle})` : ''}`, snap)
   }
 
   function removeBakeEntry(day: string, recipeId: string) {

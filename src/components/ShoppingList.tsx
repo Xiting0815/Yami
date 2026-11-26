@@ -73,7 +73,7 @@ export function ShoppingList(props: Props) {
           <div className="total">{formatEuro(result.total)}</div>
         </div>
         <div className="right muted small">
-          {result.buy.length} Artikel{result.covered.length ? ` · ${result.covered.length} schon im Vorrat` : ''}
+          {result.buy.length} Artikel{coveredText(result.covered)}
         </div>
       </div>
       <div className="week-progress">
@@ -218,6 +218,13 @@ export function ShoppingList(props: Props) {
   )
 }
 
+/** gedeckt: wirklich im Vorrat bzw. erst mit einem früheren Einkauf (liegt noch nicht im Vorrat) – getrennt zählen */
+export function coveredText(covered: BuyItem[]): string {
+  const viaTrip = covered.filter((c) => (c.fromTrip ?? 0) >= c.fromPantry - 1e-6).length
+  const inPantry = covered.length - viaTrip
+  return `${inPantry ? ` · ${inPantry} schon im Vorrat` : ''}${viaTrip ? ` · ${viaTrip} ${viaTrip === 1 ? 'kommt' : 'kommen'} mit dem Einkauf davor` : ''}`
+}
+
 function ItemDetails({ it, onEditPrice }: { it: BuyItem; onEditPrice: (name: string, pack: number, price: number) => void }) {
   const [editing, setEditing] = useState(false)
   const [pack, setPack] = useState(String(it.product.pack))
@@ -229,7 +236,8 @@ function ItemDetails({ it, onEditPrice }: { it: BuyItem; onEditPrice: (name: str
         Brauchst {formatAmount(it.required, it.unit)}
         {it.fromPantry > 0 && (
           <>
-            {' '}· {formatAmount(it.fromPantry, it.unit)} aus dem Vorrat
+            {it.fromPantry - (it.fromTrip ?? 0) > 1e-6 && <>{' '}· {formatAmount(it.fromPantry - (it.fromTrip ?? 0), it.unit)} aus dem Vorrat</>}
+            {(it.fromTrip ?? 0) > 1e-6 && <>{' '}· {formatAmount(it.fromTrip!, it.unit)} vom Einkauf davor</>}
             {it.substitutes.length > 0 && <> ({it.substitutes.map((x) => x.name).join(', ')} statt {it.name})</>}
           </>
         )}

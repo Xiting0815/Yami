@@ -273,6 +273,32 @@ class FakeHa implements HaApi {
   ok(ha.todos.some((t) => t.uid === settings.items.Hack && t.status === 'completed'), 'Sync: erledigter Eintrag bleibt in HA stehen')
 }
 {
+  // in HA abgehakt, aber Yami findet den Artikel (noch) nicht → nicht als erledigt merken, kein Wieder-Öffnen, nächster Lauf versucht es erneut
+  const ha = new FakeHa()
+  const settings = { todo: 'todo.einkaufsliste', items: {} as Record<string, string>, done: [] as string[] }
+  let seen: string[] = []
+  let accept = false
+  const run = async (local: LocalItem[]) => {
+    const r = await syncTodo(ha, settings, local, (k) => {
+      seen = k
+      return accept ? k : []
+    })
+    settings.items = r.items
+    settings.done = r.done
+    return r
+  }
+  await run([L('Eier', 'Eier – 10 Stück')])
+  ha.todos.find((t) => t.uid === settings.items.Eier)!.status = 'completed'
+  const r1 = await run([L('Eier', 'Eier – 10 Stück')])
+  ok(seen.join() === 'Eier' && !r1.done.includes('Eier'), 'Sync: nicht übernommener Haken gilt nicht als erledigt')
+  seen = []
+  await run([L('Eier', 'Eier – 10 Stück')])
+  ok(ha.todos.find((t) => t.uid === settings.items.Eier)!.status === 'completed' && seen.join() === 'Eier', 'Sync: Haken bleibt in Google Tasks, Yami versucht es erneut (kein Wieder-Öffnen)')
+  accept = true
+  const r3 = await run([L('Eier', 'Eier – 10 Stück')])
+  ok(r3.done.includes('Eier'), 'Sync: sobald übernommen → als erledigt gemerkt')
+}
+{
   // Liste ohne Beschreibungs-Unterstützung: Anlegen ohne, Zuordnung über uid
   const ha = new FakeHa()
   ha.noDescription = true

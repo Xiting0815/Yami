@@ -1,6 +1,6 @@
 import { RECIPE_BY_ID } from '../data/recipes'
-import type { BreakfastAssignment } from '../breakfast'
-import { shortDate, weekdayName } from '../store'
+import { type BreakfastAssignment, prepDayText } from '../breakfast'
+import { weekdayName } from '../store'
 import type { Recipe } from '../types'
 import { RecipeImage } from './RecipeImage'
 import { Icon } from './Icon'
@@ -11,6 +11,8 @@ interface Props {
   assignment: BreakfastAssignment
   /** Prep-Tag, wählbare Tage und die davon abgedeckten Arbeitstage */
   prep: string
+  /** heute (ISO) – Prep-Tag heute → „heute (Do, 26.11.)“ */
+  today?: string
   prepChoices: string[]
   covered: string[]
   onPrepDay: (iso: string) => void
@@ -39,14 +41,14 @@ export function shortTitle(title: string): string {
 }
 
 /** Frühstückszeile der Wochenansicht: zugeklappt 56 px, aufgeklappt mit beiden Rezepten */
-export function BreakfastCard({ picks, assignment, prep, prepChoices, covered, onPrepDay, prepProgress, open, onToggle, onPlan, onPrep, onOpen, onReset }: Props) {
+export function BreakfastCard({ picks, assignment, prep, today, prepChoices, covered, onPrepDay, prepProgress, open, onToggle, onPlan, onPrep, onOpen, onReset }: Props) {
   if (!picks.length) {
     return (
       <button className="bf-bar empty" onClick={onPlan}>
         <span className="bf-sun"><Icon name="sun" size={22} /></span>
         <span className="bf-mid">
           <b>Frühstück für {dayRange(covered) || 'die Woche'} planen</b>
-          <small>1–2 Rezepte, einmal vorbereiten ({weekdayName(prep, true)}, {shortDate(prep)})</small>
+          <small>1–2 Rezepte, einmal vorbereiten ({prepDayText(prep, today)})</small>
         </span>
         <Icon name="chevron" size={20} />
       </button>
@@ -82,7 +84,7 @@ export function BreakfastCard({ picks, assignment, prep, prepChoices, covered, o
       {open && (
         <div className="bf-body">
           <div className="bf-prepday">
-            <PrepDayChip prep={prep} choices={prepChoices} onChange={onPrepDay} />
+            <PrepDayChip prep={prep} choices={prepChoices} onChange={onPrepDay} today={today} />
             {covered.length < 5 && <span className="muted small">{covered.length === 1 ? '1 Tag' : `${covered.length} Tage`} abgedeckt</span>}
           </div>
           {rows.map(({ r, ds }) => (

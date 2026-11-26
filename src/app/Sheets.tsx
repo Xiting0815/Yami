@@ -376,6 +376,7 @@ export function Sheets({ m }: { m: AppModel }) {
           items={bf.prepItems}
           notes={bf.assignment.notes}
           prep={bf.prep}
+          today={today}
           prepChoices={bf.prepChoices}
           onPrepDay={act.changePrepDay}
           checked={state.prepChecked[weekKey] ?? []}
@@ -422,7 +423,7 @@ export function Sheets({ m }: { m: AppModel }) {
           satietyNote={satietyNote(bf.satiety)}
           forgotten={forgottenItems(state.removals, today)}
           wishes={pantryWishes(state.pantryRequests)}
-          prepWeekday={learnedPrepWeekday(state.prepDays, today)}
+          prepWeekday={learnedPrepWeekday(state.prepDays, today, state.prepLate)}
           onResetLearning={act.resetLearning}
           lastBackup={state.lastBackup}
           ha={state.ha}

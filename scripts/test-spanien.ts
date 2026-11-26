@@ -84,8 +84,16 @@ ok(kcal3 > 500 && kcal3 < 1100 && kcal3 === Math.round((gambas.nutrition.kcal + 
 // neue Auswahl für denselben Tag ersetzt den vorherigen (offenen) Tapas-Abend
 const re = planTapasEvening(ev, SAT, [GAMBAS, TORTILLA], true)
 ok((re.bakePlan[SAT] ?? []).map((e) => e.recipeId).sort().join() === [GAMBAS, TORTILLA].sort().join(), 'neue Auswahl ersetzt den geplanten Tapas-Abend des Tages')
-const moved = moveTapasEvening(ev, SAT, '2026-11-29')
+const moved = moveTapasEvening(ev, SAT, '2026-11-29').bakePlan
 ok(!moved[SAT] && (moved['2026-11-29'] ?? []).length === 3 && !removeTapasEvening(ev.bakePlan, SAT)[SAT], 'Tapas-Abend verschieben und entfernen')
+{
+  // Zieltag hat ein geplantes Abendessen → wird ersetzt (wie beim Einplanen), sonst würde beides eingekauft
+  const withDinner = { plan: { ...ev.plan, '2026-11-29': { recipeId: jamb.id, servings: 2 } }, bakePlan: ev.bakePlan }
+  const mv = moveTapasEvening(withDinner, SAT, '2026-11-29')
+  ok(!mv.plan['2026-11-29'] && mv.dropped?.recipeId === jamb.id && (mv.bakePlan['2026-11-29'] ?? []).length === 3, 'Verschieben: Abendessen des Zieltags wird ersetzt')
+  const cooked = { plan: { ...ev.plan, '2026-11-29': { recipeId: jamb.id, servings: 2, status: 'cooked' as const } }, bakePlan: ev.bakePlan }
+  ok(!!moveTapasEvening(cooked, SAT, '2026-11-29').plan['2026-11-29'], 'Verschieben: schon gekochtes Abendessen bleibt stehen')
+}
 
 // Kalender: GENAU ein Termin „🍽️ 🫒 Tapas-Abend: …“
 const cal = plannedDinners({ ...ev.plan, '2026-11-27': { recipeId: jamb.id, servings: 2 } }, TODAY, ev.bakePlan)

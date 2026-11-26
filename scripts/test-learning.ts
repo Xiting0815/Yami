@@ -1,7 +1,7 @@
 // Logiktest lernende Vorlieben:  npx vite-node scripts/test-learning.ts
 import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { addDaysIso } from '../src/kitchen'
-import { addReject, buildModel, satietyBonus, satietyIndex, satietyLean, satietyNote, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
+import { addReject, buildModel, hintOk, satietyBonus, satietyIndex, satietyLean, satietyNote, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
 import type { WeekPlan } from '../src/types'
 import { withDinner } from '../src/app/actions/plan'
 
@@ -156,6 +156,43 @@ ok(portionNote(1) === undefined && portionNote(1.1) === 'ihr braucht eher etwas 
   ok(same.ratings[day] === 'down' && same.portionFeedback[day] === 1, 'gleiches Gericht (z. B. Portionen geändert): Bewertung bleibt')
   const cleared = withDinner(s0, day, undefined)
   ok(!cleared.plan[day] && !cleared.ratings[day], 'Tag geleert: Bewertung entfernt')
+}
+
+// ───── Vorlieben-Hinweise erst mit genug Belegen und relativ zum Grundanteil (vegetarisch ~15 %) ─────
+{
+  const base = { plan: {} as WeekPlan, breakfast: {}, breakfastPicks: {} as Record<string, string[]>, rejects: [] as RejectEvent[], ratings: {}, today }
+  const veg = RECIPES.filter((r) => mainProtein(r) === 'vegetarisch')
+  const meat = RECIPES.filter((r) => mainProtein(r) !== 'vegetarisch')
+  const vegBf = BREAKFASTS.filter((r) => mainProtein(r) === 'vegetarisch')
+  const vegUnseen = veg[veg.length - 1]
+  const says = (m: ReturnType<typeof buildModel>) => preference(m, vegUnseen).reason ?? ''
+  // neuer Nutzer: 2 Frühstücke (vegetarisch) gewählt + 2 Abendessen gewischt (1 vegetarisch, 1 Fleisch)
+  const early = buildModel({
+    ...base,
+    breakfastPicks: { [addDaysIso(today, -1)]: [vegBf[0].id, vegBf[1].id] },
+    plan: { [today]: { recipeId: veg[0].id, servings: 2 }, [addDaysIso(today, 1)]: { recipeId: meat[0].id, servings: 2 } },
+  })
+  ok(!/Vegetarisches/.test(says(early)), `nach 3–4 Entscheidungen kein „Vegetarisches magst du“ (${says(early) || 'kein Hinweis'})`)
+  ok(!summarize(early).liked.some((x) => x.label === 'Vegetarisches'), 'Übersicht: nach wenigen Signalen kein „Vegetarisches“')
+  ok(preference(early, vegUnseen).score > preference(buildModel(base), vegUnseen).score, 'Ranking lernt trotzdem sanft mit (vegetarisch leicht vorn)')
+  // üblicher Haushalt über Wochen: ~15 % vegetarisch, dazu jede Woche 2 vegetarische Frühstücke → kein „Vegetarisches magst du“
+  const plan: WeekPlan = {}
+  const picks: Record<string, string[]> = {}
+  for (let i = 0; i < 28; i++) {
+    const day = addDaysIso(today, -i)
+    plan[day] = { recipeId: (i % 7 === 0 ? veg[i % veg.length] : meat[i % meat.length]).id, servings: 2, status: 'cooked' }
+    if (i % 7 === 0) picks[day] = [vegBf[0].id, vegBf[1].id]
+  }
+  const usual = buildModel({ ...base, plan, breakfastPicks: picks })
+  ok(!hintOk(usual, 'protein:vegetarisch') && !summarize(usual).liked.some((x) => x.label === 'Vegetarisches'), 'üblicher Anteil (~15 %) + vegetarisches Frühstück → keine Vorliebe „Vegetarisches“')
+  // deutlich mehr vegetarisch (jeden zweiten Tag) → wird genannt
+  const vegPlan: WeekPlan = {}
+  for (let i = 0; i < 20; i++) vegPlan[addDaysIso(today, -i)] = { recipeId: (i % 2 ? veg[i % veg.length] : meat[i % meat.length]).id, servings: 2, status: 'cooked' }
+  const vegFan = buildModel({ ...base, plan: vegPlan })
+  ok(hintOk(vegFan, 'protein:vegetarisch'), 'jeden zweiten Tag vegetarisch → deutlich über dem Grundanteil, darf genannt werden')
+  // andere Muster: erst ab Mindestzahl an Signalen
+  const one = buildModel({ ...base, plan: { [today]: { recipeId: eintopfIds[0], servings: 2, status: 'cooked' } } })
+  ok(!hintOk(one, 'type:eintopf') && !summarize(one).liked.length, 'ein einziges Gericht → noch kein Muster in der Übersicht')
 }
 
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }

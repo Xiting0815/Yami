@@ -1,4 +1,4 @@
-import { type CustomItem } from '../../store'
+import { type AppState, type CustomItem } from '../../store'
 import { isSpice, toggleSpiceBought } from '../../staples'
 import { type BuyItem, type Trip, addDaysIso, uid, unbuy } from '../../kitchen'
 import { answerTrip, haveAmount, haveLot, releaseTrip as release, unreleaseTrip as unrelease } from '../../tripState'
@@ -10,53 +10,66 @@ export interface ListRef {
   legacyKey?: string
 }
 
+/**
+ * Artikel abhaken (Vorrat füllt sich) bzw. – nur bei `mode: 'toggle'` – wieder abwählen.
+ * `mode: 'mark'` (in Google Tasks abgehakt): kauft nur, was im übergebenen (aktuellen) Stand noch fehlt, nimmt nie etwas zurück.
+ */
+export function applyBuy(s: AppState, item: BuyItem, list: ListRef, today: string, mode: 'toggle' | 'mark' = 'toggle'): AppState {
+  // schon auf der alten Wochenliste abgehakt → dort zurücknehmen
+  const forKey = !s.bought[list.key]?.[item.name] && list.legacyKey && s.bought[list.legacyKey]?.[item.name] ? list.legacyKey : list.key
+  // Gewürz: abhaken heißt „wieder da“ (kein Vorratsposten), Abwählen wieder „alle“
+  if (isSpice(item.name)) {
+    if (mode === 'mark' && s.bought[forKey]?.[item.name]) return s
+    const r = toggleSpiceBought(s.spices, s.bought[forKey] ?? {}, item.name, item.product.pack)
+    const checked = new Set(s.checked[forKey] ?? [])
+    if (r.on) checked.add(item.key)
+    else checked.delete(item.key)
+    return { ...s, spices: r.spices, bought: { ...s.bought, [forKey]: r.bought }, checked: { ...s.checked, [forKey]: [...checked] } }
+  }
+  const wk = { ...(s.bought[forKey] ?? {}) }
+  const checked = new Set(s.checked[forKey] ?? [])
+  let pantry = s.pantry
+  let { plan, breakfast } = s
+  const b = wk[item.name]
+  const needed = item.packs * item.product.pack
+  if (b && b.amount < needed - 1e-6) {
+    // Portionen wurden nach dem Einkauf erhöht → nur die fehlende Menge nachkaufen
+    const delta = needed - b.amount
+    const has = pantry.some((l) => l.id === b.lotId)
+    if (has) pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount + delta } : l))
+    else pantry = [...pantry, { id: b.lotId, name: item.name, amount: delta, unit: item.unit, expires: addDaysIso(today, item.product.shelf) }]
+    wk[item.name] = { lotId: b.lotId, amount: needed, at: today }
+    checked.add(item.key)
+  } else if (b) {
+    if (mode === 'mark') return s // schon gekauft (z. B. gerade vom anderen Handy übernommen) → nichts zurücknehmen
+    // doch nicht gekauft: nur den Rest des Postens entfernen; schon damit Gekochtes verweist danach nicht mehr darauf
+    const u = unbuy(pantry, [plan, breakfast], b.lotId, b.amount)
+    pantry = u.pantry
+    ;[plan, breakfast] = u.plans
+    delete wk[item.name]
+    checked.delete(item.key)
+  } else {
+    const amount = item.packs * item.product.pack
+    const lot = { id: uid(), name: item.name, amount, unit: item.unit, expires: addDaysIso(today, item.product.shelf) }
+    pantry = [...pantry, lot]
+    // Abhak-Tag: daraus lernt Yami, an welchem Wochentag ihr wirklich einkauft
+    wk[item.name] = { lotId: lot.id, amount, at: today }
+    checked.add(item.key)
+  }
+  return { ...s, pantry, plan, breakfast, bought: { ...s.bought, [forKey]: wk }, checked: { ...s.checked, [forKey]: [...checked] } }
+}
+
 /** Einkaufsliste: abhaken (füllt den Vorrat), zurücksetzen, eigene Posten, Preise, prüfen & freigeben */
 export function shoppingActions({ state: s0, setState, cal, flash, snapshot }: ActionContext) {
   const { today } = cal
 
   function toggleBuy(item: BuyItem, list: ListRef) {
-    setState((s) => {
-      // schon auf der alten Wochenliste abgehakt → dort zurücknehmen
-      const forKey = !s.bought[list.key]?.[item.name] && list.legacyKey && s.bought[list.legacyKey]?.[item.name] ? list.legacyKey : list.key
-      // Gewürz: abhaken heißt „wieder da“ (kein Vorratsposten), Abwählen wieder „alle“
-      if (isSpice(item.name)) {
-        const r = toggleSpiceBought(s.spices, s.bought[forKey] ?? {}, item.name, item.product.pack)
-        const checked = new Set(s.checked[forKey] ?? [])
-        if (r.on) checked.add(item.key)
-        else checked.delete(item.key)
-        return { ...s, spices: r.spices, bought: { ...s.bought, [forKey]: r.bought }, checked: { ...s.checked, [forKey]: [...checked] } }
-      }
-      const wk = { ...(s.bought[forKey] ?? {}) }
-      const checked = new Set(s.checked[forKey] ?? [])
-      let pantry = s.pantry
-      let { plan, breakfast } = s
-      const b = wk[item.name]
-      const needed = item.packs * item.product.pack
-      if (b && b.amount < needed - 1e-6) {
-        // Portionen wurden nach dem Einkauf erhöht → nur die fehlende Menge nachkaufen
-        const delta = needed - b.amount
-        const has = pantry.some((l) => l.id === b.lotId)
-        if (has) pantry = pantry.map((l) => (l.id === b.lotId ? { ...l, amount: l.amount + delta } : l))
-        else pantry = [...pantry, { id: b.lotId, name: item.name, amount: delta, unit: item.unit, expires: addDaysIso(today, item.product.shelf) }]
-        wk[item.name] = { lotId: b.lotId, amount: needed, at: today }
-        checked.add(item.key)
-      } else if (b) {
-        // doch nicht gekauft: nur den Rest des Postens entfernen; schon damit Gekochtes verweist danach nicht mehr darauf
-        const u = unbuy(pantry, [plan, breakfast], b.lotId, b.amount)
-        pantry = u.pantry
-        ;[plan, breakfast] = u.plans
-        delete wk[item.name]
-        checked.delete(item.key)
-      } else {
-        const amount = item.packs * item.product.pack
-        const lot = { id: uid(), name: item.name, amount, unit: item.unit, expires: addDaysIso(today, item.product.shelf) }
-        pantry = [...pantry, lot]
-        // Abhak-Tag: daraus lernt Yami, an welchem Wochentag ihr wirklich einkauft
-        wk[item.name] = { lotId: lot.id, amount, at: today }
-        checked.add(item.key)
-      }
-      return { ...s, pantry, plan, breakfast, bought: { ...s.bought, [forKey]: wk }, checked: { ...s.checked, [forKey]: [...checked] } }
-    })
+    setState((s) => applyBuy(s, item, list, today))
+  }
+
+  /** in Google Tasks abgehakt → als gekauft markieren; idempotent, entscheidet am aktuellen Stand */
+  function markBought(item: BuyItem, list: ListRef) {
+    setState((s) => applyBuy(s, item, list, today, 'mark'))
   }
 
   function resetChecks(list: ListRef) {
@@ -151,5 +164,5 @@ export function shoppingActions({ state: s0, setState, cal, flash, snapshot }: A
     setState((s) => ({ ...s, stockAsk: { ...s.stockAsk, [name]: yes ? 'yes' : 'no' } }))
   }
 
-  return { toggleBuy, resetChecks, toggleChecked, addCustomItem, removeCustomItem, editPrice, answerHave, answerNeed, releaseTrip, unreleaseTrip, setShopDay, dismissShopDay, answerStock }
+  return { toggleBuy, markBought, resetChecks, toggleChecked, addCustomItem, removeCustomItem, editPrice, answerHave, answerNeed, releaseTrip, unreleaseTrip, setShopDay, dismissShopDay, answerStock }
 }

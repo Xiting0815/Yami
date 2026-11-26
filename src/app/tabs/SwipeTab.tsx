@@ -1,6 +1,7 @@
 import { RECIPE_BY_ID } from '../../data/recipes'
 import { BREAKFAST_LABEL, type BreakfastType } from '../../types'
 import { portionFor } from '../../energy'
+import { eveningOn } from '../../bbq'
 import { shortDate, weekdayName } from '../../store'
 import { MealToggle } from '../../components/MealToggle'
 import { useActiveChipInView } from '../../components/FilterBar'
@@ -35,7 +36,7 @@ export function SwipeTab({ m }: { m: AppModel }) {
             )}
           </div>
           <div className="chips-row">
-            <PrepDayChip prep={bf.prep} choices={bf.prepChoices} onChange={act.changePrepDay} />
+            <PrepDayChip prep={bf.prep} choices={bf.prepChoices} onChange={act.changePrepDay} today={cal.today} />
           </div>
           <p className="muted small swipe-note">
             Wähle 1–2 Frühstücke zum Vorbereiten. Das kürzer haltbare kommt an die ersten Tage, das länger haltbare ans Ende.
@@ -66,16 +67,16 @@ export function SwipeTab({ m }: { m: AppModel }) {
       ) : (
         <>
           <div className="day-dots">
-            {days.map((d) => (
-              <button
-                key={d}
-                className={`dot ${d === swipeDay ? 'current' : ''} ${state.plan[d] ? 'filled' : ''}`}
-                onClick={() => ui.setSwipeDay(d)}
-              >
-                <b>{weekdayName(d, true)}</b>
-                <span>{state.plan[d] ? '✓' : shortDate(d)}</span>
-              </button>
-            ))}
+            {days.map((d) => {
+              // Tapas- oder Grillabend ist das Abendessen → belegt
+              const taken = !!state.plan[d] || !!eveningOn(state.bakePlan, d)
+              return (
+                <button key={d} className={`dot ${d === swipeDay ? 'current' : ''} ${taken ? 'filled' : ''}`} onClick={() => ui.setSwipeDay(d)}>
+                  <b>{weekdayName(d, true)}</b>
+                  <span>{taken ? '✓' : shortDate(d)}</span>
+                </button>
+              )
+            })}
           </div>
           <div className="swipe-head">
             <h1>
@@ -91,6 +92,11 @@ export function SwipeTab({ m }: { m: AppModel }) {
                 🧺 Vorrat zuerst ✕
               </button>
             </div>
+          )}
+          {!state.plan[swipeDay] && eveningOn(state.bakePlan, swipeDay) && (
+            <p className="muted small center swipe-note">
+              Geplant: {eveningOn(state.bakePlan, swipeDay) === 'tapas' ? 'Tapas-Abend' : 'Grillabend'}.
+            </p>
           )}
           {state.plan[swipeDay] && (
             <p className="muted small center swipe-note">

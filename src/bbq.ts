@@ -15,9 +15,9 @@ import { BASICS, RECIPE_BY_ID } from './data/recipes'
 import { isBbqSeason } from './data/season'
 import {
   type BakeHint, type BakedRef, HINTS_MAX, bakeHabits, bakedWithin, daysBetween, habitDay, hintBlocked, nextWeekday, plannedWithin,
-  recipeScores, weekdayLabel,
+  moveBake, recipeScores, weekdayLabel,
 } from './bakePlan'
-import type { BakePlan, BbqGroup, PlanEntry, Recipe } from './types'
+import type { BakePlan, BbqGroup, PlanEntry, Recipe, WeekPlan } from './types'
 import { isBbq, isSalat, isTapa, replacesDinner } from './types'
 import type { Snack } from './energy'
 
@@ -82,6 +82,25 @@ export const bbqHint = (hints: BakeHint[], today: string, action: 'accepted' | '
 export const dinnerToReplace = (plan: Record<string, PlanEntry | undefined>, day: string): PlanEntry | undefined => {
   const e = plan[day]
   return e && !e.status && RECIPE_BY_ID[e.recipeId] ? e : undefined
+}
+
+/**
+ * Backplan-Eintrag verschieben; ein Grillabend (ersetzt das Abendessen) streicht – wie beim Einplanen – das offene
+ * Abendessen des Zieltags, sonst würde beides eingekauft. Beilagen, Salate und Backen bleiben Zusatz.
+ */
+export function moveBakeEntry(
+  s: { plan: WeekPlan; bakePlan: BakePlan },
+  from: string,
+  recipeId: string,
+  to: string,
+): { plan: WeekPlan; bakePlan: BakePlan; dropped?: PlanEntry } {
+  if (from === to) return { plan: s.plan, bakePlan: s.bakePlan }
+  const bakePlan = moveBake(s.bakePlan, from, recipeId, to)
+  const dropped = replacesDinner(RECIPE_BY_ID[recipeId]) ? dinnerToReplace(s.plan, to) : undefined
+  if (!dropped) return { plan: s.plan, bakePlan }
+  const plan = { ...s.plan }
+  delete plan[to]
+  return { plan, bakePlan, dropped }
 }
 
 /**

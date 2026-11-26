@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { Recipe } from '../types'
 import { BREAKFASTS } from '../data/recipes'
-import { assignBreakfasts, coveredDays, prepOptions, prepPlan, resolvePrepDay } from '../breakfast'
+import { assignBreakfasts, coveredDays, prepDayInfo, prepOptions, prepPlan } from '../breakfast'
 import { preference, satietyBonus, satietyLean } from '../learning'
 import type { AppState } from '../store'
 import { insight, lastSeenMap, PANTRY_ONLY_MAX_EURO } from '../kitchen'
@@ -17,7 +17,13 @@ export function useBreakfastPlan(
   { week, jitter, taste, todayMonth }: Pick<Planning, 'week' | 'jitter' | 'taste' | 'todayMonth'>,
 ) {
   const picks = state.breakfastPicks[weekKey] ?? []
-  const prep = useMemo(() => resolvePrepDay(state.prepDays, days, today), [state.prepDays, days, today])
+  // später Einstieg (Prep-Tag schon vorbei, nichts gewählt/vorbereitet) → heute vorbereiten (`prepLate`, zählt nicht fürs Lernen)
+  const prepInfo = useMemo(
+    () => prepDayInfo(state.prepDays, days, today, { preps: state.bfPreps, late: state.prepLate, picks: state.breakfastPicks }),
+    [state.prepDays, days, today, state.bfPreps, state.prepLate, state.breakfastPicks],
+  )
+  const prep = prepInfo.day
+  const prepLate = prepInfo.late
   const prepChoices = useMemo(() => prepOptions(days), [days])
   const covered = useMemo(() => coveredDays(days, prep), [days, prep])
   const assignment = useMemo(() => assignBreakfasts(picks, days, prep), [picks, days, prep])
@@ -59,7 +65,7 @@ export function useBreakfastPlan(
     return [...fresh, ...later]
   }, [bTypes, picks, rejected, bInsights, days, bPantryOnly, prep, covered])
 
-  return { picks, prep, prepChoices, covered, assignment, prepItems, prepTotal, prepDone, bInsights, bDeck, satiety }
+  return { picks, prep, prepLate, prepChoices, covered, assignment, prepItems, prepTotal, prepDone, bInsights, bDeck, satiety }
 }
 
 export type BreakfastPlan = ReturnType<typeof useBreakfastPlan>

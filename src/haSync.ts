@@ -185,12 +185,16 @@ export function planMoves(current: string[], desired: string[]): { uid: string; 
   return out
 }
 
-/** Einkaufsliste abgleichen. `onBought` bekommt die Schlüssel, die in HA abgehakt wurden. */
+/**
+ * Einkaufsliste abgleichen. `onBought` bekommt die Schlüssel, die in HA abgehakt wurden, und gibt die zurück,
+ * die Yami übernommen hat (ohne Rückgabe: alle). Nicht Übernommenes gilt nicht als erledigt → kein Wieder-Öffnen,
+ * der nächste Lauf versucht es erneut.
+ */
 export async function syncTodo(
   api: HaApi,
   ha: Pick<HaSettings, 'todo' | 'items' | 'done'>,
   local: LocalItem[],
-  onBought: (keys: string[]) => void,
+  onBought: (keys: string[]) => string[] | void,
 ): Promise<TodoSyncResult> {
   const target = { entity_id: ha.todo }
   const remote = await listTodo(api, ha.todo)
@@ -236,8 +240,8 @@ export async function syncTodo(
       }
     }
   }
-  if (d.bought.length) onBought(d.bought)
-  const done = [...d.done, ...d.bought]
+  const taken = new Set(d.bought.length ? onBought(d.bought) ?? d.bought : [])
+  const done = d.done.filter((k) => !d.bought.includes(k) || taken.has(k))
 
   // Reihenfolge wie im Laden: Yami-Einträge (offen) in der Reihenfolge von `local`; Fremdes bleibt unberührt.
   // Nur wenn sich die Reihenfolge unterscheidet, wird verschoben (todo/item/move) – sonst keine Anfrage.
@@ -288,6 +292,9 @@ export interface ReminderInput {
   breakfastPicks: Record<string, string[]>
   /** Prep-Tag je Woche (optional; fehlt er, gilt der gelernte Wochentag bzw. der Sonntag davor) */
   prepDays?: Record<string, string>
+  /** Wochen mit spätem Einstieg und erledigte Vorbereitungen (für den Prep-Tag, siehe prepDayInfo) */
+  prepLate?: string[]
+  bfPreps?: { week: string; date: string }[]
   weighIns: WeighIn[]
   /** Wiege-Erinnerung nur mit Profil */
   hasProfile: boolean
@@ -327,10 +334,11 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
 
     // Prep-Tag: gehört zur Woche, in der D liegt, oder (Sonntag/Samstag davor) zur nächsten
     const prepDays = input.prepDays ?? {}
+    const extra = { preps: input.bfPreps, late: input.prepLate, picks: input.breakfastPicks }
     const m0 = mondayIso(D)
     for (const monday of [m0, addDaysIso(m0, 7)]) {
       const days = weekDays(parseIso(monday))
-      if (resolvePrepDay(prepDays, days, today) !== D) continue
+      if (resolvePrepDay(prepDays, days, today, extra) !== D) continue
       const a = assignBreakfasts(input.breakfastPicks[monday] ?? [], days, D)
       if (!Object.keys(a.days).length) continue
       const parts = prepPlan(a).map((p) => `${p.portions}× ${p.recipe.title}${p.frozenDays.length ? ` (${p.frozenDays.length} einfrieren)` : ''}`)
@@ -340,7 +348,7 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
     const tm = addDaysIso(D, 1)
     const tMonday = mondayIso(tm)
     const tDays = weekDays(parseIso(tMonday))
-    const ta = assignBreakfasts(input.breakfastPicks[tMonday] ?? [], tDays, resolvePrepDay(prepDays, tDays, today))
+    const ta = assignBreakfasts(input.breakfastPicks[tMonday] ?? [], tDays, resolvePrepDay(prepDays, tDays, today, extra))
     if (ta.frozen.includes(tm) && ta.days[tm]) {
       const title = RECIPE_BY_ID[ta.days[tm]]?.title ?? 'Frühstück'
       mk(`rem:thaw:${D}`, '❄️ Frühstück auftauen', `${title} für morgen aus dem Gefrierfach in den Kühlschrank legen.`, at(D, 20, 0))

@@ -37,7 +37,7 @@ export function tripsOf(s: AppState, today: string): Trip[] {
     staple: { memo: s.staples, spices: s.spices, portion, extraUse: removalUseEvents(s.removals) },
     // Frühstück wird am Prep-Tag vorbereitet: dann braucht es die Zutaten; vorbei = schon vorbereitet
     breakfastDay: (d) => {
-      const p = resolvePrepDay(s.prepDays, weekDays(mondayOf(parseIso(d))), today)
+      const p = resolvePrepDay(s.prepDays, weekDays(mondayOf(parseIso(d))), today, { preps: s.bfPreps, late: s.prepLate, picks: s.breakfastPicks })
       return p < today ? null : p
     },
     shopDay: s.shopDay,

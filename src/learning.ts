@@ -135,8 +135,36 @@ interface Acc {
 export interface TasteModel {
   recipe: Map<string, Acc>
   feature: Map<string, Acc>
+  /** positive Signale je Muster, nur aus Abendessen (für den Anteil gegenüber dem Grundanteil, siehe hintOk) */
+  dinnerPos: Map<string, number>
   /** Anzahl berücksichtigter Signale */
   signals: number
+}
+
+/**
+ * Hinweise „👍 … magst du“ und die Übersicht „Das habe ich gelernt“ erst bei genug Belegen (das Ranking lernt
+ * trotzdem von Anfang an sanft mit): mindestens so viele (zeitgewichtete) Signale für das Muster …
+ */
+const HINT_MIN_N = 4
+/**
+ * … und bei Mustern mit bekanntem Grundanteil deutlich darüber: Vegetarisches isst der Haushalt ohnehin zu ~15 %.
+ * Als Vorliebe gilt es erst, wenn mindestens doppelt so viel davon gewählt wird (Anteil an allen positiven
+ * Abendessen-Signalen derselben Art, z. B. aller Hauptzutaten). Frühstück (meist vegetarisch) zählt dabei nicht mit.
+ */
+const BASE_SHARE: Record<string, number> = { 'protein:vegetarisch': 0.15 }
+const BASE_FACTOR = 2
+
+/** genug belegt, um als Vorliebe genannt zu werden? */
+export function hintOk(m: TasteModel, f: string): boolean {
+  const a = m.feature.get(f)
+  if (!a || a.n < HINT_MIN_N) return false
+  const base = BASE_SHARE[f]
+  if (base === undefined) return true
+  const kind = f.slice(0, f.indexOf(':') + 1)
+  let all = 0
+  for (const [k, v] of m.dinnerPos) if (k.startsWith(kind)) all += v
+  const mine = m.dinnerPos.get(f) ?? 0
+  return all > 0 && mine / all >= base * BASE_FACTOR
 }
 
 export interface TasteInput {
@@ -169,7 +197,7 @@ export interface TasteInput {
 }
 
 export function buildModel(inp: TasteInput): TasteModel {
-  const m: TasteModel = { recipe: new Map(), feature: new Map(), signals: 0 }
+  const m: TasteModel = { recipe: new Map(), feature: new Map(), dinnerPos: new Map(), signals: 0 }
   const add = (id: string, date: string, w: number, day?: string) => {
     const r = RECIPE_BY_ID[id]
     if (!r || (inp.since && date < inp.since)) return
@@ -183,7 +211,11 @@ export function buildModel(inp: TasteInput): TasteModel {
       map.set(key, a)
     }
     bump(m.recipe, id)
-    for (const f of features(r, day)) bump(m.feature, f)
+    const dinner = !r.breakfast && !r.basic
+    for (const f of features(r, day)) {
+      bump(m.feature, f)
+      if (dinner && v > 0) m.dinnerPos.set(f, (m.dinnerPos.get(f) ?? 0) + v)
+    }
     m.signals++
   }
 
@@ -260,7 +292,8 @@ export function preference(m: TasteModel, r: Recipe, day?: string): Preference {
     reason = '❤️ magst du'
     liked = 'recipe'
   } else {
-    const best = fs.filter((x) => x.a > 0.3).sort((a, b) => b.a - a.a)[0]
+    // Muster nur mit genug Belegen (und deutlich über dem Grundanteil) nennen – die Sortierung lernt trotzdem mit
+    const best = fs.filter((x) => x.a > 0.3 && hintOk(m, x.f)).sort((a, b) => b.a - a.a)[0]
     if (best) {
       reason = `👍 ${featureLabel(best.f)} magst du`
       liked = 'feature'
@@ -323,10 +356,12 @@ export interface LearnedSummary {
 
 /** Übersicht „Das habe ich gelernt“ */
 export function summarize(m: TasteModel): LearnedSummary {
-  const feats = [...m.feature].filter(([, a]) => a.n >= 1.5).map(([k, a]) => ({ label: featureLabel(k), a: aff(a, PRIOR_FEATURE) }))
+  const feats = [...m.feature].filter(([, a]) => a.n >= 1.5).map(([k, a]) => ({ key: k, label: featureLabel(k), a: aff(a, PRIOR_FEATURE) }))
+  const strip = ({ label, a }: { label: string; a: number }) => ({ label, a })
   return {
-    liked: feats.filter((x) => x.a > 0.2).sort((a, b) => b.a - a.a).slice(0, 5),
-    disliked: feats.filter((x) => x.a < -0.1).sort((a, b) => a.a - b.a).slice(0, 4),
+    // „Magst du“ erst mit genug Belegen und deutlich über dem Grundanteil (siehe hintOk)
+    liked: feats.filter((x) => x.a > 0.2 && hintOk(m, x.key)).sort((a, b) => b.a - a.a).slice(0, 5).map(strip),
+    disliked: feats.filter((x) => x.a < -0.1).sort((a, b) => a.a - b.a).slice(0, 4).map(strip),
     favorites: [...m.recipe]
       .map(([id, a]) => ({ title: RECIPE_BY_ID[id]?.title ?? id, a: aff(a, PRIOR_RECIPE) }))
       .filter((x) => x.a > 0.4)

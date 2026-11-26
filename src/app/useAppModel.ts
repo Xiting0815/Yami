@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { useAppState } from '../store'
-import { isBought } from '../shopping'
 import { findHaItem } from '../tripState'
 import { useHomeAssistant } from '../useHa'
 import { useCalendar } from './useCalendar'
@@ -72,12 +71,19 @@ export function useAppModel() {
     setState,
     local: plan.haLocal,
     state,
-    // in HA abgehakt → wie Abhaken in der Liste (Vorrat füllt sich); Schlüssel `<Einkaufstag>|<Artikel>`
+    // in HA abgehakt → als gekauft markieren (Vorrat füllt sich); Schlüssel `<Einkaufstag>|<Artikel>`.
+    // Nie umschalten: ob schon gekauft, entscheidet der aktuelle Stand (markBought), nicht die letzte Anzeige.
+    // Zurück kommen nur die übernommenen Schlüssel – ein nicht gefundener Artikel wird beim nächsten Lauf erneut versucht,
+    // statt dass Yami den Haken in Google Tasks wieder öffnet.
     onBought: (keys) => {
+      const taken: string[] = []
       for (const k of keys) {
         const hit = findHaItem(haRef.current, k)
-        if (hit && !isBought(hit.item)) act.toggleBuy(hit.item, hit.trip)
+        if (!hit) continue
+        act.markBought(hit.item, hit.trip)
+        taken.push(k)
       }
+      return taken
     },
   })
 

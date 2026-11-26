@@ -228,7 +228,8 @@ state = tick(state, today)
 ok(state.plan['2026-11-23']?.status === 'cooked', 'Di 24.11.: Gericht vom Mo 23.11. gekocht')
 ok(state.pantry.every((l) => l.amount > 0 && Number.isFinite(l.amount)), 'Vorrat ohne leere/ungültige Posten')
 ok(prepPlan(assignBreakfasts([], days2, resolvePrepDay(state.prepDays, days2, today))).length === 0, 'nächste Woche: noch kein Frühstück → leere Prep-Liste')
-ok(resolvePrepDay(state.prepDays, days2, today) === '2026-11-22', 'nächste Woche: Prep-Tag Sonntag (Montag erst einmal gewählt)')
+ok(resolvePrepDay(state.prepDays, days2, '2026-11-21') === '2026-11-22', 'nächste Woche: Prep-Tag Sonntag (Montag erst einmal gewählt)')
+ok(resolvePrepDay(state.prepDays, days2, today) === today, 'Di 24.11., Sonntag vorbei und noch nichts gewählt → heute vorbereiten')
 
 // ───── 29.11.: nicht entfernte, abgelaufene Posten wandern nach 7 Tagen in „weggeworfen“ ─────
 const s2 = tick({ ...state, pantry: [...state.pantry, lot('Schmand', 100, '2026-11-20')] }, '2026-11-28')

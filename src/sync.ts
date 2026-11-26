@@ -27,7 +27,7 @@
  * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked, bfRatings, bfSatiety
  *   (Frühstück: Bewertung/Sättigung nach dem Vorbereiten – zählt nur fürs eigene Profil, nie als Haushalts-Abendessen).
  *   Persönlich bleibt bfPreps (Vorbereitungen; die Portionen selbst liegen als Posten im geteilten Vorrat).
- * PERSÖNLICH (nie geteilt): profile, weighIns, adjustDecidedAt, profileCreated, breakfast, breakfastPicks, prepDays,
+ * PERSÖNLICH (nie geteilt): profile, weighIns, adjustDecidedAt, profileCreated, breakfast, breakfastPicks, prepDays, prepLate,
  *   prepChecked, bfPreps, bfSatietyDismissed, snacks (kcal), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
  *   bfOpen, showClassicSteps, lastBackup, ha (Token, Person, Gerät), sync (dieser Abgleich-Stand).
  *

@@ -16,7 +16,7 @@ export function BakeAskCard({ recipe, day, onYes, onMove, onNo }: { recipe: Reci
       <div className="rate-btns">
         <button onClick={onYes}><span aria-hidden>✅</span> Ja</button>
         <button onClick={onMove}><span aria-hidden>📅</span> Verschieben</button>
-        <button onClick={onNo}><span aria-hidden>🗑️</span> Nein, entfernen</button>
+        <button onClick={onNo}><span aria-hidden>❌</span> Nein, nicht gemacht</button>
       </div>
     </section>
   )
@@ -34,7 +34,7 @@ export function TapasAskCard({ titles, day, onYes, onMove, onNo }: { titles: str
       <div className="rate-btns">
         <button onClick={onYes}><span aria-hidden>✅</span> Ja</button>
         <button onClick={onMove}><span aria-hidden>📅</span> Verschieben</button>
-        <button onClick={onNo}><span aria-hidden>🗑️</span> Nein, entfernen</button>
+        <button onClick={onNo}><span aria-hidden>❌</span> Nein, nicht gemacht</button>
       </div>
     </section>
   )

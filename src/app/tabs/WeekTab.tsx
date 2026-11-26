@@ -7,7 +7,8 @@ import { shortTitle as tapaTitle } from '../../tapas'
 import { bbqIdeas } from '../../bbq'
 import { householdPreference, pendingRating } from '../../learning'
 import { targetKcal } from '../../energy'
-import { sharingActive, shortDate, weekdayName } from '../../store'
+import { sharingActive, weekdayName } from '../../store'
+import { prepDayText } from '../../breakfast'
 import { plannedBy } from '../../sync'
 import { formatEuro } from '../../kitchen'
 import { BreakfastCard, shortTitle } from '../../components/BreakfastCard'
@@ -41,7 +42,7 @@ export function WeekTab({ m }: { m: AppModel }) {
     },
     {
       title: `Frühstück für ${dayRangeText(covered)} wählen`,
-      sub: picks.length ? picks.map((id) => shortTitle(RECIPE_BY_ID[id]?.title ?? '')).join(' + ') : `1–2 Rezepte, einmal vorbereiten (${weekdayName(prep, true)}, ${shortDate(prep)})`,
+      sub: picks.length ? picks.map((id) => shortTitle(RECIPE_BY_ID[id]?.title ?? '')).join(' + ') : `1–2 Rezepte, einmal vorbereiten (${prepDayText(prep, today)})`,
       verb: 'Wählen',
       done: picks.length > 0,
       editable: true,
@@ -263,6 +264,7 @@ export function WeekTab({ m }: { m: AppModel }) {
             picks={picks}
             assignment={bf.assignment}
             prep={prep}
+            today={today}
             prepChoices={bf.prepChoices}
             covered={covered}
             onPrepDay={act.changePrepDay}

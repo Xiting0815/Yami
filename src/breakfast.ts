@@ -3,7 +3,7 @@
  */
 import { RECIPE_BY_ID } from './data/recipes'
 import { addDaysIso, daysUntil } from './kitchen'
-import { isoDate, mondayOf, parseIso, weekdayName } from './store'
+import { isoDate, mondayOf, parseIso, shortDate, weekdayName } from './store'
 import type { Ingredient, Recipe, WeekPlan } from './types'
 
 /** Arbeitstage Mo–Fr einer Woche (days = Mo–So) */
@@ -32,11 +32,13 @@ const LEARN_WEEKS = 8
  * Gelernter Standard-Wochentag (JS: 0 = So … 4 = Do) fürs Vorbereiten: der häufigste Tag der gespeicherten
  * Prep-Tage der letzten ~8 Wochen, aber erst ab 2 gleichen. Sonst Sonntag.
  */
-export function learnedPrepWeekday(prepDays: Record<string, string>, today: string): number {
+export function learnedPrepWeekday(prepDays: Record<string, string>, today: string, late: string[] = []): number {
   const from = addDaysIso(today, -7 * LEARN_WEEKS)
   const to = addDaysIso(today, 7)
   const count = new Map<number, { n: number; last: string }>()
-  for (const iso of Object.values(prepDays)) {
+  for (const [week, iso] of Object.entries(prepDays)) {
+    // später Einstieg mitten in der Woche („heute vorbereiten“) verrät nichts über den üblichen Tag
+    if (late.includes(week)) continue
     if (typeof iso !== 'string' || iso < from || iso > to) continue
     const dow = parseIso(iso).getDay()
     if (dow > 4) continue
@@ -49,14 +51,42 @@ export function learnedPrepWeekday(prepDays: Record<string, string>, today: stri
   return best
 }
 
-/** Prep-Tag einer Woche: gespeichert (und gültig), sonst gelernter Wochentag, sonst Sonntag davor */
-export function resolvePrepDay(prepDays: Record<string, string>, days: string[], today: string): string {
+/** was der Prep-Tag außer `prepDays` braucht: erledigte Vorbereitungen (BfPrep) und Wochen mit spätem Einstieg */
+export interface PrepExtra {
+  preps?: { week: string; date: string }[]
+  late?: string[]
+  /** gewählte Frühstücke je Woche: schon gewählt → kein später Einstieg (dann gilt der übliche Tag) */
+  picks?: Record<string, string[]>
+}
+
+/**
+ * Prep-Tag einer Woche, mit `late`: gespeichert (und gültig), sonst gelernter Wochentag, sonst Sonntag davor.
+ * Später Einstieg: liegt dieser Tag schon zurück, ist für die Woche nichts gewählt (nichts gespeichert/gewählt) und nichts
+ * vorbereitet, wird HEUTE vorbereitet (`late` = true) – nur, solange heute noch ein möglicher Prep-Tag (So–Do) ist.
+ * Wurde in der Woche schon vorbereitet, gilt der Tag der Vorbereitung. Ein später Einstieg wird beim Wählen mit
+ * gespeichert (damit die Verteilung stehen bleibt), aber in `prepLate` vermerkt und zählt nicht für den gelernten Wochentag.
+ */
+export function prepDayInfo(prepDays: Record<string, string>, days: string[], today: string, extra: PrepExtra = {}): { day: string; late: boolean } {
+  const { preps = [], late = [], picks = {} } = extra
   const opts = prepOptions(days)
   const stored = prepDays[days[0]]
-  if (stored && opts.includes(stored)) return stored
-  const learned = learnedPrepWeekday(prepDays, today)
-  return opts.find((d) => parseIso(d).getDay() === learned) ?? opts[0]
+  if (stored && opts.includes(stored)) return { day: stored, late: late.includes(days[0]) }
+  const learned = learnedPrepWeekday(prepDays, today, late)
+  const usual = opts.find((d) => parseIso(d).getDay() === learned) ?? opts[0]
+  if (usual >= today) return { day: usual, late: false }
+  const done = preps.filter((p) => p.week === days[0] && opts.includes(p.date)).map((p) => p.date).sort()[0]
+  if (done) return { day: done, late: false }
+  return opts.includes(today) && !picks[days[0]]?.length ? { day: today, late: true } : { day: usual, late: false }
 }
+
+/** Prep-Tag einer Woche (siehe prepDayInfo) */
+export function resolvePrepDay(prepDays: Record<string, string>, days: string[], today: string, extra: PrepExtra = {}): string {
+  return prepDayInfo(prepDays, days, today, extra).day
+}
+
+/** „heute (Do, 26.11.)“ bzw. „So, 22.11.“ – Prep-Tag für Hinweise */
+export const prepDayText = (prep: string, today?: string) =>
+  `${prep === today ? 'heute (' : ''}${weekdayName(prep, true)}, ${shortDate(prep)}${prep === today ? ')' : ''}`
 
 /** „Du bereitest meist montags vor“ – Adverb zum Wochentag */
 export const PREP_ADVERB = ['sonntags', 'montags', 'dienstags', 'mittwochs', 'donnerstags']

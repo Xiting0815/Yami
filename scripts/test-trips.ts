@@ -9,6 +9,8 @@ import { haLocalFor, haRound } from '../src/haRun'
 import { formatAmount, isBought } from '../src/shopping'
 import { type AppState, newHa, sanitize } from '../src/store'
 import { extract, rebuild } from '../src/sync'
+import { applyBuy } from '../src/app/actions/shopping'
+import { coveredText } from '../src/components/ShoppingList'
 import {
   answerTrip, findHaItem, haTripItems, haveAmount, haveCounts, haveLot, isReleased, learnedShopDay, newSinceRelease, releaseTrip, reviewQueue,
   shopDaySuggestion, stockSuggestion, tripCoverText, tripReminderInput, tripsOf, unreleaseTrip,
@@ -230,7 +232,7 @@ ok(keepDays(1) === 1 && keepDays(4) === 4 && keepDays(5) === 4 && keepDays(30) =
   }
   let cur: AppState = base({ ha: { ...newHa('https://x', 'tok'), enabled: true } })
   const bought: string[] = []
-  const round = () => haRound({ api, getState: () => cur, setState: (fn) => (cur = fn(cur)), onBought: (k) => bought.push(...k), now: new Date('2026-11-20T18:00:00') })
+  const round = () => haRound({ api, getState: () => cur, setState: (fn) => (cur = fn(cur)), onBought: (k) => { bought.push(...k) }, now: new Date('2026-11-20T18:00:00') })
   const shop = () => lists['todo.einkaufen'] ?? []
   await round()
   ok(shop().length === 0, 'HA: Entwurf → Google Tasks bleibt leer')
@@ -266,6 +268,36 @@ ok(keepDays(1) === 1 && keepDays(4) === 4 && keepDays(5) === 4 && keepDays(30) =
   const withOrder = base({ shopOrder: ['tk', 'gemuese'] })
   ok(extract(withOrder)['shop:order'] !== undefined && rebuild(base(), extract(withOrder), new Set(['shop'])).shopOrder?.join() === 'tk,gemuese', 'shopOrder geht durch den Familien-Abgleich')
   ok(sanitize({ shopOrder: ['tk', 'blah'] }).shopOrder === undefined && sanitize({ shopOrder: ['tk', 'nudeln'] }).shopOrder?.length === 2, 'shopOrder: ungültig → verworfen')
+}
+
+// ───── In Google Tasks abgehakt → „als gekauft markieren“ (idempotent, nie zurücknehmen) ─────
+{
+  const st0 = base()
+  const t0 = tripsOf(st0, TODAY).find((t) => t.date === '2026-11-21')!
+  const item = t0.buy.find((b) => b.name === 'Hackfleisch gemischt')!
+  const s1 = applyBuy(st0, item, t0, TODAY, 'mark')
+  const lots1 = s1.pantry.filter((l) => l.name === item.name).length
+  ok(!!s1.bought[t0.key]?.[item.name] && lots1 === st0.pantry.filter((l) => l.name === item.name).length + 1, 'Markieren: nicht gekauft → gekauft, Vorrat +1 Posten')
+  const s2 = applyBuy(s1, item, t0, TODAY, 'mark')
+  ok(s2 === s1, 'Markieren: schon gekauft (z. B. vom anderen Handy) → nichts ändert sich, kein Zurücknehmen')
+  const s3 = applyBuy(s1, item, t0, TODAY)
+  ok(!s3.bought[t0.key]?.[item.name], 'Umschalten (Liste in Yami) nimmt weiterhin zurück')
+  const spice = t0.buy.find((b) => b.cat === 'gewuerze') ?? tripsOf(st0, TODAY).flatMap((t) => t.buy).find((b) => b.cat === 'gewuerze')
+  if (spice) {
+    const g1 = applyBuy(st0, spice, t0, TODAY, 'mark')
+    ok(applyBuy(g1, spice, t0, TODAY, 'mark') === g1, 'Markieren: Gewürz zweimal → bleibt „da“')
+  }
+}
+
+// ───── „schon im Vorrat“ nur für echten Vorrat; was erst der Einkauf davor bringt, heißt so ─────
+{
+  const fresh = sanitize({ plan, pantry: [], onboarding: 'done' })
+  const tr = tripsOf(fresh, TODAY)
+  const later = tr.filter((t) => t.covered.length)
+  ok(later.length > 0 && later.every((t) => t.covered.every((c) => (c.fromTrip ?? 0) >= c.fromPantry - 1e-6)), 'leerer Vorrat: Gedecktes kommt nur aus früheren Einkäufen (fromTrip)')
+  ok(later.every((t) => !/schon im Vorrat/.test(coveredText(t.covered)) && /mit dem Einkauf davor/.test(coveredText(t.covered))), `leerer Vorrat: kein „schon im Vorrat“ (${coveredText(later[0]?.covered ?? [])})`)
+  const withLot = tripsOf(base(), TODAY).flatMap((t) => t.covered)
+  ok(withLot.some((c) => c.fromPantry - (c.fromTrip ?? 0) > 1e-6) && /schon im Vorrat/.test(coveredText(withLot)), 'mit Vorrat (Zwiebeln, Sahne, Bandnudeln): „schon im Vorrat“')
 }
 
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')

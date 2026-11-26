@@ -15,7 +15,7 @@ export interface HaInput {
   local: LocalItem[]
   state: AppState
   /** in HA abgehakt → in Yami als gekauft markieren */
-  onBought: (keys: string[]) => void
+  onBought: (keys: string[]) => string[] | void
 }
 
 export type HaLive = 'off' | 'connecting' | 'ok' | 'error'

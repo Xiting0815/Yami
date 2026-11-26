@@ -19,8 +19,10 @@ export interface BuyItem {
   unit: string
   /** Bedarf der ganzen Woche */
   required: number
-  /** davon aus dem Vorrat */
+  /** davon aus dem Vorrat (inklusive `fromTrip`) */
   fromPantry: number
+  /** Teil von `fromPantry`, der erst mit einem früheren Einkauf kommt (liegt noch nicht im Vorrat) */
+  fromTrip?: number
   /** Teil davon aus austauschbaren Zutaten (z. B. Penne statt Spaghetti) */
   substitutes: { name: string; amount: number }[]
   packs: number
@@ -212,7 +214,7 @@ export function planWeek(
   for (const l of scope?.extra ?? []) pool.push({ ...l })
   /** Menge aus dem Pool nehmen (nur Posten, die am Tag noch gut sind): erst die Zutat selbst, dann austauschbare */
   const take = (name: string, amount: number, day: string, exactOnly: boolean) => {
-    const got: { name: string; amount: number }[] = []
+    const got: { name: string; amount: number; trip: number }[] = []
     let rest = amount
     const lots = lotsFor(pool, name, day, exactOnly).filter((l) => exactOnly || l.name !== name)
     for (const l of lots) {
@@ -220,9 +222,13 @@ export function planWeek(
       const t = Math.min(l.amount, rest)
       l.amount -= t
       rest -= t
+      // `from`: kommt erst mit einem früheren Einkauf (scope.extra), liegt also noch nicht im Vorrat
+      const trip = l.from ? t : 0
       const g = got.find((x) => x.name === l.name)
-      if (g) g.amount += t
-      else got.push({ name: l.name, amount: t })
+      if (g) {
+        g.amount += t
+        g.trip += trip
+      } else got.push({ name: l.name, amount: t, trip })
     }
     return got
   }
@@ -261,18 +267,24 @@ export function planWeek(
     const got = sum(take(n.name, n.amount, n.day, true))
     if (n.amount - got > 1e-6) take(n.name, n.amount - got, n.day, false)
   }
-  const weekNeeds = allNeeds.filter((x) => x.owner === 0)
-  for (const n of weekNeeds) n.exact = sum(take(n.name, n.amount, n.day, true))
-  const have = new Map<string, { exact: number; subs: { name: string; amount: number }[] }>()
-  for (const name of req.keys()) have.set(name, { exact: 0, subs: [] })
+  const weekNeeds = allNeeds.filter((x) => x.owner === 0).map((n) => ({ ...n, trip: 0 }))
+  for (const n of weekNeeds) {
+    const g = take(n.name, n.amount, n.day, true)
+    n.exact = sum(g)
+    n.trip = g.reduce((s, x) => s + x.trip, 0)
+  }
+  const have = new Map<string, { exact: number; trip: number; subs: { name: string; amount: number }[] }>()
+  for (const name of req.keys()) have.set(name, { exact: 0, trip: 0, subs: [] })
   for (const n of weekNeeds) {
     const h = have.get(n.name)!
     h.exact += n.exact
+    h.trip += n.trip
     if (n.amount - n.exact <= 1e-6) continue
     for (const g of take(n.name, n.amount - n.exact, n.day, false)) {
+      h.trip += g.trip
       const cur = h.subs.find((x) => x.name === g.name)
       if (cur) cur.amount += g.amount
-      else h.subs.push({ ...g })
+      else h.subs.push({ name: g.name, amount: g.amount })
     }
   }
 
@@ -303,6 +315,7 @@ export function planWeek(
       bought: bought[itemName]?.amount ?? 0,
       recipes: [...recipes],
     }
+    if (h.trip > 1e-6) item.fromTrip = h.trip
     if (forDays.size) item.forDays = [...forDays].sort()
     if (reqDays.has(name)) item.days = [...reqDays.get(name)!].sort()
     if (packs > 0 && isQtyStaple(name)) item.note = 'knapp'
@@ -317,6 +330,7 @@ export function planWeek(
       total -= twin.cost
       twin.required += item.required
       twin.fromPantry += item.fromPantry
+      if (item.fromTrip) twin.fromTrip = (twin.fromTrip ?? 0) + item.fromTrip
       twin.substitutes = [...twin.substitutes, ...item.substitutes]
       const miss = Math.max(0, twin.required - twin.fromPantry)
       twin.packs = Math.ceil(miss / product.pack - 1e-6)

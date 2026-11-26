@@ -13,6 +13,7 @@ interface Props {
   prep: string
   prepChoices: string[]
   onPrepDay: (iso: string) => void
+  today?: string
   checked: string[]
   onToggle: (key: string) => void
   /** schon vorbereitet? → Tag + „4 Gläser …“ */
@@ -24,7 +25,7 @@ interface Props {
 }
 
 
-export function PrepSheet({ items, notes, prep, prepChoices, onPrepDay, checked, onToggle, prepped, onFinish, onUndo, onClose }: Props) {
+export function PrepSheet({ items, notes, prep, today, prepChoices, onPrepDay, checked, onToggle, prepped, onFinish, onUndo, onClose }: Props) {
   const done = new Set(checked)
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -44,7 +45,7 @@ export function PrepSheet({ items, notes, prep, prepChoices, onPrepDay, checked,
           <p className="muted">
             ca. {Math.round(prepMinutes(items))} Min. · {containers} bereitstellen
           </p>
-          <div className="bf-prepday"><PrepDayChip prep={prep} choices={prepChoices} onChange={onPrepDay} /></div>
+          <div className="bf-prepday"><PrepDayChip prep={prep} choices={prepChoices} onChange={onPrepDay} today={today} /></div>
           {notes.map((n) => (
             <p key={n} className="bf-note">ℹ️ {n}</p>
           ))}

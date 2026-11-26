@@ -1,6 +1,7 @@
 import type { Tab } from './types'
 import type { AppModel } from './useAppModel'
 import { Icon, type IconName } from '../components/Icon'
+import { eveningOn } from '../bbq'
 
 const TABS: [Tab, IconName, string][] = [
   ['woche', 'calendar', 'Woche'],
@@ -24,8 +25,9 @@ export function TabBar({ m }: { m: AppModel }) {
           aria-current={ui.tab === t ? 'page' : undefined}
           onClick={() => {
             // alles ab heute geplant → nicht auf einem vergangenen Tag landen, sondern heute zeigen
+            // Tapas- oder Grillabend ist das Abendessen → Tag gilt als belegt
             if (t === 'wischen')
-              ui.setSwipeDay(days.find((d) => !state.plan[d] && d >= today) ?? (ui.swipeDay < today && days.includes(today) ? today : ui.swipeDay))
+              ui.setSwipeDay(days.find((d) => !state.plan[d] && !eveningOn(state.bakePlan, d) && d >= today) ?? (ui.swipeDay < today && days.includes(today) ? today : ui.swipeDay))
             ui.setTab(t)
           }}
         >
