@@ -1,10 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { registerSW } from 'virtual:pwa-register'
 import App from './App'
+import { initServiceWorker } from './app/UpdateBanner'
 import './styles.css'
 
-registerSW({ immediate: true })
+initServiceWorker()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

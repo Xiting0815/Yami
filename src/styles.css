@@ -106,6 +106,12 @@ button:focus:not(:focus-visible) { outline: none; }
 .icon-btn.tiny { font-size: 13px; color: var(--muted); background: transparent; }
 .topbar .profile-btn { color: var(--text); }
 
+.update-banner {
+  display: flex; align-items: center; gap: 10px; margin: 6px 16px 0; padding: 6px 6px 6px 14px;
+  background: var(--surface); border: 1.5px solid var(--accent); border-radius: 16px; font-size: 14px; font-weight: 600;
+}
+.update-banner span { flex: 1; min-width: 0; }
+.update-banner .btn { padding: 8px 14px; }
 .content { flex: 1; padding: 4px 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
 /* Wischen: füllt genau den Platz zwischen Kopfzeile und Tabbar (siehe .swipe-screen) */
 .content.swipe { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
@@ -899,8 +905,8 @@ textarea.ed-input { resize: vertical; line-height: 1.4; }
 .dev-chip.dev-alt { background: transparent; border-style: dashed; color: var(--muted); font-weight: 500; }
 .dev-chip.dev-alt .icon { color: var(--muted); }
 .cook-step .dev-chip { font-size: 15px; padding: 6px 12px 6px 10px; }
-.dev-toggle { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 10px; }
-.dev-toggle button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 13px; color: var(--accent-text); text-decoration: underline; cursor: pointer; }
+.dev-toggle { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 10px; }
+.dev-toggle button { background: none; border: 0; padding: 4px 0; min-height: var(--tap); font: inherit; font-size: 13px; color: var(--accent-text); text-decoration: underline; cursor: pointer; }
 
 /* ───── Fertig gekocht & „Wie war’s?“ ───── */
 .cook-finish { margin: 8px 0 24px; padding: 14px; background: var(--accent-soft); border-radius: var(--radius); }

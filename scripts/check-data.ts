@@ -60,10 +60,11 @@ for (const [base, forms] of Object.entries(BROTH_FORMS)) {
   }
 }
 for (const n of Object.keys(CATALOG)) if (CATALOG[n] === 'vorrat' && !PRODUCTS[canonical(n)]) { console.error(`Grundzutat "${n}": kein Produkt`); errors++ }
-// Tiefkühlware: der Rest einer angebrochenen Packung kommt zurück ins Gefrierfach – „angebrochen 1 Tag“ wäre ein falscher Verderb-Alarm
+// Tiefkühlware (lose gefroren): der Rest einer angebrochenen Packung kommt zurück ins Gefrierfach – „angebrochen 1 Tag“ wäre ein
+// falscher Verderb-Alarm. Ausnahme: eingefrorene Portionen (selbstgemachter Fond), die als Ganzes auftauen
 for (const n of Object.keys(CATALOG)) {
   const pr = PRODUCTS[n]
-  if (CATALOG[n] === 'tk' && pr?.opened != null && pr.opened < 30) { console.error(`TK-Produkt "${n}": angebrochen ${pr.opened} Tage – Rest bleibt gefroren (opened weglassen oder wie shelf)`); errors++ }
+  if (CATALOG[n] === 'tk' && pr?.opened != null && pr.opened < 30 && pr.packName !== 'Portion') { console.error(`TK-Produkt "${n}": angebrochen ${pr.opened} Tage – Rest bleibt gefroren (opened weglassen oder wie shelf)`); errors++ }
 }
 // Grundrezepte: Ergebnis (z. B. „Rinderfond selbstgemacht“) braucht Katalog, Produkt in derselben Einheit und Nährwerte;
 // sie dürfen nicht unter den Abendessen landen
@@ -220,12 +221,16 @@ const bySalat = (g: string) => RAW_BASICS.filter((r) => r.salat === g).length
 console.log(`Tapas: ${byKind('tapas')} – Fisch ${byTapas('fisch')}, Fleisch ${byTapas('fleisch')}, Gemüse ${byTapas('gemuese')}, Ei & Kartoffel ${byTapas('ei')}, Brot & Dips ${byTapas('brot')} · Saucen ${byTapas('sauce')} · Salate & Beilagen: ${byKind('salat')} – Nudel ${bySalat('nudel')}, Kartoffel ${bySalat('kartoffel')}, Reis ${bySalat('reis')}, Bohnen ${bySalat('bohnen')}, Gemüse ${bySalat('gemuese')} · Spanische Desserts: ${RAW_BASICS.filter((r) => r.cuisine === 'es' && (r.kind === 'dessert' || r.kind === 'kuchen' || r.kind === 'gebaeck')).length}`)
 console.log(`BBQ: ${byKind('bbq')} Rezepte – Smoker ${byBbq('smoker')}, Grill ${byBbq('grill')}, Dutch Oven ${byBbq('dutch')}, Burger ${byBbq('burger')}, Beilagen ${byBbq('beilage')} · Rubs & Saucen ${byBbq('rub')}`)
 // Geräte-Schritte: bekannte Rezepte, Texte, Einstellungen im gültigen Bereich
+const timeOf = new Map([...RAW_RECIPES, ...RAW_BREAKFASTS, ...RAW_BASICS].map((r) => [r.id, r.time]))
 for (const [id, steps] of Object.entries(DEVICE_STEPS)) {
   if (!ids.has(id)) { console.error(`Geräte-Schritte für unbekanntes Rezept: ${id}`); errors++; continue }
   if (!steps.length) { console.error(`Geräte-Schritte leer: ${id}`); errors++ }
   steps.forEach((st, i) => {
     if (!st.text || !st.text.trim()) { console.error(`Geräte-Schritt ${i + 1} ohne Text: ${id}`); errors++ }
     for (const se of st.settings ?? []) for (const e of validateSetting(se)) { console.error(`Gerät in ${id}, Schritt ${i + 1}: ${e}`); errors++ }
+    // Gesamtzeit des Rezepts muss mindestens so lang sein wie eine einzelne Geräte-Einstellung
+    const time = timeOf.get(id)
+    for (const se of st.settings ?? []) if (time != null && se.minutes != null && se.minutes > time) { console.error(`${id}, Schritt ${i + 1}: Gerät ${se.minutes} Min. > Gesamtzeit ${time} Min.`); errors++ }
   })
 }
 // Text und Einstellung müssen zusammenpassen (Temperatur, Betriebsart, Gerät, Minuten) – Details: scripts/check-device-text.ts

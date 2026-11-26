@@ -3,6 +3,7 @@ import { TopBar } from './app/TopBar'
 import { TabBar } from './app/TabBar'
 import { Sheets } from './app/Sheets'
 import { ToastBar } from './app/ToastBar'
+import { UpdateBanner } from './app/UpdateBanner'
 import { WeekTab } from './app/tabs/WeekTab'
 import { SwipeTab } from './app/tabs/SwipeTab'
 import { ListTab } from './app/tabs/ListTab'
@@ -19,6 +20,7 @@ export default function App() {
   return (
     <div className="app">
       <TopBar m={m} />
+      <UpdateBanner />
 
       <main className={`content ${tab === 'wischen' ? 'swipe' : ''}`}>
         {tab === 'woche' && <WeekTab m={m} />}

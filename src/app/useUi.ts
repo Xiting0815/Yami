@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react'
 import type { BreakfastType } from '../types'
 import { useBackStack } from '../useBackStack'
+import { isoDate } from '../store'
 import type { EditorState, Meal, SheetState, Tab } from './types'
+
+/** erster Tag der Woche, der nicht schon vorbei ist (sonst Montag) – Wischen startet nie an einem vergangenen Tag */
+const firstOpenDay = (days: string[]) => {
+  const t = isoDate(new Date())
+  return days.find((d) => d >= t) ?? days[0]
+}
 
 /** Bildschirm-Zustand: Tab, Wischen, offene Sheets – plus Zurück-Taste */
 export function useUi(days: string[], weekKey: string) {
   const [tab, setTab] = useState<Tab>('woche')
-  const [swipeDay, setSwipeDay] = useState<string>(days[0])
+  const [swipeDay, setSwipeDay] = useState<string>(() => firstOpenDay(days))
   const [sheet, setSheet] = useState<SheetState | null>(null)
   /** Kochmodus über dem Rezept-Sheet */
   const [cooking, setCooking] = useState(false)
@@ -57,7 +64,7 @@ export function useUi(days: string[], weekKey: string) {
     setRejected([])
     // Wochenwechsel (auch automatisch, wenn die App über das Wochenende offen bleibt): der Wisch-Tag gehört zur gezeigten
     // Woche – sonst landet „nehmen“ in der alten Woche, ohne dass ein Tag markiert ist
-    setSwipeDay((d) => (days.includes(d) ? d : days[0]))
+    setSwipeDay((d) => (days.includes(d) ? d : firstOpenDay(days)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekKey])
   // Vorrats-Modus endet mit dem Tab-Wechsel

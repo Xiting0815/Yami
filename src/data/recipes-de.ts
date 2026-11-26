@@ -304,7 +304,7 @@ export const recipesDe = [
       'Auf dem heißen Blech 10 bis 12 Minuten knusprig backen.',
     ], 'Flammkuchen'),
 
-  r('bauernfruehstueck', 'Bauernfrühstück mit Gewürzgurke', 'de', 'haupt', 30,
+  r('bauernfruehstueck', 'Bauernfrühstück mit Gewürzgurke', 'de', 'haupt', 45,
     '500 g Kartoffeln festkochend | 4 Stk Ei | 100 g Speckwürfel | 1 Stk Zwiebel | 2 EL Milch | 0.5 Bund Schnittlauch | 2 Stk Gewürzgurke | 1 EL Butterschmalz | Salz | Pfeffer',
     [
       'Kartoffeln als Pellkartoffeln vorkochen, pellen und in Scheiben schneiden.',
@@ -313,7 +313,7 @@ export const recipesDe = [
       'Mit Schnittlauch bestreuen und mit Gewürzgurken servieren.',
     ], 'Bauernfrühstück'),
 
-  r('matjes-hausfrauenart', 'Matjes nach Hausfrauenart mit Pellkartoffeln', 'de', 'haupt', 30,
+  r('matjes-hausfrauenart', 'Matjes nach Hausfrauenart mit Pellkartoffeln', 'de', 'haupt', 40,
     '4 Stk Matjesfilet | 1 Stk Apfel säuerlich | 1 Stk Zwiebel rot | 2 Stk Gewürzgurke | 150 g Saure Sahne | 100 g Joghurt natur | 0.5 Bund Dill | 600 g Kartoffeln festkochend | Salz | Pfeffer | Zucker',
     [
       'Kartoffeln mit Schale kochen.',
@@ -340,7 +340,7 @@ export const recipesDe = [
       'Lachs mit Sauce und Kartoffeln anrichten.',
     ], 'Lachs Dillsauce'),
 
-  r('pellkartoffeln-kraeuterquark', 'Pellkartoffeln mit Kräuterquark und Leinöl', 'de', 'haupt', 30,
+  r('pellkartoffeln-kraeuterquark', 'Pellkartoffeln mit Kräuterquark und Leinöl', 'de', 'haupt', 40,
     '800 g Kartoffeln festkochend | 500 g Speisequark | 100 ml Milch | 1 Bund Schnittlauch | 0.5 Bund Petersilie | 0.5 Bund Dill | 1 Stk Zwiebel rot | 2 EL Leinöl | Salz | Pfeffer',
     [
       'Kartoffeln mit Schale in Salzwasser ca. 25 Minuten gar kochen.',
@@ -602,7 +602,7 @@ export const recipesDe = [
       'Mit Majoran, Muskat, Salz, Pfeffer und Petersilie abschmecken.',
     ], 'Kartoffelsuppe Würstchen'),
 
-  r('weisse-bohnen-eintopf', 'Weiße-Bohnen-Eintopf mit Kassler', 'de', 'eintopf', 60,
+  r('weisse-bohnen-eintopf', 'Weiße-Bohnen-Eintopf mit Kasseler', 'de', 'eintopf', 60,
     '2 Dose Weiße Bohnen | 250 g Kasseler Nacken | 1 Stk Zwiebel | 2 Stk Möhre | 300 g Kartoffeln festkochend | 1 Stk Lauch | 1 EL Tomatenmark | 1 l Gemüsebrühe | 1 Zweig Thymian | 1 Bund Petersilie | Salz | Pfeffer',
     [
       'Kasseler würfeln, kurz anbraten und Zwiebel mitdünsten. Tomatenmark kurz mitrösten.',

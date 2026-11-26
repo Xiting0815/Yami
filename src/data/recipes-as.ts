@@ -66,7 +66,7 @@ export const recipesAs = [
       'Paprika und Lauchzwiebeln in Stücken, Reiswein und Zucker zugeben und kurz pfannenrühren. Mit Reis servieren.',
     ], 'Twice cooked pork'),
 
-  r('tomaten-ei', 'Tomaten mit Rührei (Xihongshi Chao Jidan)', 'as', 'haupt', 15,
+  r('tomaten-ei', 'Tomaten mit Rührei (Xihongshi Chao Jidan)', 'as', 'haupt', 30,
     '4 Stk Ei | 4 Stk Tomate | 2 Stk Frühlingszwiebel | 1 TL Zucker | 1 EL Tomatenketchup | 2 EL Sonnenblumenöl | 150 g Jasminreis | Salz',
     [
       'Reis kochen. Eier mit einer Prise Salz verquirlen. Tomaten in Spalten schneiden.',
@@ -174,7 +174,7 @@ export const recipesAs = [
       'Bohnen zurückgeben und mit Sojasauce, Reiswein, Zucker und Salz durchschwenken.',
     ], 'Dry fried green beans'),
 
-  r('pak-choi-shiitake', 'Pak Choi mit Shiitake und Tofu in Austernsauce', 'as', 'haupt', 20,
+  r('pak-choi-shiitake', 'Pak Choi mit Shiitake und Tofu in Austernsauce', 'as', 'haupt', 30,
     '400 g Pak Choi | 150 g Shiitake | 200 g Tofu natur | 3 Zehe Knoblauch | 3 EL Austernsauce | 1 EL Sojasauce | 1 TL Sesamöl | 1 TL Speisestärke | 2 EL Sonnenblumenöl | 150 g Jasminreis',
     [
       'Tofu würfeln und im Öl goldbraun braten. Herausnehmen. Reis kochen.',
@@ -284,7 +284,7 @@ export const recipesAs = [
       'Mit Koriander servieren. Zitronengras und Galgant werden nicht mitgegessen.',
     ], 'Tom kha gai'),
 
-  r('pad-kra-pao', 'Pad Kra Pao mit Spiegelei', 'as', 'haupt', 20,
+  r('pad-kra-pao', 'Pad Kra Pao mit Spiegelei', 'as', 'haupt', 30,
     '300 g Hähnchenschenkelfilet | 4 Zehe Knoblauch | 4 Stk Chili rot | 1 Bund Thai-Basilikum | 2 EL Austernsauce | 1 EL Sojasauce | 1 EL Fischsauce | 1 TL Zucker | 2 Stk Ei | 3 EL Sonnenblumenöl | 150 g Jasminreis',
     [
       'Hähnchen grob hacken. Knoblauch und Chili im Mörser zerstoßen. Reis kochen.',

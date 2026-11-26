@@ -8,7 +8,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // „prompt“: neue Version wartet, bis der Nutzer „Neu laden“ tippt (src/app/UpdateBanner.tsx) –
+      // kein Neuladen mitten im Kochmodus; nach komplettem Schließen der App ist sie ohnehin aktiv
+      registerType: 'prompt',
       includeAssets: ['icon.svg'],
       manifest: {
         name: 'Yami – Wochenplaner',

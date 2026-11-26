@@ -23,7 +23,9 @@ export function TabBar({ m }: { m: AppModel }) {
           className={ui.tab === t ? 'active' : ''}
           aria-current={ui.tab === t ? 'page' : undefined}
           onClick={() => {
-            if (t === 'wischen') ui.setSwipeDay(days.find((d) => !state.plan[d] && d >= today) ?? ui.swipeDay)
+            // alles ab heute geplant → nicht auf einem vergangenen Tag landen, sondern heute zeigen
+            if (t === 'wischen')
+              ui.setSwipeDay(days.find((d) => !state.plan[d] && d >= today) ?? (ui.swipeDay < today && days.includes(today) ? today : ui.swipeDay))
             ui.setTab(t)
           }}
         >
