@@ -230,9 +230,176 @@ export const brot: ExtraGroup = {
         'Den Teig zu einem Rechteck (ca. 24 × 30 cm) ausrollen und in 24 Streifen schneiden. Jeden Streifen mit den Händen zu einer 30 cm langen Stange rollen und im restlichen Hartweizengrieß wälzen. Mit Abstand auf zwei mit Backpapier belegte Bleche legen.',
         'Die Grissini 15–18 Minuten backen, bis sie goldbraun sind. Den Ofen ausschalten, die Tür einen Spalt öffnen und die Stangen 10 Minuten nachtrocknen lassen, bis sie knusprig sind.',
       ]),
+
+    // ========== Ohne Sauerteig: Toastbrote, Brötchen, Brote mit Hefe, Backpulver oder Natron ==========
+
+    // ---------- Klassisches Toastbrot (Kastenform, auch als Sandwichtoast mit Deckel) ----------
+    backen('brot', 'toastbrot-klassisch', 'Klassisches Toastbrot',
+      {
+        time: 240,
+        yields: { name: 'Toastbrot selbstgebacken', amount: 820, unit: 'g', shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
+        lighter: 'Butter auf 15 g und Zucker auf 10 g verringern – spart rund 15 kcal pro 50 g; wer 25-g-Scheiben toastet, halbiert zusätzlich die Kalorien pro Scheibe.',
+      },
+      '500 g Weizenmehl | 10 g Salz | 15 g Hefe frisch | 20 g Zucker | 40 g Butter | 150 ml Milch',
+      [
+        'Die Hefe frisch mit dem Zucker in der lauwarmen Milch und 150 ml lauwarmem Wasser auflösen. Mit Weizenmehl und Salz 5 Minuten kneten, dann die weiche Butter in Stückchen zugeben und weitere 5 Minuten zu einem glatten, elastischen Teig kneten.',
+        'Fensterprobe machen: Ein kleines Teigstück vorsichtig zwischen den Fingern ausziehen. Lässt es sich hauchdünn dehnen, sodass Licht durchscheint, ohne zu reißen, ist der Teig fertig – sonst noch 2 Minuten weiterkneten. Den Teig abgedeckt 60 Minuten gehen lassen, bis er sich verdoppelt hat.',
+        'Eine Kastenform (30 cm) mit Backpapier auslegen. Den Teig in 3 gleich große Stücke teilen, jedes rund formen und die Kugeln nebeneinander in die Form setzen. Abgedeckt 40–50 Minuten gehen lassen, bis der Teig etwa 1 cm unter dem Rand steht. Inzwischen den Backofen auf 190 °C Ober-/Unterhitze vorheizen.',
+        'Das Toastbrot auf der unteren Schiene 35 Minuten goldbraun backen. Sofort aus der Form lösen: Es klingt beim Klopfen auf die Unterseite hohl.',
+        'Auf einem Gitter mindestens 1 Stunde auskühlen lassen. Zum Einfrieren in 1 cm dicke Scheiben schneiden, portionsweise in Gefrierbeutel füllen und die Scheiben gefroren direkt in den Toaster stecken.',
+      ]),
+
+    // ---------- Dinkel-Vollkorntoast ----------
+    backen('brot', 'dinkel-vollkorntoast', 'Dinkel-Vollkorntoast',
+      {
+        time: 230,
+        yields: { name: 'Dinkel-Vollkorntoast selbstgebacken', amount: 830, unit: 'g', shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
+        lighter: 'Die Butter weglassen und die Milch durch Wasser ersetzen – spart rund 20 kcal pro 50 g; die Krume wird etwas fester.',
+      },
+      '300 g Dinkelvollkornmehl | 200 g Dinkelmehl | 10 g Salz | 15 g Hefe frisch | 15 g Honig | 30 g Butter | 200 ml Milch',
+      [
+        'Dinkelvollkornmehl und Dinkelmehl mit der lauwarmen Milch und 150 ml lauwarmem Wasser verrühren und abgedeckt 20 Minuten quellen lassen – so nimmt das Vollkornmehl das Wasser auf und der Toast wird nicht krümelig.',
+        'Die Hefe frisch mit dem Honig verrühren, mit Salz und der weichen Butter zum Teig geben und 6 Minuten langsam zu einem weichen, leicht klebrigen Teig kneten (Dinkel nicht überkneten). Abgedeckt 45 Minuten gehen lassen.',
+        'Eine Kastenform (30 cm) mit Backpapier auslegen. Den Teig auf wenig Mehl zu einem Rechteck (ca. 25 × 30 cm) drücken, von der kurzen Seite her straff aufrollen und mit der Naht nach unten in die Form legen.',
+        'Abgedeckt 30–35 Minuten gehen lassen, bis der Teig knapp den Rand erreicht (Dinkel nicht zu lange gehen lassen, sonst fällt er ein). Inzwischen den Backofen auf 190 °C Ober-/Unterhitze vorheizen.',
+        'Den Toast auf der unteren Schiene 35 Minuten backen, sofort aus der Form lösen und die Klopfprobe machen: Die Unterseite klingt hohl.',
+        'Auf einem Gitter mindestens 1 Stunde auskühlen lassen. Zum Einfrieren in Scheiben schneiden und portionsweise in Gefrierbeutel füllen; die Scheiben gefroren toasten.',
+      ]),
+
+    // ---------- Hokkaido-Milchtoast mit Tangzhong ----------
+    backen('brot', 'milchtoast-hokkaido', 'Hokkaido-Milchtoast (Buttertoast)',
+      {
+        time: 250,
+        yields: { name: 'Milchtoast selbstgebacken', amount: 760, unit: 'g', shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
+        lighter: 'Zucker auf 20 g und Butter auf 20 g verringern – spart rund 15 kcal pro 50 g, der Toast bleibt dank Tangzhong trotzdem weich.',
+      },
+      '400 g Weizenmehl | 8 g Salz | 10 g Hefe frisch | 40 g Zucker | 40 g Butter | 260 ml Milch | 1 Stk Ei',
+      [
+        'Für das Tangzhong (Mehlkochstück) 25 g vom Weizenmehl mit 125 ml von der Milch in einem kleinen Topf glatt rühren und bei mittlerer Hitze unter ständigem Rühren 2–3 Minuten erhitzen, bis eine puddingartige Masse entsteht (ca. 65 °C). Abgedeckt auf Handwärme abkühlen lassen. Das gebundene Wasser macht den Toast besonders weich und länger frisch.',
+        'Die Hefe frisch mit dem Zucker in 125 ml lauwarmer Milch auflösen. Mit dem restlichen Weizenmehl, Salz, Ei und dem Tangzhong 6 Minuten kneten, dann die weiche Butter in Stückchen zugeben und weitere 6 Minuten kneten, bis der Teig die Fensterprobe besteht (lässt sich hauchdünn ausziehen, ohne zu reißen).',
+        'Den Teig abgedeckt 60 Minuten gehen lassen, bis er sich verdoppelt hat.',
+        'Den Teig in 3 Stücke teilen, jedes zu einem Oval (ca. 12 × 25 cm) ausrollen, von der kurzen Seite her aufrollen und die Rollen nebeneinander in eine mit Backpapier ausgelegte Kastenform (30 cm) setzen. Abgedeckt 45 Minuten gehen lassen, bis der Teig fast den Rand erreicht.',
+        'Den Backofen auf 180 °C Ober-/Unterhitze vorheizen. Den Toast mit den restlichen 10 ml Milch bestreichen und auf der unteren Schiene 30 Minuten goldbraun backen; wird er zu dunkel, nach 20 Minuten mit Backpapier abdecken.',
+        'Sofort aus der Form lösen und auf einem Gitter mindestens 1 Stunde auskühlen lassen. Zum Einfrieren in Scheiben schneiden und portionsweise in Gefrierbeutel füllen.',
+      ]),
+
+    // ---------- Schnelle Quarkbrötchen (Backpulver, ohne Hefe) ----------
+    backen('brot', 'quarkbroetchen', 'Schnelle Quarkbrötchen',
+      {
+        time: 50,
+        yields: { name: 'Quarkbrötchen selbstgebacken', amount: 10, unit: 'Stk', shelf: 2, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
+        lighter: 'Das Öl auf 25 ml halbieren und 12 statt 10 Brötchen formen – spart rund 55 kcal pro Brötchen.',
+      },
+      '400 g Weizenmehl | 1 Pck Backpulver | 6 g Salz | 10 g Zucker | 250 g Magerquark | 1 Stk Ei | 70 ml Milch | 50 ml Sonnenblumenöl | 2 TL Sesam',
+      [
+        'Den Backofen auf 200 °C Ober-/Unterhitze vorheizen und ein Blech mit Backpapier belegen.',
+        'Weizenmehl, Backpulver (1 Päckchen, 15 g), Salz und Zucker mischen. Magerquark, Ei, 60 ml von der Milch und Sonnenblumenöl zugeben und mit den Händen nur kurz zu einem glatten Teig verkneten – Backpulverteig nicht lange kneten, sonst wird er zäh.',
+        'Den Teig in 10 Stücke (je ca. 85 g) teilen, mit bemehlten Händen rund formen und mit Abstand auf das Blech setzen. Mit den restlichen 10 ml Milch bestreichen, mit Sesam bestreuen und mit einem Messer kreuzweise einschneiden.',
+        'Die Brötchen sofort 20–22 Minuten backen, bis sie goldbraun sind. Auf einem Gitter auskühlen lassen; am Folgetag kurz aufbacken.',
+      ]),
+
+    // ---------- Körnerbrötchen (Mehrkorn) ----------
+    backen('brot', 'koernerbroetchen', 'Körnerbrötchen',
+      {
+        time: 180,
+        yields: { name: 'Körnerbrötchen selbstgebacken', amount: 10, unit: 'Stk', shelf: 2, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
+        lighter: 'Die Kürbiskerne obendrauf weglassen und nur mit Haferflocken bestreuen – spart rund 15 kcal pro Brötchen.',
+      },
+      '350 g Weizenmehl | 150 g Weizenvollkornmehl | 30 g Sonnenblumenkerne | 3 EL Kürbiskerne | 20 g Leinsamen geschrotet | 5 TL Sesam | 40 g Haferflocken | 11 g Salz | 15 g Hefe frisch | 10 g Honig',
+      [
+        'Für das Brühstück Sonnenblumenkerne, Leinsamen, 3 TL vom Sesam und 20 g von den Haferflocken mit 100 ml kochendem Wasser übergießen und abgedeckt 30 Minuten quellen lassen – so ziehen die Körner dem Teig später kein Wasser mehr.',
+        'Die Hefe frisch mit dem Honig in 280 ml lauwarmem Wasser auflösen. Mit Weizenmehl, Weizenvollkornmehl und Salz 8 Minuten zu einem glatten Teig kneten, dann das Brühstück 2 Minuten unterarbeiten.',
+        'Den Teig abgedeckt 60 Minuten gehen lassen, bis er sich verdoppelt hat.',
+        'Den Teig in 10 Stücke (je ca. 105 g) teilen und rund formen. Kürbiskerne, den restlichen Sesam und die restlichen Haferflocken auf einem Teller mischen, die Brötchen oben mit Wasser befeuchten und hineindrücken. Mit Abstand auf ein Blech mit Backpapier setzen und abgedeckt 30 Minuten gehen lassen.',
+        'Den Backofen mit einer ofenfesten Schale auf dem Boden auf 220 °C vorheizen. Eine Tasse Wasser in die Schale gießen und die Brötchen 12 Minuten backen.',
+        'Den Dampf ablassen, auf 200 °C herunterschalten und weitere 8 Minuten backen, bis sie kräftig braun sind und hohl klingen. Auf einem Gitter auskühlen lassen.',
+      ]),
+
+    // ---------- Milchbrötchen ----------
+    backen('brot', 'milchbroetchen', 'Milchbrötchen',
+      {
+        time: 150,
+        yields: { name: 'Milchbrötchen selbstgebacken', amount: 12, unit: 'Stk', shelf: 3, store: 'luftdicht in einem Beutel bei Raumtemperatur', frozen: 90 },
+        lighter: 'Zucker auf 25 g und Butter auf 40 g verringern – spart rund 25 kcal pro Brötchen.',
+      },
+      '500 g Weizenmehl | 9 g Salz | 21 g Hefe frisch | 50 g Zucker | 70 g Butter | 280 ml Milch | 2 Stk Ei',
+      [
+        'Die Hefe frisch mit dem Zucker in 260 ml lauwarmer Milch auflösen. Mit Weizenmehl, Salz und einem Ei 5 Minuten kneten, dann die weiche Butter in Stückchen zugeben und weitere 6 Minuten zu einem glatten, glänzenden Teig kneten.',
+        'Den Teig abgedeckt 60 Minuten gehen lassen, bis er sich verdoppelt hat.',
+        'Den Teig in 12 Stücke (je ca. 80 g) teilen, rund wirken und mit 2 cm Abstand auf ein Blech mit Backpapier setzen – beim Backen wachsen sie leicht zusammen und bleiben seitlich weich. Abgedeckt 30 Minuten gehen lassen.',
+        'Den Backofen auf 170 °C Heißluft vorheizen. Das zweite Ei mit den restlichen 20 ml Milch verquirlen und die Brötchen damit bestreichen.',
+        'Die Milchbrötchen 18 Minuten goldbraun backen. Auf einem Gitter auskühlen lassen.',
+      ]),
+
+    // ---------- Irisches Soda Bread (Natron statt Hefe) ----------
+    backen('brot', 'soda-bread', 'Irisches Soda Bread',
+      {
+        time: 90,
+        yields: { name: 'Soda Bread selbstgebacken', amount: 820, unit: 'g', shelf: 3, store: 'in ein Küchentuch gewickelt im Brotkasten', frozen: 90 },
+        lighter: 'Dünn schneiden (35 g statt 50 g pro Scheibe) und mit Kräuterquark statt Butter belegen – spart pro Scheibe rund 80 kcal.',
+      },
+      '250 g Weizenvollkornmehl | 200 g Weizenmehl | 30 g Haferflocken | 6 g Backnatron | 8 g Salz | 10 g Zucker | 420 ml Buttermilch',
+      [
+        'Den Backofen auf 200 °C Ober-/Unterhitze vorheizen und ein Blech mit Backpapier belegen.',
+        'Weizenvollkornmehl, Weizenmehl, 20 g von den Haferflocken, Backnatron, Salz und Zucker in einer Schüssel mischen. Die Buttermilch zugießen und mit einem Löffel nur so lange verrühren, bis kein trockenes Mehl mehr zu sehen ist – nicht kneten.',
+        'Den klebrigen Teig sofort mit bemehlten Händen zu einem runden Laib (ca. 18 cm) formen, auf das Blech setzen, mit den restlichen Haferflocken bestreuen und mit einem bemehlten Messer ein tiefes Kreuz (ca. 2 cm) einschneiden.',
+        'Das Soda Bread 40 Minuten backen, bis es kräftig braun ist und beim Klopfen auf die Unterseite hohl klingt.',
+        'Auf einem Gitter auskühlen lassen – für eine weiche Kruste in ein Küchentuch wickeln. Am besten am Backtag und am Folgetag essen, danach toasten.',
+      ]),
+
+    // ---------- Bauernbrot mit Hefe (Weizen-Roggen-Mischbrot, Vorteig) ----------
+    backen('brot', 'bauernbrot-hefe', 'Bauernbrot mit Hefe (ohne Sauerteig)',
+      {
+        time: 1020,
+        yields: { name: 'Hefe-Bauernbrot selbstgebacken', amount: 920, unit: 'g', shelf: 4, store: 'in Papier oder im Brotkasten', frozen: 90 },
+        lighter: 'Dünn schneiden (35 g statt 50 g pro Scheibe) und mit Magerquark und Schnittlauch statt Butter belegen – spart pro Scheibe rund 80 kcal.',
+      },
+      '350 g Weizenmehl | 150 g Roggenmehl | 11 g Salz | 8 g Hefe frisch | 1 TL Kümmel',
+      [
+        'Am Vorabend einen Vorteig ansetzen: Das Roggenmehl mit 150 ml kaltem Wasser und 1 g von der Hefe frisch verrühren und abgedeckt 12–16 Stunden bei Raumtemperatur reifen lassen. Er ersetzt den Sauerteig als Aromageber.',
+        'Am Backtag den Vorteig mit Weizenmehl, der restlichen Hefe frisch, Salz, Kümmel und 200 ml lauwarmem Wasser 8 Minuten langsam zu einem weichen, leicht klebrigen Teig kneten.',
+        'Den Teig abgedeckt 45 Minuten gehen lassen. Dann rund formen und mit der Naht nach oben in ein bemehltes Gärkörbchen legen.',
+        'Abgedeckt 45 Minuten gehen lassen, bis der Teig sichtbar aufgegangen ist. Inzwischen den Backofen mit einem Blech und einer ofenfesten Schale auf dem Boden auf 230 °C vorheizen.',
+        'Den Laib auf Backpapier stürzen, auf das heiße Blech ziehen, eine Tasse Wasser in die Schale gießen und 10 Minuten anbacken.',
+        'Den Dampf ablassen, auf 200 °C herunterschalten und weitere 40 Minuten backen, bis das Brot beim Klopfen auf die Unterseite hohl klingt. Auf einem Gitter mindestens 2 Stunden auskühlen lassen.',
+      ]),
+
+    // ---------- Baguette mit Poolish ----------
+    backen('brot', 'baguette-poolish', 'Baguette mit Poolish',
+      {
+        time: 960,
+        yields: { name: 'Baguette selbstgebacken', amount: 3, unit: 'Stk', shelf: 1, store: 'in Papier bei Raumtemperatur', frozen: 90 },
+        lighter: 'Ein Baguette auf vier statt drei Portionen teilen und mit Tomate statt Butter essen – spart rund 140 kcal pro Portion.',
+      },
+      '500 g Weizenmehl | 10 g Salz | 4 g Hefe frisch',
+      [
+        'Am Vorabend den Poolish ansetzen: 200 g vom Weizenmehl, 200 ml kaltes Wasser und 1 g von der Hefe frisch verrühren und abgedeckt 12–16 Stunden bei Raumtemperatur stehen lassen, bis er voller Blasen ist.',
+        'Am Backtag den Poolish mit dem restlichen Weizenmehl, der restlichen Hefe frisch und 130 ml Wasser 2 Minuten mischen, dann das Salz zugeben und 8 Minuten zu einem glatten Teig kneten.',
+        'Den Teig abgedeckt 90 Minuten bei Raumtemperatur gehen lassen und nach 30 und 60 Minuten dehnen und falten.',
+        'Den Teig in 3 Stücke (je ca. 280 g) teilen, locker zu Rollen vorformen und 20 Minuten ruhen lassen. Dann jedes Stück flach drücken, von der langen Seite her straff aufrollen und zu 35 cm langen Stangen rollen. Auf bemehltes Backpapier legen und abgedeckt 40 Minuten gehen lassen.',
+        'Den Backofen mit einem Blech und einer ofenfesten Schale auf dem Boden auf 240 °C vorheizen. Die Baguettes dreimal schräg und flach einschneiden, auf das heiße Blech ziehen, eine Tasse Wasser in die Schale gießen und 12 Minuten backen.',
+        'Den Dampf ablassen und weitere 12 Minuten bei 220 °C backen, bis die Kruste kräftig braun ist. Auf einem Gitter auskühlen lassen.',
+      ]),
+
+    // ---------- Wasserweck / Schnittbrötchen ----------
+    backen('brot', 'wasserweck', 'Wasserweck (Schnittbrötchen)',
+      {
+        time: 140,
+        yields: { name: 'Wasserweck selbstgebacken', amount: 10, unit: 'Stk', shelf: 1, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
+        lighter: 'Aus dem Teig 12 statt 10 kleinere Wecken formen – spart rund 30 kcal pro Brötchen.',
+      },
+      '500 g Weizenmehl | 10 g Salz | 15 g Hefe frisch | 5 g Zucker | 10 ml Sonnenblumenöl',
+      [
+        'Die Hefe frisch mit dem Zucker in 300 ml lauwarmem Wasser auflösen. Mit Weizenmehl, Salz und Sonnenblumenöl 10 Minuten zu einem glatten, festen Teig kneten.',
+        'Den Teig abgedeckt 45 Minuten gehen lassen, bis er sich fast verdoppelt hat.',
+        'Den Teig in 10 Stücke (je ca. 83 g) teilen, rund wirken und zu ovalen Wecken (ca. 10 cm) rollen. Mit der Naht nach oben auf ein bemehltes Tuch legen und abgedeckt 30 Minuten gehen lassen.',
+        'Den Backofen mit einer ofenfesten Schale auf dem Boden auf 220 °C vorheizen. Die Wecken umdrehen, auf ein Blech mit Backpapier setzen und mit einem scharfen Messer der Länge nach ca. 1 cm tief einschneiden.',
+        'Eine Tasse Wasser in die Schale gießen und die Wecken 12 Minuten backen. Den Dampf ablassen, auf 200 °C herunterschalten und weitere 8 Minuten backen, bis sie goldbraun sind. Auf einem Gitter auskühlen lassen.',
+      ]),
   ],
   catalog: {
-    vorrat: ['Roggenmehl', 'Dinkelmehl', 'Dinkelvollkornmehl', 'Hartweizengrieß', 'Backnatron'],
+    vorrat: ['Roggenmehl', 'Dinkelmehl', 'Dinkelvollkornmehl', 'Hartweizengrieß', 'Backnatron', 'Weizenvollkornmehl'],
+    konserven: ['Sonnenblumenkerne'],
   },
   products: {
     Roggenmehl: prod(1000, 'g', 1.19, 365, 180, 'Pck'),
@@ -240,6 +407,8 @@ export const brot: ExtraGroup = {
     Dinkelvollkornmehl: prod(1000, 'g', 1.79, 365, 120, 'Pck'),
     Hartweizengrieß: prod(500, 'g', 1.49, 540, 365, 'Pck'),
     Backnatron: prod(50, 'g', 0.89, 1095, 1095, 'Pck'),
+    Weizenvollkornmehl: prod(1000, 'g', 1.29, 365, 120, 'Pck'),
+    Sonnenblumenkerne: prod(200, 'g', 1.29, 365, 90, 'Pck'),
   },
   nutrition: {
     Roggenmehl: [324, 8.3, 1.4, 68, 8],
@@ -247,11 +416,15 @@ export const brot: ExtraGroup = {
     Dinkelvollkornmehl: [330, 14, 2.7, 60, 10],
     Hartweizengrieß: [347, 11, 1.1, 71, 3.5],
     Backnatron: [0, 0, 0, 0, 0],
+    Weizenvollkornmehl: [325, 12, 2.4, 60, 10],
+    Sonnenblumenkerne: [584, 21, 51, 12, 9],
     // Anstellgut = Roggenmehl und Wasser 1:1 (die automatische Berechnung kennt das Wasser nicht)
     Anstellgut: [162, 4.2, 0.7, 34, 4],
   },
   grams: {
     Roggenmehl: { EL: 10 },
+    Weizenvollkornmehl: { EL: 10 },
+    Sonnenblumenkerne: { EL: 10 },
   },
   convert: {
     Roggenmehl: { EL: 10 },
@@ -259,18 +432,21 @@ export const brot: ExtraGroup = {
   substitutes: {
     // selbstgebackenes Brot (im Vorrat in Scheiben à 50 g) deckt Vollkornbrot, z. B. in den Frühstücksboxen – und wird zuerst genommen
     groups: {
-      'brot-scheibe': ['Bauernbrot selbstgebacken', 'Dinkelvollkornbrot selbstgebacken', 'Roggenmischbrot selbstgebacken', 'Pane pugliese selbstgebacken'],
+      'brot-scheibe': ['Bauernbrot selbstgebacken', 'Dinkelvollkornbrot selbstgebacken', 'Roggenmischbrot selbstgebacken', 'Pane pugliese selbstgebacken', 'Hefe-Bauernbrot selbstgebacken', 'Soda Bread selbstgebacken'],
       ciabatta: ['Ciabatta selbstgebacken'],
       // Brötchen (Stk): selbstgebackene vor „Brötchen vom Vortag“; Laugengebäck deckt Laugenbrezeln
-      broetchen: ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken'],
+      broetchen: ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken', 'Quarkbrötchen selbstgebacken', 'Körnerbrötchen selbstgebacken', 'Wasserweck selbstgebacken'],
+      // Toastbrot (Scheiben): selbstgebackener Toast vor dem gekauften. Achtung: eine Vorrats-Scheibe = 50 g, gekaufte Toastscheibe ≈ 25 g
+      toast: ['Toastbrot', 'Toastbrot selbstgebacken', 'Dinkel-Vollkorntoast selbstgebacken', 'Milchtoast selbstgebacken'],
       laugen: ['Laugenbrezel', 'Laugenbrötchen selbstgebacken'],
       // Burger-Brötchen (Stk): selbstgebackene Buns vor den gekauften
       'burger-broetchen': ['Burger-Brötchen', 'Burger-Buns selbstgebacken'],
     },
     preferred: {
-      Vollkornbrot: ['Bauernbrot selbstgebacken', 'Dinkelvollkornbrot selbstgebacken', 'Roggenmischbrot selbstgebacken'],
+      Vollkornbrot: ['Bauernbrot selbstgebacken', 'Dinkelvollkornbrot selbstgebacken', 'Roggenmischbrot selbstgebacken', 'Hefe-Bauernbrot selbstgebacken', 'Soda Bread selbstgebacken'],
+      Toastbrot: ['Toastbrot selbstgebacken', 'Dinkel-Vollkorntoast selbstgebacken', 'Milchtoast selbstgebacken'],
       Ciabatta: ['Ciabatta selbstgebacken'],
-      'Brötchen vom Vortag': ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken'],
+      'Brötchen vom Vortag': ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken', 'Quarkbrötchen selbstgebacken', 'Körnerbrötchen selbstgebacken', 'Wasserweck selbstgebacken'],
       Laugenbrezel: ['Laugenbrötchen selbstgebacken'],
       'Burger-Brötchen': ['Burger-Buns selbstgebacken'],
     },
@@ -386,6 +562,92 @@ export const brot: ExtraGroup = {
       st('Die Schüssel herausnehmen und den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen. Den Teig zu einem Rechteck (ca. 24 × 30 cm) ausrollen und in 24 Streifen schneiden. Jeden Streifen zu einer 30 cm langen Stange rollen und im restlichen Hartweizengrieß wälzen. Mit Abstand auf Backpapier legen.', steamer('Heißluft', 200, undefined, 'vorheizen, Kuchenblech Ebene 2')),
       st('Die Grissini mit dem Backpapier auf das heiße Blech ziehen und 15–18 Minuten backen, bis sie goldbraun sind. Danach den CombiSteamer ausschalten, die Tür einen Spalt öffnen und die Stangen 10 Minuten nachtrocknen lassen.', steamer('Heißluft', 200, 16, 'Ebene 2, ohne Dampf')),
     ],
+    // ---------- ohne Sauerteig ----------
+    'toastbrot-klassisch': [
+      st('Die Hefe frisch mit dem Zucker in der lauwarmen Milch und 150 ml lauwarmem Wasser auflösen. Mit Weizenmehl und Salz in den Famag geben und 5 Minuten kneten, dann die weiche Butter in Stückchen nach und nach zugeben und weitere 5 Minuten zu einem glatten, elastischen Teig kneten.', famag(5), famag(5, { note: 'Butter nach und nach' })),
+      st('Fensterprobe machen: Ein kleines Teigstück vorsichtig zwischen den Fingern ausziehen. Lässt es sich hauchdünn dehnen, sodass Licht durchscheint, ohne zu reißen, hat sich das Klebergerüst gebildet und der Teig ist fertig – reißt es sofort, noch 2 Minuten weiterkneten.'),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 50 Minuten gehen lassen, bis er sich verdoppelt hat (Gare: die Hefe bildet Gas, der Teig wird luftig).', gare(50)),
+      st('Eine Kastenform (30 cm) mit Backpapier auslegen. Den Teig in 3 gleich große Stücke teilen, jedes unter der hohlen Hand zu einer straffen Kugel rollen und die Kugeln nebeneinander in die Form setzen – so steigt der Toast gleichmäßig und bekommt die typischen Kuppeln. Für Sandwichtoast mit geraden Kanten später eine Kastenform mit Deckel (Pullman-Form) nehmen und den Deckel schließen, sobald der Teig 1 cm unter dem Rand steht.'),
+      st('Die Form abgedeckt im CombiSteamer 40 Minuten gehen lassen, bis der Teig etwa 1 cm unter dem Rand steht (Stückgare). Nach 25 Minuten den Combair auf 190 °C Ober-/Unterhitze vorheizen.', gare(40, 'Form auf den Gitterrost'), { device: 'combair', mode: 'Ober-/Unterhitze', temp: 190, note: 'vorheizen, Ebene 1 (hohe Form)' }),
+      st('Die Form auf dem Gitterrost auf Ebene 1 in den Combair stellen und das Toastbrot 35 Minuten goldbraun backen. Sofort aus der Form lösen: Es klingt beim Klopfen auf die Unterseite hohl, sonst ohne Form noch 5 Minuten nachbacken.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 190, minutes: 35, note: 'Ebene 1 (hohe Form)' }),
+      st('Auf einem Gitter mindestens 1 Stunde auskühlen lassen, erst dann schneiden. Zum Einfrieren das ausgekühlte Brot in 1 cm dicke Scheiben schneiden, portionsweise (z. B. 4 Scheiben) in Gefrierbeutel füllen und flach einfrieren (hält ca. 3 Monate). Die Scheiben gefroren direkt in den Toaster stecken.'),
+    ],
+    'dinkel-vollkorntoast': [
+      st('Dinkelvollkornmehl und Dinkelmehl mit der lauwarmen Milch und 150 ml lauwarmem Wasser in der Schüssel des Famag verrühren und abgedeckt 20 Minuten quellen lassen – so nimmt das Vollkornmehl das Wasser auf und der Toast wird nicht krümelig.'),
+      st('Die Hefe frisch mit dem Honig verrühren, mit Salz und der weichen Butter zum Teig geben und im Famag 6 Minuten langsam zu einem weichen, leicht klebrigen Teig kneten (Dinkel nicht überkneten, sonst reißt das Klebergerüst).', famag(6, { mode: 'Kneten langsam', note: 'Dinkel nicht überkneten' })),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 40 Minuten gehen lassen.', gare(40)),
+      st('Eine Kastenform (30 cm) mit Backpapier auslegen. Den Teig auf wenig Mehl zu einem Rechteck (ca. 25 × 30 cm) drücken, von der kurzen Seite her straff aufrollen und mit der Naht nach unten in die Form legen.'),
+      st('Die Form abgedeckt im CombiSteamer 30 Minuten gehen lassen, bis der Teig knapp den Rand erreicht (Dinkel nicht zu lange gehen lassen, sonst fällt er ein). Nach 15 Minuten den Combair auf 190 °C Ober-/Unterhitze vorheizen.', gare(30, 'Form auf den Gitterrost'), { device: 'combair', mode: 'Ober-/Unterhitze', temp: 190, note: 'vorheizen, Ebene 1 (hohe Form)' }),
+      st('Die Form auf dem Gitterrost auf Ebene 1 in den Combair stellen und den Toast 35 Minuten backen. Sofort aus der Form lösen und die Klopfprobe machen: Die Unterseite klingt hohl.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 190, minutes: 35, note: 'Ebene 1 (hohe Form)' }),
+      st('Auf einem Gitter mindestens 1 Stunde auskühlen lassen. Zum Einfrieren in 1 cm dicke Scheiben schneiden, portionsweise in Gefrierbeutel füllen und flach einfrieren (ca. 3 Monate); die Scheiben gefroren toasten.'),
+    ],
+    'milchtoast-hokkaido': [
+      st('Für das Tangzhong (Mehlkochstück) 25 g vom Weizenmehl mit 125 ml von der Milch in einem kleinen Topf glatt rühren und unter ständigem Rühren erhitzen, bis eine puddingartige Masse entsteht (ca. 65 °C, nach 2–3 Minuten). Abgedeckt auf Handwärme abkühlen lassen. Das gebundene Wasser macht den Toast besonders weich und länger frisch.', { device: 'bora', mode: 'Kochzone', level: '3', note: 'ständig rühren' }),
+      st('Die Hefe frisch mit dem Zucker in 125 ml lauwarmer Milch auflösen. Mit dem restlichen Weizenmehl, Salz, Ei und dem Tangzhong in den Famag geben und 6 Minuten kneten. Dann die weiche Butter in Stückchen nach und nach zugeben und weitere 6 Minuten kneten, bis der Teig die Fensterprobe besteht (ein Teigstück lässt sich hauchdünn ausziehen, ohne zu reißen).', famag(6), famag(6, { note: 'Butter nach und nach' })),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 60 Minuten gehen lassen, bis er sich verdoppelt hat.', gare(60)),
+      st('Den Teig in 3 Stücke teilen, jedes zu einem Oval (ca. 12 × 25 cm) ausrollen, von der kurzen Seite her aufrollen und die Rollen nebeneinander in eine mit Backpapier ausgelegte Kastenform (30 cm) setzen.'),
+      st('Die Form abgedeckt im CombiSteamer 45 Minuten gehen lassen, bis der Teig fast den Rand erreicht. Nach 30 Minuten den Combair auf 180 °C Ober-/Unterhitze vorheizen.', gare(45, 'Form auf den Gitterrost'), { device: 'combair', mode: 'Ober-/Unterhitze', temp: 180, note: 'vorheizen, Ebene 1 (hohe Form)' }),
+      st('Den Toast mit den restlichen 10 ml Milch bestreichen, die Form auf dem Gitterrost auf Ebene 1 in den Combair stellen und 30 Minuten goldbraun backen. Wird die Oberfläche zu dunkel, locker mit Backpapier abdecken.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 180, minutes: 30, note: 'Ebene 1 (hohe Form)' }),
+      st('Sofort aus der Form lösen (Klopfprobe: die Unterseite klingt hohl) und auf einem Gitter mindestens 1 Stunde auskühlen lassen. Zum Einfrieren in Scheiben schneiden, portionsweise in Gefrierbeutel füllen und flach einfrieren; gefroren toasten oder 15 Minuten antauen lassen.'),
+    ],
+    'quarkbroetchen': [
+      st('Den Combair auf 200 °C Ober-/Unterhitze vorheizen und ein Blech mit Backpapier belegen.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 200, note: 'vorheizen, Ebene 2' }),
+      st('Weizenmehl, Backpulver (1 Päckchen, 15 g), Salz und Zucker mischen. Magerquark, Ei, 60 ml von der Milch und Sonnenblumenöl zugeben und mit den Händen nur kurz zu einem glatten Teig verkneten – Backpulverteig nicht lange kneten, sonst wird er zäh. Er geht nicht wie Hefeteig, das Backpulver lockert erst in der Hitze.'),
+      st('Den Teig in 10 Stücke (je ca. 85 g) teilen, mit bemehlten Händen rund formen und mit Abstand auf das Blech setzen. Mit den restlichen 10 ml Milch bestreichen, mit Sesam bestreuen und mit einem Messer kreuzweise einschneiden.'),
+      st('Die Brötchen sofort auf Ebene 2 in den Combair schieben und 21 Minuten backen, bis sie goldbraun sind. Auf einem Gitter auskühlen lassen; am Folgetag kurz aufbacken.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 200, minutes: 21, note: 'Ebene 2' }),
+    ],
+    'koernerbroetchen': [
+      st('Für das Brühstück Sonnenblumenkerne, Leinsamen, 3 TL vom Sesam und 20 g von den Haferflocken mit 100 ml kochendem Wasser übergießen und abgedeckt 30 Minuten quellen lassen – so ziehen die Körner dem Teig später kein Wasser mehr und die Brötchen bleiben saftig.'),
+      st('Die Hefe frisch mit dem Honig in 280 ml lauwarmem Wasser auflösen. Mit Weizenmehl, Weizenvollkornmehl und Salz im Famag 8 Minuten zu einem glatten Teig kneten, dann das Brühstück zugeben und 2 Minuten unterarbeiten.', famag(8), famag(2, { mode: 'Mischen', note: 'Brühstück unterarbeiten' })),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 50 Minuten gehen lassen, bis er sich verdoppelt hat.', gare(50)),
+      st('Den Teig in 10 Stücke (je ca. 105 g) teilen und rund wirken (unter der hohlen Hand kreisend zu straffen Kugeln rollen). Kürbiskerne, den restlichen Sesam und die restlichen Haferflocken auf einem Teller mischen, die Brötchen oben mit Wasser befeuchten und hineindrücken. Mit Abstand auf Backpapier auf das Kuchenblech setzen.'),
+      st('Die Brötchen auf dem Kuchenblech im CombiSteamer 25 Minuten gehen lassen.', gare(25, 'Kuchenblech Ebene 2')),
+      st('Das Blech herausnehmen und die Brötchen mit dem Backpapier auf ein Brett ziehen. Das leere Blech wieder auf Ebene 2 einschieben, den Wasserbehälter füllen und den CombiSteamer vorheizen.', preheat(220)),
+      st('Die Brötchen mit dem Backpapier auf das heiße Blech ziehen und 12 Minuten mit Dampf backen – die Tür dabei geschlossen lassen.', steamer('Heißluft mit Beschwaden', 220, 12, 'Ebene 2')),
+      st('Auf Heißluft ohne Dampf umschalten und weitere 8 Minuten backen, bis sie kräftig braun sind und beim Klopfen auf die Unterseite hohl klingen. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 200, 8, 'trocken, für die Kruste')),
+    ],
+    'milchbroetchen': [
+      st('Die Hefe frisch mit dem Zucker in 260 ml lauwarmer Milch auflösen. Mit Weizenmehl, Salz und einem Ei in den Famag geben und 5 Minuten kneten, dann die weiche Butter in Stückchen nach und nach zugeben und weitere 6 Minuten zu einem glatten, glänzenden Teig kneten.', famag(5), famag(6, { note: 'Butter nach und nach' })),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 50 Minuten gehen lassen, bis er sich verdoppelt hat.', gare(50)),
+      st('Den Teig in 12 Stücke (je ca. 80 g) teilen, rund wirken und mit 2 cm Abstand auf ein Blech mit Backpapier setzen – beim Backen wachsen sie leicht zusammen und bleiben seitlich weich.'),
+      st('Das Blech im CombiSteamer 30 Minuten gehen lassen. Nach 15 Minuten den Combair auf 170 °C Heißluft feucht vorheizen.', gare(30, 'Blech Ebene 2'), { device: 'combair', mode: 'Heißluft feucht', temp: 170, note: 'vorheizen, Ebene 2' }),
+      st('Das zweite Ei mit den restlichen 20 ml Milch verquirlen und die Brötchen damit bestreichen. Auf Ebene 2 in den Combair schieben und 18 Minuten goldbraun backen. Auf einem Gitter auskühlen lassen.', { device: 'combair', mode: 'Heißluft feucht', temp: 170, minutes: 18, note: 'Ebene 2' }),
+    ],
+    'soda-bread': [
+      st('Den Combair auf 200 °C Ober-/Unterhitze vorheizen und ein Blech mit Backpapier belegen.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 200, note: 'vorheizen, Ebene 2' }),
+      st('Weizenvollkornmehl, Weizenmehl, 20 g von den Haferflocken, Backnatron, Salz und Zucker in einer Schüssel mischen. Die Buttermilch zugießen und mit einem Löffel nur so lange verrühren, bis kein trockenes Mehl mehr zu sehen ist – nicht kneten: Das Natron reagiert sofort mit der Säure der Buttermilch und lockert den Teig, Kneten macht das Brot zäh.'),
+      st('Den klebrigen Teig sofort mit bemehlten Händen zu einem runden Laib (ca. 18 cm) formen, auf das Blech setzen, mit den restlichen Haferflocken bestreuen und mit einem bemehlten Messer ein tiefes Kreuz (ca. 2 cm) einschneiden, damit das Brot innen gleichmäßig durchbackt.'),
+      st('Das Soda Bread auf Ebene 2 in den Combair schieben und 40 Minuten backen, bis es kräftig braun ist und beim Klopfen auf die Unterseite hohl klingt.', { device: 'combair', mode: 'Ober-/Unterhitze', temp: 200, minutes: 40, note: 'Ebene 2' }),
+      st('Auf einem Gitter auskühlen lassen – für eine weiche Kruste in ein Küchentuch wickeln. Am besten am Backtag und am Folgetag essen, danach toasten; in Scheiben eingefroren hält es ca. 3 Monate.'),
+    ],
+    'bauernbrot-hefe': [
+      st('Am Vorabend einen Vorteig ansetzen: Das Roggenmehl mit 150 ml kaltem Wasser und 1 g von der Hefe frisch verrühren und abgedeckt 12–16 Stunden bei Raumtemperatur reifen lassen, bis er voller Bläschen ist. Er ersetzt den Sauerteig als Aromageber und macht das Brot saftiger.'),
+      st('Am Backtag den Vorteig mit Weizenmehl, der restlichen Hefe frisch, Salz, Kümmel und 200 ml lauwarmem Wasser im Famag 8 Minuten langsam zu einem weichen, leicht klebrigen Teig kneten.', famag(8, { mode: 'Kneten langsam', note: 'Mischteig mit Roggen' })),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 45 Minuten gehen lassen.', gare(45)),
+      st('Den Teig auf wenig Mehl zu einer straffen Kugel formen und mit der Naht (der Stelle, an der die Teigränder zusammenlaufen) nach oben in ein bemehltes Gärkörbchen legen – ersatzweise in eine Schüssel mit einem gut bemehlten Küchentuch.'),
+      st('Das Gärkörbchen abgedeckt im CombiSteamer 45 Minuten gehen lassen, bis der Teig sichtbar aufgegangen ist und auf leichten Fingerdruck langsam zurückfedert.', gare(45, 'Körbchen auf den Gitterrost')),
+      st('Das Körbchen herausnehmen. Den Wasserbehälter füllen und den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen. Den Laib auf Backpapier stürzen (die Naht liegt dann unten) und mit Mehl bestäuben.', preheat()),
+      st('Das Brot mit dem Backpapier auf das heiße Blech ziehen und 10 Minuten mit Dampf anbacken – die Tür dabei geschlossen lassen.', steamer('Heißluft mit Beschwaden', 230, 10, 'Ebene 2')),
+      st('Auf Heißluft ohne Dampf umschalten und weitere 40 Minuten backen, bis das Brot beim Klopfen auf die Unterseite hohl klingt.', steamer('Heißluft', 200, 40, 'trocken, für die Kruste')),
+      st('Auf einem Gitter mindestens 2 Stunden auskühlen lassen, erst dann anschneiden.'),
+    ],
+    'baguette-poolish': [
+      st('Am Vorabend den Poolish (flüssiger Vorteig mit sehr wenig Hefe, der über Nacht Aroma bildet) ansetzen: 200 g vom Weizenmehl, 200 ml kaltes Wasser und 1 g von der Hefe frisch verrühren und abgedeckt 12–16 Stunden bei Raumtemperatur stehen lassen, bis er voller Blasen ist.'),
+      st('Am Backtag den Poolish mit dem restlichen Weizenmehl, der restlichen Hefe frisch und 130 ml Wasser im Famag 2 Minuten mischen, dann das Salz zugeben und 8 Minuten zu einem glatten Teig kneten.', famag(2, { mode: 'Mischen' }), famag(8)),
+      st('Den Teig abgedeckt 90 Minuten bei Raumtemperatur gehen lassen und nach 30 und 60 Minuten dehnen und falten: Den Teig mit nasser Hand an einer Seite hochziehen und über den restlichen Teig legen, die Schüssel eine Vierteldrehung weiterdrehen und das reihum viermal wiederholen.'),
+      st('Den Teig in 3 Stücke (je ca. 280 g) teilen, locker zu Rollen vorformen und 20 Minuten ruhen lassen. Dann jedes Stück flach drücken, von der langen Seite her straff aufrollen, die Naht festdrücken und zu 35 cm langen Stangen rollen. Mit der Naht nach unten auf bemehltes Backpapier auf das Kuchenblech legen.'),
+      st('Die Baguettes auf dem Kuchenblech im CombiSteamer 35 Minuten gehen lassen.', gare(35, 'Kuchenblech Ebene 2')),
+      st('Das Blech herausnehmen und die Baguettes mit dem Backpapier auf ein Brett ziehen. Das leere Blech wieder auf Ebene 2 einschieben, den Wasserbehälter füllen und den CombiSteamer vorheizen. Die Baguettes mit einer Rasierklinge oder einem sehr scharfen Messer dreimal schräg und flach einschneiden.', preheat()),
+      st('Die Baguettes mit dem Backpapier auf das heiße Blech ziehen und 12 Minuten mit Dampf backen – die Tür dabei geschlossen lassen.', steamer('Heißluft mit Beschwaden', 230, 12, 'Ebene 2')),
+      st('Auf Heißluft ohne Dampf umschalten und weitere 12 Minuten backen, bis die Kruste kräftig braun ist und knistert. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 220, 12, 'trocken, für die Kruste')),
+    ],
+    'wasserweck': [
+      st('Die Hefe frisch mit dem Zucker in 300 ml lauwarmem Wasser auflösen. Mit Weizenmehl, Salz und Sonnenblumenöl im Famag 10 Minuten zu einem glatten, festen Teig kneten.', famag(10)),
+      st('Den Teig in der Schüssel abdecken und im CombiSteamer 40 Minuten gehen lassen, bis er sich fast verdoppelt hat.', gare(40)),
+      st('Den Teig in 10 Stücke (je ca. 83 g) teilen, rund wirken und zu ovalen Wecken (ca. 10 cm) rollen. Mit der Naht nach oben auf ein bemehltes Küchentuch legen und abgedeckt 30 Minuten bei Raumtemperatur gehen lassen. Inzwischen den Wasserbehälter füllen und den CombiSteamer mit dem Kuchenblech auf Ebene 2 vorheizen.', preheat(220)),
+      st('Die Wecken umdrehen, auf Backpapier setzen und mit einem scharfen Messer der Länge nach ca. 1 cm tief einschneiden. Mit dem Backpapier auf das heiße Blech ziehen und 12 Minuten mit Dampf backen – die Tür dabei geschlossen lassen.', steamer('Heißluft mit Beschwaden', 220, 12, 'Ebene 2')),
+      st('Auf Heißluft ohne Dampf umschalten und weitere 8 Minuten backen, bis die Wecken goldbraun sind und beim Klopfen auf die Unterseite hohl klingen. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 200, 8, 'trocken, für die Kruste')),
+    ],
   },
   imageQueries: {
     'sauerteig-anstellgut': 'sourdough starter jar',
@@ -401,5 +663,15 @@ export const brot: ExtraGroup = {
     'pane-pugliese': 'Pane pugliese Altamura bread',
     'pittule-salentine': 'pittule Salento fried dough balls',
     'grissini': 'Grissini breadsticks',
+    'toastbrot-klassisch': 'homemade white sandwich bread loaf pan',
+    'dinkel-vollkorntoast': 'whole grain spelt sandwich bread loaf',
+    'milchtoast-hokkaido': 'Hokkaido milk bread loaf',
+    'quarkbroetchen': 'Quarkbrötchen quark bread rolls',
+    'koernerbroetchen': 'Körnerbrötchen multigrain bread rolls seeds',
+    'milchbroetchen': 'Milchbrötchen soft milk bread rolls',
+    'soda-bread': 'Irish soda bread',
+    'bauernbrot-hefe': 'German mixed rye wheat bread loaf',
+    'baguette-poolish': 'Baguette French bread',
+    'wasserweck': 'Wasserweck Brötchen bread rolls',
   },
 }
