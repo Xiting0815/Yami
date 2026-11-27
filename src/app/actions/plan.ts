@@ -1,7 +1,8 @@
 import { finishable, isBake, isTapa, type PlanEntry, type Recipe } from '../../types'
 import { bbqMeal, doneWord, eveningOn } from '../../bbq'
 import { tapasMeal } from '../../tapas'
-import { type PortionFeedback, type Rating, addReject, portionFactor } from '../../learning'
+import { RECIPE_BY_ID } from '../../data/recipes'
+import { type PortionFeedback, type Rating, MOVES_MAX, addReject, dropDish, moveDish, portionFactor, setDishValue } from '../../learning'
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
 import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
@@ -23,11 +24,66 @@ export function withDinner<S extends Pick<AppState, 'plan' | 'pantry' | 'ratings
   if (entry) plan[day] = entry
   else delete plan[day]
   if (!old || old.recipeId === entry?.recipeId) return { ...s, plan, pantry }
-  const ratings = { ...s.ratings }
-  delete ratings[day]
-  const portionFeedback = { ...s.portionFeedback }
-  delete portionFeedback[day]
+  const ratings = dropDish(s.ratings, day, old.recipeId)
+  const portionFeedback = dropDish(s.portionFeedback, day, old.recipeId)
   return { ...s, plan, pantry, ratings, portionFeedback, ratingDismissed: s.ratingDismissed.filter((d) => d !== day) }
+}
+
+/**
+ * Abendessen verschieben bzw. zwei Tage tauschen („↔ Verschieben/Tauschen“ in der Woche). Nur offene Gerichte
+ * (nicht gekocht/übersprungen) – auf beiden Tagen. Bewertung, Portions-Rückmeldung und „Wie war’s?“-Wegklicken wandern
+ * mit dem Gericht (sie gehören zum Gericht, nicht zum Tag). Kalender und Einkaufsliste folgen von selbst (aus dem Plan).
+ * Gemerkt wird das aktiv verschobene Gericht in `moves` (Lernen: mehrmals nach hinten → leichtes Minus).
+ * Gibt `null` zurück, wenn es nicht geht.
+ */
+export function movedDinner<S extends Pick<AppState, 'plan' | 'ratings' | 'portionFeedback' | 'ratingDismissed' | 'moves'>>(s: S, from: string, to: string, today: string): S | null {
+  const a = s.plan[from]
+  const b = s.plan[to]
+  if (from === to || !a || a.status || b?.status) return null
+  const plan = { ...s.plan, [to]: a }
+  if (b) plan[from] = b
+  else delete plan[from]
+  let ratings = s.ratings
+  let portionFeedback = s.portionFeedback
+  // erst beide Gerichte lösen, dann neu ablegen (beim Tauschen desselben Rezepts nichts verlieren)
+  const ra = moveDish(ratings, from, to, a.recipeId)
+  ratings = b ? moveDish(ra, to, from, b.recipeId) : ra
+  const pa = moveDish(portionFeedback, from, to, a.recipeId)
+  portionFeedback = b ? moveDish(pa, to, from, b.recipeId) : pa
+  const dismissed = new Set(s.ratingDismissed)
+  const ratingDismissed = s.ratingDismissed
+    .filter((d) => d !== from && d !== to)
+    .concat(dismissed.has(from) ? [to] : [], b && dismissed.has(to) ? [from] : [])
+  const moves = [...(s.moves ?? []), { date: today, recipeId: a.recipeId, from, to }].slice(-MOVES_MAX)
+  return { ...s, plan, ratings, portionFeedback, ratingDismissed, moves }
+}
+
+/** Zieltag für „↔ Verschieben/Tauschen“ */
+export interface MoveTarget {
+  day: string
+  /** dort geplantes offenes Gericht (wird getauscht) */
+  swapWith?: string
+  /** nicht wählbar und warum (schon gekocht, Tapas-/Grillabend) */
+  blocked?: string
+}
+
+/** mögliche Zieltage: ab heute bis eine Woche nach dem Tag (höchstens 14), ohne den Tag selbst */
+export function moveTargets(plan: AppState['plan'], bakePlan: AppState['bakePlan'], from: string, today: string): MoveTarget[] {
+  const out: MoveTarget[] = []
+  const start = parseIso(today)
+  for (let i = 0; i < 14; i++) {
+    const day = isoDate(new Date(start.getFullYear(), start.getMonth(), start.getDate() + i))
+    if (i >= 8 && day > isoDate(addDays(parseIso(from), 7))) break
+    if (day === from) continue
+    const e = plan[day]
+    const ev = eveningOn(bakePlan, day)
+    const t: MoveTarget = { day }
+    if (e?.status) t.blocked = e.status === 'cooked' ? 'schon gekocht' : 'abgeschlossen'
+    else if (e) t.swapWith = RECIPE_BY_ID[e.recipeId]?.title ?? 'Gericht'
+    else if (ev) t.blocked = ev === 'tapas' ? 'Tapas-Abend' : 'Grillabend'
+    out.push(t)
+  }
+  return out
 }
 
 /** Abendessen planen: Wischen, Nehmen/Wegwischen, Tage leeren, gekocht/nicht gekocht, Bewertung, Woche wechseln */
@@ -81,8 +137,10 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
   function planOn(recipe: Recipe, day: string) {
     if (recipe.basic) return
     const snap = snapshot()
+    const old = state.plan[day]
+    const replaced = old && old.recipeId !== recipe.id ? RECIPE_BY_ID[old.recipeId]?.title : undefined
     setEntry(day, { recipeId: recipe.id, servings: state.defaultServings })
-    flash(`${recipe.title} → ${weekdayName(day)} ✓`, snap)
+    flash(`${recipe.title} → ${weekdayName(day)} ✓${replaced ? ` (ersetzt: ${replaced})` : ''}`, snap)
   }
 
   /** Karte nach links: ans Ende des Stapels */
@@ -131,28 +189,38 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
 
   /** Bewertung eines gekochten Gerichts (Lernsignal) */
   function rate(day: string, v: Rating) {
-    setState((s) => ({ ...s, ratings: { ...s.ratings, [day]: v } }))
+    setState((s) => {
+      const id = s.plan[day]?.recipeId
+      return id ? { ...s, ratings: setDishValue(s.ratings, day, id, v) } : s
+    })
     flash(v === 'down' ? 'Gemerkt – kommt seltener ✓' : v === 'again' ? 'Gemerkt – kommt bald wieder ✓' : 'Danke – gemerkt ✓')
   }
 
   /** Bewertung im „Wie war’s?“-Sheet: sofort speichern, nochmal tippen nimmt sie zurück (kein Toast – das Sheet bleibt offen) */
   function setRating(day: string, v: Rating | undefined) {
     setState((s) => {
-      const ratings = { ...s.ratings }
-      if (v) ratings[day] = v
-      else delete ratings[day]
-      return { ...s, ratings }
+      const id = s.plan[day]?.recipeId
+      return id ? { ...s, ratings: setDishValue(s.ratings, day, id, v) } : s
     })
   }
 
   /** Portion im „Wie war’s?“-Sheet (zu wenig / passt / zu viel) → lernt den Portionsfaktor */
   function setPortionFeedback(day: string, v: PortionFeedback | undefined) {
     setState((s) => {
-      const portionFeedback = { ...s.portionFeedback }
-      if (v != null) portionFeedback[day] = v
-      else delete portionFeedback[day]
-      return { ...s, portionFeedback }
+      const id = s.plan[day]?.recipeId
+      return id ? { ...s, portionFeedback: setDishValue(s.portionFeedback, day, id, v ?? undefined) } : s
     })
+  }
+
+  /** „↔ Verschieben/Tauschen“: Gericht auf einen anderen Tag; ist der belegt, werden beide getauscht (Rückgängig im Toast) */
+  function moveDinner(from: string, to: string) {
+    const a = state.plan[from]
+    const b = state.plan[to]
+    if (!movedDinner(state, from, to, today)) return
+    const snap = snapshot()
+    setState((s) => movedDinner(s, from, to, today) ?? s)
+    const ta = RECIPE_BY_ID[a!.recipeId]?.title ?? 'Gericht'
+    flash(b ? `${weekdayName(from)} ↔ ${weekdayName(to)} getauscht` : `${ta} → ${weekdayName(to)} ✓`, snap)
   }
 
   /**
@@ -246,5 +314,5 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
     setState((s) => ({ ...s, ratingDismissed: [...s.ratingDismissed, day].slice(-60) }))
   }
 
-  return { undoSyncNotice, dismissSyncNotice, setEntry, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, finishBasic, setBakeRating, dismissRating }
+  return { undoSyncNotice, dismissSyncNotice, setEntry, moveDinner, startSwipe, startPantrySwipe, take, planOn, reject, removeEntry, changeWeek, uncookDay, recookDay, rate, setRating, setPortionFeedback, finishCooking, finishBasic, setBakeRating, dismissRating }
 }

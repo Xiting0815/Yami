@@ -9,10 +9,15 @@ import { RecipeImage } from './RecipeImage'
 import imageMap from '../data/images.json'
 import { type Insight, type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { InsightBadges } from './SwipeDeck'
-import { CookMode, type CookFinish } from './CookMode'
+import type { CookFinish } from './CookMode'
+import { lazyNamed } from '../app/lazy'
+
+// Kochmodus erst beim Start des Kochens laden
+const CookMode = lazyNamed(() => import('./CookMode').then((m) => m.CookMode))
 import { DeviceChips } from './DeviceChip'
 import { basicFor } from '../data/recipes'
 import { BakeDays } from './BakeDays'
+import type { DayNote } from './DayPicker'
 
 /** kurze Erklärung für Zutaten, die man leicht verwechselt */
 const INGREDIENT_HINT: Record<string, string> = {
@@ -50,7 +55,7 @@ interface Props {
    * Backen & Desserts / Grundrezepte / BBQ: „Einplanen für“ – Tag wählen legt das Rezept (mit der gewählten Rezeptmenge) in den Backplan.
    * BBQ: `replace` = das geplante Abendessen des Tages streichen (BBQ ersetzt es); `dinnerOn` nennt es für die Frage.
    */
-  bakePlanner?: { today: string; plannedDays: string[]; onPlan: (day: string, amount: number, replace?: boolean) => void; dinnerOn?: (day: string) => string | undefined }
+  bakePlanner?: { today: string; plannedDays: string[]; onPlan: (day: string, amount: number, replace?: boolean) => void; dinnerOn?: (day: string) => string | undefined; dayNote?: (day: string) => DayNote }
 }
 
 export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, householdNote, cooking, onFinish, onCooking, onEdit, onDelete, onOpenRecipe, showClassic, onShowClassic, bakePlanner }: Props) {
@@ -149,6 +154,8 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                   today={bakePlanner.today}
                   marked={(d) => bakePlanner.plannedDays.includes(d)}
                   onPick={(d) => bakePlanner.onPlan(d, servings, replaces && replaceDinner && !!bakePlanner.dinnerOn?.(d))}
+                  note={bakePlanner.dayNote}
+                  replaces={replaces && replaceDinner ? bakePlanner.dinnerOn : undefined}
                 />
               </div>
             )}

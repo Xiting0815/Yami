@@ -72,7 +72,7 @@ ok(Object.keys(s2.plan).length === 1 && s2.plan['2026-11-16'] !== undefined, 'un
   ok(j.pantry.length === 2 && j.pantry.every((l) => typeof l.amount === 'number' && l.amount > 0 && !!l.id), 'Vorrat: kaputte Posten verworfen, Menge als Text umgewandelt, fehlende Id ergänzt')
   ok(j.plan['2026-11-10'].servings === 2 && j.plan['2026-11-10'].consumed!.length === 1, 'Plan: fehlende Portionen = Standard, kaputte „entnommen“-Einträge verworfen')
   ok(j.plan['2026-11-11'].servings === 3 && j.plan['2026-11-11'].status === undefined, 'Plan: unbekannter Status verworfen')
-  ok(j.rejects.length === 1 && Object.keys(j.ratings).join() === '2026-11-10', 'Wischen/Bewertungen: kaputte verworfen')
+  ok(j.rejects.length === 1 && Object.keys(j.ratings).join() === `2026-11-10:${rid}`, 'Wischen/Bewertungen: kaputte verworfen, alte Bewertung dem geplanten Gericht zugeordnet')
   ok(Object.keys(j.bought['2026-11-09']).join() === 'Sahne' && Array.isArray(j.checked['2026-11-09']), 'Einkäufe/Haken: kaputte verworfen')
   ok(LEGACY_KEYS.every((k) => !(k in j)), 'altes Profil/Messungen werden verworfen, ohne Absturz')
   ok(j.defaultServings === 2, 'Standard-Portionen 0 → 2')

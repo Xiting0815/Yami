@@ -4,7 +4,7 @@
  */
 import { RECIPE_BY_ID } from './data/recipes'
 import { amountValue, boughtOfWeek } from './kitchen'
-import { type Rating, buildModel, summarize } from './learning'
+import { type Rating, buildModel, dishValue, summarize } from './learning'
 import { type AppState, addDays, isoWeekNumber, mondayOf, parseIso } from './store'
 import { TYPE_LABEL, type DishType } from './types'
 
@@ -101,8 +101,8 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
 
   // ───── Highlights ─────
   const rated = weekDays
-    .filter((d) => state.ratings[d] && state.plan[d] && RECIPE_BY_ID[state.plan[d]!.recipeId])
-    .map((d) => ({ day: d, title: RECIPE_BY_ID[state.plan[d]!.recipeId].title, rating: state.ratings[d] }))
+    .filter((d) => state.plan[d] && RECIPE_BY_ID[state.plan[d]!.recipeId] && dishValue(state.ratings, d, state.plan[d]!.recipeId))
+    .map((d) => ({ day: d, title: RECIPE_BY_ID[state.plan[d]!.recipeId].title, rating: dishValue(state.ratings, d, state.plan[d]!.recipeId)! }))
     .filter((r) => r.rating !== 'down')
   const typeCount = new Map<DishType, number>()
   for (const d of weekDays) {
@@ -129,6 +129,7 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
     bfPrepped: state.bfPreps,
     bfRatings: state.bfRatings,
     bfSatiety: state.bfSatiety,
+    moves: state.moves,
   })
   const learned = summarize(model).liked.slice(0, 2).map((l) => l.label)
 

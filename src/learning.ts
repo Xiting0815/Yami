@@ -18,6 +18,19 @@
  * Gelernt wird pro Gericht UND pro Muster (Küche, Gerichtart, Hauptzutat, schnell/aufwendig an Werktagen
  * bzw. am Wochenende, Frühstückstyp). So bekommen auch nie gesehene Gerichte einen passenden Platz.
  *
+ * Verschieben/Tauschen (Woche „↔ Verschieben“) ist KEIN negatives Signal – das Gericht wurde ja gewählt. Gelernt wird nur:
+ *   der neue Tag zählt fürs Zeit-Muster (aufwendig → Wochenende geschoben lehrt „aufwendig am Wochenende“), und wer
+ *   dasselbe Gericht innerhalb von 14 Tagen MEHRMALS nach hinten schiebt, hat wohl wenig Lust darauf: ab dem 2. Mal je −0,2.
+ * Bewertung und Portions-Rückmeldung gehören zum GERICHT: Schlüssel `Tag:Rezept-Id` (ältere Stände nur `Tag` → beim Laden
+ *   dem dort geplanten Gericht zugeordnet, siehe `rekeyDish`). So ordnen Tauschen und Familien-Abgleich nichts falsch zu.
+ *
+ * Ruheabstand (`restOf`): Wie lange ein Gericht nach dem Planen bzw. nach dem Wegwischen hinten bleibt, ist gelernt –
+ *   je Gericht und je Muster: oft weggewischt / 👎 → länger, 🔁 „bald wieder“ / 👍 → kürzer (Abwechslung bleibt:
+ *   mindestens 10 Tage). Startwerte 21 Tage nach dem Planen, 10 Tage nach dem Wegwischen.
+ *
+ * Süße Hauptgerichte (Kaiserschmarrn, Kartoffelpuffer mit Apfelmus … – `isSweetMain`) starten leicht hinten (eigenes
+ *   Muster „style:suess“); sobald sie gewählt/gut bewertet werden, fällt der Abzug weg.
+ *
  * Kein Geschmack, aber auch gelernt: „Vergessen zu kaufen“ beim Löschen im Vorrat → „⚠️ oft vergessen“ (src/forgot.ts),
  * „Aufgebraucht“ bei Grundzutaten → Verbrauch (removalUseEvents in src/staples.ts).
  */
@@ -36,6 +49,75 @@ export interface RejectEvent {
   date: string
 }
 
+/** Abendessen von Hand verschoben/getauscht (nur das aktiv verschobene Gericht) */
+export interface MoveEvent {
+  /** wann verschoben (ISO) */
+  date: string
+  recipeId: string
+  from: string
+  to: string
+}
+export const MOVES_MAX = 100
+
+// ───────────── Bewertung/Portion je Gericht ─────────────
+
+/** Schlüssel für Bewertung/Portion eines Abendessens: `Tag:Rezept-Id` */
+export const dishKey = (day: string, recipeId: string) => `${day}:${recipeId}`
+/** Tag eines Schlüssels (`Tag` oder `Tag:Rezept-Id`) */
+export const keyDay = (key: string) => key.slice(0, 10)
+/** Rezept eines Schlüssels; ältere Schlüssel (nur `Tag`) → undefined */
+export const keyRecipe = (key: string) => (key.length > 11 && key[10] === ':' ? key.slice(11) : undefined)
+
+/** Wert für das Gericht `recipeId` am Tag (fällt auf einen älteren Schlüssel nur mit Tag zurück) */
+export function dishValue<T>(map: Record<string, T> | undefined, day: string, recipeId: string | undefined): T | undefined {
+  if (!map) return undefined
+  if (recipeId) {
+    const v = map[dishKey(day, recipeId)]
+    if (v !== undefined) return v
+  }
+  return map[day]
+}
+
+/** Wert für das Gericht setzen (`undefined` löscht); ein älterer Schlüssel nur mit Tag fällt dabei weg */
+export function setDishValue<T>(map: Record<string, T>, day: string, recipeId: string, v: T | undefined): Record<string, T> {
+  const out = { ...map }
+  delete out[day]
+  if (v === undefined) delete out[dishKey(day, recipeId)]
+  else out[dishKey(day, recipeId)] = v
+  return out
+}
+
+/** Bewertung/Portion des Gerichts `recipeId` vom Tag entfernen (auch der ältere Schlüssel nur mit Tag) */
+export function dropDish<T>(map: Record<string, T>, day: string, recipeId: string): Record<string, T> {
+  if (!(day in map) && !(dishKey(day, recipeId) in map)) return map
+  const out = { ...map }
+  delete out[day]
+  delete out[dishKey(day, recipeId)]
+  return out
+}
+
+/** Gericht wandert von `from` nach `to`: seine Bewertung/Portion wandert mit */
+export function moveDish<T>(map: Record<string, T>, from: string, to: string, recipeId: string): Record<string, T> {
+  const v = dishValue(map, from, recipeId)
+  const out = dropDish(map, from, recipeId)
+  if (v === undefined) return out
+  return { ...dropDish(out, to, recipeId), [dishKey(to, recipeId)]: v }
+}
+
+/** Migration: ältere Schlüssel nur mit Tag dem dort geplanten Gericht zuordnen (ohne Eintrag bleiben sie, wie sie sind) */
+export function rekeyDish<T>(map: Record<string, T>, plan: WeekPlan): Record<string, T> {
+  let out: Record<string, T> | undefined
+  for (const [k, v] of Object.entries(map)) {
+    if (k.length !== 10) continue
+    const id = plan[k]?.recipeId
+    if (!id) continue
+    out ??= { ...map }
+    delete out[k]
+    if (!(dishKey(k, id) in out)) out[dishKey(k, id)] = v
+  }
+  return out ?? map
+}
+
 /** so viele Wegwisch-Signale werden gespeichert */
 export const REJECTS_MAX = 400
 
@@ -49,7 +131,9 @@ export function addReject(rejects: RejectEvent[], id: string, date: string): Rej
 }
 
 const HALF_LIFE = 60
-const W = { waste: -0.3, take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3, eaten: 0.3 }
+const W = { waste: -0.3, take: 1, reject: -0.4, cooked: 0.8, skipped: -1, up: 2, again: 2.5, down: -3, eaten: 0.3, postponed: -0.2 }
+/** „mehrmals nach hinten geschoben“: zählt, wenn dasselbe Gericht innerhalb so vieler Tage schon einmal nach hinten kam */
+const POSTPONE_WINDOW = 14
 /** Frühstück: Sättigung „bis mittags satt?“ (−1 zu wenig · 0 passt · 1 zu viel) als Signal fürs Rezept */
 const W_SATIETY: Record<PortionFeedback, number> = { [-1]: -0.6, 0: 0.3, 1: -0.2 }
 /** Glättung: so viele „neutrale“ Beobachtungen werden angenommen, bevor etwas als Vorliebe gilt */
@@ -100,8 +184,25 @@ export function features(r: Recipe, day?: string): string[] {
   if (r.basic) return [`bake:${r.kind ?? 'grundrezept'}`]
   if (r.breakfast) return [`bf:${r.breakfast.type}`, `protein:${mainProtein(r)}`]
   const f = [`cuisine:${r.cuisine}`, `type:${r.type}`, `protein:${mainProtein(r)}`]
+  if (isSweetMain(r)) f.push('style:suess')
   if (day) f.push(`speed:${quick(r) ? 'schnell' : 'aufwendig'}@${isWorkday(day) ? 'werktag' : 'wochenende'}`)
   return f
+}
+
+const SWEET_MARK = /^(Apfelmus|Puderzucker|Vanillezucker|Marmelade|Konfitüre|Pflaumenmus|Zwetschgenmus|Kompott|Rosinen|Vanillesoße|Vanillesauce|Zimtzucker)/i
+
+/**
+ * Süßes Hauptgericht (Kaiserschmarrn, Kartoffelpuffer mit Apfelmus, Dampfnudeln, Germknödel, Pfannkuchen mit Marmelade …):
+ * Abendessen ohne Fleisch/Fisch mit typisch süßer Beigabe oder viel Zucker (ab 2 EL bzw. 25 g). Erkannt am Rezept –
+ * gilt so auch für eigene Rezepte.
+ */
+export function isSweetMain(r: Recipe): boolean {
+  if (r.basic || r.breakfast || !r.vegetarian) return false
+  return r.ingredients.some((i) => {
+    if (SWEET_MARK.test(i.name)) return true
+    if (!/^Zucker$/i.test(i.name) || i.amount == null) return false
+    return (i.unit === 'EL' && i.amount >= 2) || (i.unit === 'g' && i.amount >= 25)
+  })
 }
 
 /** lesbare Bezeichnung eines Merkmals */
@@ -116,6 +217,7 @@ export function featureLabel(key: string): string {
   if (kind === 'tapas') return `Tapas: ${TAPAS_GROUP_LABEL[value as TapasGroup] ?? value}`
   if (kind === 'tapasprotein') return value === 'vegetarisch' ? 'Vegetarische Tapas' : `Tapas mit ${value}`
   if (kind === 'salat') return SALAT_GROUP_LABEL[value as SalatGroup] ?? value
+  if (kind === 'style') return 'Süße Hauptgerichte'
   if (kind === 'bf') return `Frühstück ${BREAKFAST_LABEL[value as keyof typeof BREAKFAST_LABEL]}`
   if (kind === 'speed') {
     const [s, when] = value.split('@')
@@ -138,6 +240,11 @@ export interface TasteModel {
   dinnerPos: Map<string, number>
   /** Anzahl berücksichtigter Signale */
   signals: number
+  /** Ruheabstand: Signale je Gericht bzw. Muster (> 0 = länger ruhen lassen, < 0 = darf früher wieder), siehe restOf */
+  rest: Map<string, Acc>
+  restFeature: Map<string, Acc>
+  /** zuletzt weggewischt (Gericht → Datum) */
+  lastReject: Map<string, string>
 }
 
 /**
@@ -193,10 +300,30 @@ export interface TasteInput {
   bfRatings?: Record<string, Rating>
   /** Frühstück: „bis mittags satt?“, Schlüssel `Prep-Tag:Rezept-Id` */
   bfSatiety?: Record<string, PortionFeedback>
+  /** Abendessen von Hand verschoben (mehrmals nach hinten → leichtes Minus) */
+  moves?: MoveEvent[]
 }
 
+/** Ruheabstand-Signale (nur Abendessen): weggewischt verlängert, 🔁/👍 verkürzt; Kochen allein ändert nichts (sonst Dauerschleife) */
+const REST_W = { reject: 1, down: 1.5, skipped: 0.5, up: -0.7, again: -1.5 }
+
 export function buildModel(inp: TasteInput): TasteModel {
-  const m: TasteModel = { recipe: new Map(), feature: new Map(), dinnerPos: new Map(), signals: 0 }
+  const m: TasteModel = { recipe: new Map(), feature: new Map(), dinnerPos: new Map(), signals: 0, rest: new Map(), restFeature: new Map(), lastReject: new Map() }
+  const decayOf = (date: string) => Math.pow(0.5, Math.max(0, -daysUntil(date, inp.today)) / HALF_LIFE)
+  const bumpAcc = (map: Map<string, Acc>, key: string, v: number, n: number) => {
+    const a = map.get(key) ?? { sum: 0, n: 0 }
+    a.sum += v
+    a.n += n
+    map.set(key, a)
+  }
+  /** Ruheabstand: Gericht und seine Muster (ohne Zeit-Muster) */
+  const addRest = (id: string, date: string, w: number) => {
+    const r = RECIPE_BY_ID[id]
+    if (!r || r.basic || r.breakfast || (inp.since && date < inp.since)) return
+    const decay = decayOf(date)
+    bumpAcc(m.rest, id, w * decay, decay)
+    for (const f of features(r)) bumpAcc(m.restFeature, f, w * decay, decay)
+  }
   const add = (id: string, date: string, w: number, day?: string) => {
     const r = RECIPE_BY_ID[id]
     if (!r || (inp.since && date < inp.since)) return
@@ -218,21 +345,42 @@ export function buildModel(inp: TasteInput): TasteModel {
     m.signals++
   }
 
-  // Abendessen: geplant, gekocht / nicht gekocht, Bewertung
+  // Abendessen: geplant, gekocht / nicht gekocht
   for (const [day, e] of Object.entries(inp.plan)) {
     if (!e) continue
     add(e.recipeId, day, W.take, day)
     if (e.status === 'cooked') add(e.recipeId, day, W.cooked, day)
-    if (e.status === 'skipped') add(e.recipeId, day, W.skipped, day)
-    const rating = inp.ratings[day]
-    if (rating) add(e.recipeId, day, W[rating], day)
+    if (e.status === 'skipped') {
+      add(e.recipeId, day, W.skipped, day)
+      addRest(e.recipeId, day, REST_W.skipped)
+    }
   }
+  // Bewertung gehört zum Gericht (`Tag:Rezept-Id`); ältere Schlüssel nur mit Tag → das dort geplante Gericht
+  for (const [key, v] of Object.entries(inp.ratings)) {
+    if (!(v in W)) continue
+    const day = keyDay(key)
+    const id = keyRecipe(key) ?? inp.plan[key]?.recipeId
+    if (!id) continue
+    add(id, day, W[v], day)
+    addRest(id, day, REST_W[v])
+  }
+  // Mehrmals nach hinten geschoben: ab dem zweiten Mal innerhalb von 14 Tagen leicht abwerten (Verschieben an sich ist neutral)
+  const back = (inp.moves ?? []).filter((x) => x.to > x.from).sort((a, b) => a.date.localeCompare(b.date))
+  back.forEach((x, i) => {
+    if (back.slice(0, i).some((y) => y.recipeId === x.recipeId && -daysUntil(y.date, x.date) <= POSTPONE_WINDOW)) add(x.recipeId, x.date, W.postponed, x.to)
+  })
   // Frühstück: pro Woche gewählt (nicht 5× pro Tag zählen)
   for (const [week, ids] of Object.entries(inp.breakfastPicks)) for (const id of ids ?? []) add(id, week, W.take)
   // Selbst angelegt: ein eigenes Rezept zeigt, was man gern isst
   for (const c of inp.customRecipes ?? []) add(c.id, c.created, W.take)
-  // Weggewischt
-  for (const r of inp.rejects) add(r.id, r.date, W.reject)
+  // Weggewischt (dazu: Ruheabstand verlängern, letztes Wegwischen merken)
+  for (const r of inp.rejects) {
+    add(r.id, r.date, W.reject)
+    if (inp.since && r.date < inp.since) continue
+    addRest(r.id, r.date, REST_W.reject)
+    const cur = m.lastReject.get(r.id)
+    if (!cur || r.date > cur) m.lastReject.set(r.id, r.date)
+  }
   // Backen & Desserts: gebacken, gegessen, bewertet
   for (const b of inp.baked ?? []) add(b.recipeId, b.date, W.cooked)
   for (const s of inp.snacks ?? []) if (s.recipeId) add(s.recipeId, s.date, W.eaten)
@@ -277,6 +425,11 @@ export interface Preference {
   liked?: 'recipe' | 'feature'
 }
 
+/** Startabzug süßer Hauptgerichte (Score-Punkte; zum Vergleich: Wiederholung in der Ruhezeit −12, Vorliebe ±6) */
+export const SWEET_START = 4
+/** ab dieser gelernten Zuneigung (Gericht + Muster „Süße Hauptgerichte“) ist der Startabzug ganz weg */
+const SWEET_LIKED = 0.3
+
 /** Vorliebe für ein Gericht – `day` ist der Tag, für den gewischt wird */
 export function preference(m: TasteModel, r: Recipe, day?: string): Preference {
   const ar = aff(m.recipe.get(r.id), PRIOR_RECIPE)
@@ -284,7 +437,12 @@ export function preference(m: TasteModel, r: Recipe, day?: string): Preference {
   const fMean = fs.length ? fs.reduce((s, x) => s + x.a, 0) / fs.length : 0
   const raw = ar + 0.8 * fMean
   // „mittel“: etwa so stark wie Vorrat und Preis zusammen
-  const score = Math.max(-2, Math.min(2, raw)) * 3
+  let score = Math.max(-2, Math.min(2, raw)) * 3
+  // süßes Hauptgericht: startet leicht hinten – je mehr es (oder süße Hauptgerichte allgemein) gemocht wird, desto weniger
+  if (isSweetMain(r)) {
+    const liked = Math.max(0, ar) + Math.max(0, aff(m.feature.get('style:suess'), PRIOR_FEATURE))
+    score -= SWEET_START * Math.max(0, 1 - liked / SWEET_LIKED)
+  }
   let reason: string | undefined
   let liked: Preference['liked']
   if (ar > 0.45) {
@@ -336,6 +494,65 @@ export function householdPreference(mine: TasteModel, others: PersonModel[], r: 
   return { score, reason, liked: me.liked }
 }
 
+// ───────────── Ruheabstand ─────────────
+
+/** Startwerte (Tage): nach dem Planen bzw. nach dem Wegwischen */
+export const REST_REPEAT = 21
+export const REST_REJECT = 10
+/** Grenzen: Abwechslung bleibt (mindestens 10 Tage zwischen zwei Malen), höchstens ca. 2 Monate */
+export const REST_REPEAT_MIN = 10
+export const REST_REPEAT_MAX = 60
+export const REST_REJECT_MAX = 60
+
+export interface Rest {
+  /** so viele Tage nach dem letzten Planen bleibt das Gericht hinten */
+  repeat: number
+  /** so viele Tage nach dem letzten Wegwischen ruht es */
+  reject: number
+  /** vor wie vielen Tagen zuletzt weggewischt (fehlt = nie bzw. vor dem Zurücksetzen) */
+  rejectedAgo?: number
+}
+
+/** Neigung (> 0 länger, < 0 kürzer) aus den Signalen des Gerichts und seiner Muster */
+function restLean(m: TasteModel, r: Recipe): number {
+  const own = aff(m.rest.get(r.id), 1)
+  const fs = features(r).map((f) => aff(m.restFeature.get(f), PRIOR_FEATURE))
+  const pat = fs.length ? fs.reduce((a, b) => a + b, 0) / fs.length : 0
+  return own + 0.5 * pat
+}
+
+/**
+ * Gelernter Ruheabstand eines Gerichts: Startwert × 2^Neigung. Oft weggewischt / 👎 → länger (auch für ähnliche Gerichte
+ * über die Muster, schwächer), 🔁 / 👍 → kürzer. Nach dem Planen mindestens 10 Tage.
+ */
+export function restOf(m: TasteModel, r: Recipe, today: string): Rest {
+  const lean = restLean(m, r)
+  const f = Math.pow(2, Math.max(-1.5, Math.min(2, lean)))
+  const repeat = Math.round(Math.max(REST_REPEAT_MIN, Math.min(REST_REPEAT_MAX, REST_REPEAT * f)))
+  // Wegwischen: mit jedem weiteren Mal länger (die Neigung enthält das Wegwischen schon)
+  const reject = Math.round(Math.max(3, Math.min(REST_REJECT_MAX, REST_REJECT * Math.pow(2, Math.max(-1, Math.min(2.6, lean))))))
+  const last = m.lastReject.get(r.id)
+  return { repeat, reject, ...(last ? { rejectedAgo: Math.max(0, -daysUntil(last, today)) } : {}) }
+}
+
+/** Haushalt: jede Person zählt – das Gericht ruht so lange, wie es die Person mit dem längsten Abstand braucht */
+export function householdRest(mine: TasteModel, others: PersonModel[], r: Recipe, today: string): Rest {
+  const all = [mine, ...others.map((o) => o.model)].map((m) => restOf(m, r, today))
+  const out: Rest = { repeat: Math.max(...all.map((x) => x.repeat)), reject: REST_REJECT }
+  // Wegwischen: die Person, deren Ruhe am längsten noch dauert
+  let best = -Infinity
+  for (const x of all) {
+    if (x.rejectedAgo == null) continue
+    const left = x.reject - x.rejectedAgo
+    if (left > best) {
+      best = left
+      out.reject = x.reject
+      out.rejectedAgo = x.rejectedAgo
+    }
+  }
+  return out
+}
+
 /** Zutaten, die du oft in den Vorrat legst, für die es aber kaum Rezepte gibt (Name → Zahl der Rezepte) */
 export function pantryWishes(requests: Record<string, number> | undefined, minCount = 2): { name: string; count: number; recipes: number }[] {
   return Object.entries(requests ?? {})
@@ -373,14 +590,14 @@ export function summarize(m: TasteModel): LearnedSummary {
 /** Abendessen, das gestern oder vorgestern gekocht und noch nicht bewertet wurde */
 export function pendingRating(plan: WeekPlan, ratings: Record<string, Rating>, today: string, dismissed: string[]): string | undefined {
   return Object.keys(plan)
-    .filter((d) => d < today && daysUntil(d, today) >= -2 && plan[d]?.status === 'cooked' && !ratings[d] && !dismissed.includes(d))
+    .filter((d) => d < today && daysUntil(d, today) >= -2 && plan[d]?.status === 'cooked' && !dishValue(ratings, d, plan[d]!.recipeId) && !dismissed.includes(d))
     .sort()
     .pop()
 }
 
 // ───────────── Portionen ─────────────
 
-/** Rückmeldung zur Menge nach dem Essen: −1 zu wenig · 0 passt · 1 zu viel (Tag → Wert) */
+/** Rückmeldung zur Menge nach dem Essen: −1 zu wenig · 0 passt · 1 zu viel (`Tag:Rezept-Id` → Wert) */
 export type PortionFeedback = -1 | 0 | 1
 
 export const PORTION_MIN = 0.85
@@ -396,12 +613,13 @@ const PORTION_MIN_FEEDBACK = 2
 export function portionFactor(feedback: Record<string, PortionFeedback> | (Record<string, PortionFeedback> | undefined)[] | undefined, today: string): number {
   // mehrere Personen (Familien-Abgleich): alle Rückmeldungen zählen für den gemeinsamen Faktor
   const list = Array.isArray(feedback) ? feedback : [feedback]
-  const entries = list.flatMap((f) => Object.entries(f ?? {})).filter(([d, v]) => d <= today && (v === -1 || v === 0 || v === 1))
+  // Schlüssel `Tag` oder `Tag:Rezept-Id`
+  const entries = list.flatMap((f) => Object.entries(f ?? {})).filter(([k, v]) => keyDay(k) <= today && (v === -1 || v === 0 || v === 1))
   if (entries.length < PORTION_MIN_FEEDBACK) return 1
   let sum = 0
   let n = 0
-  for (const [d, v] of entries) {
-    const w = Math.pow(0.5, Math.max(0, -daysUntil(d, today)) / HALF_LIFE)
+  for (const [k, v] of entries) {
+    const w = Math.pow(0.5, Math.max(0, -daysUntil(keyDay(k), today)) / HALF_LIFE)
     sum += -v * w // „zu wenig“ (−1) → mehr kochen
     n += w
   }

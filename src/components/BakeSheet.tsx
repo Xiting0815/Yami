@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import type { BakeEntry, Recipe } from '../types'
-import { isBbq } from '../types'
+import { isBbq, replacesDinner } from '../types'
 import { doneWord, planWord } from '../bbq'
 import { yieldText } from '../bake'
 import { shortDate, weekdayName } from '../store'
 import { Icon } from './Icon'
 import { RecipeImage } from './RecipeImage'
 import { BakeDays } from './BakeDays'
+import type { DayNote } from './DayPicker'
 
 interface Props {
   day: string
@@ -17,6 +18,10 @@ interface Props {
   plannedDays: string[]
   /** gleich den Tag zum Verschieben wählen (aus der Frage „Gebacken?“) */
   startMove?: boolean
+  /** offenes Abendessen eines Tages (ein verschobener Grillabend ersetzt es) */
+  dinnerOn?: (day: string) => string | undefined
+  /** was an jedem Tag schon geplant ist */
+  dayNote?: (day: string) => DayNote
   onClose: () => void
   onAmount: (n: number) => void
   onView: () => void
@@ -26,7 +31,7 @@ interface Props {
 }
 
 /** Antippen von „🍰 Backen: …“ in der Wochenansicht: Ansehen, Verschieben, Entfernen (und „Gebacken“) */
-export function BakeSheet({ day, entry, recipe, today, plannedDays, startMove, onClose, onAmount, onView, onBaked, onMove, onRemove }: Props) {
+export function BakeSheet({ day, entry, recipe, today, plannedDays, startMove, dinnerOn, dayNote, onClose, onAmount, onView, onBaked, onMove, onRemove }: Props) {
   const [moving, setMoving] = useState(!!startMove)
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -74,7 +79,7 @@ export function BakeSheet({ day, entry, recipe, today, plannedDays, startMove, o
         {open && (
           <button className="act-row" aria-expanded={moving} onClick={() => setMoving((m) => !m)}><Icon name="calendar" /> Auf einen anderen Tag verschieben</button>
         )}
-        {open && moving && <BakeDays today={today} current={day} marked={(d) => plannedDays.includes(d)} onPick={onMove} />}
+        {open && moving && <BakeDays today={today} current={day} marked={(d) => plannedDays.includes(d)} note={dayNote} replaces={replacesDinner(recipe) ? dinnerOn : undefined} onPick={onMove} />}
         <button className="act-row danger" onClick={onRemove}><Icon name="trash" /> Aus dem Plan entfernen</button>
       </div>
     </div>

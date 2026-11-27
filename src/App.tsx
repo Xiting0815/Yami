@@ -5,10 +5,13 @@ import { Sheets } from './app/Sheets'
 import { ToastBar } from './app/ToastBar'
 import { UpdateBanner } from './app/UpdateBanner'
 import { WeekTab } from './app/tabs/WeekTab'
-import { SwipeTab } from './app/tabs/SwipeTab'
-import { ListTab } from './app/tabs/ListTab'
-import { PantryTab } from './app/tabs/PantryTab'
-import { RecipesTab } from './app/tabs/RecipesTab'
+import { lazyNamed } from './app/lazy'
+
+// Start-Tab „Woche“ sofort, die übrigen Tabs beim ersten Antippen (liegen offline im Vorab-Speicher)
+const SwipeTab = lazyNamed(() => import('./app/tabs/SwipeTab').then((m) => m.SwipeTab))
+const ListTab = lazyNamed(() => import('./app/tabs/ListTab').then((m) => m.ListTab))
+const PantryTab = lazyNamed(() => import('./app/tabs/PantryTab').then((m) => m.PantryTab))
+const RecipesTab = lazyNamed(() => import('./app/tabs/RecipesTab').then((m) => m.RecipesTab))
 
 /**
  * Gerüst der App. Zustand, abgeleitete Werte und Aktionen: src/app/useAppModel.ts;

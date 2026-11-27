@@ -2,7 +2,7 @@
 // Szenario des Nutzers: heute Fr 20.11.2026, Abendessen Sa 21. bis So 29.11. geplant, Einkauf samstags (optional mittwochs).
 import { RECIPE_BY_ID } from '../src/data/recipes'
 import { PRODUCTS } from '../src/data/products'
-import { type BuyItem, type PantryLot, type Trip, boughtOfWeek, keepDays, needsOf, shoppingTrips, tripKey, uid } from '../src/kitchen'
+import { type BuyItem, type PantryLot, type Trip, addDaysIso, boughtOfWeek, keepDays, needsOf, shoppingTrips, tripKey, uid } from '../src/kitchen'
 import { type HaApi, type RemoteTodo, plannedReminders } from '../src/haSync'
 import { HaError } from '../src/homeassistant'
 import { haLocalFor, haRound } from '../src/haRun'
@@ -12,7 +12,7 @@ import { extract, rebuild } from '../src/sync'
 import { applyBuy } from '../src/app/actions/shopping'
 import { coveredText } from '../src/components/ShoppingList'
 import {
-  answerTrip, findHaItem, haTripItems, haveAmount, haveCounts, haveLot, isReleased, learnedShopDay, newSinceRelease, releaseTrip, reviewQueue,
+  answerTrip, boughtDay, haveHint, usualHave, findHaItem, haTripItems, haveAmount, haveCounts, haveLot, isReleased, learnedShopDay, newSinceRelease, releaseTrip, reviewQueue,
   shopDaySuggestion, stockSuggestion, tripCoverText, tripReminderInput, tripsOf, unreleaseTrip,
 } from '../src/tripState'
 import type { WeekPlan } from '../src/types'
@@ -298,6 +298,67 @@ ok(keepDays(1) === 1 && keepDays(4) === 4 && keepDays(5) === 4 && keepDays(30) =
   ok(later.every((t) => !/schon im Vorrat/.test(coveredText(t.covered)) && /mit dem Einkauf davor/.test(coveredText(t.covered))), `leerer Vorrat: kein „schon im Vorrat“ (${coveredText(later[0]?.covered ?? [])})`)
   const withLot = tripsOf(base(), TODAY).flatMap((t) => t.covered)
   ok(withLot.some((c) => c.fromPantry - (c.fromTrip ?? 0) > 1e-6) && /schon im Vorrat/.test(coveredText(withLot)), 'mit Vorrat (Zwiebeln, Sahne, Bandnudeln): „schon im Vorrat“')
+}
+
+// ───── Kauftag aus Google Tasks: echtes Abhak-Datum bzw. „nachgetragen“ ─────
+{
+  const st0 = base()
+  const t0 = tripsOf(st0, TODAY).find((t) => t.date === '2026-11-21')!
+  const item = t0.buy.find((b) => b.name === 'Hackfleisch gemischt')!
+  const before = new Set(st0.pantry.map((l) => l.id))
+  // mit Abhak-Datum (gestern) → Kauftag und Haltbarkeit ab gestern
+  const a = applyBuy(st0, item, t0, TODAY, 'mark', { at: '2026-11-19' })
+  const ba = a.bought[t0.key][item.name]
+  const lotA = a.pantry.find((l) => !before.has(l.id))!
+  ok(ba.at === '2026-11-19' && !ba.late && lotA.expires === addDaysIso('2026-11-19', item.product.shelf), 'Abhak-Datum aus Google Tasks: Kauftag und Haltbarkeit ab diesem Tag')
+  // nachgetragen → markiert, zählt nicht für den Einkaufstag
+  const b = applyBuy(st0, item, t0, TODAY, 'mark', { late: true })
+  ok(b.bought[t0.key][item.name].late === true && b.bought[t0.key][item.name].at === TODAY, 'nachgetragen: gekennzeichnet (Einkauf liegt in der Zukunft → heute)')
+  // plausibelster Tag: Einkaufstag, wenn er schon war; nicht vor der Freigabe; nie nach heute
+  ok(boughtDay({ late: true }, tripKey('2026-11-14'), {}, TODAY) === '2026-11-14', 'nachgetragen: Kauftag = vergangener Einkaufstag')
+  ok(boughtDay({ late: true }, tripKey('2026-11-14'), { '2026-11-14': { released: new Date('2026-11-17T12:00:00').getTime() } }, TODAY) === '2026-11-17', 'nachgetragen: nicht vor der Freigabe')
+  ok(boughtDay({ at: '2026-11-25' }, tripKey('2026-11-21'), {}, TODAY) === TODAY && boughtDay(undefined, tripKey('2026-11-14'), {}, TODAY) === TODAY, 'Kauftag nie nach heute; ohne Angabe heute')
+  // Einkaufstag lernen: nachgetragene Käufe zählen nicht
+  const fri = { lotId: 'a', amount: 1 }
+  const bought = {
+    x1: { A: { ...fri, at: '2026-10-30' } },
+    x2: { A: { ...fri, at: '2026-11-06' } },
+    x3: { A: { ...fri, at: '2026-11-13' } },
+    x4: { A: { ...fri, at: '2026-11-16', late: true as const }, B: { ...fri, at: '2026-11-17', late: true as const } },
+  }
+  ok(learnedShopDay(bought, TODAY) === 5, 'Einkaufstag: nachgetragene Käufe (Mo/Di) verfälschen „freitags“ nicht')
+  // Speicher und Familien-Abgleich behalten die Kennzeichnung
+  const sb = sanitize({ bought: { [t0.key]: { [item.name]: { lotId: 'l', amount: 1, at: '2026-11-19', late: true } } } })
+  ok(sb.bought[t0.key][item.name].late === true, 'nachgetragen: übersteht Speichern/Sicherung')
+}
+
+// ───── „Habe ich – andere Menge“ lernen (geteilt, mit Abklingen) ─────
+{
+  let tr = answerTrip({}, '2026-11-07', 'Sahne', 'have', 200)
+  ok(tr['2026-11-07'].have?.Sahne === 200 && tr['2026-11-07'].answers?.Sahne === 'have', 'Habe ich mit Menge: Antwort und Menge gemerkt')
+  ok(usualHave(tr, 'Sahne', TODAY) === undefined, 'eine Antwort reicht noch nicht')
+  tr = answerTrip(tr, '2026-11-14', 'Sahne', 'have', 220)
+  ok(usualHave(tr, 'Sahne', TODAY) === 210, 'ab 2 Antworten: meist noch ~210 ml da')
+  // ältere Antworten zählen weniger
+  const old = answerTrip(answerTrip({}, '2026-05-01', 'Sahne', 'have', 50), '2026-11-14', 'Sahne', 'have', 200)
+  const u = usualHave({ ...old, ...answerTrip({}, '2026-11-07', 'Sahne', 'have', 200) }, 'Sahne', TODAY)!
+  ok(u > 170 && u <= 200, 'Abklingen: alte Menge (Mai) zählt kaum')
+  // „Brauche ich“ bzw. Habe ich ohne Menge löscht die Menge dieses Einkaufs
+  const tn = answerTrip(tr, '2026-11-14', 'Sahne', 'need')
+  ok(tn['2026-11-14'].have === undefined && usualHave(tn, 'Sahne', TODAY) === undefined, 'Antwort geändert → Menge dieses Einkaufs vergessen')
+  // Hinweis nur, wenn er sich spürbar von der nötigen Menge unterscheidet
+  const st0 = base()
+  const it = tripsOf(st0, TODAY).flatMap((t) => t.buy).find((b) => b.unit === 'g' || b.unit === 'ml')!
+  const need = haveAmount(it)
+  const far = answerTrip(answerTrip({}, '2026-11-07', it.key, 'have', need * 3), '2026-11-14', it.key, 'have', need * 3)
+  const near = answerTrip(answerTrip({}, '2026-11-07', it.key, 'have', need), '2026-11-14', it.key, 'have', need)
+  ok(haveHint(far, it, TODAY) != null && haveHint(near, it, TODAY) === undefined, 'Vorschlag „meist noch ~… da“ nur bei spürbarem Unterschied')
+  // Familien-Abgleich und Speicher
+  const sx = { ...st0, trips: far }
+  const rb = rebuild(st0, extract(sx), new Set(['hamt', 'ans', 'trip']))
+  ok(rb.trips['2026-11-14']?.have?.[it.key] === need * 3 || Math.abs((rb.trips['2026-11-14']?.have?.[it.key] ?? 0) - Math.round(need * 3 * 100) / 100) < 1e-9, 'Menge geht durch den Familien-Abgleich (Vorrat ist gemeinsam)')
+  const ss = sanitize({ trips: { '2026-11-14': { answers: { Sahne: 'have' }, have: { Sahne: 200, Kaputt: -1, X: 'a' } } } })
+  ok(ss.trips['2026-11-14'].have?.Sahne === 200 && Object.keys(ss.trips['2026-11-14'].have!).length === 1, 'Menge: Speicher prüft Werte')
 }
 
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')

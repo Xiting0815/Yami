@@ -2,11 +2,12 @@ import { useState } from 'react'
 import type { Trip, TripItem } from '../kitchen'
 import { formatAmount, isBought, packText } from '../shopping'
 import type { TripState } from '../store'
-import { haveAmount, reviewQueue, stockSuggestion } from '../tripState'
+import { haveAmount, haveHint, reviewQueue, stockSuggestion, usualHave } from '../tripState'
 
 interface Props {
   trip: Trip
   states: Record<string, TripState>
+  today: string
   stockAsk: Record<string, 'yes' | 'no'>
   shopOrder?: string[]
   onHave: (item: TripItem, amount?: number) => void
@@ -23,7 +24,7 @@ const amountText = (n: number) => String(Math.round(n * 100) / 100).replace('.',
  * „Liste prüfen“: Artikel für Artikel – was wahrscheinlich schon da ist, zuerst (Grundzutaten, lange haltbar,
  * gelernt aus früheren „Habe ich“). „Habe ich“ legt die Menge in den Vorrat, der Artikel verschwindet von der Liste.
  */
-export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, onStock, onRelease, onClose }: Props) {
+export function TripReview({ trip, states, today, stockAsk, shopOrder, onHave, onNeed, onStock, onRelease, onClose }: Props) {
   // Reihenfolge einmal beim Start festlegen (sonst springt sie nach jeder Antwort)
   const [queue] = useState(() => reviewQueue(trip, states, shopOrder).map((b) => b.key))
   const [skipped, setSkipped] = useState<string[]>([])
@@ -38,6 +39,8 @@ export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, 
   const done = queue.length - pending.length
   const left = trip.buy.filter((b) => !isBought(b)).length
   const next = () => setAmount(null)
+  // gelernt aus früheren „Habe ich – andere Menge“ (geteilt): meist noch so viel da
+  const hint = item ? haveHint(states, item, today) : undefined
 
   return (
     <div className="trip-review" role="region" aria-label="Liste prüfen">
@@ -51,6 +54,7 @@ export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, 
           <h3>{item.name}{item.forgot && <small className="forgot">{item.forgot}</small>}</h3>
           <p className="review-amt">{packText(item)}</p>
           {item.reason && <p className="item-note">🕒 {item.reason}</p>}
+          {hint != null && <p className="item-note">💡 Meist noch ~{formatAmount(hint, item.unit)} da</p>}
           {item.recipes.length > 0 && <p className="muted small">Für: {item.recipes.join(' · ')}</p>}
           {stockSuggestion(item.name, states, stockAsk) && (
             <div className="review-stock">
@@ -62,7 +66,7 @@ export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, 
                   className="btn primary grow"
                   onClick={() => {
                     onStock(item.name, true)
-                    setAmount(amountText(Math.max(haveAmount(item), item.product.pack)))
+                    setAmount(amountText(usualHave(states, item.key, today) ?? Math.max(haveAmount(item), item.product.pack)))
                   }}
                 >
                   Ja, Menge eintragen
@@ -90,8 +94,10 @@ export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, 
           </div>
           <div className="row-links">
             {amount == null && (
-              <button className="link small" onClick={() => setAmount(amountText(haveAmount(item)))}>
-                Habe ich – andere Menge ({formatAmount(haveAmount(item), item.unit)} nötig)
+              <button className="link small" onClick={() => setAmount(amountText(hint ?? haveAmount(item)))}>
+                {hint != null
+                  ? `Habe ich – ~${formatAmount(hint, item.unit)} wie meist? (${formatAmount(haveAmount(item), item.unit)} nötig)`
+                  : `Habe ich – andere Menge (${formatAmount(haveAmount(item), item.unit)} nötig)`}
               </button>
             )}
             <button className="link small" onClick={() => { setSkipped((s) => [...s, item.key]); next() }}>Überspringen</button>

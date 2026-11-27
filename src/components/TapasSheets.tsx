@@ -5,6 +5,7 @@ import { TAPAS_MIN, shortTitle } from '../tapas'
 import { tapasFactorFor } from '../bakePlan'
 import { shortDate, weekdayName } from '../store'
 import { BakeDays } from './BakeDays'
+import type { DayNote } from './DayPicker'
 import { Icon } from './Icon'
 import { RecipeImage } from './RecipeImage'
 
@@ -29,13 +30,15 @@ const factorText = (n: number) => {
  * „Tapas-Abend planen“: Auswahl prüfen, Tag wählen. „Ersetzt das Abendessen“ ist vorgewählt (wie beim BBQ); die Zutaten
  * aller Tapas kommen zusammen auf die Einkaufsliste, im Kalender steht ein Termin „🍽️ 🫒 Tapas-Abend: …“.
  */
-export function TapasPlanSheet({ picks, today, plannedDays, dinnerOn, onRemove, onPlan, onClose }: {
+export function TapasPlanSheet({ picks, today, plannedDays, dinnerOn, dayNote, onRemove, onPlan, onClose }: {
   picks: Recipe[]
   today: string
   /** Tage, an denen schon ein Tapas-Abend geplant ist */
   plannedDays: string[]
   /** geplantes Abendessen eines Tages (Titel), das ersetzt würde */
   dinnerOn: (day: string) => string | undefined
+  /** was an jedem Tag schon geplant ist */
+  dayNote?: (day: string) => DayNote
   onRemove: (id: string) => void
   onPlan: (day: string, replace: boolean) => void
   onClose: () => void
@@ -70,7 +73,7 @@ export function TapasPlanSheet({ picks, today, plannedDays, dinnerOn, onRemove, 
         </label>
         <div className="bake-plan-head"><b>Für welchen Tag?</b><span className="muted small">Zutaten kommen auf die Einkaufsliste, der Abend in den Kalender</span></div>
         {n >= TAPAS_MIN ? (
-          <BakeDays today={today} marked={(d) => plannedDays.includes(d)} onPick={(d) => onPlan(d, replace && !!dinnerOn(d))} />
+          <BakeDays today={today} marked={(d) => plannedDays.includes(d)} note={dayNote} replaces={replace ? dinnerOn : undefined} onPick={(d) => onPlan(d, replace && !!dinnerOn(d))} />
         ) : (
           <p className="muted small">Bitte mindestens {TAPAS_MIN} Tapas auswählen.</p>
         )}
@@ -80,11 +83,14 @@ export function TapasPlanSheet({ picks, today, plannedDays, dinnerOn, onRemove, 
 }
 
 /** Antippen von „🫒 Tapas-Abend“ in der Woche: Kochmodus, Tapas ansehen, alles gemacht, verschieben, entfernen */
-export function TapasEveningSheet({ day, today, entries, plannedDays, startMove, onCook, onView, onDone, onMove, onRemove, onClose }: {
+export function TapasEveningSheet({ day, today, entries, plannedDays, dinnerOn, dayNote, startMove, onCook, onView, onDone, onMove, onRemove, onClose }: {
   day: string
   today: string
   entries: { entry: BakeEntry; recipe: Recipe }[]
   plannedDays: string[]
+  /** offenes Abendessen eines Tages – ein verschobener Tapas-Abend ersetzt es */
+  dinnerOn?: (day: string) => string | undefined
+  dayNote?: (day: string) => DayNote
   startMove?: boolean
   onCook: () => void
   onView: (r: Recipe) => void
@@ -120,7 +126,7 @@ export function TapasEveningSheet({ day, today, entries, plannedDays, startMove,
         ))}
         {open && <button className="act-row" onClick={onDone}><Icon name="check" /> Ja, alles gemacht – Zutaten abziehen</button>}
         {open && <button className="act-row" aria-expanded={moving} onClick={() => setMoving((m) => !m)}><Icon name="calendar" /> Auf einen anderen Tag verschieben</button>}
-        {open && moving && <BakeDays today={today} current={day} marked={(d) => plannedDays.includes(d)} onPick={onMove} />}
+        {open && moving && <BakeDays today={today} current={day} marked={(d) => plannedDays.includes(d)} note={dayNote} replaces={dinnerOn} onPick={onMove} />}
         <button className="act-row danger" onClick={onRemove}><Icon name="trash" /> Tapas-Abend entfernen</button>
       </div>
     </div>

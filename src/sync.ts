@@ -28,14 +28,14 @@
  *   (Frühstück: Bewertung/Sättigung nach dem Vorbereiten – zählt nur fürs eigene Profil, nie als Haushalts-Abendessen).
  *   Persönlich bleibt bfPreps (Vorbereitungen; die Portionen selbst liegen als Posten im geteilten Vorrat).
  * PERSÖNLICH (nie geteilt): breakfast, breakfastPicks, prepDays, prepLate,
- *   prepChecked, bfPreps, bfSatietyDismissed, snacks (Gegessenes, fürs Lernen), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
+ *   prepChecked, bfPreps, bfSatietyDismissed, snacks (Gegessenes, fürs Lernen), ratingDismissed, moves, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
  *   bfOpen, showClassicSteps, lastBackup, ha (Token, Person, Gerät), sync (dieser Abgleich-Stand).
  *
  * ZUSAMMENFÜHREN (pro Eintrag, „letzte Änderung gewinnt“)
  *   Jeder Eintrag hat `{ t: ms, by: Person }`. Schlüssel: plan:<Tag>, bplan:<Tag>|<Rezept-Id>, lot:<Posten-Id>, bought:<Woche bzw. trip:Einkaufstag>|<Artikel>,
- *   check:<Woche>|<Artikel>, cust:<Woche>|<Id>, waste:<Prüfsumme>, trip:<Einkaufstag> (Freigabe), ans:<Einkaufstag>|<Artikel>
+ *   check:<Woche>|<Artikel>, cust:<Woche>|<Id>, waste:<Prüfsumme>, trip:<Einkaufstag> (Freigabe), ans:<Einkaufstag>|<Artikel>, hamt:<Einkaufstag>|<Artikel> (Menge bei „Habe ich“)
  *   (Habe ich/Brauche ich), shop:day, recipe:<Id>, ing:<Name>, price:/staple:/spice:/req:<Name>,
- *   rating:<Tag>, reject:<Datum>|<Id>, pf:<Tag>, bake:<Datum:Id>, baked:<Datum>|<Id>, bfr:<Prep-Tag:Id>, bfs:<Prep-Tag:Id>.
+ *   rating:<Tag:Id>, reject:<Datum>|<Id>, pf:<Tag:Id> (ältere Stände: nur <Tag>), bake:<Datum:Id>, baked:<Datum>|<Id>, bfr:<Prep-Tag:Id>, bfs:<Prep-Tag:Id>.
  *   Lokale Änderungen erkennt der Abgleich selbst: Wert ≠ Prüfsumme im letzten Abgleich-Stand (`sync.base`) → neu
  *   gestempelt; fehlt ein Eintrag, der beim letzten Mal da war → Grabstein (Löschung wandert mit). Grabsteine werden
  *   nach 30 Tagen vergessen. Die Aktionen der App müssen davon nichts wissen.
@@ -140,7 +140,7 @@ const split2 = (s: string): [string, string] => {
 const PERSON_KINDS = new Set(['rating', 'reject', 'pf', 'bake', 'baked', 'bfr', 'bfs'])
 const DOC_OF: Record<string, string> = {
   plan: 'kitchen', bplan: 'kitchen', lot: 'kitchen', bought: 'kitchen', check: 'kitchen', cust: 'kitchen', waste: 'kitchen',
-  trip: 'kitchen', ans: 'kitchen', rm: 'kitchen', shift: 'kitchen',
+  trip: 'kitchen', ans: 'kitchen', hamt: 'kitchen', rm: 'kitchen', shift: 'kitchen',
   recipe: 'recipes', ing: 'recipes',
   price: 'prefs', staple: 'prefs', spice: 'prefs', req: 'prefs', shop: 'prefs',
 }
@@ -170,6 +170,7 @@ export function extract(s: AppState): Record<string, unknown> {
   for (const [d, t] of Object.entries(s.trips ?? {})) {
     if (t.released) o[`trip:${d}`] = { released: t.released, ...(t.sent ? { sent: t.sent } : {}) }
     for (const [k, v] of Object.entries(t.answers ?? {})) o[`ans:${d}|${k}`] = v
+    for (const [k, v] of Object.entries(t.have ?? {})) o[`hamt:${d}|${k}`] = v
   }
   for (const r of s.removals ?? []) o[`rm:${r.id}`] = r
   for (const r of s.shifts ?? []) o[`shift:${r.id}`] = r
@@ -251,7 +252,7 @@ export function rebuild(s: AppState, live: Record<string, unknown>, kinds: Set<s
   if (kinds.has('staple')) next.staples = obj('staple') as AppState['staples']
   if (kinds.has('spice')) next.spices = obj('spice') as AppState['spices']
   if (kinds.has('req')) next.pantryRequests = obj('req') as AppState['pantryRequests']
-  if (kinds.has('trip') || kinds.has('ans')) {
+  if (kinds.has('trip') || kinds.has('ans') || kinds.has('hamt')) {
     // Freigabe und Antworten zusammen neu bauen (beide Arten stehen vollständig in `live`)
     const t: Record<string, TripState> = {}
     for (const [d, v] of of('trip')) t[d] = { ...(v as TripState) }
@@ -259,6 +260,13 @@ export function rebuild(s: AppState, live: Record<string, unknown>, kinds: Set<s
       const [d, k] = split2(r)
       const cur = (t[d] ??= {})
       cur.answers = { ...cur.answers, [k]: v as 'have' | 'need' }
+    }
+    // „Habe ich – andere Menge“ (Vorrat ist gemeinsam → die gelernte Menge auch)
+    for (const [r, v] of of('hamt')) {
+      const [d, k] = split2(r)
+      if (typeof v !== 'number') continue
+      const cur = (t[d] ??= {})
+      cur.have = { ...cur.have, [k]: v }
     }
     next.trips = t
   }

@@ -73,12 +73,13 @@ export function useAppModel() {
     // Nie umschalten: ob schon gekauft, entscheidet der aktuelle Stand (markBought), nicht die letzte Anzeige.
     // Zurück kommen nur die übernommenen Schlüssel – ein nicht gefundener Artikel wird beim nächsten Lauf erneut versucht,
     // statt dass Yami den Haken in Google Tasks wieder öffnet.
-    onBought: (keys) => {
+    // Kauftag: echtes Abhak-Datum aus Google Tasks, sonst „nachgetragen“ (zählt nicht für den gelernten Einkaufstag).
+    onBought: (keys, when) => {
       const taken: string[] = []
       for (const k of keys) {
         const hit = findHaItem(haRef.current, k)
         if (!hit) continue
-        act.markBought(hit.item, hit.trip)
+        act.markBought(hit.item, hit.trip, when?.[k])
         taken.push(k)
       }
       return taken

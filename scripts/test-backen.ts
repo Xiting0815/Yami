@@ -92,6 +92,32 @@ const tc = cookNow({}, [homeToast], today, { recipeId: 'ragout-fin', servings: 2
 ok(near(tc.pantry.find((l) => l.id === 'ht')?.amount ?? 0, 10 - toastNeed), `Ragout fin: ${toastNeed} gekaufte Toastscheiben = ${toastNeed} selbstgebackene (nicht doppelt so viel)`)
 ok(near(RECIPE_BY_ID['toastbrot-klassisch'].yields!.perPiece!.kcal, Math.round(RECIPE_BY_ID['toastbrot-klassisch'].yields!.perPiece!.kcal)) && RECIPE_BY_ID['toastbrot-klassisch'].yields!.perPiece!.kcal < 100, 'Nährwerte je Toastscheibe (25 g) unter 100 kcal')
 
+// ───── Ciabatta & Baguette: im Vorrat in Scheiben à 30 g, „1 Scheibe gegessen“ ─────
+{
+  const cia = RECIPE_BY_ID['ciabatta']
+  const bag = RECIPE_BY_ID['baguette-poolish']
+  ok(PRODUCTS['Ciabatta selbstgebacken']?.unit === 'Scheibe' && near(PRODUCTS['Ciabatta selbstgebacken'].pack, 26) && PRODUCTS['Ciabatta'].unit === 'Scheibe' && PRODUCTS['Ciabatta'].pack === 10, 'Ciabatta: selbstgebacken 780 g → 26 Scheiben, gekauft 1 Stk = 10 Scheiben')
+  ok(PRODUCTS['Baguette selbstgebacken']?.unit === 'Scheibe' && near(PRODUCTS['Baguette selbstgebacken'].pack, 24), 'Baguette: 720 g → 24 Stücke à 30 g')
+  const cl = cookBasic([], cia, 1, today, 'cia').lot!
+  ok(cl.unit === 'Scheibe' && near(cl.amount, 26) && eatInfo(cl)?.label === '1 Scheibe gegessen' && near(eatOne([cl], 'cia', today).pantry[0].amount, 25), 'Ciabatta: 26 Scheiben in den Vorrat, „1 Scheibe gegessen“ zieht eine ab')
+  ok(yieldText(cia, 1) === '780 g (≈ 26 Scheiben)' && yieldText(bag, 1) === '720 g (≈ 24 Scheiben)', 'Texte: „780 g (≈ 26 Scheiben)“, „720 g (≈ 24 Scheiben)“')
+  ok(substitutesFor('Ciabatta').includes('Ciabatta selbstgebacken') && substitutesFor('Weißbrot').includes('Baguette selbstgebacken'), 'Austausch: Ciabatta ← selbstgebacken, Weißbrot ← Baguette')
+  // Rezept mit „1 Stk Ciabatta“ nimmt 10 Scheiben vom selbstgebackenen, kauft nichts
+  const homeCia: PantryLot = { id: 'hc', name: 'Ciabatta selbstgebacken', amount: 26, unit: 'Scheibe', expires: addDaysIso(today, 2) }
+  const cc = cookNow({}, [homeCia], today, { recipeId: 'philly-cheesesteak', servings: 2 })
+  ok(near(cc.pantry.find((l) => l.id === 'hc')?.amount ?? 0, 16), 'Philly Cheesesteak (1 Stk Ciabatta) zieht 10 Scheiben vom selbstgebackenen ab')
+  const wc = planWeek({ [days[2]]: { recipeId: 'philly-cheesesteak', servings: 2 } }, days, [homeCia], {}, today, {}, (a, u) => formatAmount(a, u))
+  ok(!wc.buy.some((b) => b.name === 'Ciabatta'), 'planWeek: kein Ciabatta kaufen, das selbstgebackene im Vorrat deckt es')
+  // ältere Vorratsposten in Stück werden beim Laden in Scheiben umgerechnet
+  const old = sanitize({ pantry: [
+    { id: 'o1', name: 'Ciabatta selbstgebacken', amount: 3, unit: 'Stk', expires: '2026-11-19' },
+    { id: 'o2', name: 'Ciabatta', amount: 1, unit: 'Stk', expires: '2026-11-19' },
+    { id: 'o3', name: 'Baguette selbstgebacken', amount: 2, unit: 'Stk', expires: '2026-11-18' },
+  ] })
+  const ol = (id: string) => old.pantry.find((l) => l.id === id)
+  ok(ol('o1')?.unit === 'Scheibe' && near(ol('o1')!.amount, 26) && ol('o2')?.unit === 'Scheibe' && ol('o2')!.amount === 10 && ol('o3')?.unit === 'Scheibe' && ol('o3')!.amount === 16, 'Migration: Ciabatta/Baguette in Stück → Scheiben (3 → 26, 1 → 10, 2 → 16)')
+}
+
 // ───── Speichern, Sicherung ─────
 const dirty = sanitize({
   snacks: [e.snack, { date: 'gestern', name: 'x', kcal: 1, protein: 0 }, { date: today, name: 'Kuchen', kcal: 'viel', protein: 0 }, null],

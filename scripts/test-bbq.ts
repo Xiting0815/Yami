@@ -105,6 +105,19 @@ const w3 = run({}, [vac], { [SAT]: { recipeId: ques.id, servings: 2 } })
 ok(!w3.buy.some((b) => b.name === 'Pulled Pork') && w3.pantryLeft.find((l) => l.id === 'v')?.amount === 1250, 'Einkauf: Reste aus dem Vorrat statt Pulled Pork kaufen (250 g reserviert)')
 ok(run({}, [], { [SAT]: { recipeId: ques.id, servings: 2 } }).buy.some((b) => b.name === 'Pulled Pork'), 'ohne Reste: gekauftes Pulled Pork auf die Liste')
 
+// Brisket-Reste: Brisket Chili und Brisket Hash nehmen „Pulled Beef“ – der vakuumierte Brisket geht vor
+{
+  const BR = 'Brisket (vakuumiert)'
+  const chili = RECIPE_BY_ID['brisket-chili']
+  const hash = RECIPE_BY_ID['brisket-hash']
+  ok(!!chili && !!hash && [chili, hash].every((r) => r.cuisine === 'us' && !r.basic && RECIPES.includes(r) && r.ingredients.some((i) => i.name === 'Pulled Beef') && !r.vegetarian), 'Resteessen: Brisket Chili und Brisket Hash (Amerikanisch, Wischstapel) mit Pulled Beef')
+  ok(PREFERRED['Pulled Beef']?.includes(BR) && interchangeable('Pulled Beef', BR), 'Vorrang: vakuumierter Brisket vor gekauftem Pulled Beef')
+  const bri = { id: 'br', name: BR, amount: 1000, unit: 'g', expires: '2026-12-01' }
+  ok(insight(chili, 2, [bri], TODAY, {}, new Map(), 0).fromPantry.includes(BR), 'Stapel: Brisket Chili zeigt den Brisket aus dem Vorrat')
+  const w4 = run({}, [bri], { [SAT]: { recipeId: hash.id, servings: 2 } })
+  ok(!w4.buy.some((b) => b.name === 'Pulled Beef') && w4.pantryLeft.find((l) => l.id === 'br')?.amount === 750, 'Einkauf: Brisket Hash nimmt 250 g Brisket aus dem Vorrat, kein Pulled Beef kaufen')
+}
+
 // ───── 6) Saison-Karte nur März–September ─────
 ok(isBbqSeason('2026-03-01') && isBbqSeason('2026-09-30') && !isBbqSeason('2026-02-28') && !isBbqSeason('2026-10-01') && !isBbqSeason(11), 'BBQ-Saison: März–September')
 const base = (today: string, extra: Partial<BbqInput> = {}): BbqInput => ({ today, baked: [], bakeRatings: {}, bakePlan: {}, hints: [], ...extra })

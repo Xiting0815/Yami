@@ -77,7 +77,18 @@ export interface InsightOptions {
   freshDays?: number
   /** Monat (1–12) des Kochtags: Saisonbezug und Saisonpreise */
   month?: number
+  /**
+   * Gelernter Ruheabstand (siehe `restOf` in src/learning.ts): so viele Tage nach dem letzten Planen bleibt das Gericht
+   * hinten (Standard 21), und nach dem Wegwischen ruht es `reject` Tage (abklingend). Ohne Angabe: feste 21 Tage, kein Wegwisch-Ruhen.
+   */
+  rest?: { repeat: number; reject: number; rejectedAgo?: number }
 }
+
+/** Standard-Ruhezeit nach dem Planen (ohne Gelerntes) */
+export const REPEAT_DAYS = 21
+/** Abzug in der Ruhezeit nach dem Planen bzw. direkt nach dem Wegwischen (klingt bis zum Ende der Ruhe ab) */
+export const REPEAT_PENALTY = 12
+export const REJECT_REST_PENALTY = 8
 
 /** „Nur mit Vorrat kochbar“: höchstens so viel muss zugekauft werden */
 export const PANTRY_ONLY_MAX_EURO = 1.5
@@ -183,7 +194,11 @@ export function insight(
   }
   const seen = lastSeen.get(recipe.id)
   const lastSeenDays = seen ? -daysUntil(seen, today) : undefined
-  const repeatPenalty = lastSeenDays != null && lastSeenDays <= 21 ? 12 : 0
+  const rest = opts.rest
+  // Wiederholung: in der (gelernten) Ruhezeit nach hinten; frisch weggewischt: ruht, abklingend bis zum Ende der Ruhe
+  const repeatPenalty =
+    (lastSeenDays != null && lastSeenDays <= (rest?.repeat ?? REPEAT_DAYS) ? REPEAT_PENALTY : 0) +
+    (rest?.rejectedAgo != null && rest.rejectedAgo < rest.reject ? REJECT_REST_PENALTY * (1 - rest.rejectedAgo / rest.reject) : 0)
   // Abwechslung: gleiche Gerichtart / Küche in derselben Woche abwerten
   const isBreakfast = recipe.meal === 'breakfast'
   const sameType = isBreakfast ? 0 : weekRecipes.filter((w) => w.type === recipe.type).length

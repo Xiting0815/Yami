@@ -154,6 +154,16 @@ const used = cookBasic([bought, homemade], withAlioli, 1, SAT)
 ok(used.pantry.find((l) => l.id === 'h')?.amount === 140 && used.pantry.find((l) => l.id === 'b')?.amount === 200, 'Kochen: selbstgemachte Alioli wird zuerst genommen, das Glas bleibt')
 ok(['Salsa brava', 'Romesco', 'Mojo rojo', 'Mojo verde'].every((n) => CATALOG[n] && PRODUCTS[n]), 'kaufbare Grundnamen für Salsa brava, Romesco, Mojo rojo/verde angelegt')
 
+// Calçots con romesco: Tapa mit der kaufbaren Romesco, Selbstgemachtes geht vor
+{
+  const cal = RECIPE_BY_ID['calcots-con-romesco']
+  ok(!!cal && isTapa(cal) && cal.tapas === 'gemuese' && cal.serve === 'heiss' && cal.ingredients.some((i) => i.name === 'Romesco') && /\(.+\)/.test(cal.title), 'Calçots con romesco: Gemüse-Tapa, heiß, mit Romesco')
+  const rom = { id: 'r', name: 'Romesco selbstgemacht', amount: 400, unit: 'g', expires: '2026-11-30' }
+  const romBought = { id: 'rb', name: 'Romesco', amount: 180, unit: 'g', expires: '2027-03-01' }
+  const usedR = cookBasic([romBought, rom], cal, 1, SAT)
+  ok(usedR.pantry.find((l) => l.id === 'r')!.amount < 400 && usedR.pantry.find((l) => l.id === 'rb')?.amount === 180, 'Kochen: selbstgemachte Romesco zuerst, das Glas bleibt')
+}
+
 // ───── 7) Salate & Beilagen: Zusatz, ersetzt nichts ─────
 const sec = salatSection()
 ok(!!nudel && isSalat(nudel) && sec.includes(nudel) && sec.some((r) => r.id === 'ensaladilla-rusa') && sec.some((r) => r.id === 'southern-potato-salad'), 'Salate & Beilagen: Nudelsalat, Ensaladilla rusa und die BBQ-Beilagen')

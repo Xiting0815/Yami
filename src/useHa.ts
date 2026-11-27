@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { HaClient, haErrorText } from './homeassistant'
-import type { LocalItem } from './haSync'
+import { type BoughtWhen, type LocalItem, noteLiveTodo } from './haSync'
 import { haRound } from './haRun'
 import { type AppState, type HaSettings, sharingActive } from './store'
 
@@ -14,8 +14,8 @@ export interface HaInput {
   /** Einkaufsliste der Abgleich-Woche */
   local: LocalItem[]
   state: AppState
-  /** in HA abgehakt → in Yami als gekauft markieren */
-  onBought: (keys: string[]) => string[] | void
+  /** in HA abgehakt → in Yami als gekauft markieren (mit Kauftag bzw. „nachgetragen“) */
+  onBought: (keys: string[], when: Record<string, BoughtWhen>) => string[] | void
 }
 
 export type HaLive = 'off' | 'connecting' | 'ok' | 'error'
@@ -35,6 +35,9 @@ export function useHomeAssistant(input: HaInput) {
   const unsub = useRef<(() => void) | null>(null)
   const unsubSync = useRef<(() => void) | null>(null)
   const connecting = useRef<Promise<void> | null>(null)
+  /** live gesehene Haken der Einkaufsliste (uid → Tag) und offene Einträge der letzten Meldung (für Listen ohne Abhak-Zeit) */
+  const liveDone = useRef<Record<string, string>>({})
+  const liveOpen = useRef<Set<string>>(new Set())
 
   const ha = input.ha
   const active = !!ha && ha.enabled && !!ha.url && !!ha.token
@@ -52,7 +55,14 @@ export function useHomeAssistant(input: HaInput) {
         .connect(h.url, h.token)
         .then(async () => {
           unsub.current?.()
-          unsub.current = await haClient.subscribe({ type: 'todo/item/subscribe', entity_id: ref.current.ha!.todo }, () => requestRef.current(500)).catch(() => null)
+          // frische Verbindung: was vorher abgehakt wurde, hat Gusto nicht live gesehen
+          liveOpen.current = new Set()
+          unsub.current = await haClient
+            .subscribe({ type: 'todo/item/subscribe', entity_id: ref.current.ha!.todo }, (ev) => {
+              liveOpen.current = noteLiveTodo(ev, liveOpen.current, liveDone.current, new Date())
+              requestRef.current(500)
+            })
+            .catch(() => null)
           // Familien-Abgleich: Änderungen der anderen kommen live über die Sync-Liste
           unsubSync.current?.()
           unsubSync.current = null
@@ -82,8 +92,9 @@ export function useHomeAssistant(input: HaInput) {
         api: haClient,
         getState: () => ref.current.state,
         setState: (fn) => ref.current.setState(fn),
-        onBought: (keys) => ref.current.onBought(keys),
+        onBought: (keys, when) => ref.current.onBought(keys, when),
         now: new Date(),
+        live: liveDone.current,
       })
       if (r.again) again.current = true
       setLive(r.error ? 'error' : 'ok')
@@ -176,6 +187,8 @@ export function useHomeAssistant(input: HaInput) {
     if (!active) return
     const onVis = () => {
       haClient.setVisible(!document.hidden)
+      // im Hintergrund kann die Verbindung ruhen → danach Gesehenes nicht als „gerade eben abgehakt“ werten
+      if (document.hidden) liveOpen.current = new Set()
       if (!document.hidden) requestRef.current(300)
     }
     document.addEventListener('visibilitychange', onVis)

@@ -8,7 +8,7 @@ import {
   type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type BakePlan, type PlanEntry, type ShopSection, type Snack, type WeekPlan,
 } from './types'
 import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
-import type { PortionFeedback, Rating, RejectEvent } from './learning'
+import type { MoveEvent, PortionFeedback, Rating, RejectEvent } from './learning'
 import { type SyncLocal, sanitizeSync } from './syncLocal'
 import { type BakeHint, sanitizeBakeHints, sanitizeBakePlan } from './bakePlan'
 import { type BfPrep, sanitizePreps } from './breakfastPrep'
@@ -180,12 +180,14 @@ export interface AppState {
   bfSatietyDismissed: string[]
   /** weggewischte Karten (zum Lernen), höchstens die letzten 400 */
   rejects: RejectEvent[]
-  /** Bewertungen nach dem Essen: Tag → 👍/🔁/👎 */
+  /** Bewertungen nach dem Essen: `Tag:Rezept-Id` → 👍/🔁/👎 (gehört zum Gericht; ältere Stände nur `Tag`, siehe sanitize) */
   ratings: Record<string, Rating>
   /** Tage, deren Bewertungsfrage weggeklickt wurde */
   ratingDismissed: string[]
-  /** Menge nach dem Essen: Tag → −1 zu wenig · 0 passt · 1 zu viel (lernt den Portionsfaktor des Haushalts) */
+  /** Menge nach dem Essen: `Tag:Rezept-Id` → −1 zu wenig · 0 passt · 1 zu viel (lernt den Portionsfaktor des Haushalts) */
   portionFeedback: Record<string, PortionFeedback>
+  /** Abendessen von Hand verschoben/getauscht (nur lokal, fürs Lernen: mehrmals nach hinten → leichtes Minus) */
+  moves: MoveEvent[]
   /** gelernte Vorlieben gelten erst ab diesem Datum (nach „Zurücksetzen“) */
   tasteSince?: string
   /** Start-Checkliste: fehlt = läuft noch, 'done' = erledigt, 'dismissed' = ausgeblendet */
@@ -282,6 +284,8 @@ export interface TripState {
   sent?: string[]
   /** „Liste prüfen“: Artikel → habe ich / brauche ich */
   answers?: Record<string, 'have' | 'need'>
+  /** „Habe ich – andere Menge“: Artikel → Menge, die noch da war (lernt „meist noch ~200 g da“, siehe usualHave) */
+  have?: Record<string, number>
 }
 
 export const TRIPS_MAX = 60
@@ -299,6 +303,10 @@ export function sanitizeTrips(x: unknown): Record<string, TripState> {
     if (t.answers && typeof t.answers === 'object' && !Array.isArray(t.answers)) {
       const a = Object.fromEntries(Object.entries(t.answers as Record<string, unknown>).filter(([k, v]) => k.length <= 80 && (v === 'have' || v === 'need'))) as TripState['answers']
       if (Object.keys(a!).length) st.answers = a
+    }
+    if (t.have && typeof t.have === 'object' && !Array.isArray(t.have)) {
+      const h = Object.fromEntries(Object.entries(t.have as Record<string, unknown>).filter(([k, v]) => k.length <= 80 && isNum(v) && v > 0 && v < 1e6))
+      if (Object.keys(h).length) st.have = h as Record<string, number>
     }
     if (Object.keys(st).length) out[d] = st
   }
@@ -376,6 +384,7 @@ const INITIAL: AppState = {
   ratings: {},
   ratingDismissed: [],
   portionFeedback: {},
+  moves: [],
   wasted: [],
   reviewDismissed: [],
   customRecipes: [],
@@ -398,6 +407,8 @@ const hasData = (s: AppState, saved: Record<string, unknown>) =>
   !!saved.profile || [s.plan, s.breakfast, s.breakfastPicks].some((o) => o && Object.values(o).some((v) => (Array.isArray(v) ? v.length : v)))
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/
+/** Schlüssel `Tag:Rezept-Id` (Bewertung/Portion eines Abendessens) */
+const DISH_KEY = /^\d{4}-\d{2}-\d{2}:.+/
 const MAX_IMAGE = 300_000
 
 function validIngredient(x: unknown): x is CustomIngredient {
@@ -502,6 +513,14 @@ export function migrateNames(state: AppState): AppState {
       return amount == null ? { ...l, name } : { ...l, name, amount, unit: prod ? prod.unit : l.unit }
     })
   }
+  // Vorrat in einer früheren Einheit (z. B. Ciabatta in Stück → jetzt Scheiben) in die Einheit des Produkts umrechnen
+  if (Array.isArray(next.pantry))
+    next.pantry = next.pantry.map((l) => {
+      const prod = l && typeof l.name === 'string' ? PRODUCTS[l.name] : undefined
+      if (!prod || typeof l.unit !== 'string' || l.unit === prod.unit || typeof l.amount !== 'number') return l
+      const amount = toBase(l.name, l.amount, l.unit, prod)
+      return amount == null ? l : { ...l, amount, unit: prod.unit }
+    })
   if (Array.isArray(next.wasted)) next.wasted = next.wasted.map((w) => (w && w.name in RENAMED ? { ...w, name: renameKey(w.name) } : w))
   if (Array.isArray(next.customRecipes))
     next.customRecipes = next.customRecipes.map((r) =>
@@ -608,14 +627,29 @@ export function sanitize(parsed: unknown): AppState {
   state.spices = sanitizeSpices(state.spices)
   state.staples = rememberStaples(sanitizeMemos(state.staples), Array.isArray(state.pantry) ? state.pantry : [])
   state.rejects = state.rejects.filter((r) => !!r && typeof r.id === 'string' && typeof r.date === 'string' && ISO.test(r.date)).slice(-400)
-  state.ratings = Object.fromEntries(Object.entries(state.ratings).filter(([d, v]) => ISO.test(d) && (v === 'up' || v === 'again' || v === 'down')))
+  // Bewertung/Portion gehören zum Gericht: `Tag:Rezept-Id`; ältere Stände (nur `Tag`) → dem dort geplanten Gericht zuordnen
+  const dishKeyed = <T,>(m: Record<string, T>) =>
+    Object.fromEntries(
+      Object.entries(m).map(([k, v]) => {
+        const id = ISO.test(k) ? state.plan[k]?.recipeId : undefined
+        return [id && !(`${k}:${id}` in m) ? `${k}:${id}` : k, v]
+      }),
+    ) as Record<string, T>
+  const dishOk = (k: string) => ISO.test(k) || DISH_KEY.test(k)
+  state.ratings = dishKeyed(Object.fromEntries(Object.entries(state.ratings).filter(([d, v]) => dishOk(d) && (v === 'up' || v === 'again' || v === 'down'))))
   state.ratingDismissed = state.ratingDismissed.filter((d) => typeof d === 'string')
-  state.portionFeedback = Object.fromEntries(
-    Object.entries(state.portionFeedback)
-      .filter(([d, v]) => ISO.test(d) && (v === -1 || v === 0 || v === 1))
-      .sort(([a], [b]) => a.localeCompare(b))
-      .slice(-120),
+  state.portionFeedback = dishKeyed(
+    Object.fromEntries(
+      Object.entries(state.portionFeedback)
+        .filter(([d, v]) => dishOk(d) && (v === -1 || v === 0 || v === 1))
+        .sort(([a], [b]) => a.localeCompare(b))
+        .slice(-120),
+    ),
   )
+  state.moves = state.moves
+    .filter((x) => !!x && typeof x.recipeId === 'string' && [x.date, x.from, x.to].every((d) => typeof d === 'string' && ISO.test(d)))
+    .map((x) => ({ date: x.date, recipeId: x.recipeId, from: x.from, to: x.to }))
+    .slice(-100)
   state.bought = Object.fromEntries(
     Object.entries(state.bought)
       .filter(([, m]) => m && typeof m === 'object' && !Array.isArray(m))

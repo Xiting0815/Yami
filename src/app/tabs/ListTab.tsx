@@ -94,6 +94,7 @@ export function ListTab({ m }: { m: AppModel }) {
         <TripReview
           trip={trip}
           states={state.trips}
+          today={today}
           stockAsk={state.stockAsk}
           shopOrder={state.shopOrder}
           onHave={(it, amount) => act.answerHave(trip, it, amount)}

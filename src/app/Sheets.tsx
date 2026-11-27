@@ -2,29 +2,33 @@ import { RECIPE_BY_ID } from '../data/recipes'
 import { forgottenItems } from '../forgot'
 import { learnedPrepWeekday } from '../breakfast'
 import { findPrep, preppedKeep, preppedText } from '../breakfastPrep'
-import { pantryWishes, portionNote, satietyNote, summarize } from '../learning'
+import { dishValue, pantryWishes, portionNote, satietyNote, summarize } from '../learning'
+import { moveTargets } from './actions/plan'
 import { cookTarget } from '../cookDone'
 import { bakesOn } from '../bakePlan'
 import { dinnerToReplace, doneWord } from '../bbq'
 import { isBbq, isTapa } from '../types'
 import { shortTitle } from '../tapas'
 import { TapasEveningSheet, TapasPlanSheet } from '../components/TapasSheets'
-import { TapasCook } from '../components/TapasCook'
 import { defaultReviewMonday } from '../review'
 import { addDays, isoDate, parseIso, sharingActive, weekdayName } from '../store'
 import { syncStatusText } from '../sync'
 import { DayActionsSheet } from '../components/DayActionsSheet'
 import { BakeSheet } from '../components/BakeSheet'
-import { DayPicker } from '../components/DayPicker'
+import { DayPicker, dayNote } from '../components/DayPicker'
 import { FilterSheet } from '../components/FilterBar'
-import { PantryDaySheet } from '../components/PantryDaySheet'
-import { PrepSheet } from '../components/PrepSheet'
-import { SettingsSheet } from '../components/SettingsSheet'
-import { RecipeEditor } from '../components/RecipeEditor'
 import { RateSheet } from '../components/RateSheet'
 import { RecipeSheet } from '../components/RecipeSheet'
-import { ReviewSheet } from '../components/ReviewSheet'
 import type { AppModel } from './useAppModel'
+import { lazyNamed } from './lazy'
+
+// selten gebraucht → erst beim Öffnen laden (schnellerer Start)
+const TapasCook = lazyNamed(() => import('../components/TapasCook').then((m) => m.TapasCook))
+const PantryDaySheet = lazyNamed(() => import('../components/PantryDaySheet').then((m) => m.PantryDaySheet))
+const PrepSheet = lazyNamed(() => import('../components/PrepSheet').then((m) => m.PrepSheet))
+const SettingsSheet = lazyNamed(() => import('../components/SettingsSheet').then((m) => m.SettingsSheet))
+const RecipeEditor = lazyNamed(() => import('../components/RecipeEditor').then((m) => m.RecipeEditor))
+const ReviewSheet = lazyNamed(() => import('../components/ReviewSheet').then((m) => m.ReviewSheet))
 
 /**
  * Alle Sheets/Overlays über den Tabs. Welche offen sind, steht in `useUi` –
@@ -36,6 +40,12 @@ export function Sheets({ m }: { m: AppModel }) {
   const { sheet, editor, actionsDay } = ui
   const actionsEntry = actionsDay ? state.plan[actionsDay] : undefined
   const actionsRecipe = actionsEntry ? RECIPE_BY_ID[actionsEntry.recipeId] : undefined
+  // „Einplanen für“: was an jedem Tag schon geplant ist, und welches offene Abendessen ersetzt würde
+  const noteOn = (day: string) => dayNote(state.plan, state.bakePlan, day)
+  const dinnerOn = (day: string) => {
+    const e = dinnerToReplace(state.plan, day)
+    return e ? RECIPE_BY_ID[e.recipeId]?.title : undefined
+  }
 
   return (
     <>
@@ -84,10 +94,8 @@ export function Sheets({ m }: { m: AppModel }) {
                     act.planBake(sheet.recipe, day, amount, replace)
                     ui.setSheet(null)
                   },
-                  dinnerOn: (day) => {
-                    const e = dinnerToReplace(state.plan, day)
-                    return e ? RECIPE_BY_ID[e.recipeId]?.title : undefined
-                  },
+                  dinnerOn,
+                  dayNote: noteOn,
                 }
               : undefined
           }
@@ -153,8 +161,11 @@ export function Sheets({ m }: { m: AppModel }) {
 
       {sheet?.mode === 'pick' && !sheet.recipe.breakfast && !sheet.recipe.basic && (
         <DayPicker
+          key={sheet.recipe.id}
           days={days}
           plan={state.plan}
+          bakePlan={state.bakePlan}
+          today={today}
           onPick={(day) => {
             act.planOn(sheet.recipe, day)
             ui.setSheet(null)
@@ -176,6 +187,8 @@ export function Sheets({ m }: { m: AppModel }) {
             today={today}
             plannedDays={Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => e.recipeId === recipeId && !e.status))}
             startMove={move}
+            dinnerOn={dinnerOn}
+            dayNote={noteOn}
             onClose={() => ui.setBakeSheet(null)}
             onAmount={(n) => act.changeBakeAmount(day, recipeId, n)}
             onView={() => {
@@ -200,10 +213,8 @@ export function Sheets({ m }: { m: AppModel }) {
           picks={ui.tapasPick.map((id) => RECIPE_BY_ID[id]).filter(Boolean)}
           today={today}
           plannedDays={Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => !e.status && isTapa(RECIPE_BY_ID[e.recipeId])))}
-          dinnerOn={(day) => {
-            const e = dinnerToReplace(state.plan, day)
-            return e ? RECIPE_BY_ID[e.recipeId]?.title : undefined
-          }}
+          dinnerOn={dinnerOn}
+          dayNote={noteOn}
           onRemove={(id) => ui.setTapasPick(ui.tapasPick.filter((x) => x !== id))}
           onPlan={(day, replace) => {
             act.planTapas(day, ui.tapasPick, replace)
@@ -225,6 +236,8 @@ export function Sheets({ m }: { m: AppModel }) {
             entries={entries}
             startMove={move}
             plannedDays={Object.keys(state.bakePlan).filter((d) => bakesOn(state.bakePlan, d).some((e) => !e.status && isTapa(RECIPE_BY_ID[e.recipeId])))}
+            dinnerOn={dinnerOn}
+            dayNote={noteOn}
             onCook={() => {
               ui.setTapasSheet(null)
               ui.setTapasDay(day)
@@ -308,6 +321,11 @@ export function Sheets({ m }: { m: AppModel }) {
             ui.setActionsDay(null)
             act.removeEntry(actionsDay)
           }}
+          moveTargets={actionsEntry.status ? [] : moveTargets(state.plan, state.bakePlan, actionsDay, today)}
+          onMove={(to) => {
+            ui.setActionsDay(null)
+            act.moveDinner(actionsDay, to)
+          }}
         />
       )}
 
@@ -316,12 +334,13 @@ export function Sheets({ m }: { m: AppModel }) {
           title={RECIPE_BY_ID[state.plan[ui.rateDay]!.recipeId].title}
           day={ui.rateDay}
           today={today}
-          rating={state.ratings[ui.rateDay]}
-          portion={state.portionFeedback[ui.rateDay]}
+          rating={dishValue(state.ratings, ui.rateDay, state.plan[ui.rateDay]!.recipeId)}
+          portion={dishValue(state.portionFeedback, ui.rateDay, state.plan[ui.rateDay]!.recipeId)}
           onRate={(v) => act.setRating(ui.rateDay!, v)}
           onPortion={(v) => act.setPortionFeedback(ui.rateDay!, v)}
           onClose={() => {
-            if (state.ratings[ui.rateDay!] !== undefined || state.portionFeedback[ui.rateDay!] !== undefined) m.flash('Danke – gemerkt ✓')
+            const id = state.plan[ui.rateDay!]?.recipeId
+            if (dishValue(state.ratings, ui.rateDay!, id) !== undefined || dishValue(state.portionFeedback, ui.rateDay!, id) !== undefined) m.flash('Danke – gemerkt ✓')
             ui.setRateDay(null)
           }}
         />

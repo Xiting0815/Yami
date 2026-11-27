@@ -9,15 +9,15 @@
  */
 import { PRODUCTS } from './data/products'
 import { resolvePrepDay } from './breakfast'
-import { type BuyItem, type Trip, type TripItem, DEFAULT_SHOP_DAY, addDaysIso, daysUntil, shoppingTrips, wdShort } from './kitchen'
+import { type BuyItem, type Trip, type TripItem, DEFAULT_SHOP_DAY, TRIP_PREFIX, addDaysIso, daysUntil, shoppingTrips, wdShort } from './kitchen'
 import { portionFactor } from './learning'
 import { formatAmount, isBought } from './shopping'
 import { isQtyStaple, isSpice, removalUseEvents } from './staples'
 import { compareShop, shopOrderOf } from './shopSection'
-import { type AppState, type TripState, mondayOf, parseIso, shortDate, weekDays } from './store'
+import { type AppState, type TripState, isoDate, mondayOf, parseIso, shortDate, weekDays } from './store'
 import { householdFeedback } from './sync'
 import { forgottenItems } from './forgot'
-import { type LocalItem, todoSummary } from './haSync'
+import { type BoughtWhen, type LocalItem, todoSummary } from './haSync'
 
 /** Einkäufe ab heute aus dem App-Zustand (wie in der Liste und für Home Assistant) */
 export function tripsOf(s: AppState, today: string): Trip[] {
@@ -155,9 +155,70 @@ export function haveLot(it: BuyItem, amount: number, today: string, id: string) 
   return { id, name: it.name, amount, unit: it.unit, expires: last && last > byShelf ? last : byShelf }
 }
 
-export function answerTrip(trips: Record<string, TripState>, date: string, key: string, v: 'have' | 'need'): Record<string, TripState> {
+/** Antwort merken; bei „Habe ich“ mit `amount` auch die Menge, die noch da war (lernt „meist noch ~200 g da“) */
+export function answerTrip(trips: Record<string, TripState>, date: string, key: string, v: 'have' | 'need', amount?: number): Record<string, TripState> {
   const t = trips[date] ?? {}
-  return { ...trips, [date]: { ...t, answers: { ...t.answers, [key]: v } } }
+  const have = { ...t.have }
+  if (v === 'have' && amount != null && amount > 0) have[key] = Math.round(amount * 100) / 100
+  else delete have[key]
+  const { have: _h, ...rest } = t
+  return { ...trips, [date]: { ...rest, answers: { ...t.answers, [key]: v }, ...(Object.keys(have).length ? { have } : {}) } }
+}
+
+/** Halbwertszeit (Tage) und Mindestzahl für „meist noch ~… da“ */
+const HAVE_HALF_LIFE = 60
+const HAVE_MIN = 2
+
+/**
+ * Gelernte Menge, die bei einem Artikel meist noch da ist (aus „Habe ich“ mit Menge, über alle Einkäufe, geteilt):
+ * gewichteter Mittelwert, ältere Einkäufe zählen weniger (Halbwertszeit 60 Tage), ab 2 Antworten. Gerundet
+ * (ab 100 auf 10er, sonst auf eine Nachkommastelle). Kein Wert → undefined.
+ */
+export function usualHave(states: Record<string, TripState>, key: string, today: string): number | undefined {
+  let w = 0
+  let sum = 0
+  let n = 0
+  for (const [d, t] of Object.entries(states)) {
+    const a = t.have?.[key]
+    if (!(a != null && a > 0) || d > addDaysIso(today, 28)) continue
+    const age = Math.max(0, daysUntil(today, d))
+    const wt = Math.pow(0.5, age / HAVE_HALF_LIFE)
+    if (wt < 0.05) continue
+    w += wt
+    sum += wt * a
+    n++
+  }
+  if (n < HAVE_MIN || w <= 0) return undefined
+  const v = sum / w
+  return v >= 100 ? Math.round(v / 10) * 10 : Math.round(v * 10) / 10
+}
+
+/** Vorschlag in der Prüfliste: gelernte Menge, wenn sie sich spürbar (über 15 %) von der nötigen unterscheidet */
+export function haveHint(states: Record<string, TripState>, it: BuyItem, today: string): number | undefined {
+  const u = usualHave(states, it.key, today)
+  if (u == null) return undefined
+  const need = haveAmount(it)
+  return Math.abs(u - need) > need * 0.15 ? u : undefined
+}
+
+// ───────────── Kauftag ─────────────
+
+/**
+ * Kauftag eines abgehakten Artikels (für Haltbarkeit und den gelernten Einkaufstag):
+ * echtes Abhak-Datum (höchstens heute) → das; „nachgetragen“ → der Einkaufstag, wenn er schon war (sonst heute),
+ * aber nicht vor der Freigabe; ohne Angabe → heute.
+ */
+export function boughtDay(when: BoughtWhen | undefined, listKey: string, states: Record<string, TripState>, today: string): string {
+  if (when?.at) return when.at > today ? today : when.at
+  if (!when?.late || !listKey.startsWith(TRIP_PREFIX)) return today
+  const date = listKey.slice(TRIP_PREFIX.length)
+  let day = date < today ? date : today
+  const rel = states[date]?.released
+  if (rel) {
+    const r = isoDate(new Date(rel))
+    if (r > day && r <= today) day = r
+  }
+  return day
 }
 
 /** ab 3× „Habe ich“: „Zwiebeln hast du meist da – im Vorrat führen?“ (einmal fragen) */
@@ -173,13 +234,13 @@ const WEEKDAY_ADVERB = ['sonntags', 'montags', 'dienstags', 'mittwochs', 'donner
 export const weekdayAdverb = (d: number) => WEEKDAY_ADVERB[d]
 
 /**
- * Gelernter Haupteinkaufstag aus den Abhak-Tagen (`bought[…][…].at`) der letzten 8 Wochen: der häufigste Wochentag,
+ * Gelernter Haupteinkaufstag aus den Abhak-Tagen (`bought[…][…].at`, ohne „nachgetragene“) der letzten 8 Wochen: der häufigste Wochentag,
  * wenn an mindestens 3 verschiedenen Tagen eingekauft wurde und er mindestens 60 % davon ausmacht.
  */
 export function learnedShopDay(bought: AppState['bought'], today: string): number | undefined {
   const from = addDaysIso(today, -LEARN_DAYS)
   const dates = new Set<string>()
-  for (const m of Object.values(bought)) for (const b of Object.values(m ?? {})) if (b.at && b.at >= from && b.at <= today && !b.lotId.startsWith('spice:')) dates.add(b.at)
+  for (const m of Object.values(bought)) for (const b of Object.values(m ?? {})) if (b.at && !b.late && b.at >= from && b.at <= today && !b.lotId.startsWith('spice:')) dates.add(b.at)
   if (dates.size < 3) return undefined
   const count = new Map<number, number>()
   for (const d of dates) {

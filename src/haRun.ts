@@ -4,7 +4,7 @@
  * geplant hat, landet also im selben Lauf in Google Tasks und im Kalender (siehe Kopf von src/sync.ts).
  */
 import { HaError, haErrorText } from './homeassistant'
-import { type Desired, type HaApi, type LocalItem, listTodo, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo, withReminders } from './haSync'
+import { type BoughtWhen, type Desired, type HaApi, type LocalItem, listTodo, plannedDinners, plannedReminders, syncCalendar, syncReminders, syncTodo, withReminders } from './haSync'
 import type { Trip } from './kitchen'
 import { type AppState, type HaSettings, sharingActive } from './store'
 import { LEASE_MS, type MainDoc, PREFIX, applyRound, familySync, hashOf, leaseDecision, parseRemote, writeMain } from './sync'
@@ -26,9 +26,11 @@ export interface HaRunDeps {
   /** aktueller Stand (im Hook: zuletzt gerenderter) */
   getState: () => AppState
   setState: (fn: (s: AppState) => AppState) => void
-  /** in HA abgehakt → in Yami als gekauft markieren */
-  onBought: (keys: string[]) => string[] | void
+  /** in HA abgehakt → in Yami als gekauft markieren (mit Kauftag bzw. „nachgetragen“, siehe boughtWhen) */
+  onBought: (keys: string[], when: Record<string, BoughtWhen>) => string[] | void
   now: Date
+  /** live gesehene Haken der Einkaufsliste (uid → Tag) – für Listen ohne Abhak-Zeit (siehe noteLiveTodo) */
+  live?: Record<string, string>
 }
 
 export interface HaRunResult {
@@ -161,7 +163,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
       return { again: false, error: per.error, wrote: false }
     }
     // Schritt für Schritt merken: bricht das Netz mitten im Lauf ab, wird beim nächsten Mal nichts doppelt angelegt/geschickt
-    const todo = await syncTodo(d.api, h0, haLocalFor(s0, today, trips0), d.onBought)
+    const todo = await syncTodo(d.api, h0, haLocalFor(s0, today, trips0), d.onBought, { now, live: d.live })
     patchHa({ items: todo.items, done: todo.done })
     const rem = await syncReminders(d.api, h0.reminders, h0.events, remindersOf(s0, trips0), now)
     const events1 = withReminders(h0.events, rem.events)
@@ -230,7 +232,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
 
   // Schreibstab: Einkaufsliste (Google Tasks), Abendessen im Familienkalender, Ablauf-Erinnerungen – mit dem zusammengeführten Stand
   const h: HaSettings = { ...h0, items: mapping.items, done: mapping.done, events: mapping.events }
-  const todo = await syncTodo(d.api, h, haLocalFor(state, today, trips), d.onBought)
+  const todo = await syncTodo(d.api, h, haLocalFor(state, today, trips), d.onBought, { now, live: d.live })
   const rem = await syncReminders(d.api, h0.reminders, h.events, shared, now)
   const events1 = withReminders(h.events, rem.events)
   if (rem.net) {

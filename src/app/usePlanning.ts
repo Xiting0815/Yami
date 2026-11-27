@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { Recipe } from '../types'
 import { RECIPES, RECIPE_BY_ID } from '../data/recipes'
-import { type PersonModel, buildModel, householdPreference, portionFactor } from '../learning'
+import { type PersonModel, buildModel, householdPreference, householdRest, portionFactor } from '../learning'
 import { householdFeedback } from '../sync'
 import { sharingActive } from '../store'
 import type { AppState } from '../store'
@@ -68,8 +68,9 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
         bfPrepped: state.bfPreps,
         bfRatings: state.bfRatings,
         bfSatiety: state.bfSatiety,
+        moves: state.moves,
       }),
-    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings, state.bakePlan, state.bfPreps, state.bfRatings, state.bfSatiety],
+    [state.plan, state.breakfast, state.breakfastPicks, state.rejects, state.ratings, state.wasted, today, state.tasteSince, state.customRecipes, state.baked, state.snacks, state.bakeRatings, state.bakePlan, state.bfPreps, state.bfRatings, state.bfSatiety, state.moves],
   )
 
   // ───── Familie: Geschmack der anderen Personen (eigene Bewertungen/Wischen, gemeinsamer Plan) ─────
@@ -109,6 +110,8 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
             freshDays: freshDays,
             month: swipeMonth,
             day: swipeDay,
+            // gelernter Ruheabstand (nach dem Planen / nach dem Wegwischen) statt fester 21 Tage
+            rest: householdRest(taste, others, r, today),
           })
           const pref = householdPreference(taste, others, r, swipeDay)
           // Vorrats-Modus: Vorrat zuerst, gelernte Vorliebe nur als Tie-Breaker (×0,3)

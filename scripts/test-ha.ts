@@ -4,6 +4,7 @@ import { HaClient, HaError, normalizeUrl, type WsLike } from '../src/homeassista
 import {
   type Desired, type HaApi, type LocalItem, type RemoteTodo, MARKER,
   diffDinnerEvents, diffTodo, planMoves, plannedDinners, plannedReminders, syncCalendar, syncTodo,
+  type BoughtWhen, boughtWhen, completedDay, isDinnerTitle, noteLiveTodo,
 } from '../src/haSync'
 import { backupBody, parseBackup } from '../src/backup'
 import { haRound, otherHousehold, sendAlerts } from '../src/haRun'
@@ -189,7 +190,7 @@ class FakeHa implements HaApi {
       if (!this.syncTodos) throw new HaError('failed', 'Entity not found', 'not_found')
       return { items: this.syncTodos.map((t) => ({ ...t })) } as T
     }
-    if (msg.type === 'todo/item/list') return { items: this.todos.map((t) => ({ uid: t.uid, summary: t.summary, status: t.status, ...(this.noDescription ? {} : { description: t.description }) })) } as T
+    if (msg.type === 'todo/item/list') return { items: this.todos.map((t) => ({ uid: t.uid, summary: t.summary, status: t.status, ...(this.noDescription ? {} : { description: t.description }), ...(t.completed ? { completed: t.completed } : {}) })) } as T
     if (msg.type === 'todo/item/move') {
       if (!this.moveSupported) throw new HaError('unsupported', 'unknown', 'unknown_command')
       const i = this.todos.findIndex((t) => t.uid === msg.uid)
@@ -709,6 +710,66 @@ const plan = (o: Record<string, [string, number]>) => Object.fromEntries(Object.
   const w: Desired = { key: 'dinner:2026-11-27', summary: '🍽️ Gulasch', description: 'x', start: '2026-11-27 18:30:00', end: '2026-11-27 19:30:00', sig: 's1' }
   const r = await syncCalendar(fh, { calendar: 'calendar.familie', reminders: 'calendar.yami_erinnerungen', events: { 'dinner:2026-11-27': { sig: 's1', uid: 'e1' } } }, [w], [], new Date('2026-11-26T10:00:00'))
   ok(fh.events.length === 1 && fh.events[0].uid === 'e1' && r.events['dinner:2026-11-27']?.uid === 'e1', 'Kalender: Doppelter gelöscht, eigener Termin bleibt gemerkt')
+}
+
+// ───── Kauftag aus Google Tasks (Abhak-Zeit) bzw. „nachgetragen“ ─────
+{
+  ok(completedDay('2026-11-23T17:40:11.449000+00:00', '2026-11-27') === '2026-11-23', 'Abhak-Zeit: lokales Datum aus completed')
+  ok(completedDay('2026-12-02T10:00:00+00:00', '2026-11-27') === '2026-11-27' && completedDay('kaputt', '2026-11-27') === undefined && completedDay(null, '2026-11-27') === undefined, 'Abhak-Zeit: höchstens heute, Ungültiges ignoriert')
+  const L = (key: string, summary: string): LocalItem => ({ key, summary, bought: false })
+  const remote: RemoteTodo[] = [
+    { uid: 'a', summary: 'Hack – 500 g', status: 'completed', description: MARKER, completed: '2026-11-23T17:40:00+00:00' },
+    { uid: 'b', summary: 'Sahne – 200 ml', status: 'completed', description: MARKER },
+    { uid: 'c', summary: 'Ei – 10 Stk', status: 'completed', description: MARKER },
+  ]
+  const d = diffTodo([L('Hack', 'Hack – 500 g'), L('Sahne', 'Sahne – 200 ml'), L('Ei', 'Ei – 10 Stk')], remote, { Hack: 'a', Sahne: 'b', Ei: 'c' }, [], '2026-11-27', { c: '2026-11-26' })
+  ok(d.bought.length === 3 && d.boughtAt.Hack === '2026-11-23' && d.boughtAt.Ei === '2026-11-26' && !d.boughtAt.Sahne, 'Diff: Abhak-Tag aus completed bzw. live gesehen, sonst unbekannt')
+  const w = boughtWhen(d.bought, d.boughtAt)
+  ok(w.Hack.at === '2026-11-23' && !w.Hack.late && w.Sahne.late === true && !w.Sahne.at, 'Kauftag: bekannt → Datum, unbekannt → „nachgetragen“')
+
+  // syncTodo reicht den Kauftag an onBought weiter
+  const ha = new FakeHa()
+  ha.todos = [
+    { uid: 'a', summary: 'Hack – 500 g', status: 'completed', description: MARKER, completed: '2026-11-23T17:40:00+00:00', n: 0 },
+    { uid: 'b', summary: 'Sahne – 200 ml', status: 'completed', description: MARKER, n: 0 },
+  ]
+  let got: Record<string, BoughtWhen> = {}
+  await syncTodo(ha, { todo: 'todo.einkaufen', items: { Hack: 'a', Sahne: 'b' }, done: [] }, [L('Hack', 'Hack – 500 g'), L('Sahne', 'Sahne – 200 ml')], (_k, when) => { got = when }, { now: new Date('2026-11-27T09:00:00') })
+  ok(got.Hack?.at === '2026-11-23' && got.Sahne?.late === true, 'syncTodo: onBought bekommt Abhak-Tag bzw. „nachgetragen“')
+
+  // Live-Meldungen: offen → erledigt = gerade eben abgehakt; erste Meldung nach dem Verbinden zählt nicht
+  const live: Record<string, string> = {}
+  let open = noteLiveTodo({ items: [{ uid: 'x', status: 'completed' }, { uid: 'y', status: 'needs_action' }] }, new Set(), live, new Date('2026-11-27T10:00:00'))
+  ok(!live.x && open.has('y'), 'Live: schon Erledigtes beim Verbinden zählt nicht als „gerade eben“')
+  open = noteLiveTodo({ items: [{ uid: 'x', status: 'completed' }, { uid: 'y', status: 'completed' }] }, open, live, new Date('2026-11-27T10:05:00'))
+  ok(live.y === '2026-11-27' && !live.x && open.size === 0, 'Live: offen → erledigt wird mit heutigem Tag gemerkt')
+}
+
+// ───── Abendessen heute bleibt nach „Fertig gekocht“; 🍽️ mit/ohne U+FE0F ─────
+{
+  const p = { '2026-11-16': { recipeId: dinnerRecipe.id, servings: 2, status: 'cooked' as const }, '2026-11-17': { recipeId: dinnerRecipe2.id, servings: 2, status: 'cooked' as const } }
+  const ds = plannedDinners(p, '2026-11-16')
+  ok(ds.length === 1 && ds[0].key === 'dinner:2026-11-16' && ds[0].sig === `${dinnerRecipe.id}×2`, 'Plan: heute gekocht → Termin bleibt (gleiche Signatur), andere Tage mit Status nicht')
+  ok(plannedDinners({ '2026-11-16': { recipeId: dinnerRecipe.id, servings: 2, status: 'skipped' } }, '2026-11-16').length === 0, 'Plan: heute ausgelassen → kein Termin')
+  // Kalender: heute gekocht → bestehender Termin wird weder gelöscht noch neu angelegt
+  const fh = new FakeHa()
+  fh.events = [{ uid: 'e1', summary: `🍽️ ${dinnerRecipe.title}`, start: '2026-11-16T18:30:00' }]
+  const r = await syncCalendar(fh, { calendar: 'calendar.familie', reminders: 'calendar.yami_erinnerungen', events: { 'dinner:2026-11-16': { sig: `${dinnerRecipe.id}×2`, uid: 'e1' } } }, ds, [], new Date('2026-11-16T19:00:00'))
+  ok(fh.events.length === 1 && fh.events[0].uid === 'e1' && r.events['dinner:2026-11-16']?.uid === 'e1' && !fh.calls.some((c) => c.service === 'create_event'), 'Kalender: heutiger Termin bleibt nach „Fertig gekocht“')
+  // vergangener Tag wird nicht angefasst
+  const fh2 = new FakeHa()
+  fh2.events = [{ uid: 'old', summary: `🍽️ ${dinnerRecipe.title}`, start: '2026-11-15T18:30:00' }]
+  await syncCalendar(fh2, { calendar: 'calendar.familie', reminders: 'calendar.yami_erinnerungen', events: {} }, [], [], new Date('2026-11-16T10:00:00'))
+  ok(fh2.events.length === 1, 'Kalender: gestriger Termin bleibt unberührt')
+
+  // U+FE0F: „🍽“ ohne Variationszeichen gilt als eigener Termin
+  const bare = '\u{1F37D}'
+  ok(isDinnerTitle(`${bare} Gulasch`) && isDinnerTitle('🍽️ Gulasch') && !isDinnerTitle('Schule'), 'Erkennung: 🍽️ mit und ohne U+FE0F')
+  const w: Desired = { key: 'dinner:2026-11-16', summary: '🍽️ Gulasch', description: 'x', start: '2026-11-16 18:30:00', end: '2026-11-16 19:30:00', sig: 's' }
+  let diff = diffDinnerEvents([w], {}, [{ uid: 'g', summary: `${bare} Gulasch`, date: '2026-11-16', description: 'x' }], '2026-11-16')
+  ok(diff.create.length === 0 && diff.del.length === 0 && diff.keep?.[0]?.uid === 'g', 'Diff: Termin ohne U+FE0F wird übernommen statt doppelt angelegt')
+  diff = diffDinnerEvents([], {}, [{ uid: 'g', summary: `${bare} Altes Gericht`, date: '2026-11-17' }], '2026-11-16')
+  ok(diff.del.length === 1 && diff.del[0].uids[0] === 'g', 'Diff: veralteter Termin ohne U+FE0F wird aufgeräumt')
 }
 
 console.log(fails ? `\n${fails} Test(s) fehlgeschlagen` : '\nAlle Tests OK')

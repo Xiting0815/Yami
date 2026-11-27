@@ -62,6 +62,7 @@ export interface SyncLocal {
 export const emptySync = (): SyncLocal => ({ base: {}, household: {}, notices: [], peers: {} })
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/
+const DISH = /^\d{4}-\d{2}-\d{2}:.+/
 const obj = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x)
 const num = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x)
 const isRating = (v: unknown): v is Rating => v === 'up' || v === 'again' || v === 'down'
@@ -69,11 +70,12 @@ const isRating = (v: unknown): v is Rating => v === 'up' || v === 'again' || v =
 export function sanitizePerson(x: unknown): PersonSignals {
   const p = obj(x) ? x : {}
   const ratings: Record<string, Rating> = {}
-  if (obj(p.ratings)) for (const [d, v] of Object.entries(p.ratings)) if (ISO.test(d) && isRating(v)) ratings[d] = v
+  // Abendessen: `Tag:Rezept-Id` (gehört zum Gericht), ältere Stände nur `Tag`
+  if (obj(p.ratings)) for (const [d, v] of Object.entries(p.ratings)) if ((ISO.test(d) || DISH.test(d)) && isRating(v)) ratings[d] = v
   const bakeRatings: Record<string, Rating> = {}
   if (obj(p.bakeRatings)) for (const [k, v] of Object.entries(p.bakeRatings)) if (/^\d{4}-\d{2}-\d{2}:.+/.test(k) && isRating(v)) bakeRatings[k] = v
   const portionFeedback: Record<string, PortionFeedback> = {}
-  if (obj(p.portionFeedback)) for (const [d, v] of Object.entries(p.portionFeedback)) if (ISO.test(d) && (v === -1 || v === 0 || v === 1)) portionFeedback[d] = v
+  if (obj(p.portionFeedback)) for (const [d, v] of Object.entries(p.portionFeedback)) if ((ISO.test(d) || DISH.test(d)) && (v === -1 || v === 0 || v === 1)) portionFeedback[d] = v
   const rejects = Array.isArray(p.rejects)
     ? p.rejects.filter((r): r is RejectEvent => obj(r) && typeof r.id === 'string' && typeof r.date === 'string' && ISO.test(r.date)).map((r) => ({ id: r.id, date: r.date })).slice(-400)
     : []

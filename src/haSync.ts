@@ -30,6 +30,48 @@ export interface RemoteTodo {
   summary: string
   status: 'needs_action' | 'completed'
   description?: string | null
+  /** Zeitpunkt des Abhakens (ISO mit Zeitzone), falls die Liste ihn liefert (Google Tasks: ja) */
+  completed?: string | null
+}
+
+/** Wann ein in HA abgehakter Artikel gekauft wurde: echtes Abhak-Datum, oder „nachgetragen“ (Tag unbekannt) */
+export interface BoughtWhen {
+  /** lokales Datum (ISO) des Abhakens */
+  at?: string
+  /** erst später bemerkt, Tag unbekannt → zählt nicht für den gelernten Einkaufstag */
+  late?: boolean
+}
+/** Abhak-Datum aus dem `completed`-Zeitstempel (lokales Datum), höchstens heute */
+export function completedDay(completed: string | null | undefined, today: string): string | undefined {
+  if (!completed) return undefined
+  const d = new Date(completed)
+  if (isNaN(d.getTime())) return undefined
+  const iso = isoDate(d)
+  return iso > today ? today : iso
+}
+
+/** Für jeden in HA abgehakten Schlüssel: bekannter Abhak-Tag (siehe diffTodo) oder „nachgetragen“ (Tag unbekannt) */
+export function boughtWhen(keys: string[], boughtAt: Record<string, string>): Record<string, BoughtWhen> {
+  return Object.fromEntries(keys.map((k) => [k, boughtAt[k] ? { at: boughtAt[k] } : { late: true }]))
+}
+
+/**
+ * Live-Meldungen der Einkaufsliste (todo/item/subscribe) mitlesen: ein Eintrag, der in der vorigen Meldung noch offen
+ * war und jetzt erledigt ist, wurde gerade eben abgehakt → uid → heutiges Datum in `live`. `open` = offene uids der
+ * vorigen Meldung (leer nach Verbindungsaufbau/Hintergrund – dann zählt nichts als „gerade eben“). Gibt die neuen offenen zurück.
+ */
+export function noteLiveTodo(event: unknown, open: Set<string>, live: Record<string, string>, now: Date): Set<string> {
+  const items = Array.isArray(event) ? event : (event as { items?: unknown[] } | null)?.items
+  if (!Array.isArray(items)) return open
+  const next = new Set<string>()
+  for (const i of items as { uid?: unknown; status?: unknown }[]) {
+    if (i?.uid == null) continue
+    const uid = String(i.uid)
+    if (i.status === 'completed') {
+      if (open.has(uid) && !live[uid]) live[uid] = isoDate(now)
+    } else next.add(uid)
+  }
+  return next
 }
 
 /** "Rinderhackfleisch – 500 g" */
@@ -61,18 +103,21 @@ export interface TodoDiff {
   remove: { uid: string }[]
   /** in HA abgehakt → in Yami als gekauft markieren */
   bought: string[]
+  /** Abhak-Tag (lokal) der abgehakten Schlüssel, soweit HA ihn liefert */
+  boughtAt: Record<string, string>
   /** neue Zuordnung Schlüssel → uid (neue Einträge ergänzt der Aufrufer nach dem Anlegen) */
   items: Record<string, string>
   done: string[]
 }
 
-export function diffTodo(local: LocalItem[], remote: RemoteTodo[], map: Record<string, string>, done: string[] = []): TodoDiff {
+/** `today`: für das Abhak-Datum (`completed`, höchstens heute); `live`: uid → Tag, an dem Gusto den Haken live gesehen hat */
+export function diffTodo(local: LocalItem[], remote: RemoteTodo[], map: Record<string, string>, done: string[] = [], today?: string, live: Record<string, string> = {}): TodoDiff {
   const mapUids = new Set(Object.values(map))
   const isYami = (r: RemoteTodo) => (r.description ?? '').trim() === MARKER || mapUids.has(r.uid)
   const yami = remote.filter(isYami)
   const byUid = new Map(yami.map((r) => [r.uid, r]))
   const claimed = new Set<string>()
-  const out: TodoDiff = { add: [], rename: [], complete: [], reopen: [], remove: [], bought: [], items: {}, done: [] }
+  const out: TodoDiff = { add: [], rename: [], complete: [], reopen: [], remove: [], bought: [], boughtAt: {}, items: {}, done: [] }
   const wasDone = new Set(done)
 
   // erst die sicheren Zuordnungen über die gemerkte uid, dann der Rest über gleichen Text
@@ -109,6 +154,8 @@ export function diffTodo(local: LocalItem[], remote: RemoteTodo[], map: Record<s
         isDone = false
       } else {
         out.bought.push(l.key) // in HA abgehakt
+        const day = completedDay(r.completed, today ?? '9999-12-31') ?? live[r.uid]
+        if (day) out.boughtAt[l.key] = day
       }
     } else {
       if (l.bought) {
@@ -137,7 +184,7 @@ export interface HaApi {
 export async function listTodo(api: HaApi, entity: string): Promise<RemoteTodo[]> {
   const res = await api.command<{ items?: RemoteTodo[] } | RemoteTodo[]>({ type: 'todo/item/list', entity_id: entity })
   const items = Array.isArray(res) ? res : res?.items ?? []
-  return items.map((i) => ({ uid: String(i.uid), summary: String(i.summary ?? ''), status: i.status === 'completed' ? 'completed' : 'needs_action', description: i.description ?? null }))
+  return items.map((i) => ({ uid: String(i.uid), summary: String(i.summary ?? ''), status: i.status === 'completed' ? 'completed' : 'needs_action', description: i.description ?? null, ...(typeof i.completed === 'string' ? { completed: i.completed } : {}) }))
 }
 
 export interface TodoSyncResult {
@@ -185,19 +232,22 @@ export function planMoves(current: string[], desired: string[]): { uid: string; 
 }
 
 /**
- * Einkaufsliste abgleichen. `onBought` bekommt die Schlüssel, die in HA abgehakt wurden, und gibt die zurück,
- * die Yami übernommen hat (ohne Rückgabe: alle). Nicht Übernommenes gilt nicht als erledigt → kein Wieder-Öffnen,
- * der nächste Lauf versucht es erneut.
+ * Einkaufsliste abgleichen. `onBought` bekommt die Schlüssel, die in HA abgehakt wurden (mit dem Kauftag, siehe
+ * boughtWhen), und gibt die zurück, die Yami übernommen hat (ohne Rückgabe: alle). Nicht Übernommenes gilt nicht als
+ * erledigt → kein Wieder-Öffnen, der nächste Lauf versucht es erneut.
+ * `opts.now`: jetzt; `opts.live`: live gesehene Haken (uid → Tag, siehe noteLiveTodo) für Listen ohne Abhak-Zeit.
  */
 export async function syncTodo(
   api: HaApi,
   ha: Pick<HaSettings, 'todo' | 'items' | 'done'>,
   local: LocalItem[],
-  onBought: (keys: string[]) => string[] | void,
+  onBought: (keys: string[], when: Record<string, BoughtWhen>) => string[] | void,
+  opts: { now?: Date; live?: Record<string, string> } = {},
 ): Promise<TodoSyncResult> {
   const target = { entity_id: ha.todo }
   const remote = await listTodo(api, ha.todo)
-  const d = diffTodo(local, remote, ha.items, ha.done ?? [])
+  const now = opts.now ?? new Date()
+  const d = diffTodo(local, remote, ha.items, ha.done ?? [], isoDate(now), opts.live)
   let error: string | undefined
   let changed = 0
   const attempt = async (fn: () => Promise<unknown>) => {
@@ -239,7 +289,7 @@ export async function syncTodo(
       }
     }
   }
-  const taken = new Set(d.bought.length ? onBought(d.bought) ?? d.bought : [])
+  const taken = new Set(d.bought.length ? onBought(d.bought, boughtWhen(d.bought, d.boughtAt)) ?? d.bought : [])
   const done = d.done.filter((k) => !d.bought.includes(k) || taken.has(k))
 
   // Reihenfolge wie im Laden: Yami-Einträge (offen) in der Reihenfolge von `local`; Fremdes bleibt unberührt.
@@ -357,6 +407,7 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
  *   – sonst das Abendessen aus dem Plan
  * Steht zusätzlich noch ein Abendessen im Plan, wird es in der Beschreibung mitgenannt; Salate & Beilagen des Tages
  * (Zusatz, ersetzen nichts) stehen als „Dazu: …“ in der Beschreibung.
+ * Heute bleibt der Termin auch nach „Fertig gekocht“ (bzw. gebacken) im Kalender; nur „ausgelassen“ nimmt ihn heraus.
  */
 export function plannedDinners(plan: WeekPlan, today: string, bakePlan: BakePlan = {}): Desired[] {
   const out: Desired[] = []
@@ -364,11 +415,13 @@ export function plannedDinners(plan: WeekPlan, today: string, bakePlan: BakePlan
     const D = addDaysIso(today, i)
     const e = plan[D]
     const r = e && RECIPE_BY_ID[e.recipeId] ? entryRecipe(e) : undefined
-    const open = (bakePlan[D] ?? []).filter((b) => !b.status && RECIPE_BY_ID[b.recipeId])
+    // heute bleibt der Termin auch nach „Fertig gekocht“/„gebacken“ stehen (nur „ausgelassen“ nimmt ihn heraus)
+    const live = (status?: string) => !status || (i === 0 && status !== 'skipped')
+    const open = (bakePlan[D] ?? []).filter((b) => live(b.status) && RECIPE_BY_ID[b.recipeId])
     const tapas = open.filter((b) => isTapa(RECIPE_BY_ID[b.recipeId]))
     const bbqs = open.filter((b) => isBbq(RECIPE_BY_ID[b.recipeId]) && replacesDinner(RECIPE_BY_ID[b.recipeId]))
     const sides = open.filter((b) => isSalat(RECIPE_BY_ID[b.recipeId]) || (isBbq(RECIPE_BY_ID[b.recipeId]) && !replacesDinner(RECIPE_BY_ID[b.recipeId])))
-    const dinner = e && r && !e.status ? { e, r } : undefined
+    const dinner = e && r && live(e.status) ? { e, r } : undefined
     if (!dinner && !bbqs.length && !tapas.length) continue
     const linesOf = (rec: Recipe, base: number, servings: number) =>
       rec.ingredients.map((ing) => {
@@ -426,6 +479,10 @@ export interface DinnerDiff {
 
 /** Abendessen-Termine von Yami erkennt man am Titel (auch BBQ „🍽️ 🔥 …“ und Tapas-Abend „🍽️ 🫒 …“); alles andere im Kalender bleibt unberührt */
 export const DINNER_MARK = '🍽️'
+/** Titel ohne unsichtbares Variationszeichen (U+FE0F): „🍽️“ und „🍽“ gelten als gleich (Kalender speichern es mal so, mal so) */
+export const normTitle = (s: string) => s.replace(/\uFE0F/g, '')
+/** Abendessen-Termin von Gusto? (🍽️ mit oder ohne Variationszeichen) */
+export const isDinnerTitle = (s: string) => normTitle(s).trimStart().startsWith(normTitle(DINNER_MARK))
 /** so viele Tage nach heute plant der Kalender (heute … heute + DINNER_DAYS) */
 export const DINNER_DAYS = 7
 
@@ -446,7 +503,7 @@ export function diffDinnerEvents(desired: Desired[], tracked: HaSettings['events
   if (!remote) return diffDinnerBlind(desired, tracked, today)
   const out: DinnerDiff = { create: [], del: [], forget: [], keep: [] }
   const want = new Map(desired.map((d) => [d.key, d]))
-  const mine = remote.filter((e) => e.summary.startsWith(DINNER_MARK))
+  const mine = remote.filter((e) => isDinnerTitle(e.summary))
 
   // vergangene Tage nur vergessen
   for (const key of Object.keys(tracked)) if (key.startsWith('dinner:') && key.slice(7) < today) out.forget.push(key)
@@ -464,7 +521,7 @@ export function diffDinnerEvents(desired: Desired[], tracked: HaSettings['events
       continue
     }
     const same = !!t && t.sig === w.sig
-    const titled = evs.filter((e) => e.summary === w.summary)
+    const titled = evs.filter((e) => normTitle(e.summary).trim() === normTitle(w.summary).trim())
     // 1) eigener gemerkter Termin, unverändert
     let keep = same && t!.uid ? titled.find((e) => e.uid === t!.uid) : undefined
     // 2) früher ohne uid gemerkt → über den Titel
@@ -655,7 +712,7 @@ export async function syncCalendar(
       const after = await listEvents(api, ha.calendar, from, to)
       const before = new Set(remote.map((e) => e.uid))
       for (const d of diff.create) {
-        const e = after.find((x) => !before.has(x.uid) && x.date === d.key.slice(7) && x.summary === d.summary)
+        const e = after.find((x) => !before.has(x.uid) && x.date === d.key.slice(7) && normTitle(x.summary).trim() === normTitle(d.summary).trim())
         if (e && events[d.key]) events[d.key] = { ...events[d.key], uid: e.uid }
       }
     } catch {

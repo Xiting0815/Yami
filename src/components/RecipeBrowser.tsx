@@ -18,7 +18,7 @@ import { formatAmount } from '../shopping'
 import { FilterBar } from './FilterBar'
 import { RecipeImage } from './RecipeImage'
 import { searchIngredients } from '../customIngredients'
-import { norm, searchRecipes } from '../recipeSearch'
+import { areaHits, norm, sortedHits } from '../recipeSearch'
 
 interface Props {
   filters: Filters
@@ -44,6 +44,11 @@ interface Props {
 
 /** Bereich der Rezeptliste (außer Frühstück/Abendessen) */
 type Area = 'bake' | 'bbq' | 'tapas' | 'salat'
+/** alle Ansichten des Rezepte-Tabs (für die Suche über alle Bereiche) */
+type View = Area | 'dinner' | 'breakfast' | 'basics'
+const VIEW_LABEL: Record<View, [icon: string, name: string]> = {
+  dinner: ['🌙', 'Abendessen'], breakfast: ['☀️', 'Frühstück'], bake: ['🍰', 'Backen'], bbq: ['🔥', 'BBQ'], tapas: ['🫒', 'Tapas'], salat: ['🥗', 'Salate'], basics: ['🫙', 'Grundrezepte'],
+}
 
 const BAKE_KINDS: BasicKind[] = ['dessert', 'kuchen', 'brot', 'gebaeck']
 const BBQ_GROUPS: BbqGroup[] = ['smoker', 'grill', 'dutch', 'burger', 'beilage', 'rub']
@@ -98,29 +103,54 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
           ? BREAKFASTS
           : RECIPES.filter((r) => matches(r, filters, perPortion.get(r.id)))
     const pool = base.filter((r) => basics || area || !mine || r.custom)
-    // Titel-Treffer vor Zutaten-Treffern; Tippfehler („Tortila“, „Spagetti“) über ähnlich geschriebene Titel/Zutaten
-    const rank = searchRecipes(pool, q, () => searchIngredients(q, 6))
-    const byTitle = (a: Recipe, b: Recipe) => a.title.localeCompare(b.title, 'de')
     // Backen: was du gern bäckst und isst, kommt nach vorn (gelernt)
     // Saisongebäck (Plätzchen) steht in seiner Zeit ganz oben, danach folgt die gelernte Vorliebe
     const day = todayIso()
-    // BBQ/Tapas/Salate: gelernte Vorliebe (geplant, gemacht, bewertet) sortiert – Rubs & Saucen ans Ende der Gesamtliste
-    const score = new Map(
+    // BBQ/Tapas/Salate: gelernte Vorliebe (geplant, gemacht, bewertet) sortiert – Rubs & Saucen ans Ende der Gesamtliste.
+    // Frühstück/Abendessen: beim Suchen entscheidet bei gleich guter Übereinstimmung die gelernte Vorliebe.
+    const score = (r: Recipe) =>
       area
-        ? base.map((r) => [
-            r.id,
-            (bakePref?.(r).score ?? 0) + (festiveOf(r, day)?.active ? SEASON_BOOST : 0) -
-              ((bbq === 'alle' && !isBbq(r)) || (tapas === 'alle' && !isTapa(r)) ? SEASON_BOOST : 0),
-          ])
-        : [],
-    )
-    return pool
-      .filter((r) => rank.has(r.id))
-      .sort((a, b) => rank.get(a.id)! - rank.get(b.id)! || (score.get(b.id) ?? 0) - (score.get(a.id) ?? 0) || byTitle(a, b))
+        ? (bakePref?.(r).score ?? 0) + (festiveOf(r, day)?.active ? SEASON_BOOST : 0) -
+          ((bbq === 'alle' && !isBbq(r)) || (tapas === 'alle' && !isTapa(r)) ? SEASON_BOOST : 0)
+        : q.trim()
+          ? bakePref?.(r).score ?? 0
+          : 0
+    // Titel-Treffer vor Zutaten-Treffern; Tippfehler („Tortila“, „Spagetti“) über ähnlich geschriebene Titel/Zutaten
+    return sortedHits(pool, q, score, () => searchIngredients(q, 6))
   }, [q, filters, perPortion, meal, mine, custom, basics, bake, bbq, tapas, salat, area, bakePref])
   const picked = tapasPick.map((id) => BASICS.find((r) => r.id === id)).filter((r): r is Recipe => !!r)
   const togglePick = (id: string) =>
     onTapasPick?.(tapasPick.includes(id) ? tapasPick.filter((x) => x !== id) : tapasPick.length >= TAPAS_MAX ? tapasPick : [...tapasPick, id])
+  // Suche über alle Bereiche: Treffer in anderen Bereichen als Hinweis („3 in Backen · 2 in Tapas“), antippen wechselt dorthin
+  const view: View = area ?? (basics ? 'basics' : meal)
+  const elsewhere = useMemo(() => {
+    const t = q.trim()
+    if (!t) return []
+    const areas: { key: View; pool: Recipe[] }[] = [
+      { key: 'dinner', pool: RECIPES.filter((r) => matches(r, filters, perPortion.get(r.id))) },
+      { key: 'breakfast', pool: BREAKFASTS },
+      { key: 'bake', pool: BASICS.filter(isBakery) },
+      { key: 'bbq', pool: bbqSection(undefined) },
+      { key: 'tapas', pool: tapasSection(undefined) },
+      { key: 'salat', pool: salatSection(undefined) },
+      { key: 'basics', pool: BASICS.filter((r) => r.kind === 'grundrezept') },
+    ]
+    return areaHits(areas, t, () => searchIngredients(t, 6))
+      .filter((a) => a.key !== view)
+      .sort((a, b) => b.count - a.count)
+  }, [q, filters, perPortion, custom, view])
+  const goTo = (v: View) => {
+    if (v === 'dinner' || v === 'breakfast') {
+      openArea(null)
+      setBasics(false)
+      setMine(false)
+      onMeal(v)
+    } else if (v === 'basics') {
+      openArea(null)
+      setMine(false)
+      setBasics(true)
+    } else openArea(v)
+  }
   // Wortvorschläge beim Tippen (Zutaten, auch bei Tippfehlern)
   const words = useMemo(() => {
     const t = q.trim()
@@ -136,6 +166,16 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
           {words.map((w) => (
             <button key={w} className="chip" onClick={() => setQ(w)}>
               {w}
+            </button>
+          ))}
+        </div>
+      )}
+      {elsewhere.length > 0 && (
+        <div className={`search-elsewhere ${list.length === 0 ? 'only' : ''}`} role="group" aria-label="Treffer in anderen Bereichen">
+          <span className="muted small">{list.length === 0 ? 'Hier nichts – aber gefunden in:' : 'Auch in:'}</span>
+          {elsewhere.map((a) => (
+            <button key={a.key} className="chip" onClick={() => goTo(a.key)} aria-label={`${a.count} Treffer in ${VIEW_LABEL[a.key][1]} – dorthin wechseln`}>
+              {VIEW_LABEL[a.key][0]} <b>{a.count}</b> in {VIEW_LABEL[a.key][1]}
             </button>
           ))}
         </div>

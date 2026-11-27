@@ -96,3 +96,37 @@ export function searchRecipes(pool: Recipe[], query: string, similarIngredients:
   }
   return out
 }
+
+/**
+ * Treffer sortiert: bessere Textübereinstimmung zuerst; bei gleich guter Übereinstimmung entscheidet die
+ * gelernte Vorliebe (`score`, größer = beliebter, siehe householdPreference in src/learning.ts), dann der Titel.
+ */
+export function sortedHits(pool: Recipe[], query: string, score: (r: Recipe) => number = () => 0, similarIngredients?: () => string[]): Recipe[] {
+  const rank = searchRecipes(pool, query, similarIngredients)
+  const s = new Map<string, number>()
+  const sc = (r: Recipe) => {
+    let v = s.get(r.id)
+    if (v === undefined) s.set(r.id, (v = score(r)))
+    return v
+  }
+  return pool
+    .filter((r) => rank.has(r.id))
+    .sort((a, b) => rank.get(a.id)! - rank.get(b.id)! || sc(b) - sc(a) || a.title.localeCompare(b.title, 'de'))
+}
+
+/**
+ * Suche über alle Bereiche des Rezepte-Tabs (Abendessen, Frühstück, Backen, BBQ, Tapas, Salate, Grundrezepte):
+ * Zahl der Treffer je Bereich. Findet irgendein Bereich den Begriff genau (Titel/Zutat), zählen anderswo nur genaue
+ * Treffer – sonst würden Tippfehler-Treffer („ähnlich geschrieben“) als Hinweis auf andere Bereiche ablenken.
+ * Leere Suche → keine Treffer. Ähnliche Zutaten (`similarIngredients`) werden nur einmal ermittelt.
+ */
+export function areaHits<K extends string>(areas: { key: K; pool: Recipe[] }[], query: string, similarIngredients?: () => string[]): { key: K; count: number }[] {
+  if (!query.trim()) return []
+  let similar: string[] | undefined
+  const sim = () => (similar ??= similarIngredients?.() ?? [])
+  const ranks = areas.map((a) => ({ key: a.key, rank: searchRecipes(a.pool, query, sim) }))
+  const exact = ranks.some((a) => [...a.rank.values()].some((v) => v < 2))
+  return ranks
+    .map((a) => ({ key: a.key, count: [...a.rank.values()].filter((v) => !exact || v < 2).length }))
+    .filter((a) => a.count > 0)
+}

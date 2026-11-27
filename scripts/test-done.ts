@@ -62,8 +62,8 @@ ok(none.plan[today]!.status === 'cooked' && none.pantry.length === 0, 'cookNow: 
 
 // ───── Bewertung / Portion im Stand ─────
 const st = sanitize({ plan: r.plan, ratings: { [today]: 'up' }, portionFeedback: { [today]: -1, '2026-11-10': 5, kaputt: 1, '2026-11-11': 0 } })
-ok(st.ratings[today] === 'up', 'Bewertung wird unter dem Tag gespeichert')
-ok(Object.keys(st.portionFeedback).join() === '2026-11-11,2026-11-17' && st.portionFeedback[today] === -1, 'sanitize: Portionsfeedback geprüft (kaputte verworfen)')
+ok(st.ratings[`${today}:carbonara`] === 'up' && st.ratings[today] === undefined, 'alte Bewertung (nur Tag) gehört jetzt zum Gericht des Tages')
+ok(Object.keys(st.portionFeedback).join() === '2026-11-11,2026-11-17:carbonara' && st.portionFeedback[`${today}:carbonara`] === -1, 'sanitize: Portionsfeedback geprüft (kaputte verworfen, dem Gericht zugeordnet)')
 ok(sanitize({}).portionFeedback && Object.keys(sanitize({}).portionFeedback).length === 0, 'sanitize: alter Stand ohne Feld → leer')
 const back = parseBackup(JSON.stringify(backupBody({ ...sanitize({}), portionFeedback: { [today]: 1 } })))
 ok(back.portionFeedback[today] === 1, 'Sicherung enthält Portionsfeedback')

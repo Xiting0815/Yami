@@ -34,7 +34,10 @@ export const WASTE_AFTER_DAYS = 7
 export type PriceOverrides = Record<string, { pack: number; price: number }>
 
 /** gekaufte Mengen je Woche: Zutat → angelegter Vorratsposten */
-export type BoughtMap = Record<string, { lotId: string; amount: number; /** Tag des Abhakens (lernt den Einkaufstag) */ at?: string }>
+export type BoughtMap = Record<
+  string,
+  { lotId: string; amount: number; /** Tag des Abhakens (lernt den Einkaufstag) */ at?: string; /** in Google Tasks abgehakt, Tag unbekannt (nachgetragen) – zählt nicht für den Einkaufstag */ late?: true }
+>
 
 // ───────────── Hilfen ─────────────
 

@@ -8,7 +8,7 @@ import { CHUNK, PREFIX, applyRound, extract, familySync, hashOf, leaseDecision, 
 import { haRound } from '../src/haRun'
 import { settleDue } from '../src/app/upkeep'
 import { cookDue, allNeedsOf } from '../src/kitchen'
-import { buildModel, householdPreference, portionFactor } from '../src/learning'
+import { buildModel, dishValue, householdPreference, portionFactor } from '../src/learning'
 import { backupBody, parseBackup } from '../src/backup'
 
 let fails = 0
@@ -364,7 +364,7 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   marc = await sync(hass, marc)
   ok(!marc.plan['2026-11-30'] && !marc.pantry.some((l) => l.id === 'zz'), 'falsche Einträge: unbekanntes Rezept / kaputter Posten verworfen')
   ok(marc.plan['2026-11-16']?.recipeId === mPlan16, 'falsche Einträge: kaputte Metadaten ändern nichts')
-  ok(marc.ratings['2026-11-16'] === 'up', 'falsche Einträge: Bewertung im falschen Dokument wird ignoriert')
+  ok(dishValue(marc.ratings, '2026-11-16', marc.plan['2026-11-16']?.recipeId) === 'up', 'falsche Einträge: Bewertung im falschen Dokument wird ignoriert')
   marc = await sync(hass, marc)
   ok(!JSON.parse(hass.items.find((i) => i.summary === PREFIX + 'kitchen')!.description).items['plan:2026-11-30']?.v, 'verworfener Eintrag wird beim nächsten Abgleich gelöscht')
   // gar keine Yami-Daten / fremde Einträge in der Liste

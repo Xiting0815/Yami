@@ -5,7 +5,7 @@ import { BakeAskCard, BakeHintCard, BbqIdeasCard, TapasAskCard } from '../../com
 import { isTapa } from '../../types'
 import { shortTitle as tapaTitle } from '../../tapas'
 import { bbqIdeas } from '../../bbq'
-import { householdPreference, pendingRating } from '../../learning'
+import { dishValue, householdPreference, pendingRating } from '../../learning'
 import { sharingActive, weekdayName } from '../../store'
 import { prepDayText } from '../../breakfast'
 import { plannedBy } from '../../sync'
@@ -167,7 +167,7 @@ export function WeekTab({ m }: { m: AppModel }) {
         if ((!day || !r) && !sr) return null
         return (
           <>
-            {day && r && <RatingCard title={r.title} day={day} portion={state.portionFeedback[day]} onPortion={(v) => act.setPortionFeedback(day, v)} onRate={(v) => act.rate(day, v)} onDismiss={() => act.dismissRating(day)} />}
+            {day && r && <RatingCard title={r.title} day={day} portion={dishValue(state.portionFeedback, day, state.plan[day]!.recipeId)} onPortion={(v) => act.setPortionFeedback(day, v)} onRate={(v) => act.rate(day, v)} onDismiss={() => act.dismissRating(day)} />}
             {sp && sr && <SatietyCard title={sr.title} day={sp.days[0]} onAnswer={(v) => act.setBfSatiety(prepRatingKey(sp), v)} onDismiss={() => act.dismissSatiety(prepRatingKey(sp))} />}
           </>
         )
