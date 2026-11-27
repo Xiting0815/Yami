@@ -3,6 +3,7 @@ import { RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { formatAmount } from '../src/shopping'
 import { needsOf, cookDue, uncook, insight, lastSeenMap, planWeek, uid, addDaysIso, pantryAmount, type PantryLot, type BoughtMap } from '../src/kitchen'
 import type { WeekPlan } from '../src/types'
+import { buildModel, isSweetMain, preference, restOf } from '../src/learning'
 
 let fails = 0
 const ok = (cond: boolean, msg: string) => { console.log(`${cond ? '✓' : '✗'} ${msg}`); if (!cond) fails++ }
@@ -104,5 +105,22 @@ ok(costs[100] > 1 && costs[100] < 6, 'Median-Kosten pro Portion plausibel')
   ok(need('saltimbocca', 'Kalbsschnitzel')?.amount === 2 && need('scaloppine-limone', 'Kalbsschnitzel')?.amount === 2, 'Saltimbocca/Scaloppine: 2 Kalbsschnitzel (1 Packung) statt 4')
   ok(need('piccata', 'Schweineschnitzel')?.amount === 2, 'Piccata: 2 Schweineschnitzel statt 4')
 }
+// Süße Hauptgerichte: beim allerersten Planen (nichts gelernt) nicht vorne im Stapel
+{
+  const day = '2026-11-23'
+  const m0 = buildModel({ plan: {}, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: {}, today: day })
+  const dinners = RECIPES.filter((r) => !r.basic && !r.breakfast)
+  const rank = (useTaste: boolean) =>
+    dinners
+      .map((r) => ({ r, s: insight(r, 2, [], day, {}, new Map(), 0.5, [], { month: 11, day, rest: restOf(m0, r, day) }).score + (useTaste ? preference(m0, r, day).score : 0) }))
+      .sort((a, b) => b.s - a.s)
+      .map((x) => x.r.id)
+  const withPrior = rank(true)
+  const without = rank(false)
+  const sweet = dinners.filter(isSweetMain).map((r) => r.id)
+  const pos = (list: string[]) => sweet.map((id) => list.indexOf(id))
+  ok(sweet.length >= 2 && pos(withPrior).every((p, i) => p > pos(without)[i]) && pos(withPrior).every((p) => p >= 15), `süße Hauptgerichte starten weiter hinten (Plätze ${pos(without).map((p) => p + 1).join('/')} → ${pos(withPrior).map((p) => p + 1).join('/')})`)
+}
+
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }
 console.log('Alle Tests OK')

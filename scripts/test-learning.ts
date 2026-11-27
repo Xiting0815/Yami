@@ -3,7 +3,10 @@ import { BREAKFASTS, RECIPES, RECIPE_BY_ID } from '../src/data/recipes'
 import { addDaysIso } from '../src/kitchen'
 import { addReject, buildModel, hintOk, satietyBonus, satietyIndex, satietyLean, satietyNote, mainProtein, pendingRating, portionFactor, portionNote, preference, summarize, type PortionFeedback, type RejectEvent } from '../src/learning'
 import type { WeekPlan } from '../src/types'
-import { withDinner } from '../src/app/actions/plan'
+import { movedDinner, moveTargets, withDinner } from '../src/app/actions/plan'
+import { insight, lastSeenMap } from '../src/kitchen'
+import { sanitize } from '../src/store'
+import { REST_REPEAT, REST_REPEAT_MIN, SWEET_START, dishKey, dishValue, householdRest, isSweetMain, restOf, type MoveEvent } from '../src/learning'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -193,6 +196,111 @@ ok(portionNote(1) === undefined && portionNote(1.1) === 'ihr braucht eher etwas 
   // andere Muster: erst ab Mindestzahl an Signalen
   const one = buildModel({ ...base, plan: { [today]: { recipeId: eintopfIds[0], servings: 2, status: 'cooked' } } })
   ok(!hintOk(one, 'type:eintopf') && !summarize(one).liked.length, 'ein einziges Gericht → noch kein Muster in der Übersicht')
+}
+
+// ───── Verschieben / Tauschen: Bewertung gehört zum Gericht ─────
+{
+  const mon = '2026-11-23', tue = '2026-11-24', wed = '2026-11-25'
+  const s0 = {
+    plan: { [mon]: { recipeId: 'carbonara', servings: 2 }, [tue]: { recipeId: 'rindergulasch', servings: 2 } } as WeekPlan,
+    ratings: {} as Record<string, 'up' | 'again' | 'down'>,
+    portionFeedback: {} as Record<string, PortionFeedback>,
+    ratingDismissed: [] as string[],
+    moves: [] as MoveEvent[],
+  }
+  const moved = movedDinner(s0, mon, wed, today)!
+  ok(!moved.plan[mon] && moved.plan[wed]?.recipeId === 'carbonara' && moved.moves.length === 1, 'Verschieben auf freien Tag: Mo leer, Mi Carbonara, gemerkt')
+  const swapped = movedDinner(s0, mon, tue, today)!
+  ok(swapped.plan[mon]?.recipeId === 'rindergulasch' && swapped.plan[tue]?.recipeId === 'carbonara', 'Zieltag belegt: beide Gerichte getauscht')
+  ok(swapped.moves.length === 1 && swapped.moves[0].recipeId === 'carbonara', 'nur das aktiv verschobene Gericht wird gemerkt')
+  ok(movedDinner({ ...s0, plan: { ...s0.plan, [tue]: { recipeId: 'rindergulasch', servings: 2, status: 'cooked' } } }, mon, tue, today) === null, 'auf einen gekochten Tag wird nicht getauscht')
+  // Bewertung/Portion/Wegklicken wandern mit dem Gericht (z. B. wenn ein vergangener, bewerteter Tag doch getauscht wird)
+  const rated = { ...s0, ratings: { [dishKey(mon, 'carbonara')]: 'up' as const, [tue]: 'down' as const }, portionFeedback: { [dishKey(mon, 'carbonara')]: -1 as PortionFeedback }, ratingDismissed: [tue] }
+  const sw = movedDinner(rated, mon, tue, today)!
+  ok(dishValue(sw.ratings, tue, 'carbonara') === 'up' && dishValue(sw.ratings, mon, 'rindergulasch') === 'down', 'Tauschen: beide Bewertungen wandern mit ihrem Gericht (auch alter Schlüssel nur mit Tag)')
+  ok(dishValue(sw.portionFeedback, tue, 'carbonara') === -1 && dishValue(sw.portionFeedback, mon, 'rindergulasch') === undefined, 'Tauschen: Portions-Rückmeldung wandert mit')
+  ok(sw.ratingDismissed.join() === mon, 'Tauschen: „Wie war’s?“-Wegklicken wandert mit')
+  // Lernen ordnet die Bewertung dem Gericht zu, auch wenn der Plan inzwischen etwas anderes an dem Tag hat (Familien-Abgleich)
+  const mm = buildModel({ plan: { [mon]: { recipeId: 'rindergulasch', servings: 2 } }, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: { [dishKey(mon, 'carbonara')]: 'down' }, today })
+  ok((mm.recipe.get('carbonara')?.sum ?? 0) < 0 && (mm.recipe.get('rindergulasch')?.sum ?? 0) > 0, 'Bewertung „Tag:Rezept“ zählt fürs bewertete Gericht, nicht fürs jetzt geplante')
+  // Migration: alte Bewertung nur mit Tag → dem dort geplanten Gericht
+  const st = sanitize({ plan: { [mon]: { recipeId: 'carbonara', servings: 2 } }, ratings: { [mon]: 'again', '2026-11-01': 'up' }, portionFeedback: { [mon]: 1 } })
+  ok(st.ratings[dishKey(mon, 'carbonara')] === 'again' && st.ratings['2026-11-01'] === 'up' && st.portionFeedback[dishKey(mon, 'carbonara')] === 1, 'Migration: alte Bewertungen/Portionen dem geplanten Gericht zugeordnet (ohne Eintrag bleiben sie)')
+  ok(portionFactor({ [dishKey('2026-11-10', 'a')]: -1, [dishKey('2026-11-11', 'b')]: -1, [dishKey('2026-11-12', 'c')]: -1 }, today) > 1, 'Portionsfaktor: „Tag:Rezept“-Schlüssel zählen')
+  // Lernen: einmal verschieben ist neutral, mehrmals nach hinten leicht negativ
+  const base = { plan: {} as WeekPlan, breakfast: {}, breakfastPicks: {}, rejects: [] as RejectEvent[], ratings: {}, today }
+  const m0 = buildModel(base)
+  const once = buildModel({ ...base, moves: [{ date: today, recipeId: 'carbonara', from: mon, to: wed }] })
+  const twice = buildModel({ ...base, moves: [{ date: addDaysIso(today, -3), recipeId: 'carbonara', from: mon, to: tue }, { date: today, recipeId: 'carbonara', from: tue, to: wed }] })
+  const forward = buildModel({ ...base, moves: [{ date: addDaysIso(today, -3), recipeId: 'carbonara', from: wed, to: mon }, { date: today, recipeId: 'carbonara', from: tue, to: mon }] })
+  const pc = (m: ReturnType<typeof buildModel>) => preference(m, RECIPE_BY_ID['carbonara']).score
+  ok(pc(once) === pc(m0), 'einmal verschieben: kein Signal')
+  ok(pc(twice) < pc(m0) && pc(twice) > -1.5, `mehrmals nach hinten geschoben: leicht weniger (${pc(twice).toFixed(2)})`)
+  ok(pc(forward) === pc(m0), 'nach vorn geholt: kein Minus')
+  // Zieltage: ab heute, ohne den Tag selbst, gekochte/Tapas-Abende gesperrt
+  const tg = moveTargets({ [mon]: { recipeId: 'carbonara', servings: 2 }, [tue]: { recipeId: 'rindergulasch', servings: 2, status: 'cooked' }, [wed]: { recipeId: 'frikadellen', servings: 2 } }, {}, mon, '2026-11-22')
+  ok(!tg.some((t) => t.day === mon) && tg[0].day === '2026-11-22' && !!tg.find((t) => t.day === tue)?.blocked && tg.find((t) => t.day === wed)?.swapWith === RECIPE_BY_ID['frikadellen'].title, 'Zieltage: frei / tauschen / gesperrt')
+}
+
+// ───── Gelernter Ruheabstand ─────
+{
+  const base = { plan: {} as WeekPlan, breakfast: {}, breakfastPicks: {}, rejects: [] as RejectEvent[], ratings: {} as Record<string, 'up' | 'again' | 'down'>, today }
+  const g = RECIPE_BY_ID['rindergulasch']
+  const r0 = restOf(buildModel(base), g, today)
+  ok(r0.repeat === REST_REPEAT && r0.rejectedAgo === undefined, `ohne Signale: Startwert ${r0.repeat} Tage`)
+  let rj: RejectEvent[] = []
+  for (let i = 0; i < 4; i++) rj = addReject(rj, g.id, addDaysIso(today, -i * 7))
+  const rOften = restOf(buildModel({ ...base, rejects: rj }), g, today)
+  const rOnce = restOf(buildModel({ ...base, rejects: addReject([], g.id, today) }), g, today)
+  ok(rOften.repeat > r0.repeat && rOften.reject > rOnce.reject && rOnce.rejectedAgo === 0, `oft weggewischt → ruht länger (${rOnce.reject} → ${rOften.reject} Tage nach dem Wischen, ${rOften.repeat} nach dem Planen)`)
+  // gekocht und mit 🔁 bewertet → darf früher wieder, aber nicht unter 10 Tage
+  const plan: WeekPlan = {}
+  const ratings: Record<string, 'up' | 'again' | 'down'> = {}
+  for (let i = 1; i <= 4; i++) {
+    const d = addDaysIso(today, -i * 12)
+    plan[d] = { recipeId: g.id, servings: 2, status: 'cooked' }
+    ratings[dishKey(d, g.id)] = 'again'
+  }
+  const rLove = restOf(buildModel({ ...base, plan, ratings }), g, today)
+  ok(rLove.repeat < r0.repeat && rLove.repeat >= REST_REPEAT_MIN, `gekocht & 🔁 → kürzere Wiederholung (${rLove.repeat} Tage, mind. ${REST_REPEAT_MIN})`)
+  // nur oft gekocht (ohne Bewertung) verkürzt nicht – sonst kommt ein Gericht immer öfter
+  const cookedOnly = restOf(buildModel({ ...base, plan }), g, today)
+  ok(cookedOnly.repeat === r0.repeat, 'nur gekocht (ohne 🔁/👍): Abstand bleibt beim Startwert')
+  // Muster: ähnliche Gerichte (gleiche Küche/Art/Hauptzutat) bekommen etwas davon ab
+  const fishIds2 = RECIPES.filter((r) => mainProtein(r) === 'Fisch' && r.type === 'haupt').map((r) => r.id)
+  let fr: RejectEvent[] = []
+  for (const id of fishIds2.slice(0, 5)) for (let w = 0; w < 3; w++) fr = addReject(fr, id, addDaysIso(today, -w * 7))
+  const other = RECIPE_BY_ID[fishIds2[fishIds2.length - 1]]
+  ok(restOf(buildModel({ ...base, rejects: fr }), other, today).repeat > r0.repeat, `Muster: Fisch oft weggewischt → auch ${other.title} ruht länger`)
+  // Wirkung in der Sortierung: frisch weggewischt ruht, abklingend; nach Ablauf kein Abzug mehr
+  const m1 = buildModel({ ...base, rejects: addReject([], g.id, addDaysIso(today, -2)) })
+  const restNow = householdRest(m1, [], g, today)
+  const sc = (rest?: Parameters<typeof insight>[8]['rest'], seen = new Map<string, string>()) => insight(g, 2, [], today, {}, seen, 0, [], { rest }).score
+  ok(sc(restNow) < sc(restOf(buildModel(base), g, today)) - 3, 'frisch weggewischt → rutscht nach hinten')
+  const later = householdRest(buildModel({ ...base, rejects: addReject([], g.id, addDaysIso(today, -30)) }), [], g, today)
+  ok(sc(later) === sc(restOf(buildModel(base), g, today)), 'Ruhe abgelaufen → kein Abzug mehr')
+  // Wiederholung: 15 Tage her → mit Startwert (21) hinten, mit gelernten 🔁 (kürzer) schon wieder vorne dabei
+  const seen = lastSeenMap({ [addDaysIso(today, -15)]: { recipeId: g.id, servings: 2 } }, today)
+  ok(sc(r0, seen) < sc(rLove, seen) - 5, `vor 15 Tagen geplant: Start → noch Ruhe, 🔁-Lieblingsgericht (${rLove.repeat} Tage) → wieder dabei`)
+  // Haushalt: die Person mit dem längsten Abstand zählt
+  const hh = householdRest(buildModel(base), [{ name: 'Lisa', model: buildModel({ ...base, rejects: rj }) }], g, today)
+  ok(hh.repeat === rOften.repeat && hh.rejectedAgo === 0, 'Familie: Lisas häufiges Wegwischen verlängert den gemeinsamen Ruheabstand')
+}
+
+// ───── Süße Hauptgerichte: starten leicht hinten, Lernen übersteuert ─────
+{
+  const sweet = RECIPES.filter(isSweetMain)
+  ok(sweet.some((r) => r.id === 'kaiserschmarrn') && sweet.some((r) => r.id === 'kartoffelpuffer'), `erkannt: ${sweet.map((r) => r.title).join(', ')}`)
+  ok(!isSweetMain(RECIPE_BY_ID['tomatensuppe']) && !isSweetMain(RECIPE_BY_ID['carbonara']) && !sweet.some((r) => !r.vegetarian || r.basic || r.breakfast), 'nicht süß: Tomatensuppe (Prise Zucker), Fleischgerichte, Desserts/Frühstück')
+  const base = { plan: {} as WeekPlan, breakfast: {}, breakfastPicks: {}, rejects: [] as RejectEvent[], ratings: {} as Record<string, 'up' | 'again' | 'down'>, today }
+  const k = RECIPE_BY_ID['kaiserschmarrn']
+  const fresh = preference(buildModel(base), k).score
+  ok(fresh === -SWEET_START, `neuer Nutzer: Kaiserschmarrn startet leicht hinten (${fresh})`)
+  const d = addDaysIso(today, -5)
+  const liked = buildModel({ ...base, plan: { [d]: { recipeId: k.id, servings: 2, status: 'cooked' } }, ratings: { [dishKey(d, k.id)]: 'up' } })
+  ok(preference(liked, k).score > 0, `gekocht & 👍 → Abzug weg, kommt nach vorn (${preference(liked, k).score.toFixed(2)})`)
+  const p = RECIPE_BY_ID['kartoffelpuffer']
+  ok(preference(liked, p).score > fresh, 'Muster „Süße Hauptgerichte“: auch Kartoffelpuffer rücken etwas nach vorn')
 }
 
 if (fails) { console.error(`${fails} Test(s) fehlgeschlagen`); process.exit(1) }

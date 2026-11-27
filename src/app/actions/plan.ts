@@ -2,7 +2,7 @@ import { finishable, isBake, isTapa, type PlanEntry, type Recipe } from '../../t
 import { bbqMeal, doneWord, eveningOn } from '../../bbq'
 import { tapasMeal } from '../../tapas'
 import { RECIPE_BY_ID } from '../../data/recipes'
-import { type PortionFeedback, type Rating, MOVES_MAX, addReject, dropDish, moveDish, portionFactor, setDishValue } from '../../learning'
+import { type PortionFeedback, type Rating, MOVES_MAX, addReject, dropDish, moveDish, portionFactor, rekeyDish, setDishValue } from '../../learning'
 import { cookTarget, futureDuplicate } from '../../cookDone'
 import { addDays, isoDate, mondayOf, parseIso, weekdayName } from '../../store'
 import { cookBasic, cookDue, cookNow, uncook } from '../../kitchen'
@@ -43,9 +43,9 @@ export function movedDinner<S extends Pick<AppState, 'plan' | 'ratings' | 'porti
   const plan = { ...s.plan, [to]: a }
   if (b) plan[from] = b
   else delete plan[from]
-  let ratings = s.ratings
-  let portionFeedback = s.portionFeedback
-  // erst beide Gerichte lösen, dann neu ablegen (beim Tauschen desselben Rezepts nichts verlieren)
+  // ältere Schlüssel nur mit Tag erst dem geplanten Gericht zuordnen, dann wandert alles mit seinem Gericht
+  let ratings = rekeyDish(s.ratings, s.plan)
+  let portionFeedback = rekeyDish(s.portionFeedback, s.plan)
   const ra = moveDish(ratings, from, to, a.recipeId)
   ratings = b ? moveDish(ra, to, from, b.recipeId) : ra
   const pa = moveDish(portionFeedback, from, to, a.recipeId)

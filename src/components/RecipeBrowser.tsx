@@ -175,7 +175,7 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
           <span className="muted small">{list.length === 0 ? 'Hier nichts – aber gefunden in:' : 'Auch in:'}</span>
           {elsewhere.map((a) => (
             <button key={a.key} className="chip" onClick={() => goTo(a.key)} aria-label={`${a.count} Treffer in ${VIEW_LABEL[a.key][1]} – dorthin wechseln`}>
-              {VIEW_LABEL[a.key][0]} <b>{a.count}</b> in {VIEW_LABEL[a.key][1]}
+              <span>{VIEW_LABEL[a.key][0]} <b>{a.count}</b> in {VIEW_LABEL[a.key][1]}</span>
             </button>
           ))}
         </div>
