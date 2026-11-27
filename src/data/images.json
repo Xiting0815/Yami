@@ -1,4 +1,10 @@
 {
+ "aceitunas-alinadas": {
+  "author": "Gemini",
+  "file": "img/aceitunas-alinadas.webp",
+  "license": "KI",
+  "source": ""
+ },
  "acqua-pazza": {
   "author": "Syced",
   "commonsTitle": "File:Acqua Pazza in Ebisu.jpg",
@@ -26,12 +32,30 @@
   "license": "KI",
   "source": ""
  },
+ "albondigas-tapa": {
+  "author": "Gemini",
+  "file": "img/albondigas-tapa.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "alioli": {
+  "author": "Gemini",
+  "file": "img/alioli.webp",
+  "license": "KI",
+  "source": ""
+ },
  "alla-norma": {
   "author": "Paoletta S.",
   "commonsTitle": "File:Pasta alla Norma (2563876877).jpg",
   "file": "img/alla-norma.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pasta_alla_Norma_(2563876877).jpg"
+ },
+ "allioli-de-mortero": {
+  "author": "Gemini",
+  "file": "img/allioli-de-mortero.webp",
+  "license": "KI",
+  "source": ""
  },
  "amaretti-morbidi": {
   "author": "Superchilum",
@@ -54,6 +78,42 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Penne_Arrabbiata.jpg"
  },
+ "arroz-a-banda": {
+  "author": "Gemini",
+  "file": "img/arroz-a-banda.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "arroz-al-horno": {
+  "author": "Gemini",
+  "file": "img/arroz-al-horno.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "arroz-caldoso-de-marisco": {
+  "author": "Gemini",
+  "file": "img/arroz-caldoso-de-marisco.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "arroz-con-leche": {
+  "author": "Gemini",
+  "file": "img/arroz-con-leche.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "arroz-negro": {
+  "author": "Gemini",
+  "file": "img/arroz-negro.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "asiatischer-nudelsalat": {
+  "author": "Gemini",
+  "file": "img/asiatischer-nudelsalat.webp",
+  "license": "KI",
+  "source": ""
+ },
  "atomic-buffalo-turds": {
   "author": "Gemini",
   "file": "img/atomic-buffalo-turds.webp",
@@ -63,6 +123,12 @@
  "baby-back-ribs": {
   "author": "Gemini",
   "file": "img/baby-back-ribs.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "bacalao-a-la-vizcaina": {
+  "author": "Gemini",
+  "file": "img/bacalao-a-la-vizcaina.webp",
   "license": "KI",
   "source": ""
  },
@@ -98,6 +164,12 @@
   "license": "KI",
   "source": ""
  },
+ "baguette-poolish": {
+  "author": "Gemini",
+  "file": "img/baguette-poolish.webp",
+  "license": "KI",
+  "source": ""
+ },
  "baked-oats-apfel": {
   "author": "JamieS93",
   "commonsTitle": "File:Apple Goodie crisp.JPG",
@@ -117,6 +189,12 @@
   "file": "img/bami-goreng.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Mi_Goreng_GM.jpg"
+ },
+ "bauernbrot-hefe": {
+  "author": "Gemini",
+  "file": "img/bauernbrot-hefe.webp",
+  "license": "KI",
+  "source": ""
  },
  "bauernbrot-sauerteig": {
   "author": "Gemini",
@@ -146,6 +224,12 @@
  "beer-can-chicken": {
   "author": "Gemini",
   "file": "img/beer-can-chicken.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "berenjenas-con-miel": {
+  "author": "Gemini",
+  "file": "img/berenjenas-con-miel.webp",
   "license": "KI",
   "source": ""
  },
@@ -196,6 +280,18 @@
   "license": "CC0",
   "source": "https://commons.wikimedia.org/wiki/File:Ghormeh_Sabzi.JPG"
  },
+ "bohnensalat": {
+  "author": "Gemini",
+  "file": "img/bohnensalat.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "boquerones-en-vinagre": {
+  "author": "Gemini",
+  "file": "img/boquerones-en-vinagre.webp",
+  "license": "KI",
+  "source": ""
+ },
  "boscaiola": {
   "author": "Gemini",
   "file": "img/boscaiola.webp",
@@ -224,6 +320,18 @@
  "brisket-burnt-ends": {
   "author": "Gemini",
   "file": "img/brisket-burnt-ends.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "brisket-chili": {
+  "author": "Gemini",
+  "file": "img/brisket-chili.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "brisket-hash": {
+  "author": "Gemini",
+  "file": "img/brisket-hash.webp",
   "license": "KI",
   "source": ""
  },
@@ -335,6 +443,24 @@
   "license": "KI",
   "source": ""
  },
+ "calamares-a-la-romana": {
+  "author": "Gemini",
+  "file": "img/calamares-a-la-romana.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "calamares-en-su-tinta": {
+  "author": "Gemini",
+  "file": "img/calamares-en-su-tinta.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "calcots-con-romesco": {
+  "author": "Gemini",
+  "file": "img/calcots-con-romesco.webp",
+  "license": "KI",
+  "source": ""
+ },
  "calzone": {
   "author": "Deryck Chan",
   "commonsTitle": "File:Wikimania 2016 Deryck day 0 - 07 calzone.jpg",
@@ -387,6 +513,12 @@
   "license": "KI",
   "source": ""
  },
+ "carrillada-iberica-al-pedro-ximenez": {
+  "author": "Gemini",
+  "file": "img/carrillada-iberica-al-pedro-ximenez.webp",
+  "license": "KI",
+  "source": ""
+ },
  "cashew-huhn": {
   "author": "Simon Law from Montréal, QC, Canada",
   "commonsTitle": "File:Cashewchickenphoto.jpg",
@@ -406,6 +538,12 @@
   "file": "img/champignoncremesuppe.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cream_Mushroom_soup_2.jpg"
+ },
+ "champinones-al-ajillo": {
+  "author": "Gemini",
+  "file": "img/champinones-al-ajillo.webp",
+  "license": "KI",
+  "source": ""
  },
  "char-siu": {
   "author": "Peachyeung316",
@@ -510,12 +648,24 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Choc-Chip-Cookie.jpg"
  },
+ "chorizo-a-la-sidra": {
+  "author": "Gemini",
+  "file": "img/chorizo-a-la-sidra.webp",
+  "license": "KI",
+  "source": ""
+ },
  "chow-mein": {
   "author": "Gaurav Dhwaj Khadka",
   "commonsTitle": "File:Chow Mein 1.jpg",
   "file": "img/chow-mein.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chow_Mein_1.jpg"
+ },
+ "churros-con-chocolate": {
+  "author": "Gemini",
+  "file": "img/churros-con-chocolate.webp",
+  "license": "KI",
+  "source": ""
  },
  "ciabatta": {
   "author": "Vincent Talleu",
@@ -524,12 +674,24 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Ciabatta_cut.JPG"
  },
+ "cocido-madrileno": {
+  "author": "Gemini",
+  "file": "img/cocido-madrileno.webp",
+  "license": "KI",
+  "source": ""
+ },
  "cola-wings": {
   "author": "Alpha from Melbourne, Australia",
   "commonsTitle": "File:Chicken Wings in Coca Cola Sauce.jpg",
   "file": "img/cola-wings.webp",
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chicken_Wings_in_Coca_Cola_Sauce.jpg"
+ },
+ "cordero-al-chilindron": {
+  "author": "Gemini",
+  "file": "img/cordero-al-chilindron.webp",
+  "license": "KI",
+  "source": ""
  },
  "cordon-bleu": {
   "author": "JIP",
@@ -554,6 +716,18 @@
  "creamy-coleslaw": {
   "author": "Gemini",
   "file": "img/creamy-coleslaw.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "crema-catalana": {
+  "author": "Gemini",
+  "file": "img/crema-catalana.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "croquetas-de-jamon": {
+  "author": "Gemini",
+  "file": "img/croquetas-de-jamon.webp",
   "license": "KI",
   "source": ""
  },
@@ -584,6 +758,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Dan-dan_noodles,_Shanghai.jpg"
  },
+ "dinkel-vollkorntoast": {
+  "author": "Gemini",
+  "file": "img/dinkel-vollkorntoast.webp",
+  "license": "KI",
+  "source": ""
+ },
  "dinkelbroetchen-ueber-nacht": {
   "author": "Gemini",
   "file": "img/dinkelbroetchen-ueber-nacht.webp",
@@ -593,6 +773,12 @@
  "dinkelvollkornbrot": {
   "author": "Gemini",
   "file": "img/dinkelvollkornbrot.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "dorada-a-la-sal": {
+  "author": "Gemini",
+  "file": "img/dorada-a-la-sal.webp",
   "license": "KI",
   "source": ""
  },
@@ -618,6 +804,24 @@
  "elote": {
   "author": "Gemini",
   "file": "img/elote.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "ensalada-de-pasta": {
+  "author": "Gemini",
+  "file": "img/ensalada-de-pasta.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "ensalada-mixta": {
+  "author": "Gemini",
+  "file": "img/ensalada-mixta.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "ensaladilla-rusa": {
+  "author": "Gemini",
+  "file": "img/ensaladilla-rusa.webp",
   "license": "KI",
   "source": ""
  },
@@ -648,6 +852,24 @@
   "license": "KI",
   "source": ""
  },
+ "espinacas-con-garbanzos": {
+  "author": "Gemini",
+  "file": "img/espinacas-con-garbanzos.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "estofado-de-ternera": {
+  "author": "Gemini",
+  "file": "img/estofado-de-ternera.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "fabada-asturiana": {
+  "author": "Gemini",
+  "file": "img/fabada-asturiana.webp",
+  "license": "KI",
+  "source": ""
+ },
  "fegato-veneziana": {
   "author": "Xaura",
   "commonsTitle": "File:Fegato alla veneziana.jpg",
@@ -661,6 +883,12 @@
   "file": "img/fettuccine-alfredo.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Chicken_fettuccine_alfredo.JPG"
+ },
+ "fideua": {
+  "author": "Gemini",
+  "file": "img/fideua.webp",
+  "license": "KI",
+  "source": ""
  },
  "fischauflauf": {
   "author": "Gemini",
@@ -681,6 +909,12 @@
   "file": "img/flammkuchen.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Tarte_flamb%C3%A9e_alsacienne_514471722.jpg"
+ },
+ "flan-de-huevo": {
+  "author": "Gemini",
+  "file": "img/flan-de-huevo.webp",
+  "license": "KI",
+  "source": ""
  },
  "focaccia-genovese": {
   "author": "Alessio Sbarbaro User_talk:Yoggysot",
@@ -722,6 +956,18 @@
   "file": "img/gaisburger-marsch.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Gaisburger_Marsch.jpg"
+ },
+ "gambas-a-la-plancha": {
+  "author": "Gemini",
+  "file": "img/gambas-a-la-plancha.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "gambas-al-ajillo": {
+  "author": "Gemini",
+  "file": "img/gambas-al-ajillo.webp",
+  "license": "KI",
+  "source": ""
  },
  "gan-bian-dou": {
   "author": "Andy Li",
@@ -880,6 +1126,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:02021_1020_(2)_Goulash_soup_of_Poland.jpg"
  },
+ "gurkensalat": {
+  "author": "Gemini",
+  "file": "img/gurkensalat.webp",
+  "license": "KI",
+  "source": ""
+ },
  "gyros-kritharaki-topf": {
   "author": "Gemini",
   "file": "img/gyros-kritharaki-topf.webp",
@@ -993,6 +1245,18 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Cottage_cheese_and_vegetables_on_rice_cakes.jpg"
  },
+ "huevos-rellenos": {
+  "author": "Gemini",
+  "file": "img/huevos-rellenos.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "huevos-rotos-con-jamon": {
+  "author": "Gemini",
+  "file": "img/huevos-rotos-con-jamon.webp",
+  "license": "KI",
+  "source": ""
+ },
  "hui-guo-rou": {
   "author": "毒島みるく",
   "commonsTitle": "File:Twice cooked pork of Gyoza-no-Manshu.jpg",
@@ -1012,6 +1276,24 @@
   "file": "img/ingwer-huhn.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Hainan_Chicken,_garlic_rice,_pickles,_ginger_scallion_sauce,_seasoned_soy,_chili_sauce_(31740963840).jpg"
+ },
+ "insalata-di-pasta-pesto": {
+  "author": "Gemini",
+  "file": "img/insalata-di-pasta-pesto.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "insalata-di-riso": {
+  "author": "Gemini",
+  "file": "img/insalata-di-riso.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "insalata-fagioli-tonno": {
+  "author": "Gemini",
+  "file": "img/insalata-fagioli-tonno.webp",
+  "license": "KI",
+  "source": ""
  },
  "involtini": {
   "author": "Dr. Bernd Gross",
@@ -1036,6 +1318,12 @@
  "jambalaya": {
   "author": "Gemini",
   "file": "img/jambalaya.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "jamon-con-melon": {
+  "author": "Gemini",
+  "file": "img/jamon-con-melon.webp",
   "license": "KI",
   "source": ""
  },
@@ -1139,6 +1427,18 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Kartoffelpuffer_mit_Apfelmus.jpg"
  },
+ "kartoffelsalat-norddeutsch": {
+  "author": "Gemini",
+  "file": "img/kartoffelsalat-norddeutsch.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "kartoffelsalat-schwaebisch": {
+  "author": "Gemini",
+  "file": "img/kartoffelsalat-schwaebisch.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kartoffelsuppe": {
   "author": "Andy Li",
   "commonsTitle": "File:Cauliflower and potato soup - T @ Hove 2023-10-22.jpg",
@@ -1187,6 +1487,12 @@
   "license": "CC BY 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:2022-11-13_K%C3%B6nigsberger_Klopse_Restaurant_Dicke_Paula_Berlin_anagoria.jpg"
  },
+ "koernerbroetchen": {
+  "author": "Gemini",
+  "file": "img/koernerbroetchen.webp",
+  "license": "KI",
+  "source": ""
+ },
  "kohlrouladen": {
   "author": "Silar",
   "commonsTitle": "File:00101 Vorkarpatische Küche Piroggen, Kohlrouladen, Kroketten.JPG",
@@ -1212,12 +1518,24 @@
   "license": "KI",
   "source": ""
  },
+ "krautsalat-bayerisch": {
+  "author": "Gemini",
+  "file": "img/krautsalat-bayerisch.webp",
+  "license": "KI",
+  "source": ""
+ },
  "krautschupfnudeln": {
   "author": "MarkusHagenlocher",
   "commonsTitle": "File:Schupfnudeln mit Sauerkraut-RZ.jpg",
   "file": "img/krautschupfnudeln.webp",
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schupfnudeln_mit_Sauerkraut-RZ.jpg"
+ },
+ "kritharaki-salat": {
+  "author": "Gemini",
+  "file": "img/kritharaki-salat.webp",
+  "license": "KI",
+  "source": ""
  },
  "krustenbraten-dunkelbier": {
   "author": "Gemini",
@@ -1312,6 +1630,12 @@
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Leberkn%C3%B6delsuppe_(7061515577).jpg"
  },
+ "lentejas-con-chorizo": {
+  "author": "Gemini",
+  "file": "img/lentejas-con-chorizo.webp",
+  "license": "KI",
+  "source": ""
+ },
  "linguine-gamberi": {
   "author": "Shoichi Iwashita",
   "commonsTitle": "File:Linguini al nero, gamberi, pomodori confit e crema di burrata (23976256479).jpg",
@@ -1366,6 +1690,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Billyfoodmabodofu3.jpg"
  },
+ "marmitako": {
+  "author": "Gemini",
+  "file": "img/marmitako.webp",
+  "license": "KI",
+  "source": ""
+ },
  "marmorkuchen": {
   "author": "Fotographen: Thomas Högner Maximilian Högner (User:Leberwurscht)",
   "commonsTitle": "File:Marmorkuchen.jpg",
@@ -1400,15 +1730,39 @@
   "license": "KI",
   "source": ""
  },
+ "mejillones-a-la-vinagreta": {
+  "author": "Gemini",
+  "file": "img/mejillones-a-la-vinagreta.webp",
+  "license": "KI",
+  "source": ""
+ },
  "memphis-rub": {
   "author": "Gemini",
   "file": "img/memphis-rub.webp",
   "license": "KI",
   "source": ""
  },
+ "merluza-en-salsa-verde": {
+  "author": "Gemini",
+  "file": "img/merluza-en-salsa-verde.webp",
+  "license": "KI",
+  "source": ""
+ },
  "merluzzo-livornese": {
   "author": "Gemini",
   "file": "img/merluzzo-livornese.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "milchbroetchen": {
+  "author": "Gemini",
+  "file": "img/milchbroetchen.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "milchtoast-hokkaido": {
+  "author": "Gemini",
+  "file": "img/milchtoast-hokkaido.webp",
   "license": "KI",
   "source": ""
  },
@@ -1429,6 +1783,30 @@
  "moink-balls": {
   "author": "Gemini",
   "file": "img/moink-balls.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "mojo-rojo": {
+  "author": "Gemini",
+  "file": "img/mojo-rojo.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "mojo-verde": {
+  "author": "Gemini",
+  "file": "img/mojo-verde.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "montaditos-de-lomo": {
+  "author": "Gemini",
+  "file": "img/montaditos-de-lomo.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "morcilla-con-cebolla": {
+  "author": "Gemini",
+  "file": "img/morcilla-con-cebolla.webp",
   "license": "KI",
   "source": ""
  },
@@ -1481,6 +1859,18 @@
  "no-knead-brot": {
   "author": "Gemini",
   "file": "img/no-knead-brot.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "nudelsalat-joghurt": {
+  "author": "Gemini",
+  "file": "img/nudelsalat-joghurt.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "nudelsalat-klassisch": {
+  "author": "Gemini",
+  "file": "img/nudelsalat-klassisch.webp",
   "license": "KI",
   "source": ""
  },
@@ -1559,6 +1949,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Orecchiette_broccoli_e_salsiccia.jpg"
  },
+ "orzo-salat-zitrone": {
+  "author": "Gemini",
+  "file": "img/orzo-salat-zitrone.webp",
+  "license": "KI",
+  "source": ""
+ },
  "ossobuco": {
   "author": "Mogens Engelund",
   "commonsTitle": "File:Ossobuco.jpg",
@@ -1580,12 +1976,30 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Phat_Thai_kung_Chang_Khien_street_stall.jpg"
  },
+ "paella-de-marisco": {
+  "author": "Gemini",
+  "file": "img/paella-de-marisco.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "paella-valenciana": {
+  "author": "Gemini",
+  "file": "img/paella-valenciana.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pak-choi-shiitake": {
   "author": "Vegan Feast Catering",
   "commonsTitle": "File:Veggie Imitation Shrimp Stir Fry with Shiitake and Bok Choy (3754464671).jpg",
   "file": "img/pak-choi-shiitake.webp",
   "license": "CC BY 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Veggie_Imitation_Shrimp_Stir_Fry_with_Shiitake_and_Bok_Choy_(3754464671).jpg"
+ },
+ "pan-con-tomate": {
+  "author": "Gemini",
+  "file": "img/pan-con-tomate.webp",
+  "license": "KI",
+  "source": ""
  },
  "pane-pugliese": {
   "author": "Alice Wiegand",
@@ -1607,6 +2021,12 @@
   "file": "img/pannfisch.webp",
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Pannfisch,_2011_(01_retuschiert).jpg"
+ },
+ "papas-arrugadas": {
+  "author": "Gemini",
+  "file": "img/papas-arrugadas.webp",
+  "license": "KI",
+  "source": ""
  },
  "pappa-pomodoro": {
   "author": "it:User:LupoCapra",
@@ -1676,6 +2096,18 @@
   "license": "KI",
   "source": ""
  },
+ "patatas-alioli": {
+  "author": "Gemini",
+  "file": "img/patatas-alioli.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "patatas-bravas": {
+  "author": "Gemini",
+  "file": "img/patatas-bravas.webp",
+  "license": "KI",
+  "source": ""
+ },
  "peach-cobbler": {
   "author": "Gemini",
   "file": "img/peach-cobbler.webp",
@@ -1701,6 +2133,12 @@
   "file": "img/penne-vodka.webp",
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:PenneAllaVodka.jpg"
+ },
+ "pescaito-frito": {
+  "author": "Gemini",
+  "file": "img/pescaito-frito.webp",
+  "license": "KI",
+  "source": ""
  },
  "pesto-genovese": {
   "author": "Eluinie",
@@ -1762,9 +2200,33 @@
   "license": "KI",
   "source": ""
  },
+ "pimientos-de-padron": {
+  "author": "Gemini",
+  "file": "img/pimientos-de-padron.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pinchos-morunos": {
+  "author": "Gemini",
+  "file": "img/pinchos-morunos.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pinsa-romana": {
   "author": "Gemini",
   "file": "img/pinsa-romana.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pipirrana": {
+  "author": "Gemini",
+  "file": "img/pipirrana.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "pisto-manchego-con-huevo": {
+  "author": "Gemini",
+  "file": "img/pisto-manchego-con-huevo.webp",
   "license": "KI",
   "source": ""
  },
@@ -1826,12 +2288,24 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Polenta_con_i_funghi_(49653224713).jpg"
  },
+ "pollo-al-ajillo": {
+  "author": "Gemini",
+  "file": "img/pollo-al-ajillo.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pollo-cacciatora": {
   "author": "IXTA9839",
   "commonsTitle": "File:Cacciatore Set Meal in Matsuya Imaike.jpg",
   "file": "img/pollo-cacciatora.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Cacciatore_Set_Meal_in_Matsuya_Imaike.jpg"
+ },
+ "pollo-en-pepitoria": {
+  "author": "Gemini",
+  "file": "img/pollo-en-pepitoria.webp",
+  "license": "KI",
+  "source": ""
  },
  "pollo-romana": {
   "author": "DinaBenedettoFerrandina",
@@ -1862,6 +2336,12 @@
  "pot-roast": {
   "author": "Gemini",
   "file": "img/pot-roast.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "potaje-de-garbanzos-y-espinacas": {
+  "author": "Gemini",
+  "file": "img/potaje-de-garbanzos-y-espinacas.webp",
   "license": "KI",
   "source": ""
  },
@@ -1901,6 +2381,12 @@
   "license": "KI",
   "source": ""
  },
+ "pulpo-a-la-gallega": {
+  "author": "Gemini",
+  "file": "img/pulpo-a-la-gallega.webp",
+  "license": "KI",
+  "source": ""
+ },
  "pute-paprika-cashew": {
   "author": "Gemini",
   "file": "img/pute-paprika-cashew.webp",
@@ -1935,6 +2421,24 @@
  "quarkauflauf": {
   "author": "Gemini",
   "file": "img/quarkauflauf.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "quarkbroetchen": {
+  "author": "Gemini",
+  "file": "img/quarkbroetchen.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "queso-manchego-con-membrillo": {
+  "author": "Gemini",
+  "file": "img/queso-manchego-con-membrillo.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "rabo-de-toro": {
+  "author": "Gemini",
+  "file": "img/rabo-de-toro.webp",
   "license": "KI",
   "source": ""
  },
@@ -2090,6 +2594,12 @@
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Mischbrot_mit_Sonnenblumenkernen.jpg"
  },
+ "romesco": {
+  "author": "Gemini",
+  "file": "img/romesco.webp",
+  "license": "KI",
+  "source": ""
+ },
  "rosenkohl-gratin": {
   "author": "Gemini",
   "file": "img/rosenkohl-gratin.webp",
@@ -2125,6 +2635,12 @@
  "rumpsteak-gasgrill": {
   "author": "Gemini",
   "file": "img/rumpsteak-gasgrill.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "salsa-brava": {
+  "author": "Gemini",
+  "file": "img/salsa-brava.webp",
   "license": "KI",
   "source": ""
  },
@@ -2261,6 +2777,12 @@
   "license": "CC BY-SA 3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Schweinshaxe_Chiang_Mai.JPG"
  },
+ "secreto-iberico-con-patatas-panaderas": {
+  "author": "Gemini",
+  "file": "img/secreto-iberico-con-patatas-panaderas.webp",
+  "license": "KI",
+  "source": ""
+ },
  "seelachs-gemuesebett": {
   "author": "Gemini",
   "file": "img/seelachs-gemuesebett.webp",
@@ -2392,12 +2914,24 @@
   "license": "KI",
   "source": ""
  },
+ "soda-bread": {
+  "author": "Gemini",
+  "file": "img/soda-bread.webp",
+  "license": "KI",
+  "source": ""
+ },
  "soljanka": {
   "author": "Roland Geider (Ogre)",
   "commonsTitle": "File:Soljanka with olives.jpg",
   "file": "img/soljanka.webp",
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Soljanka_with_olives.jpg"
+ },
+ "solomillo-con-pimientos-asados": {
+  "author": "Gemini",
+  "file": "img/solomillo-con-pimientos-asados.webp",
+  "license": "KI",
+  "source": ""
  },
  "sonntagsbroetchen-kaiser": {
   "author": "unbekannt",
@@ -2577,6 +3111,12 @@
   "license": "Public domain",
   "source": "https://commons.wikimedia.org/wiki/File:Hot-and-Sour-Soup-Bowl.jpg"
  },
+ "suquet-de-peix": {
+  "author": "Gemini",
+  "file": "img/suquet-de-peix.webp",
+  "license": "KI",
+  "source": ""
+ },
  "szegediner-gulasch": {
   "author": "Nillerdk",
   "commonsTitle": "File:Segedínský guláš.jpg",
@@ -2597,6 +3137,12 @@
   "file": "img/tagliatelle-funghi.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Tagliatelle_ai_funghi_da_Luciana,_San_Piero_Patti,_Italia.jpg"
+ },
+ "tarta-de-santiago": {
+  "author": "Gemini",
+  "file": "img/tarta-de-santiago.webp",
+  "license": "KI",
+  "source": ""
  },
  "teriyaki-huhn": {
   "author": "CNEcija12345",
@@ -2630,6 +3176,12 @@
   "license": "CC BY 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Dolce_Tiramis%C3%B9_monoporzione.jpg"
  },
+ "toastbrot-klassisch": {
+  "author": "Gemini",
+  "file": "img/toastbrot-klassisch.webp",
+  "license": "KI",
+  "source": ""
+ },
  "tom-kha-gai": {
   "author": "lydiajoy1",
   "commonsTitle": "File:Tom kha gai2.jpg",
@@ -2651,6 +3203,12 @@
   "license": "CC BY-SA 2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Tomato_soup.jpg"
  },
+ "torrijas": {
+  "author": "Gemini",
+  "file": "img/torrijas.webp",
+  "license": "KI",
+  "source": ""
+ },
  "torta-caprese": {
   "author": "Fabrizio Pucci",
   "commonsTitle": "File:Torta caprese with confectioner's sugar and chocolate sauce (7830104492).jpg",
@@ -2671,6 +3229,18 @@
   "file": "img/tortellini-panna.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Tortellini_panna_e_prosciutto.png"
+ },
+ "tortellini-salat": {
+  "author": "Gemini",
+  "file": "img/tortellini-salat.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "tortilla-de-patatas": {
+  "author": "Gemini",
+  "file": "img/tortilla-de-patatas.webp",
+  "license": "KI",
+  "source": ""
  },
  "vanillekipferl": {
   "author": "Schlurcher",
@@ -2698,6 +3268,12 @@
   "file": "img/wan-tan-suppe.webp",
   "license": "CC BY-SA 4.0",
   "source": "https://commons.wikimedia.org/wiki/File:FOOD_Wonton_Soup.jpg"
+ },
+ "wasserweck": {
+  "author": "Gemini",
+  "file": "img/wasserweck.webp",
+  "license": "KI",
+  "source": ""
  },
  "weisse-bohnen-eintopf": {
   "author": "DrKssn",
@@ -2776,6 +3352,12 @@
  "zander-gurkengemuese": {
   "author": "Gemini",
   "file": "img/zander-gurkengemuese.webp",
+  "license": "KI",
+  "source": ""
+ },
+ "zarzuela-de-mariscos": {
+  "author": "Gemini",
+  "file": "img/zarzuela-de-mariscos.webp",
   "license": "KI",
   "source": ""
  },
