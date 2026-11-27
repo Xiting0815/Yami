@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CATALOG } from '../data/catalog'
 import { CAT_DEFAULTS, baseUnitOf } from '../data/custom-registry'
 import { UNITS } from '../data/define'
-import { nutritionOf } from '../data/nutrition-calc'
 import { ingredientText, parseIngredientText, searchIngredients, titleCase, unitWorks, workingUnits, CONFIDENT } from '../customIngredients'
 import { shrinkImage } from '../imageResize'
 import { uid } from '../kitchen'
@@ -143,7 +142,6 @@ export function RecipeEditor({ initial, defaultMeal, onSave, onCreateIngredient,
   const live = rows.filter((r) => !r.ignore && r.match && CATALOG[r.match])
   const ingredients = live.filter(rowOk).map((r) => ({ name: r.match!, amount: amountOf(r), unit: amountOf(r) == null ? '' : r.unit }))
   const srv = Math.max(1, Math.round(Number(servings) || 1))
-  const nutri = useMemo(() => nutritionOf(ingredients, srv), [rows, srv]) // eslint-disable-line react-hooks/exhaustive-deps
   const open = rows.filter((r) => !rowOk(r)).length
   const steps = parseSteps(stepsText)
   const missing: string[] = []
@@ -436,23 +434,15 @@ export function RecipeEditor({ initial, defaultMeal, onSave, onCreateIngredient,
                                     ))}
                                   </select>
                                 </label>
-                                <div className="ed-grid">
-                                  <label>
-                                    kcal pro 100 g
-                                    <input className="ed-input" inputMode="decimal" value={r.create.kcal} onChange={(e) => patch(r.id, { create: { ...r.create!, kcal: e.target.value } })} />
-                                  </label>
-                                  <label>
-                                    Eiweiß pro 100 g
-                                    <input className="ed-input" inputMode="decimal" value={r.create.protein} onChange={(e) => patch(r.id, { create: { ...r.create!, protein: e.target.value } })} />
-                                  </label>
-                                  {baseUnitOf(r.unit) === 'Stk' && (
+                                {baseUnitOf(r.unit) === 'Stk' && (
+                                  <>
                                     <label>
                                       Gewicht pro Stück (g)
                                       <input className="ed-input" inputMode="decimal" value={r.create.grams} onChange={(e) => patch(r.id, { create: { ...r.create!, grams: e.target.value } })} />
                                     </label>
-                                  )}
-                                </div>
-                                <p className="muted small">Grobe Werte reichen – die App rechnet damit Nährwerte und Einkaufsmenge.</p>
+                                    <p className="muted small">Ein grober Wert reicht – die App rechnet damit die Einkaufsmenge.</p>
+                                  </>
+                                )}
                                 <div className="row-btns">
                                   <button className="btn ghost" onClick={() => patch(r.id, { create: null })}>
                                     Abbrechen
@@ -484,14 +474,6 @@ export function RecipeEditor({ initial, defaultMeal, onSave, onCreateIngredient,
           />
           {steps.length > 0 && <p className="muted small">{steps.length} {steps.length === 1 ? 'Schritt' : 'Schritte'} erkannt</p>}
 
-          {ingredients.length > 0 && (
-            <div className="ed-preview" aria-live="polite">
-              <b>Pro Portion (≈)</b>
-              <span>🔥 {nutri.kcal.toLocaleString('de-DE')} kcal</span>
-              <span>💪 {Math.round(nutri.protein)} g Eiweiß</span>
-              <span>🌾 {Math.round(nutri.fiber)} g Ballaststoffe</span>
-            </div>
-          )}
         </div>
         <div className="sheet-footer">
           {!canSave && <p className="ed-missing">Noch offen: {missing.join(' · ')}</p>}

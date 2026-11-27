@@ -25,7 +25,7 @@ export function StartCard({ steps, onDismiss, onShare }: { steps: StartStep[]; o
       </div>
       {onShare && (
         <button className="link small start-share" onClick={onShare}>
-          Ich nutze Yami mit jemandem zusammen → mit Home Assistant verbinden
+          Ich nutze Gusto mit jemandem zusammen → mit Home Assistant verbinden
         </button>
       )}
       <div className="start-bar" aria-hidden>

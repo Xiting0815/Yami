@@ -10,11 +10,8 @@ import { formatTime } from '../filter'
 import { type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { RecipeImage } from './RecipeImage'
 import { Icon, type IconName } from './Icon'
-import { type DayBalance, type Portion, isProteinLow } from '../energy'
 
-export const kcal = (n: number) => n.toLocaleString('de-DE')
-
-/** höchstens ein Hinweis über dem Plan (Vorrat läuft ab > Vorschlag > Wiegetag) */
+/** höchstens ein Hinweis über dem Plan (Vorrat läuft ab > Sicherung) */
 export interface Notice {
   text: string
   tone?: 'warn' | 'ok'
@@ -45,9 +42,6 @@ interface Props {
   breakfastSlot?: ReactNode
   /** Bewertungsfrage nach dem Essen */
   ratingSlot?: ReactNode
-  /** Tagesbilanz Mo–Fr (nur mit Profil) */
-  balances: Record<string, DayBalance | undefined>
-  portions: Record<string, Portion | undefined>
   /** Familie teilen: wer (andere Person) das Gericht des Tages ausgesucht hat */
   planBy?: (day: string) => string | undefined
   /** Hinweise zu Änderungen der anderen („Lisa hat Montag geändert …“) */
@@ -80,7 +74,7 @@ export function NoticeRow({ notice }: { notice: Notice }) {
 }
 
 export function WeekView(props: Props) {
-  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, balances, portions, planBy, syncSlot, bakes = {}, onBake, onTapas, bakeSlot, dayAlert } = props
+  const { days, plan, today, total, prices, notice, reviewSlot, startSlot, hideDays, onSwipeDay, onOpen, onMore, onShop, breakfastSlot, ratingSlot, planBy, syncSlot, bakes = {}, onBake, onTapas, bakeSlot, dayAlert } = props
   // ein Grillabend oder Tapas-Abend (im Backplan) zählt als Abendessen des Tages
   const planned = days.filter((d) => plan[d] || eveningOn(bakes, d)).length
   // nur der nächste freie Tag bekommt die Akzentfarbe – die übrigen leeren Tage bleiben ruhig
@@ -135,7 +129,6 @@ export function WeekView(props: Props) {
             const entry = plan[day]
             const recipe = entry ? RECIPE_BY_ID[entry.recipeId] : undefined
             const past = day < today
-            const b = balances[day]
             const label = (
               <div className="day-label">
                 <b>{weekdayName(day, true)}</b>
@@ -163,7 +156,6 @@ export function WeekView(props: Props) {
                   ) : (
                     <button className={`day-empty ${day === nextOpen ? 'next' : ''}`} onClick={() => onSwipeDay(day)}>
                       <span className="day-empty-text"><Icon name="plus" size={18} /> Gericht wischen</span>
-                      {b && <small>bis {kcal(b.dinnerBudget)} kcal</small>}
                     </button>
                   )}
                 </li>
@@ -171,18 +163,12 @@ export function WeekView(props: Props) {
             }
 
             const by = planBy?.(day)
-            const portion = portions[day]
             const cooked = entry.status === 'cooked'
             const skipped = entry.status === 'skipped'
             const facts = `${formatTime(recipe.time)} · ≈ ${formatEuro(recipeCost(recipe, entry.servings, prices))}`
-            const over = b ? b.total - b.target : 0
-            // Zeile 2: deine Portion (mit Profil Mo–Fr), sonst Zeit & Preis
+            // Zeile 2: Zeit & Preis
             const l2 = skipped ? (
               <span className="day-l2 muted">nicht gekocht</span>
-            ) : portion ? (
-              <span className={`day-l2 ${cooked ? 'ok' : ''}`}>
-                {cooked ? '✓ gekocht' : portion.label} · {kcal(portion.kcal)} kcal
-              </span>
             ) : (
               <span className={`day-l2 ${cooked ? 'ok' : 'muted'}`}>{cooked ? `✓ gekocht · ${facts}` : facts}</span>
             )
@@ -197,28 +183,14 @@ export function WeekView(props: Props) {
                       {cooked && <i className="cooked-mark"><Icon name="check" size={12} /></i>}
                     </span>
                     <span className="day-text">
-                      <span className={`day-title ${b ? '' : 'two'}`}>{recipe.title}</span>
+                      <span className="day-title two">{recipe.title}</span>
                       {by && <span className="day-by">von {by}</span>}
                       {l2}
-                      {b && (
-                        <span className={`day-l3 ${over > 50 ? 'over' : ''}`}>
-                          <span className="l3-kcal">
-                            <span className="l3-full">Tag {kcal(b.total)} / {kcal(b.target)} kcal</span>
-                            <span className="l3-compact">{kcal(b.total)}/{kcal(b.target)}</span>
-                            {over > 50 ? ` · +${kcal(over)}` : ''}
-                          </span>
-                          <span className={`day-prot ${isProteinLow(b) ? 'low' : ''}`}>
-                            · <span className="prot-long">{b.protein} / {b.proteinTarget} g Eiweiß</span>
-                            <span className="prot-short">{b.protein}/{b.proteinTarget} g E.</span>
-                          </span>
-                        </span>
-                      )}
                     </span>
                   </button>
                   <button className="day-more" onClick={() => onMore(day)} aria-label={`Aktionen für ${weekdayName(day)}`}>
                     <Icon name="more" />
                   </button>
-                  {b && <BalanceBar b={b} />}
                 </div>
               </li>
             )
@@ -261,26 +233,5 @@ function BakeRow({ day, list, today, onBake, onTapas }: { day: string; list?: Ba
         </li>
       ))}
     </>
-  )
-}
-
-/** Tagesbilanz als 4-px-Leiste am unteren Kartenrand: Frühstück + Mittag + Abendportion + Gebackenes im Vergleich zum Ziel */
-function BalanceBar({ b }: { b: DayBalance }) {
-  const max = Math.max(b.target, b.total)
-  const pct = (v: number) => `${(v / max) * 100}%`
-  const dinner = b.dinner ?? 0
-  const overPart = Math.max(0, b.total - b.target)
-  // über dem Ziel: der Überschuss wird zuerst vom Gebackenen, dann vom Abendessen abgezogen und rot gezeigt
-  const snackOver = Math.min(b.snacks, overPart)
-  const dinnerOver = Math.min(dinner, overPart - snackOver)
-  return (
-    <div className="balance-bar" aria-hidden>
-      <div className="seg bf" style={{ width: pct(b.breakfast) }} />
-      <div className="seg lunch" style={{ width: pct(b.lunch) }} />
-      <div className="seg dinner" style={{ width: pct(dinner - dinnerOver) }} />
-      {b.snacks > 0 && <div className="seg snack" style={{ width: pct(b.snacks - snackOver) }} />}
-      <div className="seg over" style={{ width: pct(overPart) }} />
-      <div className="target-mark" style={{ left: pct(b.target) }} />
-    </div>
   )
 }

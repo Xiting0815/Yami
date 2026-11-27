@@ -1,28 +1,18 @@
 /**
- * Wochenrückblick: eine Woche (Mo–So) auf einen Blick – Gewicht, Ernährung, Ausgaben, Lebensmittel, Highlights, ein Tipp.
+ * Wochenrückblick: eine Woche (Mo–So) auf einen Blick – Abwechslung, Ausgaben, Lebensmittel, Highlights, ein Tipp.
  * Reine Berechnung ohne Oberfläche (testbar).
  */
 import { RECIPE_BY_ID } from './data/recipes'
-import { PROTEIN_LOW_SHARE, dayBalance, isWorkday } from './energy'
 import { amountValue, boughtOfWeek } from './kitchen'
 import { type Rating, buildModel, summarize } from './learning'
-import { type WeighIn, weekOf } from './progress'
 import { type AppState, addDays, isoWeekNumber, mondayOf, parseIso } from './store'
 import { TYPE_LABEL, type DishType } from './types'
 
-/** Toleranz: bis so viele kcal über dem Ziel gelten noch als „im Ziel“ */
-export const KCAL_TOLERANCE = 50
-
-export interface ReviewNutrition {
-  /** Arbeitstage mit geplantem Abendessen (und Profil) */
-  days: number
-  avgKcal?: number
-  target?: number
-  avgProtein?: number
-  proteinTarget?: number
-  inTarget: number
-  /** Tage mit mehr als Ziel + Toleranz */
-  overDays: number
+export interface ReviewVariety {
+  /** verschiedene Küchen bei den Abendessen der Woche */
+  cuisines: number
+  /** Abendessen, die vorher noch nie im Plan standen */
+  newDishes: number
 }
 
 export interface ReviewWaste {
@@ -37,16 +27,7 @@ export interface WeekReview {
   kw: number
   /** gibt es überhaupt etwas zu berichten? */
   hasData: boolean
-  weight: {
-    current?: WeighIn
-    prev?: WeighIn
-    /** Veränderung in kg (negativ = abgenommen) */
-    delta?: number
-    goal?: number
-    /** noch bis zum Ziel (kg), 0 = erreicht */
-    remaining?: number
-  }
-  nutrition: ReviewNutrition
+  variety: ReviewVariety
   spending: { total: number; items: number; dinners: number; perDinner?: number }
   food: { usedEuro: number; usedItems: number; waste: ReviewWaste }
   highlights: {
@@ -55,7 +36,7 @@ export interface WeekReview {
     /** „Das merke ich mir“ – stärkste gelernte Vorlieben */
     learned: string[]
   }
-  tip: { kind: 'protein' | 'waste' | 'kcal' | 'ok' | 'empty'; text: string }
+  tip: { kind: 'variety' | 'waste' | 'ok' | 'empty'; text: string }
 }
 
 /** Montag der Woche, die der Rückblick „zuletzt“ betrifft: sonntags diese Woche, sonst die vergangene */
@@ -66,41 +47,19 @@ export function defaultReviewMonday(today: string): string {
   return `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, '0')}-${String(target.getDate()).padStart(2, '0')}`
 }
 
-const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : undefined)
-
 export function weekReview(state: AppState, weekDays: string[], today: string): WeekReview {
   const weekKey = weekDays[0]
   const inWeek = (d: string) => weekDays.includes(d)
-  const profile = state.profile
 
-  // ───── Gewicht ─────
-  const current = state.weighIns.find((w) => weekOf(w.date) === weekKey)
-  const prev = [...state.weighIns].filter((w) => w.date < weekKey).pop()
-  const goal = profile?.goalWeight
-  const weight: WeekReview['weight'] = {
-    current,
-    prev,
-    delta: current && prev ? Math.round((current.weight - prev.weight) * 10) / 10 : undefined,
-    goal,
-    remaining: current && goal ? Math.max(0, Math.round((current.weight - goal) * 10) / 10) : undefined,
-  }
-
-  // ───── Ernährung Mo–Fr ─────
-  const balances = profile
-    ? weekDays
-        .filter((d) => isWorkday(d) && state.plan[d] && state.plan[d]!.status !== 'skipped' && RECIPE_BY_ID[state.plan[d]!.recipeId])
-        .map((d) => dayBalance(profile, state.breakfast[d], state.plan[d], state.snacks, d))
-    : []
-  const avgKcal = avg(balances.map((b) => b.total))
-  const avgProtein = avg(balances.map((b) => b.protein))
-  const nutrition: ReviewNutrition = {
-    days: balances.length,
-    avgKcal: avgKcal != null ? Math.round(avgKcal) : undefined,
-    target: balances[0]?.target,
-    avgProtein: avgProtein != null ? Math.round(avgProtein) : undefined,
-    proteinTarget: balances[0]?.proteinTarget,
-    inTarget: balances.filter((b) => b.total <= b.target + KCAL_TOLERANCE).length,
-    overDays: balances.filter((b) => b.total > b.target + KCAL_TOLERANCE).length,
+  // ───── Abwechslung: Küchen und neue Gerichte der Woche ─────
+  const weekDinners = weekDays
+    .map((d) => state.plan[d])
+    .filter((e) => e && e.status !== 'skipped' && RECIPE_BY_ID[e.recipeId])
+    .map((e) => RECIPE_BY_ID[e!.recipeId])
+  const before = new Set(Object.entries(state.plan).filter(([d, e]) => d < weekKey && e).map(([, e]) => e!.recipeId))
+  const variety: ReviewVariety = {
+    cuisines: new Set(weekDinners.map((r) => r.cuisine)).size,
+    newDishes: new Set(weekDinners.filter((r) => !before.has(r.id)).map((r) => r.id)).size,
   }
 
   // ───── Ausgaben (Schätzung) ─────
@@ -174,18 +133,16 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
   const learned = summarize(model).liked.slice(0, 2).map((l) => l.label)
 
   const hasData =
-    !!current || nutrition.days > 0 || spending.total > 0 || usedItems > 0 || waste.count > 0 || rated.length > 0 || dinners > 0
+    spending.total > 0 || usedItems > 0 || waste.count > 0 || rated.length > 0 || dinners > 0
 
   // ───── Tipp ─────
   let tip: WeekReview['tip']
   if (!hasData) {
     tip = { kind: 'empty', text: 'Plane dein Abendessen für die Woche – dann kann ich dir beim nächsten Mal mehr zeigen.' }
-  } else if (nutrition.avgProtein != null && nutrition.proteinTarget != null && nutrition.avgProtein < PROTEIN_LOW_SHARE * nutrition.proteinTarget) {
-    tip = { kind: 'protein', text: 'Nächste Woche mehr eiweißreiche Gerichte – ich schlage sie dir vor.' }
   } else if (waste.count > 0) {
     tip = { kind: 'waste', text: `Achte auf: ${waste.top} – kauf es kleiner oder plane es früher ein.` }
-  } else if (nutrition.overDays >= 3) {
-    tip = { kind: 'kcal', text: 'An mehreren Tagen warst du über dem Ziel. Nimm ruhig kleinere Portionen und fülle mit Gemüse oder Salat auf.' }
+  } else if (weekDinners.length >= 4 && variety.cuisines <= 1) {
+    tip = { kind: 'variety', text: 'Diese Woche gab es nur eine Küche – probier nächste Woche mal etwas aus einer anderen. Ich mische die Vorschläge.' }
   } else {
     tip = { kind: 'ok', text: 'Läuft gut – bleib bei deinem Rhythmus. Ich merke mir weiter, was dir schmeckt.' }
   }
@@ -194,8 +151,7 @@ export function weekReview(state: AppState, weekDays: string[], today: string): 
     weekKey,
     kw: isoWeekNumber(parseIso(weekKey)),
     hasData,
-    weight,
-    nutrition,
+    variety,
     spending,
     food: { usedEuro: Math.round(usedEuro * 100) / 100, usedItems, waste },
     highlights: {

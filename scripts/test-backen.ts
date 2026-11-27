@@ -7,8 +7,6 @@ import { DEVICE_STEPS } from '../src/data/device-steps'
 import { EXTRA_GROUPS } from '../src/data/extra'
 import { addDaysIso, cookBasic, cookNow, festiveOf, lotsFor, planWeek, type PantryLot } from '../src/kitchen'
 import { eatInfo, eatOne, yieldText } from '../src/bake'
-import { DEFAULT_PROFILE, dayBalance } from '../src/energy'
-import { weekReview } from '../src/review'
 import { buildModel, features, preference, summarize } from '../src/learning'
 import { sanitize } from '../src/store'
 import { backupBody, parseBackup } from '../src/backup'
@@ -42,7 +40,9 @@ ok(PRODUCTS['Bauernbrot selbstgebacken']?.unit === 'Scheibe' && near(PRODUCTS['B
 const ppB = bienenstich.yields!.perPiece!
 ok(near(ppB.kcal, Math.round(bienenstich.nutrition.kcal / 12), 1.01), `Bienenstich: ${ppB.kcal} kcal/Stück = Rezept ÷ 12`)
 ok(near(brot.yields!.perPiece!.kcal, Math.round(brot.nutrition.kcal / 20), 1.01), `Bauernbrot: ${brot.yields!.perPiece!.kcal} kcal/Scheibe = Laib ÷ 20`)
-ok(near(tiramisu.yields!.perPiece!.kcal, Math.round(tiramisu.nutrition.kcal / 6), 1.01) && !!tiramisu.lighter, `Tiramisu: ${tiramisu.yields!.perPiece!.kcal} kcal/Portion, mit Leichter-Tipp`)
+ok(near(tiramisu.yields!.perPiece!.kcal, Math.round(tiramisu.nutrition.kcal / 6), 1.01), `Tiramisu: ${tiramisu.yields!.perPiece!.kcal} kcal/Portion (intern)`)
+ok(BASICS.every((r) => !('lighter' in r)), 'keine „Leichter“-Tipps mehr in den Rezepten')
+ok(![...RECIPES, ...BASICS].some((r) => [...r.steps, ...(r.classicSteps ?? [])].some((t) => /Leichter:/.test(t))), 'keine „Leichter:“-Sätze mehr in den Schritten')
 ok(yieldText(bienenstich, 1) === '12 Stück' && yieldText(tiramisu, 1) === '6 Portionen' && yieldText(brot, 1) === '1 kg (≈ 20 Scheiben)', 'Texte: 12 Stück · 6 Portionen · 1 kg (≈ 20 Scheiben)')
 
 // ───── Fertig gebacken → Vorrat ─────
@@ -58,30 +58,16 @@ ok(cb.lot!.unit === 'Scheibe' && near(cb.lot!.amount, 20) && cb.lot!.expires ===
 ok(cookBasic([], anstell, 1, today).lot?.name === 'Anstellgut' && near(cookBasic([], anstell, 1, today).lot!.amount, 200), 'Anstellgut: 200 g in den Vorrat')
 ok(basicFor('Anstellgut')?.id === 'sauerteig-anstellgut', 'Tipp im Brot-Rezept: Anstellgut → Sauerteig ansetzen')
 
-// ───── 1 gegessen → Tagesbilanz ─────
+// ───── 1 gegessen → Vorrat (und fürs Lernen) ─────
 ok(eatInfo(c.lot!)?.label === '1 gegessen' && eatInfo(cb.lot!)?.label === '1 Scheibe gegessen', 'Beschriftung: „1 gegessen“ / „1 Scheibe gegessen“')
 ok(!eatInfo({ id: 'x', name: 'Anstellgut', amount: 200, unit: 'g', expires: today }) && !eatInfo(stock()[0]), 'kein „gegessen“ bei Anstellgut oder normalen Zutaten')
 ok(bakeFor('Bienenstich (selbstgebacken)')?.id === 'bienenstich', 'bakeFor: Vorratsname → Rezept')
 const e = eatOne(c.pantry, 'bs', today)
-ok(near(e.pantry.find((l) => l.id === 'bs')!.amount, 11) && e.snack?.kcal === ppB.kcal && e.snack?.recipeId === 'bienenstich' && e.snack.date === today, `eatOne: 11 Stück übrig, Snack ${ppB.kcal} kcal`)
+ok(near(e.pantry.find((l) => l.id === 'bs')!.amount, 11) && e.snack?.recipeId === 'bienenstich' && e.snack.date === today && !('kcal' in e.snack), 'eatOne: 11 Stück übrig, gegessen gemerkt (ohne kcal)')
 const last = eatOne([{ ...c.lot!, amount: 1 }], 'bs', today)
-ok(last.pantry.length === 0 && last.snack?.kcal === ppB.kcal, 'eatOne: letztes Stück → Posten weg')
+ok(last.pantry.length === 0 && last.snack?.recipeId === 'bienenstich', 'eatOne: letztes Stück → Posten weg')
 const half = eatOne([{ ...c.lot!, amount: 0.5 }], 'bs', today)
-ok(half.snack?.kcal === Math.round(ppB.kcal / 2), 'eatOne: halbes Reststück zählt halb')
-
-const p = DEFAULT_PROFILE
-const plan: WeekPlan = { [today]: { recipeId: RECIPES[0].id, servings: 2 } }
-const base = dayBalance(p, undefined, plan[today])
-const withSnack = dayBalance(p, undefined, plan[today], [e.snack!], today)
-ok(withSnack.total === base.total + ppB.kcal && near(withSnack.protein, Math.round(base.protein + ppB.protein), 1.01) && withSnack.snacks === ppB.kcal, 'dayBalance: Stück zählt in kcal und Eiweiß des Tages')
-ok(withSnack.dinnerBudget === base.dinnerBudget && withSnack.dinner === base.dinner, 'dayBalance: Abendportion bleibt gleich')
-ok(dayBalance(p, undefined, plan[today], [e.snack!], addDaysIso(today, 1)).total === base.total, 'dayBalance: Snack nur am eigenen Tag')
-
-const st0 = sanitize({ profile: p, plan, snacks: [] })
-const st1 = sanitize({ profile: p, plan, snacks: [e.snack] })
-const r0 = weekReview(st0, days, addDaysIso('2026-11-16', 7))
-const r1 = weekReview(st1, days, addDaysIso('2026-11-16', 7))
-ok(r1.nutrition.days === 1 && r1.nutrition.avgKcal === r0.nutrition.avgKcal! + ppB.kcal, 'Wochenrückblick: Ø kcal enthält das Stück')
+ok(half.pantry.length === 0 && !!half.snack, 'eatOne: halbes Reststück → Posten weg')
 
 // ───── Selbstgebackenes Brot ersetzt Vollkornbrot ─────
 ok(substitutesFor('Vollkornbrot').includes('Bauernbrot selbstgebacken'), 'Bauernbrot selbstgebacken ersetzt Vollkornbrot')
@@ -112,11 +98,11 @@ const dirty = sanitize({
   baked: [{ date: today, recipeId: 'bienenstich' }, { date: today, recipeId: 'gibts-nicht' }],
   bakeRatings: { [`${today}:bienenstich`]: 'up', [`${today}:gibts-nicht`]: 'up', [`${today}:tiramisu`]: 'super' },
 })
-ok(dirty.snacks.length === 1 && dirty.snacks[0].recipeId === 'bienenstich', 'sanitize: kaputte Snacks verworfen')
+ok(dirty.snacks.length === 2 && dirty.snacks[0].recipeId === 'bienenstich' && dirty.snacks.every((x) => !('kcal' in x) && !('protein' in x)), 'sanitize: kaputte Einträge verworfen, alte kcal/Eiweiß-Angaben entfernt')
 ok(dirty.baked.length === 1 && Object.keys(dirty.bakeRatings).join() === `${today}:bienenstich`, 'sanitize: Gebackenes/Bewertungen nur zu bekannten Rezepten')
 ok(sanitize({}).snacks.length === 0 && Array.isArray(sanitize({ snacks: 'x' }).snacks), 'sanitize: fehlende/falsche Liste → leer')
 const restored = parseBackup(JSON.stringify(backupBody(dirty)))
-ok(restored.snacks.length === 1 && restored.snacks[0].kcal === ppB.kcal && restored.bakeRatings[`${today}:bienenstich`] === 'up' && restored.baked.length === 1, 'Sicherung: Snacks, Gebackenes und Bewertungen kommen zurück')
+ok(restored.snacks.length === 2 && restored.snacks[0].recipeId === 'bienenstich' && restored.bakeRatings[`${today}:bienenstich`] === 'up' && restored.baked.length === 1, 'Sicherung: Snacks, Gebackenes und Bewertungen kommen zurück')
 
 // ───── Lernen ─────
 const m0 = buildModel({ plan: {}, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: {}, today })
@@ -130,7 +116,7 @@ ok(summarize(m1).liked.some((l) => l.label === 'Kuchen') || summarize(m1).favori
   const geb = BASICS.filter((r) => r.kind === 'gebaeck')
   const kip = RECIPE_BY_ID['vanillekipferl']
   const cookie = RECIPE_BY_ID['chocolate-chip-cookies']
-  ok(geb.length >= 17 && geb.every((r) => isBake(r) && r.yields?.unit === 'Stk' && !!r.lighter && !!DEVICE_STEPS[r.id]?.length), `Plätzchen & Cookies: ${geb.length} Rezepte mit Stk, Leichter-Tipp und Geräte-Schritten`)
+  ok(geb.length >= 17 && geb.every((r) => isBake(r) && r.yields?.unit === 'Stk' && !!DEVICE_STEPS[r.id]?.length), `Plätzchen & Cookies: ${geb.length} Rezepte mit Stk und Geräte-Schritten`)
   ok(KIND_LABEL.gebaeck === 'Plätzchen & Cookies' && KIND_ICON.gebaeck === '🍪' && features(kip).join() === 'bake:gebaeck', 'Art „gebaeck“: Label, Icon, Lernmuster bake:gebaeck')
   ok(kip.yields!.amount === 40 && kip.yields!.shelf >= 14 && /Blechdose/.test(kip.yields!.store ?? ''), 'Vanillekipferl: 40 Stk, Blechdose, mindestens 14 Tage')
   ok(festiveOf(kip, '2026-11-14')?.active === false && festiveOf(kip, '2026-11-15')?.active === true && festiveOf(kip, '2026-12-26')?.active === true && festiveOf(kip, '2026-12-27')?.active === false, 'Plätzchenzeit: 15. Nov. bis 26. Dez.')

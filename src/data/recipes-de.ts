@@ -1076,7 +1076,7 @@ export const recipesDe = [
       'Abschmecken und mit Schmand servieren, dazu passt Brot oder Reis.',
     ], 'chili con carne bowl'),
 
-  // ───────────── Leicht & sättigend (Abnehm-Abendessen, ca. 500–650 kcal pro Portion) ─────────────
+  // ───────────── Leicht & sättigend ─────────────
   r('haehnchen-paprika-pfanne', 'Hähnchen-Paprika-Pfanne mit Kartoffelspalten', 'de', 'haupt', 35,
     '300 g Hähnchenbrustfilet | 2 Stk Paprika rot | 1 Stk Paprika gelb | 2 Stk Zwiebel | 200 g Champignons | 1 TL Paprikapulver edelsüß | 1 EL Tomatenmark | 150 ml Hühnerbrühe | 2 EL Sonnenblumenöl | 300 g Kartoffeln festkochend | 0.5 Bund Petersilie | Salz | Pfeffer',
     [

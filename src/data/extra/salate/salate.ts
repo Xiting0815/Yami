@@ -7,7 +7,7 @@ import type { ExtraGroup } from '../types'
  * Kartoffelsalat, Ensaladilla rusa, Ensalada de arroz, Empedrado (Bohnen mit Bacalao), Pipirrana, Esqueixada,
  * italienischer Reissalat, Linsensalat, griechischer Bauernsalat als Beilage, Krautsalat …
  * Anlegen mit `salat(id, titel, { group: 'kartoffel' | 'reis' | 'bohnen' | 'gemuese', cuisine, time, portions,
- * name: '… (selbstgemacht)', shelf, lighter }, zutaten, schritte)`. Die BBQ-Beilagen (src/data/extra/bbq/beilagen.ts)
+ * name: '… (selbstgemacht)', shelf }, zutaten, schritte)`. Die BBQ-Beilagen (src/data/extra/bbq/beilagen.ts)
  * erscheinen in diesem Bereich automatisch mit – dort Vorhandenes nicht doppelt anlegen (Southern Potato Salad, Coleslaw …).
  * Regeln: docs/spanien-regeln.md (Abschnitt Salate). Neue Fotos: Zeilen in scripts/fotos-neu-salate.md.
  */
@@ -16,7 +16,6 @@ export const salate: ExtraGroup = {
     salat('ensaladilla-rusa', 'Ensaladilla rusa (spanischer Kartoffelsalat mit Thunfisch)',
       {
         group: 'kartoffel', cuisine: 'es', time: 90, portions: 6, name: 'Ensaladilla rusa (selbstgemacht)', shelf: 2,
-        lighter: 'Ein Drittel der Mayonnaise durch Joghurt ersetzen und Thunfisch im eigenen Saft nehmen – spart rund 80 kcal je Portion.',
       },
       '500 g Kartoffeln festkochend | 1 Stk Möhre | 100 g Erbsen TK | 2 Stk Ei | 1 Dose Thunfisch in Olivenöl | 10 Stk Oliven grün | 1 Stk Piquillo-Paprika | 150 g Mayonnaise | 0.25 Stk Zitrone | Salz | Pfeffer',
       [
@@ -28,7 +27,6 @@ export const salate: ExtraGroup = {
     salat('kartoffelsalat-schwaebisch', 'Schwäbischer Kartoffelsalat (mit Brühe, Essig und Öl, ohne Mayo)',
       {
         group: 'kartoffel', cuisine: 'de', time: 60, portions: 6, name: 'Schwäbischer Kartoffelsalat (selbstgemacht)', shelf: 3,
-        lighter: 'Öl auf 3 EL reduzieren und dafür 50 ml mehr Brühe nehmen – der Salat bleibt genauso „schlonzig“ und spart rund 40 kcal je Portion.',
       },
       '1200 g Kartoffeln festkochend | 1 Stk Zwiebel | 300 ml Rinderbrühe | 5 EL Weißweinessig | 1 TL Senf mittelscharf | 5 EL Sonnenblumenöl | 1 TL Zucker | 1 Bund Schnittlauch | Salz | Pfeffer',
       [
@@ -41,7 +39,6 @@ export const salate: ExtraGroup = {
     salat('kartoffelsalat-norddeutsch', 'Norddeutscher Kartoffelsalat mit Mayonnaise, Gewürzgurke, Ei und Apfel',
       {
         group: 'kartoffel', cuisine: 'de', time: 75, portions: 6, name: 'Norddeutscher Kartoffelsalat (selbstgemacht)', shelf: 2,
-        lighter: 'Die Hälfte der Mayonnaise durch Joghurt ersetzen und 2 statt 3 Eier nehmen – spart rund 90 kcal je Portion.',
       },
       '1000 g Kartoffeln festkochend | 3 Stk Ei | 5 Stk Gewürzgurke | 1 Stk Apfel säuerlich | 1 Stk Zwiebel | 150 g Mayonnaise | 150 g Joghurt natur | 1 TL Senf mittelscharf | 0.5 Bund Schnittlauch | Salz | Pfeffer | Zucker',
       [
@@ -53,7 +50,6 @@ export const salate: ExtraGroup = {
     salat('insalata-di-riso', 'Insalata di riso (italienischer Reissalat mit Thunfisch, Ei und Gemüse)',
       {
         group: 'reis', cuisine: 'it', time: 50, portions: 8, name: 'Insalata di riso (selbstgemacht)', shelf: 2,
-        lighter: 'Würstchen und Käse weglassen und dafür doppelt Gemüse (Paprika, Gurke) nehmen – spart rund 80 kcal je Portion.',
       },
       '300 g Langkornreis | 1 Dose Thunfisch in Olivenöl | 2 Stk Ei | 100 g Erbsen TK | 0.5 Dose Mais | 1 Stk Paprika rot | 4 Stk Gewürzgurke | 60 g Oliven grün | 3 Stk Wiener Würstchen | 3 Scheibe Emmentaler | 5 EL Olivenöl | 0.5 Stk Zitrone | Salz | Pfeffer',
       [
@@ -65,7 +61,6 @@ export const salate: ExtraGroup = {
     salat('bohnensalat', 'Grüner Bohnensalat mit Speck und Bohnenkraut',
       {
         group: 'bohnen', cuisine: 'de', time: 35, portions: 4, name: 'Bohnensalat (selbstgemacht)', shelf: 3,
-        lighter: 'Den Speck weglassen und nur 2 EL Öl nehmen – spart rund 80 kcal je Portion.',
       },
       '600 g Grüne Bohnen | 1 Stk Zwiebel | 60 g Speckwürfel | 3 EL Weißweinessig | 3 EL Sonnenblumenöl | 0.5 Bund Bohnenkraut | 1 TL Zucker | Salz | Pfeffer',
       [
@@ -77,7 +72,6 @@ export const salate: ExtraGroup = {
     salat('insalata-fagioli-tonno', 'Insalata di fagioli e tonno (toskanischer Bohnensalat mit Thunfisch und roter Zwiebel)',
       {
         group: 'bohnen', cuisine: 'it', time: 20, portions: 4, name: 'Insalata di fagioli e tonno (selbstgemacht)', shelf: 2,
-        lighter: 'Thunfisch im eigenen Saft nehmen und nur 2 EL Olivenöl – spart rund 60 kcal je Portion; bleibt ein Eiweiß-Wunder.',
       },
       '2 Dose Cannellini-Bohnen | 1 Dose Thunfisch in Olivenöl | 1 Stk Zwiebel rot | 1 Bund Petersilie | 1 Stk Zitrone | 1 EL Rotweinessig | 3 EL Olivenöl | Salz | Pfeffer',
       [
@@ -89,7 +83,6 @@ export const salate: ExtraGroup = {
     salat('ensalada-mixta', 'Ensalada mixta (spanischer gemischter Salat mit Thunfisch, Ei und Oliven)',
       {
         group: 'gemuese', cuisine: 'es', time: 25, portions: 4, name: 'Ensalada mixta (selbstgemacht)', shelf: 2,
-        lighter: 'Thunfisch im eigenen Saft nehmen und das Öl auf 2 EL reduzieren – spart rund 60 kcal je Portion.',
       },
       '1 Stk Kopfsalat | 3 Stk Tomate | 1 Stk Zwiebel | 1 Stk Möhre | 0.5 Dose Mais | 1 Dose Thunfisch in Olivenöl | 2 Stk Ei | 60 g Oliven grün | 4 EL Olivenöl | 2 EL Sherryessig | Salz',
       [
@@ -101,7 +94,6 @@ export const salate: ExtraGroup = {
     salat('pipirrana', 'Pipirrana (andalusischer Tomaten-Paprika-Gurken-Salat mit Thunfisch und Ei)',
       {
         group: 'gemuese', cuisine: 'es', time: 30, portions: 4, name: 'Pipirrana (selbstgemacht)', shelf: 2,
-        lighter: 'Thunfisch im eigenen Saft nehmen und nur 3 EL Olivenöl – spart rund 50 kcal je Portion; das Gemüse bleibt die Hauptsache.',
       },
       '4 Stk Tomate | 1 Stk Paprika grün | 1 Stk Salatgurke | 1 Stk Zwiebel | 2 Stk Ei | 1 Dose Thunfisch in Olivenöl | 1 Zehe Knoblauch | 5 EL Olivenöl | 2 EL Sherryessig | Salz',
       [
@@ -113,7 +105,6 @@ export const salate: ExtraGroup = {
     salat('krautsalat-bayerisch', 'Bayerischer Krautsalat (warm angemacht, mit Speck und Kümmel)',
       {
         group: 'gemuese', cuisine: 'de', time: 50, portions: 6, name: 'Bayerischer Krautsalat (selbstgemacht)', shelf: 4,
-        lighter: 'Den Speck auf 50 g reduzieren und das Öl auf 2 EL – spart rund 50 kcal je Portion; Kraut selbst hat kaum Kalorien.',
       },
       '800 g Weißkohl | 100 g Speckwürfel | 1 Stk Zwiebel | 150 ml Gemüsebrühe | 5 EL Weißweinessig | 3 EL Sonnenblumenöl | 1 TL Kümmel | 1 TL Zucker | Salz | Pfeffer',
       [
@@ -125,7 +116,6 @@ export const salate: ExtraGroup = {
     salat('gurkensalat', 'Gurkensalat mit Dill und Joghurt-Dressing',
       {
         group: 'gemuese', cuisine: 'de', time: 20, portions: 4, name: 'Gurkensalat (selbstgemacht)', shelf: 2,
-        lighter: 'Ist schon sehr leicht (rund 75 kcal je Portion): wer mag, ersetzt die saure Sahne ganz durch Joghurt.',
       },
       '2 Stk Salatgurke | 150 g Joghurt natur | 2 EL Saure Sahne | 1 EL Weißweinessig | 0.5 Bund Dill | 1 Stk Zwiebel rot | 1 TL Zucker | Salz | Pfeffer',
       [

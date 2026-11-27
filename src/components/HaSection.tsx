@@ -132,7 +132,7 @@ export function HaSection({ ha, onChange, onSyncNow, syncing, familyStatus, main
         <div className="ha-family" id="ha-family">
           <h4>👨‍👩 Familie teilen</h4>
           <p className="muted small">
-            Wochenplan, Einkaufsliste, Vorrat, eigene Rezepte und Bewertungen mit den anderen im Haushalt teilen – jede Person mit eigenem Handy und eigenem Token. Profil, Kalorien, Wiegen und Frühstück bleiben auf deinem Gerät.
+            Wochenplan, Einkaufsliste, Vorrat, eigene Rezepte und Bewertungen mit den anderen im Haushalt teilen – jede Person mit eigenem Handy und eigenem Token. Frühstück und deine Einstellungen bleiben auf deinem Gerät.
           </p>
           {ha.otherShare && !ha.share && (
             <div className="share-warn-box" role="alert">
@@ -234,7 +234,7 @@ export function HaSection({ ha, onChange, onSyncNow, syncing, familyStatus, main
           </label>
         </div>
         <p className="muted small">
-          Fehlt fürs Essen heute oder morgen etwas (oder hat Yami ein Gericht deshalb verschoben), schickt Yami dir sofort eine Mitteilung – über
+          Fehlt fürs Essen heute oder morgen etwas (oder hat Gusto ein Gericht deshalb verschoben), schickt Gusto dir sofort eine Mitteilung – über
           diesen Dienst (z. B. derselbe wie in der Automation „Yami: Erinnerung aufs Handy“). Leer: als Erinnerung im Kalender, kommt dann etwa
           15–20 Minuten später.
         </p>

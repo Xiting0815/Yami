@@ -1,10 +1,9 @@
-/** Backen & Desserts: Texte zum Ergebnis und „1 gegessen“ (Stück aus dem Vorrat → Tagesbilanz) */
+/** Backen & Desserts: Texte zum Ergebnis und „1 gegessen“ (Stück aus dem Vorrat, zählt fürs Lernen) */
 import { bakeFor } from './data/recipes'
 import { pieceSize, yieldStock } from './data/define'
-import type { Snack } from './energy'
 import type { PantryLot } from './kitchen'
 import { formatAmount } from './shopping'
-import type { Recipe } from './types'
+import type { Recipe, Snack } from './types'
 
 const plural = (n: number, one: string, many: string) => `${String(Math.round(n * 10) / 10).replace('.', ',')} ${n === 1 ? one : many}`
 
@@ -36,35 +35,25 @@ export function shelfText(days: number): string {
   return `${days} Tage`
 }
 
-/** Nährwert-Einheit eines Stücks: „Stück“, „Portion“, „Scheibe“ (bei g/ml: „50 g“) */
-export function pieceName(unit: string): string {
-  if (unit === 'Stk') return 'Stück'
-  if (unit === 'Portion') return 'Portion'
-  if (unit === 'Scheibe') return 'Scheibe'
-  return formatAmount(pieceSize(unit), unit)
-}
-
 /** Kann man von diesem Vorratsposten „1 gegessen“ tippen? → Rezept und Beschriftung */
 export function eatInfo(lot: PantryLot): { recipe: Recipe; label: string; amount: number } | undefined {
   const recipe = bakeFor(lot.name)
-  if (!recipe?.yields?.perPiece) return undefined
+  if (!recipe?.yields) return undefined
   const label = lot.unit === 'Stk' ? '1 gegessen' : lot.unit === 'Portion' ? '1 Portion gegessen' : '1 Scheibe gegessen'
   return { recipe, label, amount: Math.min(lot.amount, pieceSize(lot.unit)) }
 }
 
 /**
- * „1 gegessen“: ein Stück vom Posten abziehen (leerer Posten fällt weg) und als Snack für `day` festhalten.
- * Ein Rest kleiner als ein Stück zählt anteilig.
+ * „1 gegessen“: ein Stück vom Posten abziehen (leerer Posten fällt weg) und für `day` festhalten (fürs Lernen).
+ * Ist weniger als ein Stück übrig, wird der Rest abgezogen.
  */
 export function eatOne(pantry: PantryLot[], lotId: string, day: string): { pantry: PantryLot[]; snack: Snack | null } {
   const lot = pantry.find((l) => l.id === lotId)
   const info = lot ? eatInfo(lot) : undefined
   if (!lot || !info) return { pantry, snack: null }
-  const share = info.amount / pieceSize(lot.unit)
-  const pp = info.recipe.yields!.perPiece!
   const next = pantry.map((l) => (l.id === lotId ? { ...l, amount: l.amount - info.amount } : l)).filter((l) => l.amount > 1e-6)
   return {
     pantry: next,
-    snack: { date: day, name: lot.name, kcal: Math.round(pp.kcal * share), protein: Math.round(pp.protein * share * 10) / 10, recipeId: info.recipe.id },
+    snack: { date: day, name: lot.name, recipeId: info.recipe.id },
   }
 }

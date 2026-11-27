@@ -12,9 +12,6 @@ import type { ExtraIngredients } from './extra/types'
  *
  * Resteessen: Zutat „Pulled Pork“ (kaufbar, bbq-smoker.ts) – liegt vakuumiertes „Pulled Pork (vakuumiert)“ im Vorrat,
  * nimmt Yami das zuerst und zieht solche Gerichte im Stapel nach vorn (Vorrat-Priorisierung).
- *
- * Abnehmen: Abendessen ca. 550–750 kcal je Portion; wo ein Gericht darüber liegt oder leicht leichter geht, nennt der
- * letzte Schritt „Leichter: …“.
  */
 export const recipesUs = [
   r('jambalaya', 'Jambalaya mit Hähnchen, Wurst und Garnelen', 'us', 'haupt', 50,
@@ -45,7 +42,7 @@ export const recipesUs = [
       'Für die dunkle Roux das restliche Öl und das Mehl im selben Topf verrühren und bei mittlerer Hitze unter ständigem Rühren 20 bis 25 Minuten rösten, bis die Mehlschwitze die Farbe von Zartbitterschokolade hat und nussig riecht. Schwarze Pünktchen heißen verbrannt – dann neu anfangen.',
       'Sofort Zwiebel, Paprika und Sellerie in die heiße Roux geben – das stoppt das Rösten – und weich dünsten, Knoblauch und restliches Cajun-Gewürz kurz mitrösten.',
       'Die Brühe nach und nach unter Rühren angießen, Lorbeer, Thymian, Worcestersauce, Hähnchen und Wurst zugeben und offen 45 Minuten leise köcheln lassen; Fett an der Oberfläche abschöpfen.',
-      'Inzwischen den Reis in Salzwasser garen. Den Gumbo abschmecken, in tiefe Teller füllen, einen Löffel Reis in die Mitte setzen und mit Frühlingszwiebeln und Petersilie bestreuen. Leichter: Hähnchenbrust statt Schenkel und die Wurst weglassen – die dunkle Roux trägt den Geschmack.',
+      'Inzwischen den Reis in Salzwasser garen. Den Gumbo abschmecken, in tiefe Teller füllen, einen Löffel Reis in die Mitte setzen und mit Frühlingszwiebeln und Petersilie bestreuen.',
     ], 'chicken sausage gumbo'),
 
   r('red-beans-and-rice', 'Red Beans and Rice mit Räucherwurst', 'us', 'eintopf', 60,
@@ -86,7 +83,7 @@ export const recipesUs = [
       'Für den Coleslaw Weißkohl fein hobeln, Möhre raspeln und mit Joghurt, Apfelessig, Salz und Pfeffer mischen (leichter als mit Mayonnaise).',
       'Mehl, Backpulver, Paprikapulver, Knoblauchpulver, restlichen Cayennepfeffer, 1 TL Salz und Pfeffer mischen und 2 EL Marinade hineinreiben – die Klümpchen werden zur krossen, zerklüfteten Kruste. Die Hähnchenteile abtropfen lassen, kräftig darin wenden, andrücken und 10 Minuten ruhen lassen.',
       'Das Frittieröl in einem schweren Topf auf 165 °C erhitzen und die Teile 14 bis 16 Minuten goldbraun ausbacken, dabei mehrmals wenden. Innen müssen sie mindestens 80 °C haben.',
-      'Auf einem Gitter abtropfen lassen und mit dem Coleslaw servieren. Leichter: die Haut vor dem Panieren abziehen und im Airfryer statt im Fett garen – spart zusammen rund 200 kcal je Portion.',
+      'Auf einem Gitter abtropfen lassen und mit dem Coleslaw servieren.',
     ], 'southern fried chicken'),
 
   r('chicken-fried-steak', 'Chicken Fried Steak mit Pfeffer-Gravy, Kartoffelpüree und Bohnen', 'us', 'haupt', 50,
@@ -115,7 +112,7 @@ export const recipesUs = [
       'Hackfleisch, Ei, eingeweichtes Paniermehl, Zwiebel, Knoblauch, Worcestersauce, Senf, abgezupften Thymian, Salz und Pfeffer locker vermengen – nicht zu lange kneten, sonst wird der Meatloaf fest. Auf einem Blech mit Backpapier zu einem flachen Laib formen und 25 Minuten backen.',
       'Tomatenketchup, braunen Zucker und Apfelessig verrühren, den Meatloaf damit bestreichen und weitere 15 Minuten backen, bis er innen 72 °C hat und die Glasur glänzt.',
       'Inzwischen die Kartoffeln schälen, vierteln und in Salzwasser 20 Minuten weich kochen, die Bohnen die letzten 8 Minuten mitgaren.',
-      'Die Kartoffeln mit Butter und der restlichen Milch stampfen. Den Meatloaf 5 Minuten ruhen lassen, in Scheiben schneiden und mit Püree und Bohnen servieren. Leichter: halb Rinder-, halb Putenhack.',
+      'Die Kartoffeln mit Butter und der restlichen Milch stampfen. Den Meatloaf 5 Minuten ruhen lassen, in Scheiben schneiden und mit Püree und Bohnen servieren.',
     ], 'meatloaf mashed potatoes'),
 
   r('chicken-pot-pie', 'Chicken Pot Pie mit Blätterteigdeckel', 'us', 'auflauf', 60,
@@ -135,7 +132,7 @@ export const recipesUs = [
       'Zwiebel und Paprika in feine Streifen, Champignons in Scheiben schneiden. In der Hälfte vom Öl bei mittlerer Hitze 8 Minuten weich und leicht gebräunt braten, salzen und herausnehmen.',
       'Das restliche Öl in der Pfanne sehr heiß werden lassen, das Fleisch darin 2 Minuten scharf anbraten und mit dem Pfannenwender zerhacken. Salzen, pfeffern und das Gemüse untermischen.',
       'Die Mischung in zwei Portionen teilen, den Provolone darauflegen und zugedeckt 1 Minute schmelzen lassen.',
-      'Das Ciabatta halbieren, längs aufschneiden und kurz aufbacken. Mit dem Pfanneninhalt füllen und sofort essen. In Philadelphia bestellt man „wit“ (mit Zwiebeln); statt Provolone gibt es dort auch Cheez Whiz. Leichter: etwas Innenteig aus dem Brot zupfen und einen grünen Salat dazu.',
+      'Das Ciabatta halbieren, längs aufschneiden und kurz aufbacken. Mit dem Pfanneninhalt füllen und sofort essen. In Philadelphia bestellt man „wit“ (mit Zwiebeln); statt Provolone gibt es dort auch Cheez Whiz.',
     ], 'philly cheesesteak'),
 
   r('buffalo-chicken-wraps', 'Buffalo Chicken Wraps mit Blue-Cheese-Dip', 'us', 'haupt', 30,

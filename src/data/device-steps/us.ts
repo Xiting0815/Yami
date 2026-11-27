@@ -79,7 +79,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     reis(90, 'Nach 20 Minuten Köcheln'),
     {
-      text: 'Den Gumbo mit Salz und Pfeffer abschmecken, in tiefe Teller füllen, einen Löffel Reis in die Mitte setzen und mit Frühlingszwiebeln und Petersilie bestreuen. Leichter: Hähnchenbrust statt Schenkel und die Wurst weglassen – die dunkle Roux trägt den Geschmack.',
+      text: 'Den Gumbo mit Salz und Pfeffer abschmecken, in tiefe Teller füllen, einen Löffel Reis in die Mitte setzen und mit Frühlingszwiebeln und Petersilie bestreuen.',
     },
   ],
   'red-beans-and-rice': [
@@ -156,7 +156,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [airfryer(190, 25, 'vorheizen, nach der Hälfte wenden', 80)],
     },
     {
-      text: 'Kurz auf einem Gitter ruhen lassen und mit dem Coleslaw servieren. Leichter: die Haut vor dem Panieren abziehen – spart rund 100 kcal je Portion.',
+      text: 'Kurz auf einem Gitter ruhen lassen und mit dem Coleslaw servieren.',
     },
   ],
   'chicken-fried-steak': [
@@ -214,7 +214,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [vzug('combair', 'Heißluft', 180, { minutes: 15, core: 72, note: 'Ebene 2' })],
     },
     {
-      text: 'Die Kartoffeln mit Butter und der restlichen Milch stampfen. Den Meatloaf 5 Minuten ruhen lassen, in Scheiben schneiden und mit Püree und Bohnen servieren. Leichter: halb Rinder-, halb Putenhack.',
+      text: 'Die Kartoffeln mit Butter und der restlichen Milch stampfen. Den Meatloaf 5 Minuten ruhen lassen, in Scheiben schneiden und mit Püree und Bohnen servieren.',
     },
   ],
   'chicken-pot-pie': [
@@ -255,7 +255,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('Warmhalten', { minutes: 1 })],
     },
     {
-      text: 'Das Ciabatta halbieren, längs aufschneiden und im Airfryer 3 Minuten aufbacken. Mit dem Pfanneninhalt füllen und sofort essen. In Philadelphia bestellt man „wit“ (mit Zwiebeln); statt Provolone gibt es dort auch Cheez Whiz. Leichter: etwas Innenteig aus dem Brot zupfen und einen grünen Salat dazu.',
+      text: 'Das Ciabatta halbieren, längs aufschneiden und im Airfryer 3 Minuten aufbacken. Mit dem Pfanneninhalt füllen und sofort essen. In Philadelphia bestellt man „wit“ (mit Zwiebeln); statt Provolone gibt es dort auch Cheez Whiz.',
       settings: [airfryer(170, 3, 'Brot aufbacken')],
     },
   ],

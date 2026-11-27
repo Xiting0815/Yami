@@ -5,7 +5,6 @@ import { type PantryLot, discardWaste, wasteOf, WASTED_MAX } from '../../kitchen
 import type { ActionContext } from './context'
 import type { Snapshot } from '../types'
 import { eatOne } from '../../bake'
-import { isWorkday } from '../../energy'
 import { type AppState, type RemovalReason, type ShiftRecord, REMOVALS_MAX, SNACKS_MAX } from '../../store'
 import { autoShift, shiftText } from '../../shortage'
 import { forgotLabel, forgotScores } from '../../forgot'
@@ -59,7 +58,7 @@ export function pantryActions({ state, setState, cal, flash, snapshot }: ActionC
     if (reason === 'forgot') {
       const label = forgotLabel(forgotScores(removals, today)[lot.name])
       flash(`Gemerkt: ${lot.name} vergessen${label ? ' – steht ab jetzt mit ⚠️ auf der Einkaufsliste' : ''}${shifted}`, snap)
-    } else if (reason === 'used') flash(`Gemerkt: ${lot.name} aufgebraucht${isQtyStaple(lot.name) ? ' – Yami lernt, wie lange es reicht' : ''} ✓${shifted}`, snap)
+    } else if (reason === 'used') flash(`Gemerkt: ${lot.name} aufgebraucht${isQtyStaple(lot.name) ? ' – Gusto lernt, wie lange es reicht' : ''} ✓${shifted}`, snap)
     else flash(`${lot.name}: als weggeworfen gezählt (Wochenrückblick)${shifted}`, snap)
   }
 
@@ -112,7 +111,7 @@ export function pantryActions({ state, setState, cal, flash, snapshot }: ActionC
     })
   }
 
-  /** „1 gegessen“ (Kuchen, Brot, Dessert aus dem Vorrat): Stück abziehen, kcal in die heutige Tagesbilanz; Rückgängig über den Toast */
+  /** „1 gegessen“ (Kuchen, Brot, Dessert aus dem Vorrat): Stück abziehen (zählt fürs Lernen); Rückgängig über den Toast */
   function eatPiece(lotId: string) {
     const r = eatOne(state.pantry, lotId, today)
     const snack = r.snack
@@ -122,7 +121,7 @@ export function pantryActions({ state, setState, cal, flash, snapshot }: ActionC
       const x = eatOne(s.pantry, lotId, today)
       return x.snack ? { ...s, pantry: x.pantry, snacks: [...s.snacks, x.snack].slice(-SNACKS_MAX) } : s
     })
-    flash(`${snack.name}: ${snack.kcal} kcal ${isWorkday(today) ? 'in der Tagesbilanz' : 'gegessen (Sa/So ohne Bilanz)'} ✓`, snap)
+    flash(`${snack.name}: 1 gegessen ✓`, snap)
   }
 
   return { changePantry, noteRequest, createPantryItem, setSpice, eatPiece }

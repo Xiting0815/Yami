@@ -192,7 +192,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
     const tapaDay = isTapa(recipe) ? matchBake(state.bakePlan, recipe.id, today, ctxDay) : undefined
     // Tapa vom Tapas-Abend: Menge des Abends; sonst ein Teller (Faktor 1)
     const f = tapaDay ? tapasFactor(state.bakePlan, tapaDay) : 1
-    const meal = isTapa(recipe) ? tapasMeal(recipe, today, f) : bbqMeal(recipe, today)
+    const meal = isTapa(recipe) ? tapasMeal(recipe, today) : bbqMeal(recipe, today)
     setState((s) => {
       // eingeplantes Backen: dieser Eintrag gilt damit als gebacken (kein zweites Abziehen, keine Nachfrage mehr)
       const planned = matchBake(s.bakePlan, recipe.id, today, ctxDay)
@@ -201,7 +201,7 @@ export function planActions({ state, setState, cal, ui, flash, setToast, snapsho
         pantry: cookBasic(s.pantry, recipe, servings * f, today).pantry,
         baked: bake ? [...s.baked, { date: today, recipeId: recipe.id }].slice(-200) : s.baked,
         bakePlan: planned ? markBaked(s.bakePlan, planned, recipe.id) : s.bakePlan,
-        // BBQ: eine Portion zählt als Abendessen in die Tagesbilanz
+        // BBQ/Tapas: zählt fürs Lernen als „gegessen“
         snacks: meal ? [...s.snacks, meal].slice(-400) : s.snacks,
       }
     })

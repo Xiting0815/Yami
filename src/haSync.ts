@@ -7,7 +7,6 @@ import { assignBreakfasts, mondayIso, prepPlan, resolvePrepDay } from './breakfa
 import { HaError } from './homeassistant'
 import { addDaysIso, entryRecipe, swapText } from './kitchen'
 import type { PantryLot } from './kitchen'
-import { weighedThisWeek, type WeighIn } from './progress'
 import { forDaysText, formatAmount, isBought, missingPacks, packText, scale } from './shopping'
 import { type HaSettings, isoDate, parseIso, weekDays } from './store'
 import type { BuyItem } from './kitchen'
@@ -295,26 +294,9 @@ export interface ReminderInput {
   /** Wochen mit spätem Einstieg und erledigte Vorbereitungen (für den Prep-Tag, siehe prepDayInfo) */
   prepLate?: string[]
   bfPreps?: { week: string; date: string }[]
-  weighIns: WeighIn[]
-  /** Wiege-Erinnerung nur mit Profil */
-  hasProfile: boolean
   pantry: PantryLot[]
   /** Einkäufe, die noch Entwurf sind (Einkaufstag, offene Artikel) – Erinnerung am Vorabend 19:00 */
   trips?: { date: string; items: number }[]
-}
-
-/** Wochentag (0 = So), an dem meist gewogen wird; ohne Messungen Montag */
-export function usualWeighDay(weighIns: WeighIn[]): number {
-  if (!weighIns.length) return 1
-  const count = new Map<number, number>()
-  for (const w of weighIns) {
-    const d = parseIso(w.date).getDay()
-    count.set(d, (count.get(d) ?? 0) + 1)
-  }
-  const latest = parseIso(weighIns[weighIns.length - 1].date).getDay()
-  let best = latest
-  for (const [d, n] of count) if (n > (count.get(best) ?? 0)) best = d
-  return best
 }
 
 /** Erinnerungen, die in den nächsten 48 Stunden beginnen */
@@ -326,7 +308,6 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
   const mk = (key: string, summary: string, description: string, start: Date, sig = description): void => {
     if (inWindow(start)) out.push({ key, summary, description, start: stamp(start), end: stamp(plusMin(start, 30)), sig })
   }
-  const weighDay = usualWeighDay(input.weighIns)
 
   for (let i = -1; i <= 2; i++) {
     const D = addDaysIso(today, i)
@@ -353,9 +334,6 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
       const title = RECIPE_BY_ID[ta.days[tm]]?.title ?? 'Frühstück'
       mk(`rem:thaw:${D}`, '❄️ Frühstück auftauen', `${title} für morgen aus dem Gefrierfach in den Kühlschrank legen.`, at(D, 20, 0))
     }
-    if (input.hasProfile && dow === weighDay && !weighedThisWeek(input.weighIns, D)) {
-      mk(`rem:weigh:${D}`, '⚖️ Heute wiegen', 'Einmal pro Woche auf die Waage.', at(D, 7, 30))
-    }
     const tomorrow = addDaysIso(D, 1)
     const names = [...new Set(input.pantry.filter((l) => l.expires === tomorrow && l.amount > 0).map((l) => l.name))].sort((a, b) => a.localeCompare(b, 'de'))
     if (names.length) mk(`rem:exp:${D}`, `⏰ Läuft morgen ab: ${names.join(', ')}`, `Morgen laufen ab: ${names.join(', ')}. Heute noch verwenden oder einfrieren.`, at(D, 16, 30), names.join('|'))
@@ -366,7 +344,7 @@ export function plannedReminders(input: ReminderInput, now: Date): Desired[] {
     const eve = addDaysIso(t.date, -1)
     if (eve !== today || !t.items) continue
     const wd = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][parseIso(t.date).getDay()]
-    mk(`rem:shop:${eve}`, '🛒 Einkaufsliste für morgen prüfen und freigeben', `Einkauf ${wd}: ${t.items} Artikel – in Yami „Liste prüfen“ und freigeben, dann steht sie in Google Tasks.`, at(eve, 19, 0), t.date)
+    mk(`rem:shop:${eve}`, '🛒 Einkaufsliste für morgen prüfen und freigeben', `Einkauf ${wd}: ${t.items} Artikel – in Gusto „Liste prüfen“ und freigeben, dann steht sie in Google Tasks.`, at(eve, 19, 0), t.date)
   }
   return out
 }

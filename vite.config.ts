@@ -11,20 +11,21 @@ export default defineConfig({
       // „prompt“: neue Version wartet, bis der Nutzer „Neu laden“ tippt (src/app/UpdateBanner.tsx) –
       // kein Neuladen mitten im Kochmodus; nach komplettem Schließen der App ist sie ohnehin aktiv
       registerType: 'prompt',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon.svg', 'favicon-32.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Yami – Wochenplaner',
-        short_name: 'Yami',
-        description: 'Wochenplan per Wischen und sortierte Einkaufsliste',
+        name: 'Gusto – Rezepte & Wochenplan',
+        short_name: 'Gusto',
+        description: 'Abwechslungsreich und saisonal kochen, Vorrat aufbrauchen, günstig einkaufen – mit Original-Rezepten',
         lang: 'de',
-        theme_color: '#e8572a',
-        background_color: '#fff8f2',
+        theme_color: '#c65a3a',
+        background_color: '#fff3e6',
         display: 'standalone',
         start_url: './',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon-maskable-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {

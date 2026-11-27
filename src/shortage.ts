@@ -18,13 +18,12 @@ import { RECIPE_BY_ID } from './data/recipes'
 import { standInsFor } from './data/substitutes'
 import { resolvePrepDay } from './breakfast'
 import { bakeEntriesOf } from './bakePlan'
-import { isWorkday } from './energy'
 import {
   type IncomingLot, type ShortUse, type Trip, type UseShortage, addDaysIso, canonical, daysUntil, keepsUntil, lotsFor, simulateShortages, uid, wdShort,
 } from './kitchen'
 import { portionFactor } from './learning'
 import { isBought } from './shopping'
-import { type AppState, type ShiftRecord, type TripState, SHIFTS_MAX, mondayOf, parseIso, weekDays, weekdayName } from './store'
+import { type AppState, type ShiftRecord, type TripState, SHIFTS_MAX, isWorkday, mondayOf, parseIso, weekDays, weekdayName } from './store'
 import { householdFeedback } from './sync'
 import { releaseTrip, tripsOf } from './tripState'
 import type { Recipe, WeekPlan } from './types'
@@ -258,7 +257,7 @@ export function pushAlerts(s: AppState, today: string, now: Date, trips?: Trip[]
     out.push({
       key: `miss:${u.day}:${u.kind}:${u.recipeId}:${names.join(',')}`,
       title: `⚠️ ${when(u.day)} fehlt: ${namesText(names)}`,
-      message: `Für ${what} fehlt ${namesText(names)}. In Yami: noch kaufen, verschieben oder Ersatz nehmen.`,
+      message: `Für ${what} fehlt ${namesText(names)}. In Gusto: noch kaufen, verschieben oder Ersatz nehmen.`,
     })
   }
   for (const x of s.shifts) {
@@ -267,7 +266,7 @@ export function pushAlerts(s: AppState, today: string, now: Date, trips?: Trip[]
     out.push({
       key: `shift:${x.id}`,
       title: `↪️ ${RECIPE_BY_ID[x.recipeId]?.title ?? 'Gericht'} verschoben`,
-      message: `${shiftText(x)}.${other ? ` ${weekdayName(x.from)} gibt es dafür ${other}.` : ''} In Yami lässt es sich rückgängig machen oder doch noch kaufen.`,
+      message: `${shiftText(x)}.${other ? ` ${weekdayName(x.from)} gibt es dafür ${other}.` : ''} In Gusto lässt es sich rückgängig machen oder doch noch kaufen.`,
     })
   }
   return out

@@ -2,16 +2,13 @@ import { useEffect, useState } from 'react'
 import type { Recipe } from '../types'
 import { BBQ_GROUP_LABEL, BREAKFAST_LABEL, CUISINE_LABEL, KIND_ICON, KIND_LABEL, SALAT_GROUP_LABEL, TAPAS_GROUP_LABEL, TYPE_LABEL, isBake, isBbq, isSalat, isStockDish, isTapa, replacesDinner } from '../types'
 import { leftoverText } from '../bbq'
-import { pieceName, shelfText, yieldText } from '../bake'
-import { yieldStock } from '../data/define'
-import { NutritionTable } from './NutritionRow'
+import { shelfText, yieldText } from '../bake'
 import { formatTime } from '../filter'
 import { formatAmount, scale } from '../shopping'
 import { RecipeImage } from './RecipeImage'
 import imageMap from '../data/images.json'
 import { type Insight, type PriceOverrides, formatEuro, recipeCost } from '../kitchen'
 import { InsightBadges } from './SwipeDeck'
-import type { Portion } from '../energy'
 import { CookMode, type CookFinish } from './CookMode'
 import { DeviceChips } from './DeviceChip'
 import { basicFor } from '../data/recipes'
@@ -34,8 +31,8 @@ interface Props {
   action?: { label: string; onClick: (servings: number) => void }
   insight?: Insight
   prices: PriceOverrides
-  /** deine Portion (Abendessen, mit Profil) */
-  portion?: Portion & { budget: number; /** gelernt: „ihr braucht eher etwas mehr (+10 %)“ */ household?: string }
+  /** gelernt aus der Portions-Rückmeldung: „ihr braucht eher etwas mehr (+10 %)“ (nur Abendessen) */
+  householdNote?: string
   /** Kochmodus offen – App zählt ihn als Zurück-Ebene */
   cooking: boolean
   /** „Fertig gekocht“ im Kochmodus */
@@ -56,7 +53,7 @@ interface Props {
   bakePlanner?: { today: string; plannedDays: string[]; onPlan: (day: string, amount: number, replace?: boolean) => void; dinnerOn?: (day: string) => string | undefined }
 }
 
-export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, portion, cooking, onFinish, onCooking, onEdit, onDelete, onOpenRecipe, showClassic, onShowClassic, bakePlanner }: Props) {
+export function RecipeSheet({ recipe, servings: initial, onClose, action, insight, prices, householdNote, cooking, onFinish, onCooking, onEdit, onDelete, onOpenRecipe, showClassic, onShowClassic, bakePlanner }: Props) {
   const [servings, setServings] = useState(initial)
   const credit = credits[recipe.id]
   const hasDevice = !!recipe.deviceSteps && !!recipe.classicSteps
@@ -74,7 +71,6 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
   // Anstellgut → Sauerteig ansetzen, Vollkornbrot → selbstgebackenes Brot)
   const basicTips = [...new Map(recipe.ingredients.map((i) => basicFor(i.name)).filter((b): b is Recipe => !!b && b.id !== recipe.id).map((b) => [b.id, b])).values()]
   const y = recipe.yields
-  const piece = y && recipe.basic ? pieceName(yieldStock(recipe.kind, y).unit) : ''
 
   useEffect(() => {
     // Escape schließt zuerst den Kochmodus (dort), nicht das Sheet
@@ -165,30 +161,24 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
 
             {tapa ? (
               <div className="prep-facts bake-facts">
-                <div>{KIND_ICON.tapas} Ein Teller für 2 – als eine von ca. 5 Tapas · je Person <b>{recipe.nutrition.kcal.toLocaleString('de-DE')} kcal</b> · {String(recipe.nutrition.protein).replace('.', ',')} g Eiweiß</div>
+                <div>{KIND_ICON.tapas} Ein Teller für 2 – als eine von ca. 5 Tapas</div>
                 <div>🍽️ Kommt {recipe.serve === 'kalt' ? 'kalt' : recipe.serve === 'lauwarm' ? 'lauwarm' : 'heiß, ganz zum Schluss'} auf den Tisch{recipe.ahead ? ` · Vorher: ${recipe.ahead}` : ''}</div>
-                {recipe.lighter && <div className="lighter">💡 <b>Leichter:</b> {recipe.lighter}</div>}
-                <div className="muted small">Tapas planst du zusammen: im Rezepte-Tab „🫒 Tapas“ 4–6 auswählen → „Planen“. Die Mengen passt Yami an die Zahl der Tapas an.</div>
+                <div className="muted small">Tapas planst du zusammen: im Rezepte-Tab „🫒 Tapas“ 4–6 auswählen → „Planen“. Die Mengen passt Gusto an die Zahl der Tapas an.</div>
               </div>
             ) : bbq ? (
               <div className="prep-facts bake-facts">
-                <div>{KIND_ICON.bbq} Ladung für ca. <b>{(recipe.portions ?? 2) * servings} Portionen</b> · pro Portion <b>{recipe.nutrition.kcal.toLocaleString('de-DE')} kcal</b> · {String(recipe.nutrition.protein).replace('.', ',')} g Eiweiß</div>
-                {y && <div>❄️ Rest: <b>{leftoverText(recipe, servings)}</b> · hält ca. {shelfText(y.shelf)} – Yami schlägt dann Resteessen vor</div>}
-                {recipe.lighter && <div className="lighter">💡 <b>Leichter:</b> {recipe.lighter}</div>}
-                <div className="muted small">✓ „Fertig gegrillt“ im Kochmodus zieht die Zutaten ab{y ? ' und legt den Rest in den Vorrat' : ''}. Eine Portion zählt als Abendessen in die Tagesbilanz.</div>
+                <div>{KIND_ICON.bbq} Ladung für ca. <b>{(recipe.portions ?? 2) * servings} Portionen</b></div>
+                {y && <div>❄️ Rest: <b>{leftoverText(recipe, servings)}</b> · hält ca. {shelfText(y.shelf)} – Gusto schlägt dann Resteessen vor</div>}
+                <div className="muted small">✓ „Fertig gegrillt“ im Kochmodus zieht die Zutaten ab{y ? ' und legt den Rest in den Vorrat' : ''}.</div>
               </div>
             ) : bake ? (
               <div className="prep-facts bake-facts">
                 <div>{KIND_ICON[recipe.kind!]} Ergibt <b>{yieldText(recipe, servings)}</b> · hält <b>{shelfText(y!.shelf)}</b>{y!.store ? ` ${y!.store}` : ''}</div>
                 {y!.frozen ? <div>❄️ Eingefroren ca. {shelfText(y!.frozen)} haltbar</div> : null}
-                {y!.perPiece && (
-                  <div>🔥 Pro {piece}: <b>{y!.perPiece.kcal.toLocaleString('de-DE')} kcal</b> · {String(y!.perPiece.protein).replace('.', ',')} g Eiweiß</div>
-                )}
-                {recipe.lighter && <div className="lighter">💡 <b>Leichter:</b> {recipe.lighter}</div>}
                 <div className="muted small">
                   {salat
-                    ? '✓ „Fertig“ im Kochmodus legt alle Portionen in den Vorrat (Kühlschrank). Dort „1 Portion gegessen“ tippen – sie zählt in die Tagesbilanz.'
-                    : `✓ „${recipe.kind === 'dessert' ? 'Fertig' : 'Fertig gebacken'}“ im Kochmodus legt alles in den Vorrat. Dort „1 gegessen“ tippen – das Stück zählt in die Tagesbilanz.`}
+                    ? '✓ „Fertig“ im Kochmodus legt alle Portionen in den Vorrat (Kühlschrank). Dort „1 Portion gegessen“ tippen – so weiß Gusto, was noch da ist.'
+                    : `✓ „${recipe.kind === 'dessert' ? 'Fertig' : 'Fertig gebacken'}“ im Kochmodus legt alles in den Vorrat. Dort „1 gegessen“ tippen – so weiß Gusto, was noch da ist.`}
                 </div>
               </div>
             ) : isBasic ? (
@@ -199,26 +189,10 @@ export function RecipeSheet({ recipe, servings: initial, onClose, action, insigh
                 </div>
                 <div>✓ „Fertig gekocht“ im Kochmodus legt es in den Vorrat – Rezepte damit nehmen dann zuerst das Selbstgemachte.</div>
               </div>
-            ) : (
-              <NutritionTable n={recipe.nutrition} servings={1} />
-            )}
+            ) : null}
 
-            {portion && (
-              <div className={`portion-box ${portion.fraction < 1 ? 'smaller' : ''}`}>
-                <div>
-                  🍽️ <b>Deine Portion: {portion.label}</b> · {portion.kcal.toLocaleString('de-DE')} kcal
-                </div>
-                <div className="muted small">
-                  Abendbudget heute ≈ {portion.budget.toLocaleString('de-DE')} kcal (Tagesziel − Frühstück − Mittag). Eine normale Portion hat {recipe.nutrition.kcal.toLocaleString('de-DE')} kcal.
-                  {portion.rest > 0.05 &&
-                    (() => {
-                      const r = Math.round(portion.rest * 4) / 4
-                      return ` Übrig für die anderen: ca. ${String(r).replace('.', ',')} ${r === 1 ? 'Portion' : 'Portionen'}.`
-                    })()}
-                </div>
-                {portion.tip && <div className="small">🥗 {portion.tip}</div>}
-                {portion.household && <div className="muted small">👥 Erfahrungsgemäß: {portion.household}. Fürs Einkaufen rechne ich damit.</div>}
-              </div>
+            {householdNote && !recipe.breakfast && !recipe.basic && (
+              <p className="muted small portion-note">👥 Erfahrungsgemäß: {householdNote}. Fürs Einkaufen rechne ich damit.</p>
             )}
 
             {recipe.breakfast && (

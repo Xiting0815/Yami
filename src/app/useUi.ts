@@ -29,13 +29,12 @@ export function useUi(days: string[], weekKey: string) {
   const [editor, setEditor] = useState<EditorState | null>(null)
   const [showPrep, setShowPrep] = useState(false)
   const [showProfile, setShowProfileRaw] = useState(false)
-  /** Profil-Sheet direkt beim Home-Assistant-Abschnitt öffnen */
+  /** Einstellungen direkt beim Home-Assistant-Abschnitt öffnen */
   const [profileFocus, setProfileFocus] = useState<'ha' | null>(null)
   const setShowProfile = (v: boolean, focus: 'ha' | null = null) => {
     setProfileFocus(v ? focus : null)
     setShowProfileRaw(v)
   }
-  const [showProgress, setShowProgress] = useState(false)
   /** Wochenrückblick-Sheet: Montag der gezeigten Woche (null = zu) */
   const [reviewMonday, setReviewMonday] = useState<string | null>(null)
   /** Tag, dessen „⋯“-Aktionen offen sind */
@@ -81,7 +80,6 @@ export function useUi(days: string[], weekKey: string) {
     [!!editor, () => setEditor(null)],
     [cooking, () => setCooking(false)],
     [showPrep, () => setShowPrep(false)],
-    [showProgress, () => setShowProgress(false)],
     [showProfile, () => setShowProfile(false)],
     [reviewMonday !== null, () => setReviewMonday(null)],
     [pantryChooser, () => setPantryChooser(false)],
@@ -109,7 +107,6 @@ export function useUi(days: string[], weekKey: string) {
     editor, setEditor,
     showPrep, setShowPrep,
     showProfile, setShowProfile, profileFocus,
-    showProgress, setShowProgress,
     reviewMonday, setReviewMonday,
     actionsDay, setActionsDay,
     pantryChooser, setPantryChooser,

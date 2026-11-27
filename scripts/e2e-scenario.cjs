@@ -25,6 +25,7 @@ const initial = {
   ],
   spices: { Pfeffer: 'da', Muskatnuss: 'alle' },
   onboarding: 'done', onboardingListSeen: true, defaultServings: 2, lastBackup: '2026-11-15',
+  // älterer Stand mit Kalorienprofil & Messung: lädt ohne Fehler, die Felder fallen weg
   profile: { sex: 'm', age: 40, heightCm: 180, weightKg: 92, activity: 1.3, deficit: 500, lunchKcal: 600 },
   weighIns: [{ date: '2026-11-16', weight: 92 }],
 }
@@ -58,6 +59,10 @@ const amt = (s, name) => s.pantry.filter((l) => l.name === name).reduce((a, l) =
   // ── Mo 16.11. ──
   await day('2026-11-16', '17:30', async (page, st) => {
     await page.screenshot({ path: `${SHOT}/1-mo-woche.png`, fullPage: true })
+    ok(!/kcal|Eiweiß|Tagesziel/.test(await page.locator('body').innerText()), 'Woche: keine kcal/Eiweiß/Tagesziel sichtbar')
+    ok(await page.locator('.brand-name', { hasText: 'Gusto' }).isVisible() && (await page.title()) === 'Gusto', 'Name „Gusto“ in Kopfzeile und Titel')
+    const s0 = await st()
+    ok(!('profile' in s0) && !('weighIns' in s0), 'alter Stand: Kalorienprofil und Messungen beim Laden verworfen')
     await tab(page, 'Vorrat')
     await page.screenshot({ path: `${SHOT}/2-mo-vorrat.png`, fullPage: true })
     await page.getByText('Was koche ich damit?').click()

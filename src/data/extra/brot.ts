@@ -34,7 +34,6 @@ export const brot: ExtraGroup = {
       {
         time: 1140,
         yields: { name: 'Bauernbrot selbstgebacken', amount: 1000, unit: 'g', shelf: 5, store: 'in Papier oder im Brotkasten', frozen: 90 },
-        lighter: 'Dünn schneiden (35 g statt 50 g pro Scheibe) und mit Kräuterquark statt Butter belegen – spart pro Scheibe rund 60 kcal.',
       },
       '30 g Anstellgut | 450 g Roggenmehl | 220 g Weizenmehl | 14 g Salz | 5 g Hefe frisch | 1 TL Kümmel',
       [
@@ -52,7 +51,6 @@ export const brot: ExtraGroup = {
       {
         time: 270,
         yields: { name: 'Dinkelvollkornbrot selbstgebacken', amount: 1100, unit: 'g', shelf: 5, store: 'in Papier oder im Brotkasten', frozen: 90 },
-        lighter: 'Dünn schneiden (35 g statt 50 g pro Scheibe) und mit Magerquark und Radieschen statt Butter belegen – spart pro Scheibe rund 60 kcal.',
       },
       '500 g Dinkelvollkornmehl | 250 g Dinkelmehl | 15 g Salz | 21 g Hefe frisch | 1 EL Honig | 40 g Leinsamen geschrotet',
       [
@@ -69,7 +67,6 @@ export const brot: ExtraGroup = {
       {
         time: 1080,
         yields: { name: 'Roggenmischbrot selbstgebacken', amount: 1100, unit: 'g', shelf: 6, store: 'in Papier oder im Brotkasten', frozen: 90 },
-        lighter: 'Scheiben dünn schneiden (35 g statt 50 g) und mit Frischkäse light und Gurke belegen – spart pro Scheibe rund 55 kcal.',
       },
       '40 g Anstellgut | 350 g Roggenmehl | 350 g Weizenmehl | 15 g Salz | 4 g Hefe frisch | 1 TL Kümmel',
       [
@@ -87,7 +84,6 @@ export const brot: ExtraGroup = {
       {
         time: 900,
         yields: { name: 'Dinkelbrötchen selbstgebacken', amount: 10, unit: 'Stk', shelf: 2, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
-        lighter: 'Aus dem Teig 12 statt 10 kleinere Brötchen formen – spart rund 35 kcal pro Brötchen.',
       },
       '600 g Dinkelmehl | 12 g Salz | 4 g Hefe frisch | 1 TL Honig',
       [
@@ -103,7 +99,6 @@ export const brot: ExtraGroup = {
       {
         time: 180,
         yields: { name: 'Burger-Buns selbstgebacken', amount: 8, unit: 'Stk', shelf: 3, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
-        lighter: 'Die Butter auf 30 g und den Zucker auf 25 g verringern – spart rund 25 kcal pro Bun.',
       },
       '400 g Weizenmehl | 7 g Salz | 40 g Zucker | 20 g Hefe frisch | 170 ml Milch | 2 Stk Ei | 50 g Butter | 2 TL Sesam',
       [
@@ -119,7 +114,6 @@ export const brot: ExtraGroup = {
       {
         time: 150,
         yields: { name: 'Kaiserbrötchen selbstgebacken', amount: 10, unit: 'Stk', shelf: 2, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
-        lighter: 'Butter weglassen und die Milch durch Wasser ersetzen – spart rund 35 kcal pro Brötchen.',
       },
       '500 g Weizenmehl | 10 g Salz | 21 g Hefe frisch | 1 TL Zucker | 30 g Butter | 250 ml Milch | 2 TL Sesam',
       [
@@ -135,7 +129,6 @@ export const brot: ExtraGroup = {
       {
         time: 150,
         yields: { name: 'Laugenbrötchen selbstgebacken', amount: 8, unit: 'Stk', shelf: 2, store: 'in einer Papiertüte bei Raumtemperatur (nicht luftdicht)', frozen: 90 },
-        lighter: 'Aus dem Teig 10 statt 8 kleinere Brötchen formen – spart rund 50 kcal pro Stück.',
       },
       '500 g Weizenmehl | 16 g Salz | 21 g Hefe frisch | 1 TL Zucker | 40 g Butter | 40 g Backnatron',
       [
@@ -153,7 +146,6 @@ export const brot: ExtraGroup = {
         cuisine: 'it',
         time: 1050,
         yields: { name: 'Ciabatta selbstgebacken', amount: 3, unit: 'Stk', shelf: 2, store: 'in Papier bei Raumtemperatur', frozen: 90 },
-        lighter: 'Das Olivenöl im Teig weglassen (der Teig wird trotzdem luftig) – spart rund 60 kcal pro Ciabatta.',
       },
       '500 g Weizenmehl Tipo 00 | 10 g Salz | 4 g Hefe frisch | 20 ml Olivenöl',
       [
@@ -171,7 +163,6 @@ export const brot: ExtraGroup = {
         cuisine: 'it',
         time: 150,
         yields: { name: 'Focaccia selbstgebacken', amount: 12, unit: 'Stk', shelf: 2, store: 'in Papier bei Raumtemperatur', frozen: 90 },
-        lighter: 'Nur 70 statt 110 ml Olivenöl verwenden (weniger auf das Blech) – spart rund 30 kcal pro Stück.',
       },
       '500 g Weizenmehl Tipo 00 | 12 g Salz | 15 g Hefe frisch | 1 TL Honig | 110 ml Olivenöl | 2 Zweig Rosmarin',
       [
@@ -188,7 +179,6 @@ export const brot: ExtraGroup = {
         cuisine: 'it',
         time: 1020,
         yields: { name: 'Pane pugliese selbstgebacken', amount: 1050, unit: 'g', shelf: 5, store: 'in Papier oder im Brotkasten', frozen: 90 },
-        lighter: 'Dünn schneiden (35 g statt 50 g pro Scheibe) und mit Tomate und Basilikum belegen statt mit Öl zu beträufeln – spart pro Scheibe rund 50 kcal.',
       },
       '50 g Anstellgut | 400 g Hartweizengrieß | 300 g Weizenmehl Tipo 00 | 14 g Salz | 4 g Hefe frisch',
       [
@@ -206,7 +196,6 @@ export const brot: ExtraGroup = {
         cuisine: 'it',
         time: 150,
         yields: { name: 'Pittule frisch', amount: 30, unit: 'Stk', shelf: 1, store: 'am besten sofort warm essen' },
-        lighter: 'Kleinere Pittule (1 TL statt 1 EL Teig) und nach dem Frittieren gut auf Küchenpapier abtropfen lassen – pro 5 Stück spart das rund 60 kcal. Süß mit Puderzucker statt Honig spart nochmal ca. 30 kcal.',
       },
       '500 g Weizenmehl Tipo 00 | 12 g Hefe frisch | 10 g Salz | 100 g Kirschtomaten | 40 g Oliven schwarz | 1 EL Kapern | 1000 ml Frittieröl | 2 EL Honig | 2 EL Puderzucker',
       [
@@ -221,7 +210,6 @@ export const brot: ExtraGroup = {
         cuisine: 'it',
         time: 100,
         yields: { name: 'Grissini selbstgebacken', amount: 24, unit: 'Stk', shelf: 7, store: 'luftdicht in einer Dose bei Raumtemperatur' },
-        lighter: 'Aus dem Teig 36 statt 24 dünnere Stangen rollen – spart bei drei Stangen rund 60 kcal.',
       },
       '250 g Weizenmehl Tipo 00 | 50 g Hartweizengrieß | 5 g Salz | 7 g Hefe frisch | 40 ml Olivenöl',
       [
@@ -238,7 +226,6 @@ export const brot: ExtraGroup = {
       {
         time: 240,
         yields: { name: 'Toastbrot selbstgebacken', amount: 820, unit: 'g', slice: 25, shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
-        lighter: 'Butter auf 15 g und Zucker auf 10 g verringern – spart rund 8 kcal pro Scheibe (25 g).',
       },
       '500 g Weizenmehl | 10 g Salz | 15 g Hefe frisch | 20 g Zucker | 40 g Butter | 150 ml Milch',
       [
@@ -254,7 +241,6 @@ export const brot: ExtraGroup = {
       {
         time: 230,
         yields: { name: 'Dinkel-Vollkorntoast selbstgebacken', amount: 830, unit: 'g', slice: 25, shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
-        lighter: 'Die Butter weglassen und die Milch durch Wasser ersetzen – spart rund 20 kcal pro 50 g; die Krume wird etwas fester.',
       },
       '300 g Dinkelvollkornmehl | 200 g Dinkelmehl | 10 g Salz | 15 g Hefe frisch | 15 g Honig | 30 g Butter | 200 ml Milch',
       [
@@ -271,7 +257,6 @@ export const brot: ExtraGroup = {
       {
         time: 250,
         yields: { name: 'Milchtoast selbstgebacken', amount: 760, unit: 'g', slice: 25, shelf: 4, store: 'in einem Brotbeutel bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
-        lighter: 'Zucker auf 20 g und Butter auf 20 g verringern – spart rund 8 kcal pro Scheibe (25 g), der Toast bleibt dank Tangzhong trotzdem weich.',
       },
       '400 g Weizenmehl | 8 g Salz | 10 g Hefe frisch | 40 g Zucker | 40 g Butter | 260 ml Milch | 1 Stk Ei',
       [
@@ -288,7 +273,6 @@ export const brot: ExtraGroup = {
       {
         time: 50,
         yields: { name: 'Quarkbrötchen selbstgebacken', amount: 10, unit: 'Stk', shelf: 2, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
-        lighter: 'Das Öl auf 25 ml halbieren und 12 statt 10 Brötchen formen – spart rund 55 kcal pro Brötchen.',
       },
       '400 g Weizenmehl | 1 Pck Backpulver | 6 g Salz | 10 g Zucker | 250 g Magerquark | 1 Stk Ei | 70 ml Milch | 50 ml Sonnenblumenöl | 2 TL Sesam',
       [
@@ -303,7 +287,6 @@ export const brot: ExtraGroup = {
       {
         time: 180,
         yields: { name: 'Körnerbrötchen selbstgebacken', amount: 10, unit: 'Stk', shelf: 2, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
-        lighter: 'Die Kürbiskerne obendrauf weglassen und nur mit Haferflocken bestreuen – spart rund 15 kcal pro Brötchen.',
       },
       '350 g Weizenmehl | 150 g Weizenvollkornmehl | 30 g Sonnenblumenkerne | 3 EL Kürbiskerne | 20 g Leinsamen geschrotet | 5 TL Sesam | 40 g Haferflocken | 11 g Salz | 15 g Hefe frisch | 10 g Honig',
       [
@@ -320,7 +303,6 @@ export const brot: ExtraGroup = {
       {
         time: 150,
         yields: { name: 'Milchbrötchen selbstgebacken', amount: 12, unit: 'Stk', shelf: 3, store: 'luftdicht in einem Beutel bei Raumtemperatur', frozen: 90 },
-        lighter: 'Zucker auf 25 g und Butter auf 40 g verringern – spart rund 25 kcal pro Brötchen.',
       },
       '500 g Weizenmehl | 9 g Salz | 21 g Hefe frisch | 50 g Zucker | 70 g Butter | 280 ml Milch | 2 Stk Ei',
       [
@@ -336,7 +318,6 @@ export const brot: ExtraGroup = {
       {
         time: 90,
         yields: { name: 'Soda Bread selbstgebacken', amount: 820, unit: 'g', shelf: 3, store: 'in ein Küchentuch gewickelt im Brotkasten', frozen: 90 },
-        lighter: 'Dünn schneiden (35 g statt 50 g pro Scheibe) und mit Kräuterquark statt Butter belegen – spart pro Scheibe rund 80 kcal.',
       },
       '250 g Weizenvollkornmehl | 200 g Weizenmehl | 30 g Haferflocken | 6 g Backnatron | 8 g Salz | 10 g Zucker | 420 ml Buttermilch',
       [
@@ -352,7 +333,6 @@ export const brot: ExtraGroup = {
       {
         time: 1020,
         yields: { name: 'Hefe-Bauernbrot selbstgebacken', amount: 920, unit: 'g', shelf: 4, store: 'in Papier oder im Brotkasten', frozen: 90 },
-        lighter: 'Dünn schneiden (35 g statt 50 g pro Scheibe) und mit Magerquark und Schnittlauch statt Butter belegen – spart pro Scheibe rund 80 kcal.',
       },
       '350 g Weizenmehl | 150 g Roggenmehl | 11 g Salz | 8 g Hefe frisch | 1 TL Kümmel',
       [
@@ -369,7 +349,6 @@ export const brot: ExtraGroup = {
       {
         time: 960,
         yields: { name: 'Baguette selbstgebacken', amount: 3, unit: 'Stk', shelf: 1, store: 'in Papier bei Raumtemperatur', frozen: 90 },
-        lighter: 'Ein Baguette auf vier statt drei Portionen teilen und mit Tomate statt Butter essen – spart rund 140 kcal pro Portion.',
       },
       '500 g Weizenmehl | 10 g Salz | 4 g Hefe frisch',
       [
@@ -386,7 +365,6 @@ export const brot: ExtraGroup = {
       {
         time: 140,
         yields: { name: 'Wasserweck selbstgebacken', amount: 10, unit: 'Stk', shelf: 1, store: 'in einer Papiertüte bei Raumtemperatur', frozen: 90 },
-        lighter: 'Aus dem Teig 12 statt 10 kleinere Wecken formen – spart rund 30 kcal pro Brötchen.',
       },
       '500 g Weizenmehl | 10 g Salz | 15 g Hefe frisch | 5 g Zucker | 10 ml Sonnenblumenöl',
       [

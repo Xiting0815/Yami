@@ -100,8 +100,7 @@ ok(!lisa.onboarding, 'Lisa frisch: Start-Checkliste läuft')
 lisa = await sync(hass, lisa)
 ok(lisa.plan['2026-11-16']?.recipeId === A.id && lisa.pantry.length === 2, 'Lisa: übernimmt Plan und Vorrat des Haushalts')
 ok(lisa.plan['2026-11-19']?.recipeId === B.id, 'Lisa: beim Beitritt gewinnt der Haushalt (ihr alter Do-Eintrag überschreibt nichts)')
-ok(lisa.onboarding === 'done', 'Lisa: Beitritt → keine Start-Checkliste mit Kalorienprofil')
-ok(!lisa.profile, 'Lisa: kein Profil nötig')
+ok(lisa.onboarding === 'done', 'Lisa: Beitritt → keine Start-Checkliste')
 ok(lisa.sync!.notices.length === 0, 'Beitritt: keine Hinweise-Flut')
 marc = await sync(hass, marc)
 ok(marc.plan['2026-11-19']?.recipeId === B.id, 'Marc: Do bleibt sein Gericht')
@@ -485,8 +484,8 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   const api = h7.api()
   let t = Date.parse('2026-11-16T09:00:00') // Montag
   const devs: Record<string, AppState> = {
-    // Marc: Profil, wiegt dienstags → „Heute wiegen“ morgen 7:30; Ei läuft morgen ab → „Läuft morgen ab“ (geteilt)
-    Marc: dev('Marc', { onboarding: 'done', profile: { sex: 'm', age: 40, heightCm: 180, weightKg: 92, activity: 1.3, deficit: 500, lunchKcal: 600 } as AppState['profile'], weighIns: [{ date: '2026-11-10', weight: 92 }], pantry: [{ id: 'ex1', name: 'Ei', amount: 4, unit: 'Stk', expires: '2026-11-17' }] }),
+    // Marc: bereitet heute (Mo) sein Frühstück vor → „Meal-Prep heute“ 18:00 (persönlich); Ei läuft morgen ab → „Läuft morgen ab“ (geteilt)
+    Marc: dev('Marc', { onboarding: 'done', breakfastPicks: { '2026-11-16': ['oats-apfel-zimt', 'eiermuffins-schinken'] }, prepDays: { '2026-11-16': '2026-11-16' }, pantry: [{ id: 'ex1', name: 'Ei', amount: 4, unit: 'Stk', expires: '2026-11-17' }] }),
     Lisa: dev('Lisa'),
   }
   const run = async (who: string, plus = 1000) => {
@@ -502,23 +501,23 @@ ok(portionFactor([marc.portionFeedback, marc.sync!.household.Lisa.portionFeedbac
   await run('Lisa', 10 * 60_000) // Stab abgelaufen → Lisa hält ihn jetzt
   ok(devs.Lisa.sync?.main?.person === 'Lisa', 'Erinnerungen: Lisa hält den Schreibstab')
   await run('Marc', 30_000) // Marc gleicht ab, ohne Stab
-  const weigh = rem().filter((e) => e.summary.includes('wiegen'))
+  const weigh = rem().filter((e) => e.summary.includes('Meal-Prep'))
   const exp = rem().filter((e) => e.summary.includes('Läuft morgen ab'))
-  ok(weigh.length === 1, 'Erinnerungen: Marcs „Heute wiegen“ genau einmal (auch ohne Stab angelegt)')
+  ok(weigh.length === 1, 'Erinnerungen: Marcs „Meal-Prep heute“ genau einmal (auch ohne Stab angelegt)')
   ok(exp.length === 1, 'Erinnerungen: „Läuft morgen ab“ (geteilter Vorrat) genau einmal')
-  ok(Object.keys(devs.Lisa.ha!.events).every((k) => !k.startsWith('rem:Marc:')) && Object.keys(devs.Marc.ha!.events).some((k) => k.startsWith('rem:Marc:weigh:')), 'Erinnerungen: Marcs Zuordnung nur bei Marc (nicht im Stab, nicht bei Lisa)')
+  ok(Object.keys(devs.Lisa.ha!.events).every((k) => !k.startsWith('rem:Marc:')) && Object.keys(devs.Marc.ha!.events).some((k) => k.startsWith('rem:Marc:prep:')), 'Erinnerungen: Marcs Zuordnung nur bei Marc (nicht im Stab, nicht bei Lisa)')
   ok(!Object.keys(devs.Lisa.ha!.events).some((k) => k.startsWith('rem:Lisa:')), 'Erinnerungen: Lisa ohne Profil/Frühstück legt keine persönlichen an')
   for (let i = 0; i < 4; i++) {
     await run('Lisa', 20_000)
     await run('Marc', 20_000)
   }
-  ok(rem().filter((e) => e.uid === weigh[0].uid).length === 1 && rem().filter((e) => e.summary.includes('wiegen')).length === 1, 'Lisa mit Stab entfernt oder ersetzt Marcs Erinnerung nie')
+  ok(rem().filter((e) => e.uid === weigh[0].uid).length === 1 && rem().filter((e) => e.summary.includes('Meal-Prep')).length === 1, 'Lisa mit Stab entfernt oder ersetzt Marcs Erinnerung nie')
   ok(rem().length === 2, `keine doppelten Erinnerungen (${rem().length})`)
   // Stab wechselt mehrfach – Ablauf-Erinnerung bleibt einmalig (Zuordnung im Stab)
   await run('Marc', 10 * 60_000)
   await run('Lisa', 10 * 60_000)
   await run('Marc', 10 * 60_000)
-  ok(rem().filter((e) => e.summary.includes('Läuft morgen ab')).length === 1 && rem().filter((e) => e.summary.includes('wiegen')).length === 1, 'Stabwechsel: weiterhin jede Erinnerung genau einmal')
+  ok(rem().filter((e) => e.summary.includes('Läuft morgen ab')).length === 1 && rem().filter((e) => e.summary.includes('Meal-Prep')).length === 1, 'Stabwechsel: weiterhin jede Erinnerung genau einmal')
 }
 
 // ───── 13c) Einkäufe: Freigabe, „Habe ich“, Einkaufstag wandern mit (Marc gibt frei, Lisa prüft gleichzeitig) ─────

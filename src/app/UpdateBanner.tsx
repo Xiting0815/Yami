@@ -47,7 +47,7 @@ export function UpdateBanner() {
   if (!ready) return null
   return (
     <div className="update-banner" role="status">
-      <span>✨ Neue Version von Yami ist da.</span>
+      <span>✨ Neue Version von Gusto ist da.</span>
       <button className="btn primary" onClick={() => apply?.()}>
         Neu laden
       </button>

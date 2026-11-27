@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Recipe } from '../types'
 import { BREAKFAST_LABEL, CUISINE_LABEL, TYPE_LABEL } from '../types'
-import { NutritionRow } from './NutritionRow'
 import { formatTime } from '../filter'
 import { type Insight, formatEuro } from '../kitchen'
 import { formatAmount } from '../shopping'
-import type { Portion } from '../energy'
 import { RecipeImage } from './RecipeImage'
 
 interface Props {
@@ -17,8 +15,6 @@ interface Props {
   onTake: (r: Recipe) => void
   onReject: (r: Recipe) => void
   onInfo: (r: Recipe) => void
-  /** deine Portion beim Abendessen (mit Profil) */
-  portionOf?: (r: Recipe) => Portion | undefined
 }
 
 const THRESHOLD = 90
@@ -61,7 +57,7 @@ export function InsightBadges({ ins, pantryMode }: { ins?: Insight; pantryMode?:
   )
 }
 
-export function SwipeDeck({ deck, insights, pantryMode, onTake, onReject, onInfo, portionOf }: Props) {
+export function SwipeDeck({ deck, insights, pantryMode, onTake, onReject, onInfo }: Props) {
   const [drag, setDrag] = useState({ dx: 0, dy: 0, active: false })
   const [leaving, setLeaving] = useState<null | 'left' | 'right'>(null)
   const start = useRef<{ x: number; y: number; t: number } | null>(null)
@@ -191,7 +187,6 @@ export function SwipeDeck({ deck, insights, pantryMode, onTake, onReject, onInfo
             <h2>{top.title}</h2>
             {top.breakfast ? (
               <>
-                <NutritionRow n={top.nutrition} className="on-card" />
                 <div className="card-meta">
                   {BREAKFAST_LABEL[top.breakfast.type]} · 🧊 hält {top.breakfast.fridgeDays} Tage{top.breakfast.freezer ? ' · ❄️ einfrierbar' : ''}
                   {ins ? ` · ≈ ${formatEuro(ins.perPortion)}` : ''}
@@ -199,12 +194,8 @@ export function SwipeDeck({ deck, insights, pantryMode, onTake, onReject, onInfo
               </>
             ) : (
               <div className="card-meta">
-                {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)} · ≈ {top.nutrition.kcal.toLocaleString('de-DE')} kcal
+                {CUISINE_LABEL[top.cuisine]} · {TYPE_LABEL[top.type]} · ⏱ {formatTime(top.time)}
                 {ins ? ` · ≈ ${formatEuro(ins.perPortion)}/P.` : ''}
-                {(() => {
-                  const po = portionOf?.(top)
-                  return po ? <div className="card-portion">🍽️ Deine Portion: {po.label} · {po.kcal.toLocaleString('de-DE')} kcal</div> : null
-                })()}
               </div>
             )}
           </div>

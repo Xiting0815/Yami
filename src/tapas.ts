@@ -14,10 +14,9 @@ import { BASICS, RECIPE_BY_ID, basicFor } from './data/recipes'
 import { SPICES } from './data/catalog'
 import { interchangeable } from './data/substitutes'
 import { canonical, type PantryLot } from './kitchen'
-import { type BakedRef, addBake, bakesOn, daysBetween, decay, recipeScores, tapasEntries, tapasFactorFor } from './bakePlan'
+import { type BakedRef, addBake, bakesOn, daysBetween, decay, recipeScores, tapasEntries } from './bakePlan'
 import { dinnerToReplace } from './bbq'
-import type { Snack } from './energy'
-import type { BakePlan, PlanEntry, Recipe, TapasGroup, TapasServe, WeekPlan } from './types'
+import type { BakePlan, PlanEntry, Recipe, Snack, TapasGroup, TapasServe, WeekPlan } from './types'
 import { TAPAS_GROUP_LABEL, isTapa } from './types'
 
 /** so viele Tapas kann man für einen Abend wählen (empfohlen 4–6) */
@@ -38,18 +37,6 @@ export const shortTitle = (title: string): string => title.replace(/\s*\([^)]*\)
 
 /** Tapas eines Tages als Rezepte (ohne „nicht gemacht“) */
 export const tapasOn = (bp: BakePlan, day: string): Recipe[] => tapasEntries(bp, day).map((e) => RECIPE_BY_ID[e.recipeId]).filter(Boolean)
-
-/** kcal je Person für einen Abend aus diesen Tapas (jede Tapa mit dem Faktor für ihre Anzahl) */
-export function eveningKcal(recipes: Recipe[]): number {
-  const f = tapasFactorFor(recipes.length)
-  return Math.round(recipes.reduce((s, r) => s + r.nutrition.kcal * f, 0))
-}
-
-/** Eiweiß je Person für den Abend */
-export function eveningProtein(recipes: Recipe[]): number {
-  const f = tapasFactorFor(recipes.length)
-  return Math.round(recipes.reduce((s, r) => s + r.nutrition.protein * f, 0))
-}
 
 /**
  * Tapas-Abend einplanen: die gewählten Tapas (jede einmal) auf den Tag legen. Noch offene Tapas, die vorher für den Tag
@@ -97,13 +84,10 @@ export function moveTapasEvening(
   return planTapasEvening({ plan: s.plan, bakePlan: removeTapasEvening(s.bakePlan, from) }, to, ids, replaceDinner)
 }
 
-/**
- * „Fertig“ einer Tapa: ihr Anteil am Abend zählt in die Tagesbilanz (kcal je Person × Faktor des Abends) –
- * wie ein Abendessen, das man Stück für Stück isst. Auch fürs Lernen („gegessen“).
- */
-export function tapasMeal(recipe: Recipe, day: string, factor: number): Snack | null {
-  if (!isTapa(recipe) || !(recipe.nutrition.kcal > 0)) return null
-  return { date: day, name: recipe.title, kcal: Math.round(recipe.nutrition.kcal * factor), protein: Math.round(recipe.nutrition.protein * factor * 10) / 10, recipeId: recipe.id }
+/** „Fertig“ einer Tapa: zählt fürs Lernen als „gegessen“ */
+export function tapasMeal(recipe: Recipe, day: string): Snack | null {
+  if (!isTapa(recipe)) return null
+  return { date: day, name: recipe.title, recipeId: recipe.id }
 }
 
 // ───────────── Ablaufplan im Kochmodus „Tapas-Abend“ ─────────────
@@ -214,8 +198,6 @@ export interface TapasIdea {
   /** kurze Begründung: Gruppen, Lieblinge, Vorrat */
   reason: string
   recipes: Recipe[]
-  /** kcal je Person für den ganzen Abend */
-  kcal: number
 }
 
 /**
@@ -257,7 +239,7 @@ export function tapasIdeas(inp: TapasInput): TapasIdea[] {
     const stock = [...new Set(list.flatMap((x) => x.hits))]
     const parts = [groups, ...(fav.length ? [`❤️ ${fav.join(', ')}`] : []), ...(stock.length ? [`🧺 aus dem Vorrat: ${stock.slice(0, 3).join(', ')}`] : [])]
     const recipes = list.map((x) => x.r)
-    return { label, reason: parts.join(' — '), recipes, kcal: eveningKcal(recipes) }
+    return { label, reason: parts.join(' — '), recipes }
   }
   const out: TapasIdea[] = []
   const a = build(false)

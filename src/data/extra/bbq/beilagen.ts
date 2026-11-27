@@ -33,7 +33,7 @@ export const beilagen: ExtraGroup = {
 
     // ───────────── Kartoffelsalat: mit Mayo (Südstaaten) und ohne Mayo (German-Style mit Speck-Vinaigrette) ─────────────
     bbq('southern-potato-salad', 'Southern Potato Salad mit Mayo, Senf und Ei',
-      { group: 'beilage', time: 120, portions: 4, eat: 4, lighter: 'Die Hälfte der Mayonnaise durch Joghurt ersetzen – spart rund 100 kcal je Portion und schmeckt trotzdem cremig.' },
+      { group: 'beilage', time: 120, portions: 4, eat: 4 },
       '800 g Kartoffeln festkochend | 3 Stk Ei | 1 EL Apfelessig | 120 g Mayonnaise | 2 EL Senf mittelscharf | 1 TL Zucker | 2 Stk Staudensellerie | 0.5 Stk Zwiebel rot | 2 Stk Gewürzgurke | 1 TL Paprikapulver edelsüß | 0.5 Bund Schnittlauch | Salz | Pfeffer',
       [
         'Die Kartoffeln schälen, in 2 cm große Würfel schneiden und in Salzwasser 12 bis 15 Minuten gar kochen. Die Eier 10 Minuten hart kochen und kalt abschrecken.',
@@ -55,7 +55,7 @@ export const beilagen: ExtraGroup = {
 
     // ───────────── Mac and Cheese: aus dem Smoker und klassisch aus dem Topf ─────────────
     bbq('smoked-mac-and-cheese', 'Smoked Mac and Cheese aus dem Traeger',
-      { group: 'beilage', time: 90, portions: 4, eat: 4, lighter: 'Halb Milch, halb Gemüsebrühe für die Sauce und nur Cheddar (ohne Gouda) – spart rund 120 kcal je Portion.' },
+      { group: 'beilage', time: 90, portions: 4, eat: 4 },
       '250 g Nudeln | 30 g Butter | 25 g Weizenmehl | 500 ml Milch | 150 g Cheddar gerieben | 100 g Gouda gerieben | 1 TL Senf mittelscharf | 1 TL Paprikapulver geräuchert | 0.5 TL Knoblauchpulver | 30 g Panko | Salz | Pfeffer',
       [
         'Den Smoker auf 107 °C (225 °F) vorheizen. Die Nudeln (am besten kurze Hörnchennudeln) in Salzwasser 2 Minuten kürzer als auf der Packung angegeben kochen und abgießen.',
@@ -65,7 +65,7 @@ export const beilagen: ExtraGroup = {
       ]),
 
     bbq('stovetop-mac-and-cheese', 'Stovetop Mac and Cheese (cremig aus dem Topf)',
-      { group: 'beilage', time: 25, portions: 4, eat: 4, lighter: 'Mit 50 g weniger Cheddar und einer Handvoll gedämpftem Brokkoli unter den Nudeln wird es deutlich leichter.' },
+      { group: 'beilage', time: 25, portions: 4, eat: 4 },
       '250 g Nudeln | 250 ml Milch | 15 g Butter | 50 g Schmelzkäse | 150 g Cheddar gerieben | 0.5 TL Senf mittelscharf | 1 Prise Cayennepfeffer | Salz',
       [
         'Die Nudeln (am besten kurze Hörnchennudeln) in Salzwasser bissfest kochen und abgießen.',
@@ -76,7 +76,7 @@ export const beilagen: ExtraGroup = {
 
     // ───────────── Coleslaw: cremig und mit Essig (Carolina) ─────────────
     bbq('creamy-coleslaw', 'Cremiger Coleslaw',
-      { group: 'beilage', time: 80, portions: 4, eat: 4, lighter: 'Nur Joghurt statt Mayonnaise nehmen – spart rund 80 kcal je Portion.' },
+      { group: 'beilage', time: 80, portions: 4, eat: 4 },
       '500 g Weißkohl | 1 EL Zucker | 2 Stk Möhre | 80 g Mayonnaise | 80 g Joghurt natur | 2 EL Apfelessig | 1 TL Senf mittelscharf | Salz | Pfeffer',
       [
         'Den Weißkohl vierteln, den Strunk herausschneiden und den Kohl in sehr feine Streifen hobeln. Mit 1 TL Salz und dem Zucker kräftig verkneten, 10 Minuten ziehen lassen und das austretende Wasser gut ausdrücken – so bleibt der Coleslaw knackig und wird nicht wässrig.',
@@ -100,7 +100,6 @@ export const beilagen: ExtraGroup = {
       {
         group: 'beilage', time: 50, portions: 6, eat: 2,
         leftover: { name: 'Cornbread (vakuumiert)', amount: 4, unit: 'Portion', portion: 1, shelf: 90 },
-        lighter: 'Ein Stück Cornbread hat rund 270 kcal – zum Fleisch reicht eins pro Person; den Rest gleich einfrieren.',
       },
       '200 g Polenta | 350 ml Buttermilch | 80 g Weizenmehl | 1 TL Backpulver | 0.5 TL Backnatron | 1 EL Zucker | 50 g Butter | 2 Stk Ei | 1 EL Schweineschmalz | Salz',
       [
@@ -112,7 +111,7 @@ export const beilagen: ExtraGroup = {
       ]),
 
     bbq('buttermilk-biscuits', 'Buttermilk Biscuits',
-      { group: 'beilage', time: 35, portions: 4, eat: 4, lighter: 'Ein Biscuit hat rund 200 kcal – zum Fleisch eins pro Person, die übrigen ungebacken einfrieren und bei Bedarf frisch backen.' },
+      { group: 'beilage', time: 35, portions: 4, eat: 4 },
       '250 g Weizenmehl | 2 TL Backpulver | 0.5 TL Backnatron | 1 TL Zucker | 90 g Butter | 180 ml Buttermilch | Salz',
       [
         'Den Backofen auf 220 °C Ober-/Unterhitze vorheizen. Weizenmehl, Backpulver, Backnatron, Zucker und 1 TL Salz mischen.',
@@ -123,7 +122,7 @@ export const beilagen: ExtraGroup = {
       ]),
 
     bbq('hush-puppies', 'Hush Puppies aus dem Airfryer',
-      { group: 'beilage', time: 35, portions: 4, eat: 4, lighter: 'Aus dem Airfryer haben Hush Puppies nur etwa halb so viel Fett wie frittiert.' },
+      { group: 'beilage', time: 35, portions: 4, eat: 4 },
       '150 g Polenta | 60 g Weizenmehl | 1 TL Backpulver | 0.5 TL Backnatron | 1 TL Zucker | 1 Prise Cayennepfeffer | 0.5 Stk Zwiebel | 2 Stk Frühlingszwiebel | 1 Stk Ei | 150 ml Buttermilch | Frittieröl | Salz',
       [
         'Polenta, Weizenmehl, Backpulver, Backnatron, Zucker, Cayennepfeffer und 1 TL Salz mischen. Die Zwiebel sehr fein würfeln, die Frühlingszwiebeln in feine Ringe schneiden.',
@@ -144,7 +143,7 @@ export const beilagen: ExtraGroup = {
       ]),
 
     bbq('grill-baked-potatoes', 'Baked Potatoes vom Grill mit Sour Cream und Speck',
-      { group: 'beilage', time: 80, portions: 2, eat: 2, lighter: 'Statt Saurer Sahne Kräuterquark nehmen und den Speck weglassen – spart rund 150 kcal je Kartoffel.' },
+      { group: 'beilage', time: 80, portions: 2, eat: 2 },
       '600 g Kartoffeln mehligkochend | 1 EL Olivenöl | 50 g Speckwürfel | 0.5 Bund Schnittlauch | 20 g Butter | 100 g Saure Sahne | 30 g Cheddar gerieben | Salz | Pfeffer',
       [
         'Zwei große Kartoffeln (je ca. 300 g) waschen, trocken reiben, mehrmals mit der Gabel einstechen und mit Olivenöl und grobem Salz einreiben.',

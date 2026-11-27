@@ -47,7 +47,6 @@ export const tapasFisch: ExtraGroup = {
     tapa('calamares-a-la-romana', 'Calamares a la romana (frittierte Tintenfischringe in Mehl und Ei)',
       {
         group: 'fisch', time: 25, serve: 'heiss', ahead: 'Tintenfischringe am Vortag im Kühlschrank auftauen lassen',
-        lighter: 'Airfryer statt Fett: die Ringe in Mehl, verquirltem Ei und dann in Panko wenden, mit 1 TL Öl einsprühen und im vorgeheizten Airfryer bei 180 °C 8 Minuten backen, nach der Hälfte wenden – spart rund 100 kcal je Person. Mit dem klassischen Ei-Mantel allein klappt das im Airfryer nicht (er tropft ab).',
       },
       '120 g Tintenfischringe TK | 20 g Weizenmehl | 0.5 Stk Ei | 300 ml Frittieröl | 0.5 Stk Zitrone | Salz',
       [
@@ -150,7 +149,7 @@ export const tapasFisch: ExtraGroup = {
         settings: [bora('7', { minutes: 5, note: 'Öl auf 180 °C' })],
       },
       {
-        text: 'Die Ringe portionsweise (2 Runden) je 2 Minuten goldgelb ausbacken, dabei einmal wenden, und auf Küchenpapier abtropfen lassen. Nicht zu viele auf einmal, sonst kühlt das Öl ab und sie werden fettig. Den BORA-Abzug eine Stufe höher stellen. Leichter im Airfryer: Ringe in Mehl, Ei und Panko wenden, mit wenig Öl einsprühen und 8 Minuten backen.',
+        text: 'Die Ringe portionsweise (2 Runden) je 2 Minuten goldgelb ausbacken, dabei einmal wenden, und auf Küchenpapier abtropfen lassen. Nicht zu viele auf einmal, sonst kühlt das Öl ab und sie werden fettig. Den BORA-Abzug eine Stufe höher stellen. Alternative im Airfryer: Ringe in Mehl, Ei und Panko wenden, mit wenig Öl einsprühen und 8 Minuten backen.',
         settings: [bora('7', { minutes: 4, note: '2 Runden à 2 Min.' }), { device: 'airfryer', mode: 'Heissluft', temp: 180, minutes: 8, note: 'nur paniert (Mehl–Ei–Panko), vorheizen, nach 4 Min. wenden', alt: true }],
       },
       { text: 'Sofort mit Zitronenspalten und etwas Salz servieren. Tintenfisch nicht länger garen – nach 2 bis 3 Minuten wird er zäh wie Gummi.' },

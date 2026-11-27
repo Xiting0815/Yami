@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { BakeEntry, Recipe } from '../types'
 import { TAPAS_GROUP_ICON } from '../types'
-import { TAPAS_MIN, eveningKcal, eveningProtein, shortTitle } from '../tapas'
+import { TAPAS_MIN, shortTitle } from '../tapas'
 import { tapasFactorFor } from '../bakePlan'
 import { shortDate, weekdayName } from '../store'
 import { BakeDays } from './BakeDays'
@@ -51,7 +51,7 @@ export function TapasPlanSheet({ picks, today, plannedDays, dinnerOn, onRemove, 
           <div className="act-head-text">
             <b>Tapas-Abend planen</b>
             <small>
-              {n} Tapas · ≈ {eveningKcal(picks).toLocaleString('de-DE')} kcal · {eveningProtein(picks)} g Eiweiß p. P. · {factorText(n)}
+              {n} Tapas · {factorText(n)}
             </small>
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="Schließen"><Icon name="close" size={18} /></button>
@@ -104,7 +104,7 @@ export function TapasEveningSheet({ day, today, entries, plannedDays, startMove,
           <span className="tapas-head-icon" aria-hidden>🫒</span>
           <div className="act-head-text">
             <b>Tapas-Abend · {weekdayName(day, true)} {shortDate(day)}</b>
-            <small>{recipes.length} Tapas · ≈ {eveningKcal(recipes).toLocaleString('de-DE')} kcal p. P. · statt Abendessen</small>
+            <small>{recipes.length} Tapas · statt Abendessen</small>
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="Schließen"><Icon name="close" size={18} /></button>
         </div>

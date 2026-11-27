@@ -1,7 +1,7 @@
 // Backen & Desserts – Gruppe „Spanische Desserts“ (Crema catalana, Churros con chocolate, Tarta de Santiago, Flan de huevo,
 // Torrijas, Arroz con leche, Leche frita …). Nur diese Datei bearbeiten. Regeln: docs/backen-regeln.md und
 // docs/spanien-regeln.md (spanischer Titel mit deutscher Erklärung, Bezugsquellen).
-// Anlegen mit `backen('dessert' | 'kuchen' | 'gebaeck', id, titel, { cuisine: 'es', time, yields, lighter }, zutaten, schritte)`;
+// Anlegen mit `backen('dessert' | 'kuchen' | 'gebaeck', id, titel, { cuisine: 'es', time, yields }, zutaten, schritte)`;
 // Tarta de Santiago ist ein Kuchen (`'kuchen'`, Ergebnis in Stk), Churros Gebäck oder Dessert (Portion).
 // Gemeinsame Spanien-Zutaten: src/data/extra/zutaten-es.ts. Neue Fotos: Zeilen in scripts/fotos-neu-desserts-es.md.
 import { backen, prod } from '../define'
@@ -25,7 +25,6 @@ export const dessertsEs: ExtraGroup = {
         cuisine: 'es',
         time: 270,
         yields: { name: 'Crema catalana (selbstgemacht)', amount: 4, unit: 'Portion', shelf: 2, store: 'im Kühlschrank (abgedeckt, ohne Kruste)' },
-        lighter: 'Halb Milch, halb fettarme Milch und nur 60 g Zucker in der Creme – die Karamellkruste bleibt, spart rund 40 kcal je Portion.',
       },
       '500 ml Milch | 1 Stk Zimtstange | 0.5 Stk Zitrone unbehandelt | 4 Stk Eigelb | 80 g Zucker | 2 EL Speisestärke | 4 TL Zucker',
       [
@@ -41,7 +40,6 @@ export const dessertsEs: ExtraGroup = {
         cuisine: 'es',
         time: 45,
         yields: { name: 'Churros con chocolate (selbstgemacht)', amount: 4, unit: 'Portion', shelf: 1, store: 'Churros bei Raumtemperatur, Schokolade im Kühlschrank' },
-        lighter: 'Die Schokolade mit fettarmer Milch und nur 70 g Zartbitterschokolade kochen und die Churros nicht in Zucker wälzen – spart rund 90 kcal pro Portion.',
       },
       '125 g Weizenmehl | Salz | 2 EL Sonnenblumenöl | 400 ml Milch | 100 g Zartbitterschokolade | 15 g Speisestärke | 50 g Zucker',
       [
@@ -57,7 +55,6 @@ export const dessertsEs: ExtraGroup = {
         cuisine: 'es',
         time: 75,
         yields: { name: 'Tarta de Santiago (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 5, store: 'luftdicht bei Raumtemperatur', frozen: 60 },
-        lighter: 'Die Torte in 16 statt 12 Stücke schneiden und den Zucker auf 180 g reduzieren – spart rund 85 kcal pro Stück.',
       },
       '10 g Butter | 5 Stk Ei | 250 g Zucker | 250 g Mandeln gemahlen | 1 Stk Zitrone unbehandelt | 0.5 TL Zimt gemahlen | 2 EL Puderzucker',
       [
@@ -73,7 +70,6 @@ export const dessertsEs: ExtraGroup = {
         cuisine: 'es',
         time: 300,
         yields: { name: 'Flan de huevo (selbstgemacht)', amount: 4, unit: 'Portion', shelf: 3, store: 'im Kühlschrank (abgedeckt in den Förmchen)' },
-        lighter: 'Mit fettarmer Milch und nur 50 g Zucker in der Eiermasse – das Karamell bleibt, spart rund 45 kcal pro Portion.',
       },
       '160 g Zucker | 500 ml Milch | 0.5 Stk Zitrone unbehandelt | 1 Stk Zimtstange | 4 Stk Ei',
       [
@@ -90,7 +86,6 @@ export const dessertsEs: ExtraGroup = {
         time: 50,
         yields: { name: 'Torrijas (selbstgemacht)', amount: 4, unit: 'Portion', shelf: 2, store: 'im Kühlschrank (abgedeckt)' },
         festive: ['ostern'],
-        lighter: 'Die Torrijas nur mit 1 EL Öl bepinselt im Airfryer backen statt in der Pfanne auszubraten und mit fettarmer Milch tränken – spart rund 100 kcal pro Portion.',
       },
       '1 Stk Ciabatta | 500 ml Milch | 1 Stk Zimtstange | 0.5 Stk Zitrone unbehandelt | 110 g Zucker | 2 Stk Ei | 4 EL Olivenöl | 1 TL Zimt gemahlen',
       [
@@ -106,7 +101,6 @@ export const dessertsEs: ExtraGroup = {
         cuisine: 'es',
         time: 60,
         yields: { name: 'Arroz con leche (selbstgemacht)', amount: 4, unit: 'Portion', shelf: 3, store: 'im Kühlschrank (abgedeckt)' },
-        lighter: 'Mit fettarmer Milch und nur 50 g Zucker kochen – spart rund 45 kcal pro Portion.',
       },
       '800 ml Milch | 1 Stk Zimtstange | 0.5 Stk Zitrone unbehandelt | 80 g Milchreis | 70 g Zucker | 1 TL Zimt gemahlen',
       [

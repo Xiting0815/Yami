@@ -4,8 +4,7 @@ import { RECIPES, RECIPE_BY_ID } from '../data/recipes'
 import { type PersonModel, buildModel, householdPreference, portionFactor } from '../learning'
 import { householdFeedback } from '../sync'
 import { sharingActive } from '../store'
-import { dayBalance, isProteinLow, isWorkday, proteinBoost } from '../energy'
-import { type AppState, addDays, isoDate, mondayOf, parseIso } from '../store'
+import type { AppState } from '../store'
 import { matches } from '../filter'
 import { formatAmount } from '../shopping'
 import { removalUseEvents, stapleHints, useEvents } from '../staples'
@@ -99,18 +98,6 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
     [household, state.ha?.me, state.plan, state.bakePlan, state.wasted, today, state.tasteSince, state.customRecipes],
   )
 
-  // ───── Eiweiß lernen: zu wenig Eiweiß an den letzten Arbeitstagen → Abendessen mit viel Eiweiß steigen ─────
-  const proteinHigh = useMemo(() => {
-    if (!state.profile) return false
-    const weekEnd = isoDate(addDays(mondayOf(parseIso(today)), 6))
-    const last = Object.keys(state.plan)
-      .filter((d) => d <= weekEnd && isWorkday(d) && state.plan[d] && state.plan[d]!.status !== 'skipped')
-      .sort()
-      .slice(-10)
-    const low = last.filter((d) => isProteinLow(dayBalance(state.profile!, state.breakfast[d], state.plan[d], state.snacks, d))).length
-    return low >= 3
-  }, [state.profile, state.plan, state.breakfast, state.snacks, today])
-
   // Einkauf am Wochenanfang (oder heute) → wie viele Tage bis zum gewischten Kochtag?
   const freshDays = Math.max(0, daysUntil(swipeDay, today > days[0] ? today : days[0]))
   const insights = useMemo(
@@ -124,12 +111,11 @@ export function usePlanning(state: AppState, { today, days, weekKey }: Calendar,
             day: swipeDay,
           })
           const pref = householdPreference(taste, others, r, swipeDay)
-          const bonus = proteinHigh ? proteinBoost(r.nutrition.protein) : 0
           // Vorrats-Modus: Vorrat zuerst, gelernte Vorliebe nur als Tie-Breaker (×0,3)
-          return [r.id, { ...ins, score: ins.score + pref.score + bonus, modeScore: ins.modeScore + pref.score * 0.3, taste: pref.reason ?? (bonus > 0 ? '💪 viel Eiweiß' : undefined) }]
+          return [r.id, { ...ins, score: ins.score + pref.score, modeScore: ins.modeScore + pref.score * 0.3, taste: pref.reason }]
         }),
       ),
-    [week.leftovers, week.pantryLeft, pantryMode, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, others, swipeDay, swipeMonth, proteinHigh, state.customRecipes, state.customIngredients],
+    [week.leftovers, week.pantryLeft, pantryMode, today, state.prices, lastSeen, jitter, state.defaultServings, weekRecipes, freshDays, taste, others, swipeDay, swipeMonth, state.customRecipes, state.customIngredients],
   )
   const perPortion = useMemo(() => new Map([...insights].map(([id, i]) => [id, i.perPortion])), [insights])
 

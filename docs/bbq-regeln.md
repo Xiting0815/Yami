@@ -23,7 +23,7 @@ Vorbilder: `pulled-pork` (Smoker, Reste vakuumiert), `beer-can-chicken` (Gasgril
 - **Alles mit Smoker oder Grill → BBQ-Sparte** (`bbq()` aus `src/data/define.ts`). Nie im Wischstapel; man plant es frei
   für einen Tag ein (ersetzt meist das Abendessen), Zutaten kommen auf die Einkaufsliste, der Tag in den Kalender.
 - **Alltagsgerichte (Herd/V-ZUG/Airfryer) → Küche „Amerikanisch“** in `recipes-us.ts` mit `r(id, titel, 'us', art, min, zutaten, schritte, bildsuche)`,
-  Mengen für 2 Portionen. Ziele des Haushalts beachten (abnehmen: Abendessen ca. 550–750 kcal je Portion, viel Eiweiß).
+  Mengen für 2 Portionen. Original-Rezepte, keine „Leichter“-Varianten.
 - **Rubs & Saucen → Grundrezepte** (`backen('grundrezept', …, { cuisine: 'us', bbq: 'rub', yields: { …, cat } })`), Ergebnis
   „… selbstgemacht“, dazu im `substitutes` das Fertigprodukt als Ersatz in derselben Gruppe und `preferred`
   (Beispiel: `'bbq-sauce': ['BBQ-Sauce', 'BBQ-Sauce selbstgemacht']`). In Rezepten immer die **kaufbare Zutat** nennen
@@ -35,7 +35,6 @@ Vorbilder: `pulled-pork` (Smoker, Reste vakuumiert), `beer-can-chicken` (Gasgril
 bbq('spareribs-321', 'St. Louis Spareribs 3-2-1', {
   group: 'smoker', time: 420, portions: 4, eat: 2,                // Ladung = 2 Racks ≈ 4 Portionen, 2 am Grilltag
   leftover: { name: 'Spareribs (vakuumiert)', amount: 600, unit: 'g', portion: 300, shelf: 90 },
-  lighter: '…',                                                     // optional
 }, '2000 g Schweinerippchen | 4 EL BBQ-Rub | …', ['Schritt …', …])
 ```
 

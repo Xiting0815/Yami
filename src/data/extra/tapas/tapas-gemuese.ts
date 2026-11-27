@@ -41,7 +41,7 @@ const ACEITUNAS_STEPS = [
 export const tapasGemuese: ExtraGroup = {
   recipes: [
     tapa('tortilla-de-patatas', 'Tortilla de patatas (spanisches Kartoffel-Omelett)',
-      { group: 'ei', time: 45, serve: 'lauwarm', ahead: 'Tortilla bis 2 Stunden vorher braten – lauwarm schmeckt sie am besten', lighter: 'Die Kartoffeln nach dem Garen gründlich im Sieb abtropfen lassen und das Öl wiederverwenden – so bleibt nur rund 1 EL Öl in der Tortilla.' },
+      { group: 'ei', time: 45, serve: 'lauwarm', ahead: 'Tortilla bis 2 Stunden vorher braten – lauwarm schmeckt sie am besten' },
       '180 g Kartoffeln festkochend | 2 Stk Ei | 0.5 Stk Zwiebel | 1 EL Olivenöl | Salz',
       [
         'Die Kartoffeln schälen, vierteln und in 3 mm dünne Scheiben schneiden, die Zwiebel in feine Streifen. Mit Salz mischen.',
@@ -54,7 +54,7 @@ export const tapasGemuese: ExtraGroup = {
 
     // ---------- Ei & Kartoffel ----------
     tapa('patatas-bravas', 'Patatas bravas (Kartoffelwürfel mit scharfer Paprikasauce)',
-      { group: 'ei', time: 35, serve: 'heiss', ahead: 'Salsa brava am Vortag kochen (Grundrezept) und die Kartoffeln vorher schneiden und wässern', lighter: 'Im Airfryer statt frittiert und nur 1 EL Öl – spart gegenüber der Bar-Variante rund 150 kcal je Person.' },
+      { group: 'ei', time: 35, serve: 'heiss', ahead: 'Salsa brava am Vortag kochen (Grundrezept) und die Kartoffeln vorher schneiden und wässern' },
       '300 g Kartoffeln festkochend | 1 EL Olivenöl | 80 ml Salsa brava | Salz',
       [
         'Die Kartoffeln schälen und in unregelmäßige Stücke von 2–3 cm schneiden – die Kanten werden besonders knusprig. 10 Minuten in kaltem Wasser wässern (spült Stärke ab), dann sehr gründlich trocken tupfen.',
@@ -64,7 +64,7 @@ export const tapasGemuese: ExtraGroup = {
       ]),
 
     tapa('patatas-alioli', 'Patatas alioli (Kartoffeln in Knoblauchcreme)',
-      { group: 'ei', time: 35, serve: 'kalt', ahead: 'Kartoffeln am Vortag dämpfen, mit Alioli anmachen und kalt stellen – 30 Minuten vor dem Essen herausnehmen', lighter: 'Die Hälfte der Alioli durch Skyr ersetzen und mit etwas Zitronensaft abschmecken – spart rund 60 kcal je Person.' },
+      { group: 'ei', time: 35, serve: 'kalt', ahead: 'Kartoffeln am Vortag dämpfen, mit Alioli anmachen und kalt stellen – 30 Minuten vor dem Essen herausnehmen' },
       '250 g Kartoffeln festkochend | 40 ml Alioli | 0.25 Bund Petersilie | Salz',
       [
         'Die Kartoffeln schälen und in 2 cm große Würfel schneiden. In Salzwasser 12–15 Minuten garen, bis ein Messer ohne Widerstand hineingleitet, sie aber nicht zerfallen.',
@@ -74,7 +74,7 @@ export const tapasGemuese: ExtraGroup = {
       ]),
 
     tapa('papas-arrugadas', 'Papas arrugadas con mojo (kanarische Runzelkartoffeln mit roter und grüner Sauce)',
-      { group: 'ei', time: 40, serve: 'lauwarm', ahead: 'Mojo rojo und Mojo verde am Vortag zubereiten (Grundrezepte)', lighter: 'Die Mojos nur zum Tunken in kleinen Schälchen reichen statt darüberzugießen – spart rund 50 kcal je Person.' },
+      { group: 'ei', time: 40, serve: 'lauwarm', ahead: 'Mojo rojo und Mojo verde am Vortag zubereiten (Grundrezepte)' },
       '300 g Kartoffeln festkochend | 30 g Salz | 30 ml Mojo rojo | 30 ml Mojo verde',
       [
         'Kleine Kartoffeln (Drillinge, auf den Kanaren „papas bonitas“) gründlich waschen, aber nicht schälen. In einen breiten Topf legen, knapp mit Wasser bedecken und das Salz dazugeben – das Wasser soll salzig wie Meerwasser sein.',
@@ -84,7 +84,7 @@ export const tapasGemuese: ExtraGroup = {
       ]),
 
     tapa('huevos-rellenos', 'Huevos rellenos (gefüllte Eier mit Thunfisch)',
-      { group: 'ei', time: 30, serve: 'kalt', ahead: 'Eier am Vortag kochen und füllen, abgedeckt kalt stellen', lighter: 'Die Mayonnaise zur Hälfte durch Skyr ersetzen – spart rund 35 kcal je Person.' },
+      { group: 'ei', time: 30, serve: 'kalt', ahead: 'Eier am Vortag kochen und füllen, abgedeckt kalt stellen' },
       '3 Stk Ei | 0.4 Dose Thunfisch in Olivenöl | 1 EL Mayonnaise | 1 Stk Piquillo-Paprika | Salz',
       [
         'Die Eier in kochendem Wasser 10 Minuten hart kochen, in Eiswasser abschrecken und schälen.',
@@ -95,7 +95,7 @@ export const tapasGemuese: ExtraGroup = {
 
     // ---------- Gemüse ----------
     tapa('pimientos-de-padron', 'Pimientos de Padrón (gebratene grüne Paprika mit grobem Salz)',
-      { group: 'gemuese', time: 10, serve: 'heiss', ahead: 'Paprika vorher waschen und sehr gut trocknen', lighter: 'Nur 1 TL Öl auf der heißen Plancha reicht – spart rund 30 kcal je Person.' },
+      { group: 'gemuese', time: 10, serve: 'heiss', ahead: 'Paprika vorher waschen und sehr gut trocknen' },
       '200 g Pimientos de Padrón | 1 EL Olivenöl | Salz',
       [
         'Die Pimientos de Padrón (Sommer bis Herbst im Gemüseregal) waschen und sehr gründlich trocken tupfen – nasse Paprika spritzen im heißen Öl. Die Stiele dranlassen, an ihnen isst man sie.',
@@ -105,7 +105,7 @@ export const tapasGemuese: ExtraGroup = {
       ]),
 
     tapa('champinones-al-ajillo', 'Champiñones al ajillo (Knoblauch-Champignons mit Sherry)',
-      { group: 'gemuese', time: 15, serve: 'heiss', ahead: 'Champignons putzen, Knoblauch schneiden und Petersilie hacken', lighter: 'Pilze in einer beschichteten Pfanne mit nur 2 TL Öl anbraten – spart rund 40 kcal je Person.' },
+      { group: 'gemuese', time: 15, serve: 'heiss', ahead: 'Champignons putzen, Knoblauch schneiden und Petersilie hacken' },
       '250 g Champignons | 3 Zehe Knoblauch | 1 Stk Chili getrocknet | 1.5 EL Olivenöl | 30 ml Sherry fino | 0.25 Bund Petersilie | Salz',
       [
         'Die Champignons mit einem Pinsel oder Küchenpapier säubern (nicht waschen, sonst saugen sie Wasser) und halbieren, große vierteln. Den Knoblauch in dünne Scheiben schneiden, die getrocknete Chili („Guindilla“) zerbröseln, die Petersilie hacken.',
@@ -115,7 +115,7 @@ export const tapasGemuese: ExtraGroup = {
       ]),
 
     tapa('berenjenas-con-miel', 'Berenjenas con miel de caña (Auberginen-Sticks mit Zuckerrohrsirup)',
-      { group: 'gemuese', time: 45, serve: 'heiss', ahead: 'Auberginen schneiden und in Salzwasser einlegen', lighter: 'Im Airfryer statt frittiert und den Sirup nur dünn darüberziehen – spart rund 120 kcal je Person gegenüber der frittierten Bar-Variante.' },
+      { group: 'gemuese', time: 45, serve: 'heiss', ahead: 'Auberginen schneiden und in Salzwasser einlegen' },
       '1 Stk Aubergine | 3 EL Weizenmehl | 1.5 EL Olivenöl | 1.5 EL Zuckerrübensirup | Salz',
       [
         'Die Aubergine längs in 1 cm dicke Scheiben und diese in 1 cm breite Sticks schneiden. 30 Minuten in kaltes Salzwasser (oder Milch, wie in Córdoba) legen – das nimmt Bitterstoffe und die Aubergine saugt später weniger Öl.',
@@ -125,7 +125,7 @@ export const tapasGemuese: ExtraGroup = {
       ]),
 
     tapa('espinacas-con-garbanzos', 'Espinacas con garbanzos (Spinat mit Kichererbsen nach Sevilla-Art)',
-      { group: 'gemuese', time: 25, serve: 'heiss', ahead: 'Lässt sich am Vortag komplett kochen und aufwärmen – schmeckt dann noch besser', lighter: 'Das Brot im Majado weglassen und nur 1 EL Öl nehmen – spart rund 60 kcal je Person.' },
+      { group: 'gemuese', time: 25, serve: 'heiss', ahead: 'Lässt sich am Vortag komplett kochen und aufwärmen – schmeckt dann noch besser' },
       '250 g Blattspinat frisch | 0.5 Dose Kichererbsen | 2 Zehe Knoblauch | 1 Scheibe Weißbrot | 1.5 EL Olivenöl | 1 TL Kreuzkümmel | 1 TL Paprikapulver geräuchert | 1 TL Sherryessig | Salz | Pfeffer',
       [
         'Den Spinat waschen und abtropfen lassen, große Stiele entfernen. Die Kichererbsen abgießen und abspülen. Den Knoblauch in Scheiben schneiden, das Weißbrot ohne Rinde würfeln.',
@@ -136,7 +136,7 @@ export const tapasGemuese: ExtraGroup = {
 
     // ---------- Brot & Dips ----------
     tapa('pan-con-tomate', 'Pan con tomate (Pa amb tomàquet – geröstetes Brot mit Tomate und Olivenöl)',
-      { group: 'brot', time: 10, serve: 'lauwarm', ahead: 'Brot vorher in Scheiben schneiden – rösten und einreiben erst kurz vor dem Essen', lighter: 'Das Olivenöl mit einem Pinsel nur dünn auftragen – spart rund 30 kcal je Person.' },
+      { group: 'brot', time: 10, serve: 'lauwarm', ahead: 'Brot vorher in Scheiben schneiden – rösten und einreiben erst kurz vor dem Essen' },
       '0.35 Stk Ciabatta | 1 Stk Tomate | 1 Zehe Knoblauch | 1 EL Olivenöl | Salz',
       [
         'Das Ciabatta (oder ein anderes rustikales Weißbrot, in Katalonien „pan de payés“) in 4 Scheiben von 1,5 cm schneiden. Eine sehr reife Tomate quer halbieren, den Knoblauch schälen und halbieren.',
@@ -146,12 +146,12 @@ export const tapasGemuese: ExtraGroup = {
       ]),
 
     tapa('queso-manchego-con-membrillo', 'Queso manchego con membrillo (Schafskäse mit Quittenpaste)',
-      { group: 'brot', time: 5, serve: 'kalt', ahead: 'Käse und Membrillo vorher aufschneiden und abgedeckt bereitstellen', lighter: 'Den Manchego hauchdünn hobeln statt in Dreiecke schneiden – mit 50 g statt 70 g spart es rund 40 kcal je Person.' },
+      { group: 'brot', time: 5, serve: 'kalt', ahead: 'Käse und Membrillo vorher aufschneiden und abgedeckt bereitstellen' },
       '70 g Manchego | 50 g Quittenpaste',
       MANCHEGO_STEPS),
 
     tapa('aceitunas-alinadas', 'Aceitunas aliñadas (marinierte grüne Oliven)',
-      { group: 'brot', time: 10, serve: 'kalt', ahead: 'Oliven mindestens einen Tag (besser 2–3 Tage) vorher einlegen', lighter: 'Nur die Hälfte des Öls in die Marinade geben – spart rund 25 kcal je Person.' },
+      { group: 'brot', time: 10, serve: 'kalt', ahead: 'Oliven mindestens einen Tag (besser 2–3 Tage) vorher einlegen' },
       '120 g Oliven grün | 1 Zehe Knoblauch | 0.25 Stk Zitrone unbehandelt | 2 Zweig Thymian | 0.5 TL Oregano getrocknet | 0.5 TL Kreuzkümmel | 0.5 TL Paprikapulver edelsüß | 1 EL Sherryessig | 1 EL Olivenöl',
       ACEITUNAS_STEPS),
   ],

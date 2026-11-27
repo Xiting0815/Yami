@@ -170,7 +170,7 @@ ok(keepDays(1) === 1 && keepDays(4) === 4 && keepDays(5) === 4 && keepDays(30) =
 // ───── 7) Erinnerung am Vorabend – nur für Entwürfe ─────
 {
   const at = (s: string) => new Date(s.replace(' ', 'T'))
-  const inp = { breakfastPicks: {}, weighIns: [], hasProfile: false, pantry: [] }
+  const inp = { breakfastPicks: {}, pantry: [] }
   const r = plannedReminders({ ...inp, trips: tripReminderInput(trips, {}, TODAY) }, at('2026-11-20 12:00:00')).find((x) => x.key === 'rem:shop:2026-11-20')
   ok(!!r && r.start === '2026-11-20 19:00:00' && r.summary === '🛒 Einkaufsliste für morgen prüfen und freigeben', 'Fr 19:00: „Einkaufsliste für morgen prüfen und freigeben“')
   const rel = releaseTrip({}, sa!, 1)

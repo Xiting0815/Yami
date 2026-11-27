@@ -17,9 +17,8 @@ import {
   type BakeHint, type BakedRef, HINTS_MAX, bakeHabits, bakedWithin, daysBetween, habitDay, hintBlocked, nextWeekday, plannedWithin,
   moveBake, recipeScores, weekdayLabel,
 } from './bakePlan'
-import type { BakePlan, BbqGroup, PlanEntry, Recipe, WeekPlan } from './types'
+import type { BakePlan, BbqGroup, PlanEntry, Recipe, Snack, WeekPlan } from './types'
 import { isBbq, isSalat, isTapa, replacesDinner } from './types'
-import type { Snack } from './energy'
 
 /** so viele Ideen zeigt die Karte */
 export const BBQ_IDEAS = 3
@@ -103,13 +102,10 @@ export function moveBakeEntry(
   return { plan, bakePlan, dropped }
 }
 
-/**
- * „Fertig gegrillt“: eine Portion der Ladung zählt als Abendessen in die Tagesbilanz (wie ein Snack-Eintrag mit Rezept,
- * damit es auch fürs Lernen als „gegessen“ zählt). Nährwerte je Portion = alle Zutaten ÷ `portions`.
- */
+/** „Fertig gegrillt“: zählt fürs Lernen als „gegessen“ (Eintrag mit Rezept) */
 export function bbqMeal(recipe: Recipe, day: string): Snack | null {
-  if (!isBbq(recipe) || !(recipe.nutrition.kcal > 0)) return null
-  return { date: day, name: recipe.title, kcal: Math.round(recipe.nutrition.kcal), protein: Math.round(recipe.nutrition.protein * 10) / 10, recipeId: recipe.id }
+  if (!isBbq(recipe)) return null
+  return { date: day, name: recipe.title, recipeId: recipe.id }
 }
 
 /** Reste-Text: „1,5 kg · 6 × 250 g vakuumiert“ */

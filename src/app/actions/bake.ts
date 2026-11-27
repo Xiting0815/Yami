@@ -1,5 +1,5 @@
 import { RECIPE_BY_ID } from '../../data/recipes'
-import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, removeBake, setBakeAmount, settleBaked, skipBakes, tapasFactor } from '../../bakePlan'
+import { type BakeSuggestion, acceptSuggestion, addBake, bakesOn, dismissSuggestion, removeBake, setBakeAmount, settleBaked, skipBakes } from '../../bakePlan'
 import { yieldText } from '../../bake'
 import { weekdayName } from '../../store'
 import type { Recipe } from '../../types'
@@ -75,8 +75,8 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
   }
 
   /**
-   * „Fertig“ einer Tapa (Kochmodus Tapas-Abend oder Nachfrage): Zutaten mit der Menge des Abends abziehen, ihr Anteil zählt
-   * in die Tagesbilanz; danach „Wie war’s?“ für genau diese Tapa (`rate` = false: ohne Bewertungs-Sheet, z. B. im Kochmodus).
+   * „Fertig“ einer Tapa (Kochmodus Tapas-Abend oder Nachfrage): Zutaten mit der Menge des Abends abziehen (zählt fürs Lernen
+   * als „gegessen“); danach „Wie war’s?“ für genau diese Tapa (`rate` = false: ohne Bewertungs-Sheet, z. B. im Kochmodus).
    */
   function finishTapa(day: string, recipeId: string, rate = false) {
     const recipe = RECIPE_BY_ID[recipeId]
@@ -84,7 +84,7 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     if (!recipe || !isTapa(recipe) || !entry || entry.status) return
     const snap = snapshot()
     setState((s) => {
-      const meal = tapasMeal(recipe, day, tapasFactor(s.bakePlan, day))
+      const meal = tapasMeal(recipe, day)
       const r = settleBaked(s, day, recipeId)
       return r ? { ...s, ...r, snacks: meal ? [...s.snacks, meal].slice(-400) : s.snacks } : s
     })
@@ -98,11 +98,10 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     if (!open.length) return
     const snap = snapshot()
     setState((s) => {
-      const f = tapasFactor(s.bakePlan, day)
       let cur = s
       for (const e of open) {
         const r = settleBaked(cur, day, e.recipeId)
-        const meal = tapasMeal(RECIPE_BY_ID[e.recipeId], day, f)
+        const meal = tapasMeal(RECIPE_BY_ID[e.recipeId], day)
         if (r) cur = { ...cur, ...r, snacks: meal ? [...cur.snacks, meal].slice(-400) : cur.snacks }
       }
       return cur
@@ -168,7 +167,7 @@ export function bakeActions({ state, setState, cal, ui, flash, snapshot }: Actio
     const meal = bbqMeal(recipe, day)
     setState((s) => {
       const r = settleBaked(s, day, recipeId)
-      // BBQ: eine Portion zählt als Abendessen in die Tagesbilanz
+      // BBQ: zählt fürs Lernen als „gegessen“
       return r ? { ...s, ...r, snacks: meal ? [...s.snacks, meal].slice(-400) : s.snacks } : s
     })
     flash(recipe.yields ? `${yieldText(recipe, servings)} ${recipe.yields.name} im Vorrat ✓` : `${recipe.title} ${doneWord(recipe)} ✓`, snap)

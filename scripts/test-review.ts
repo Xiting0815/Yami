@@ -1,6 +1,5 @@
 // Logiktest Wochenrückblick:  npx vite-node scripts/test-review.ts
 import { RECIPES as DINNERS } from '../src/data/recipes'
-import { DEFAULT_PROFILE, type Profile } from '../src/energy'
 import { amountValue, discardWaste, moveExpired, needsOf, type PantryLot } from '../src/kitchen'
 import { buildModel, preference } from '../src/learning'
 import { defaultReviewMonday, weekReview } from '../src/review'
@@ -15,11 +14,12 @@ const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`)
 const MON = '2026-11-16' // KW 47
 const DAYS = weekDays(parseIso(MON))
 const TODAY = DAYS[6] // Sonntag
-const byProtein = [...DINNERS].sort((a, b) => b.nutrition.protein - a.nutrition.protein)
-const high = byProtein.slice(0, 5)
-const low = byProtein.slice(-5)
+// fünf Abendessen aus verschiedenen Küchen bzw. fünf aus nur einer Küche
+const mixed = (['de', 'it', 'as', 'gr', 'es'] as const).map((c) => DINNERS.find((r) => r.cuisine === c)!)
+const oneCuisine = DINNERS.filter((r) => r.cuisine === 'de').slice(0, 5)
+const high = mixed
 
-function build(dinners: typeof high, extra: Partial<AppState> = {}, profile: Profile = { ...DEFAULT_PROFILE, goalWeight: 65 }): AppState {
+function build(dinners: typeof high, extra: Partial<AppState> = {}): AppState {
   const plan: AppState['plan'] = {}
   dinners.forEach((r, i) => { plan[DAYS[i]] = { recipeId: r.id, servings: 2, status: 'cooked', consumed: [] } })
   const bf: AppState['breakfast'] = {}
@@ -28,7 +28,8 @@ function build(dinners: typeof high, extra: Partial<AppState> = {}, profile: Pro
   const bought = Object.fromEntries(needs.map((n) => [n.name, { lotId: 'x' + n.name, amount: PRODUCTS[n.name].pack * 2 }]))
   return sanitize({
     plan, breakfast: bf, breakfastPicks: { [MON]: [BREAKFASTS[0].id] }, bought: { [MON]: bought },
-    profile, weighIns: [{ date: '2026-11-09', weight: 91 }, { date: '2026-11-20', weight: 90.2 }],
+    // alte Felder (Kalorienziel, Wiegen) stören nicht
+    profile: { weightKg: 90 }, weighIns: [{ date: '2026-11-09', weight: 91 }],
     ratings: { [DAYS[1]]: 'up', [DAYS[2]]: 'again', [DAYS[3]]: 'down' },
     ...extra,
   })
@@ -36,14 +37,18 @@ function build(dinners: typeof high, extra: Partial<AppState> = {}, profile: Pro
 
 const base = build(high)
 const r = weekReview(base, DAYS, TODAY)
-console.log(`  KW ${r.kw}: Ø ${r.nutrition.avgKcal} kcal (Ziel ${r.nutrition.target}), Ø ${r.nutrition.avgProtein} g, ${r.nutrition.inTarget}/${r.nutrition.days} im Ziel, ${r.spending.total} €`)
+console.log(`  KW ${r.kw}: ${r.variety.cuisines} Küchen, ${r.variety.newDishes} neu, ${r.spending.total} €`)
 ok(r.kw === 47, 'KW 47')
 ok(r.hasData, 'Woche hat Daten')
 ok(r.spending.total > 0 && r.spending.items === needsOf(high[0], 2).length, 'Ausgaben > 0 (Einkäufe × Preis)')
 const expect = needsOf(high[0], 2).reduce((s, n) => s + amountValue(n.name, PRODUCTS[n.name].pack * 2), 0)
 ok(Math.abs(r.spending.total - expect) < 0.011, 'Ausgaben = Packungen × Preis')
-ok(r.nutrition.days === 5 && r.nutrition.avgKcal! > 0 && r.nutrition.avgKcal! <= r.nutrition.target! + 200, 'Ø kcal über 5 Arbeitstage berechnet')
-ok(r.weight.delta === -0.8 && r.weight.remaining === 25.2, 'Gewicht −0,8 kg, noch 25,2 kg')
+ok(r.variety.cuisines === 5 && r.variety.newDishes === 5, 'Abwechslung: 5 Küchen, 5 Gerichte zum ersten Mal')
+ok(!('nutrition' in r) && !('weight' in r), 'kein Kalorien- oder Gewichtsteil mehr')
+{
+  const again = build(high, { plan: { ...build(high).plan, '2026-11-02': { recipeId: high[0].id, servings: 2, status: 'cooked' } } })
+  ok(weekReview(again, DAYS, TODAY).variety.newDishes === 4, 'Abwechslung: schon früher gekochtes Gericht zählt nicht als neu')
+}
 ok(r.highlights.rated.length === 2 && r.highlights.rated.every((x) => x.rating !== 'down'), 'Highlights: nur 👍/🔁')
 ok(r.food.waste.count === 0, 'Nichts weggeworfen')
 
@@ -70,12 +75,9 @@ ok(r.tip.kind === 'ok', 'Tipp: Ermutigung bei guter Woche')
 const withWaste = build(high, { wasted: [w1!, { ...w1!, name: 'Sahne', value: 0.5 }] })
 const rw = weekReview(withWaste, DAYS, TODAY)
 ok(rw.food.waste.count === 2 && rw.food.waste.euro > 0 && rw.food.waste.top === 'Champignons' && rw.tip.kind === 'waste' && rw.tip.text.includes('Champignons'), 'Tipp: Achte auf Champignons')
-const rLow = weekReview(build(low, {}, { ...DEFAULT_PROFILE, goalWeight: 120 }), DAYS, TODAY)
-console.log(`  wenig Eiweiß: Ø ${rLow.nutrition.avgProtein} g von ${rLow.nutrition.proteinTarget} g`)
-ok(rLow.tip.kind === 'protein' && rLow.tip.text.includes('eiweißreiche'), 'Tipp: mehr Eiweiß')
-const rOver = weekReview(build(high, {}, { ...DEFAULT_PROFILE, goalWeight: 40, lunchKcal: 1500 }), DAYS, TODAY)
-console.log(`  zu viel: ${rOver.nutrition.overDays} Tage über Ziel, Ø ${rOver.nutrition.avgProtein} g`)
-ok(rOver.nutrition.overDays >= 3 && rOver.tip.kind === 'kcal', 'Tipp: Portionen bei ≥ 3 Tagen über Ziel')
+const rOne = weekReview(build(oneCuisine), DAYS, TODAY)
+ok(rOne.variety.cuisines === 1 && rOne.tip.kind === 'variety' && rOne.tip.text.includes('andere'), 'Tipp: nur eine Küche → mehr Abwechslung')
+ok(reviewStats(rOne).cuisines === '1' && reviewStats(rOne).cuisinesSub === 'Küche', 'Kennzahl: 1 Küche')
 
 // Lernen: Verschwendung wirkt leicht negativ auf Gerichte derselben Woche
 const ing = needsOf(high[0], 2)[0]
@@ -88,13 +90,13 @@ ok(preference(m2, high[0]).score === preference(m0, high[0]).score, 'Lernen: and
 
 // Woche ohne Daten
 const empty = weekReview(sanitize({}), weekDays(parseIso('2026-10-05')), TODAY)
-ok(!empty.hasData && empty.tip.kind === 'empty' && empty.spending.total === 0 && empty.nutrition.days === 0 && empty.food.waste.count === 0, 'Leere Woche → neutral, ohne Fehler')
+ok(!empty.hasData && empty.tip.kind === 'empty' && empty.spending.total === 0 && empty.variety.cuisines === 0 && empty.food.waste.count === 0, 'Leere Woche → neutral, ohne Fehler')
 {
   const st = reviewStats(empty)
   ok(st.waste === '–' && !st.wasteSub.includes('🎉'), 'Leere Woche: kein „0 € weggeworfen 🎉“ (nichts erfasst)')
   ok(reviewStats(r).waste === '0 €' || r.food.waste.count > 0, 'Woche mit Daten: 0 € weggeworfen wird gezeigt')
 }
-ok(empty.weight.delta === undefined && empty.highlights.rated.length === 0, 'Leere Woche: keine Gewichts-/Bewertungsangaben')
+ok(reviewStats(empty).cuisines === '–' && empty.highlights.rated.length === 0, 'Leere Woche: keine Abwechslungs-/Bewertungsangaben')
 
 // Standard-Woche für den Link
 ok(defaultReviewMonday('2026-11-22') === MON, 'Sonntag → Woche, die heute endet')

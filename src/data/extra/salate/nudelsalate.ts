@@ -6,7 +6,7 @@ import type { ExtraGroup } from '../types'
  * Salate & Beilagen · Nudelsalate aller Küchen: deutsch (klassisch mit Mayo, mit Fleischwurst, Schichtsalat-Art),
  * italienisch (Insalata di pasta mit Pesto/Tomaten/Mozzarella), spanisch (Ensalada de pasta mit Thunfisch und Oliven),
  * griechisch (Kritharaki-Salat) …
- * Anlegen mit `salat(id, titel, { group: 'nudel', cuisine, time, portions, name: '… (selbstgemacht)', shelf, lighter }, zutaten, schritte)`.
+ * Anlegen mit `salat(id, titel, { group: 'nudel', cuisine, time, portions, name: '… (selbstgemacht)', shelf }, zutaten, schritte)`.
  * Mengen für `portions` Beilagen-Portionen (Grillabend/Gäste: 4–8). Ergebnis kommt bei „Fertig“ in den Vorrat (Kühlschrank).
  * Haltbarkeit: mit Mayo/Ei/Fleischwurst 2 Tage, mit Essig-Öl-Dressing 3 Tage. Regeln: docs/spanien-regeln.md (Abschnitt Salate).
  * Neue Fotos: Zeilen in scripts/fotos-neu-nudelsalate.md.
@@ -16,7 +16,6 @@ export const nudelsalate: ExtraGroup = {
     salat('nudelsalat-klassisch', 'Nudelsalat klassisch mit Fleischwurst, Erbsen und Gurke',
       {
         group: 'nudel', cuisine: 'de', time: 45, portions: 6, name: 'Nudelsalat (selbstgemacht)', shelf: 2,
-        lighter: 'Fleischwurst durch Kochschinken ersetzen und die Mayonnaise ganz durch Joghurt mit 1 TL Senf – spart rund 120 kcal je Portion.',
       },
       '250 g Fusilli | 150 g Erbsen TK | 2 Stk Ei | 200 g Fleischwurst | 4 Stk Gewürzgurke | 0.5 Stk Paprika rot | 80 g Mayonnaise | 200 g Joghurt natur | 1 TL Senf mittelscharf | 0.5 Bund Schnittlauch | Salz | Pfeffer | Zucker',
       [
@@ -28,7 +27,6 @@ export const nudelsalate: ExtraGroup = {
     salat('insalata-di-pasta-pesto', 'Insalata di pasta al pesto (italienischer Nudelsalat mit Pesto, getrockneten Tomaten und Rucola)',
       {
         group: 'nudel', cuisine: 'it', time: 40, portions: 6, name: 'Insalata di pasta al pesto (selbstgemacht)', shelf: 3,
-        lighter: 'Nur 4 EL Pesto nehmen und mit 4 EL Nudelwasser strecken, das Öl der Tomaten weglassen und den Parmesan halbieren – spart rund 90 kcal je Portion.',
       },
       '250 g Fusilli | 6 EL Pesto Genovese | 80 g Getrocknete Tomaten in Öl | 250 g Kirschtomaten | 30 g Pinienkerne | 40 g Parmigiano Reggiano | 60 g Rucola | 0.5 Stk Zitrone | Olivenöl | Salz | Pfeffer',
       [
@@ -41,7 +39,6 @@ export const nudelsalate: ExtraGroup = {
     salat('nudelsalat-joghurt', 'Leichter Nudelsalat mit Joghurt-Dressing, Kochschinken und Radieschen',
       {
         group: 'nudel', cuisine: 'de', time: 40, portions: 6, name: 'Nudelsalat mit Joghurt-Dressing (selbstgemacht)', shelf: 2,
-        lighter: 'Ist schon die leichte Variante: für noch weniger kcal ein Drittel der Nudeln durch Gurke und Radieschen ersetzen.',
       },
       '250 g Fusilli | 150 g Erbsen TK | 150 g Kochschinken | 1 Bund Radieschen | 0.5 Stk Salatgurke | 3 Stk Gewürzgurke | 300 g Joghurt natur | 2 EL Mayonnaise | 1 TL Senf mittelscharf | 0.5 Bund Dill | 0.5 Bund Schnittlauch | Salz | Pfeffer | Zucker',
       [
@@ -53,7 +50,6 @@ export const nudelsalate: ExtraGroup = {
     salat('ensalada-de-pasta', 'Ensalada de pasta (spanischer Nudelsalat mit Thunfisch, Oliven und Paprika)',
       {
         group: 'nudel', cuisine: 'es', time: 40, portions: 6, name: 'Ensalada de pasta (selbstgemacht)', shelf: 2,
-        lighter: 'Thunfisch gut abtropfen lassen und nur 3 EL Olivenöl ins Dressing geben, dafür 1 EL mehr Essig und etwas Wasser – spart rund 70 kcal je Portion.',
       },
       '250 g Fusilli | 2 Dose Thunfisch in Olivenöl | 2 Stk Ei | 80 g Oliven grün | 1 Stk Paprika rot | 1 Stk Paprika grün | 1 Stk Zwiebel rot | 0.5 Dose Mais | 5 EL Olivenöl | 2 EL Sherryessig | 0.5 TL Paprikapulver edelsüß | 0.5 Bund Petersilie | Salz | Pfeffer',
       [
@@ -65,7 +61,6 @@ export const nudelsalate: ExtraGroup = {
     salat('kritharaki-salat', 'Kritharaki-Salat (griechischer Nudelsalat mit Feta, Gurke und Oliven)',
       {
         group: 'nudel', cuisine: 'gr', time: 35, portions: 6, name: 'Kritharaki-Salat (selbstgemacht)', shelf: 3,
-        lighter: 'Feta auf 120 g reduzieren und dafür mehr Gurke und Paprika nehmen – spart rund 50 kcal je Portion.',
       },
       '250 g Kritharaki | 1 Stk Salatgurke | 250 g Kirschtomaten | 1 Stk Paprika grün | 1 Stk Zwiebel rot | 60 g Oliven schwarz | 200 g Feta | 5 EL Olivenöl | 2 EL Rotweinessig | 1 Stk Zitrone | 1 TL Oregano getrocknet | 0.5 Bund Petersilie | Salz | Pfeffer',
       [
@@ -77,7 +72,6 @@ export const nudelsalate: ExtraGroup = {
     salat('asiatischer-nudelsalat', 'Asiatischer Nudelsalat mit Mie-Nudeln, Hähnchen, Sesam und Erdnüssen',
       {
         group: 'nudel', cuisine: 'as', time: 40, portions: 4, name: 'Asiatischer Nudelsalat (selbstgemacht)', shelf: 3,
-        lighter: 'Erdnüsse halbieren, Sesamöl auf 1 EL reduzieren und dafür mehr Gurke und Möhre nehmen – spart rund 70 kcal je Portion.',
       },
       '200 g Mie-Nudeln | 250 g Hähnchenbrustfilet | 2 Stk Möhre | 1 Stk Paprika rot | 0.5 Stk Salatgurke | 4 Stk Frühlingszwiebel | 0.5 Bund Koriander | 40 g Erdnüsse geröstet | 1 EL Sesam | 4 EL Sojasauce | 3 EL Reisessig | 2 EL Sesamöl | 1 EL Honig | 1 Stk Limette | 15 g Ingwer | 1 Zehe Knoblauch | Salz',
       [
@@ -90,7 +84,6 @@ export const nudelsalate: ExtraGroup = {
     salat('tortellini-salat', 'Tortellini-Salat mit Tomaten, Mozzarella und Basilikum-Vinaigrette',
       {
         group: 'nudel', cuisine: 'it', time: 35, portions: 6, name: 'Tortellini-Salat (selbstgemacht)', shelf: 2,
-        lighter: 'Halb Tortellini, halb Kirschtomaten und Paprika nehmen und Mozzarella light verwenden – spart rund 100 kcal je Portion.',
       },
       '500 g Tortellini frisch | 250 g Kirschtomaten | 1 Stk Paprika gelb | 125 g Mozzarella | 1 Bund Basilikum | 1 Zehe Knoblauch | 5 EL Olivenöl | 3 EL Weißweinessig | 1 TL Senf mittelscharf | 20 g Parmigiano Reggiano | Salz | Pfeffer | Zucker',
       [
@@ -102,7 +95,6 @@ export const nudelsalate: ExtraGroup = {
     salat('orzo-salat-zitrone', 'Orzo-Salat mit Zitrone, Hähnchen, Zucchini und Spinat',
       {
         group: 'nudel', cuisine: 'it', time: 45, portions: 4, name: 'Orzo-Salat mit Zitrone (selbstgemacht)', shelf: 3,
-        lighter: 'Halb Orzo, halb gewürfelte Zucchini nehmen und den Parmesan weglassen – spart rund 80 kcal je Portion.',
       },
       '200 g Kritharaki | 300 g Hähnchenbrustfilet | 1 Stk Zucchini | 80 g Blattspinat frisch | 1 Stk Zitrone unbehandelt | 1 Bund Petersilie | 1 Zehe Knoblauch | 4 EL Olivenöl | 1 TL Honig | 30 g Parmigiano Reggiano | Salz | Pfeffer',
       [

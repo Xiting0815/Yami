@@ -10,7 +10,6 @@ const recipes: RawRecipe[] = [
       {
         time: 210,
         yields: { name: 'Bienenstich (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 3, store: 'im Kühlschrank' },
-        lighter: 'Für die Creme 250 g Magerquark statt der geschlagenen Sahne unter den Pudding rühren und nur 100 g Mandelblättchen nehmen – spart rund 60 kcal pro Stück.',
       },
       '375 g Weizenmehl | 21 g Hefe frisch | 675 ml Milch | 210 g Zucker | 160 g Butter | 1 Stk Ei | 1 Prise Salz | 2 EL Honig | 245 ml Sahne | 150 g Mandelblättchen | 1 Pck Vanillepuddingpulver',
       [
@@ -28,7 +27,6 @@ const recipes: RawRecipe[] = [
       {
         time: 120,
         yields: { name: 'Butterkuchen (selbstgebacken)', amount: 16, unit: 'Stk', shelf: 2, store: 'luftdicht bei Raumtemperatur', frozen: 90 },
-        lighter: 'Die Butterflöckchen auf 100 g und die Mandelblättchen auf 50 g reduzieren – spart rund 35 kcal pro Stück.',
       },
       '400 g Weizenmehl | 21 g Hefe frisch | 200 ml Milch | 150 g Zucker | 210 g Butter | 1 Stk Ei | 1 Prise Salz | 1 Pck Vanillezucker | 80 g Mandelblättchen',
       [
@@ -43,7 +41,6 @@ const recipes: RawRecipe[] = [
       {
         time: 130,
         yields: { name: 'Zwetschgendatschi (selbstgebacken)', amount: 16, unit: 'Stk', shelf: 2, store: 'luftdicht bei Raumtemperatur', frozen: 90 },
-        lighter: 'Den Zucker im Teig auf 30 g und auf den Früchten auf 40 g halbieren – reife Zwetschgen sind süß genug und das spart rund 10 kcal pro Stück.',
       },
       '400 g Weizenmehl | 21 g Hefe frisch | 200 ml Milch | 100 g Zucker | 60 g Butter | 1 Stk Ei | 1 Prise Salz | 1200 g Zwetschgen | 3 EL Paniermehl | 1 TL Zimt gemahlen',
       [
@@ -58,7 +55,6 @@ const recipes: RawRecipe[] = [
       {
         time: 135,
         yields: { name: 'Streuselkuchen mit Äpfeln (selbstgebacken)', amount: 16, unit: 'Stk', shelf: 2, store: 'luftdicht bei Raumtemperatur', frozen: 90 },
-        lighter: 'Die Streusel mit 100 g statt 150 g Butter und 110 g statt 150 g Zucker machen – spart rund 35 kcal pro Stück.',
       },
       '650 g Weizenmehl | 21 g Hefe frisch | 200 ml Milch | 190 g Zucker | 210 g Butter | 1 Stk Ei | 1 Prise Salz | 4 Stk Apfel säuerlich | 1 Pck Vanillezucker | 1 TL Zimt gemahlen',
       [
@@ -74,7 +70,6 @@ const recipes: RawRecipe[] = [
       {
         time: 90,
         yields: { name: 'Marmorkuchen (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 5, store: 'luftdicht bei Raumtemperatur', frozen: 60 },
-        lighter: 'Die Butter auf 150 g reduzieren und dafür 150 g Magerquark in den Teig rühren – spart rund 55 kcal pro Stück.',
       },
       '300 g Weizenmehl | 250 g Butter | 200 g Zucker | 1 Pck Vanillezucker | 4 Stk Ei | 2 TL Backpulver | 150 ml Milch | 1 Prise Salz | 3 EL Backkakao',
       [
@@ -89,7 +84,6 @@ const recipes: RawRecipe[] = [
       {
         time: 110,
         yields: { name: 'Käsekuchen (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 4, store: 'im Kühlschrank', frozen: 60 },
-        lighter: 'Den Speisequark komplett durch Magerquark ersetzen und die Butter weglassen – spart rund 65 kcal pro Stück.',
       },
       '500 g Speisequark | 500 g Magerquark | 4 Stk Ei | 200 g Zucker | 1 Pck Vanillezucker | 1 Pck Vanillepuddingpulver | 80 g Butter | 250 ml Milch | 1 Stk Zitrone unbehandelt',
       [
@@ -104,7 +98,6 @@ const recipes: RawRecipe[] = [
       {
         time: 150,
         yields: { name: 'Hefezopf (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 3, store: 'in Folie bei Raumtemperatur', frozen: 90 },
-        lighter: 'Die Butter im Teig auf 40 g und den Zucker auf 50 g reduzieren sowie die Mandelblättchen weglassen – spart rund 45 kcal pro Stück.',
       },
       '500 g Weizenmehl | 21 g Hefe frisch | 220 ml Milch | 70 g Zucker | 80 g Butter | 1 Stk Ei | 1 Stk Eigelb | 1 Prise Salz | 1 Pck Vanillezucker | 1 Stk Zitrone unbehandelt | 30 g Mandelblättchen',
       [
@@ -121,7 +114,6 @@ const recipes: RawRecipe[] = [
         cuisine: 'it',
         time: 150,
         yields: { name: 'Torta della Nonna (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 3, store: 'im Kühlschrank' },
-        lighter: 'Nur die Hälfte der Pinienkerne verwenden und die Creme mit 30 g weniger Zucker kochen – spart rund 20 kcal pro Stück.',
       },
       '300 g Weizenmehl | 150 g Butter | 220 g Zucker | 6 Stk Eigelb | 1 TL Backpulver | 2 Stk Zitrone unbehandelt | 500 ml Milch | 40 g Speisestärke | 1 Pck Vanillezucker | 40 g Pinienkerne | 2 EL Puderzucker',
       [
@@ -138,7 +130,6 @@ const recipes: RawRecipe[] = [
         cuisine: 'it',
         time: 75,
         yields: { name: 'Torta Caprese (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 4, store: 'luftdicht bei Raumtemperatur', frozen: 60 },
-        lighter: 'Die Butter auf 150 g und den Zucker auf 120 g reduzieren – spart rund 40 kcal pro Stück.',
       },
       '200 g Zartbitterschokolade | 200 g Butter | 200 g Mandeln gemahlen | 150 g Zucker | 4 Stk Ei | 1 Prise Salz | 2 EL Puderzucker',
       [
@@ -155,7 +146,6 @@ const recipes: RawRecipe[] = [
         cuisine: 'it',
         time: 90,
         yields: { name: 'Crostata di marmellata (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 5, store: 'luftdicht bei Raumtemperatur', frozen: 60 },
-        lighter: 'Den Teig mit 70 g statt 100 g Zucker und 120 g statt 150 g Butter kneten und die Marmelade dünner streichen – spart rund 30 kcal pro Stück.',
       },
       '300 g Weizenmehl | 150 g Butter | 100 g Zucker | 2 Stk Ei | 1 Stk Zitrone unbehandelt | 1 Prise Salz | 1 TL Backpulver | 400 g Aprikosenmarmelade',
       [

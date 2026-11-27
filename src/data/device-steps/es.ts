@@ -47,7 +47,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [paella('32', 'Socarrat', { level: '9', minutes: 2 }), paella('46', 'Socarrat', { level: 'hoch', minutes: 2, alt: true })],
     },
     {
-      text: 'Vom Feuer nehmen, mit einem sauberen Küchentuch abdecken und 5 Minuten ruhen lassen. Rosmarin entfernen und direkt aus der Pfanne essen. Eine echte Paella valenciana hat weder Chorizo noch Meeresfrüchte, Erbsen oder Zwiebeln. Leichter: die Hähnchenhaut vor dem Anbraten abziehen und nur 1 EL Öl nehmen.',
+      text: 'Vom Feuer nehmen, mit einem sauberen Küchentuch abdecken und 5 Minuten ruhen lassen. Rosmarin entfernen und direkt aus der Pfanne essen. Eine echte Paella valenciana hat weder Chorizo noch Meeresfrüchte, Erbsen oder Zwiebeln.',
       settings: [paella('32', 'Ruhen', { minutes: 5 }), paella('46', 'Ruhen', { minutes: 5, alt: true })],
     },
   ],
@@ -127,7 +127,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [paella('32', 'Socarrat', { level: '9', minutes: 2 }), gross('Socarrat', { level: 'hoch', minutes: 2 })],
     },
     {
-      text: 'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli (am besten selbstgemacht) aus der Pfanne essen – erst die Alioli macht den Arroz negro rund. Leichter: Alioli nur als Klecks zum Tunken, nicht unterrühren.',
+      text: 'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli (am besten selbstgemacht) aus der Pfanne essen – erst die Alioli macht den Arroz negro rund.',
       settings: [paella('32', 'Ruhen', { minutes: 5 }), gross('Ruhen', { minutes: 5 })],
     },
   ],
@@ -165,7 +165,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [paella('32', 'Socarrat', { level: '9', minutes: 2 }), gross('Socarrat', { level: 'hoch', minutes: 2 })],
     },
     {
-      text: 'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli servieren (selbstgemacht schmeckt am besten). Leichter: Alioli nur als kleiner Klecks.',
+      text: 'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli servieren (selbstgemacht schmeckt am besten).',
       settings: [paella('32', 'Ruhen', { minutes: 5 }), gross('Ruhen', { minutes: 5 })],
     },
   ],
@@ -199,7 +199,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [paella('32', 'Socarrat', { level: '9', minutes: 2 }), gross('Socarrat', { level: 'hoch', minutes: 2 })],
     },
     {
-      text: 'Vom Feuer nehmen, mit einem Tuch abdecken und 3 Minuten ruhen lassen. Mit Alioli servieren – in Gandia gehört sie immer dazu. Leichter: Alioli nur als kleiner Klecks.',
+      text: 'Vom Feuer nehmen, mit einem Tuch abdecken und 3 Minuten ruhen lassen. Mit Alioli servieren – in Gandia gehört sie immer dazu.',
       settings: [paella('32', 'Ruhen', { minutes: 3 }), gross('Ruhen', { minutes: 3 })],
     },
   ],
@@ -245,7 +245,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [vzug('combair', 'Ober-/Unterhitze', 220, { minutes: 20, note: 'Ebene 2' })],
     },
     {
-      text: '5 Minuten ruhen lassen und in der Form servieren; die weichen Knoblauchzehen aus der Schale drücken und mit dem Reis essen. Leichter: nur 60 g Schweinebauch nehmen und dafür die ganze Dose Kichererbsen.',
+      text: '5 Minuten ruhen lassen und in der Form servieren; die weichen Knoblauchzehen aus der Schale drücken und mit dem Reis essen.',
     },
   ],
   'merluza-en-salsa-verde': [
@@ -265,7 +265,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('3', { minutes: 7 })],
     },
     {
-      text: 'Die Petersilie unterschwenken, das Ei vierteln und dazulegen und mit den Kartoffeln servieren. Leichter: nur 2 EL Öl nehmen.',
+      text: 'Die Petersilie unterschwenken, das Ei vierteln und dazulegen und mit den Kartoffeln servieren.',
     },
   ],
   'bacalao-a-la-vizcaina': [
@@ -292,7 +292,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('3', { minutes: 6 }), bora('Simmern', { minutes: 8, note: 'Deckel drauf' })],
     },
     {
-      text: 'Mit den Kartoffeln servieren. Leichter: den Fisch nicht anbraten, sondern direkt in der Sauce garen und nur 2 EL Öl nehmen.',
+      text: 'Mit den Kartoffeln servieren.',
     },
   ],
   'zarzuela-de-mariscos': [
@@ -382,7 +382,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [vzug('steamer', 'Dämpfen', 100, { minutes: 20, note: 'Schale auf gelochtem Garbehälter, Ebene 2' })],
     },
     {
-      text: 'Den Tintenfisch herausheben, die Sauce mit dem Stabmixer fein pürieren, abschmecken und den Tintenfisch darin 2 Minuten erhitzen. Mit dem Reis servieren – klassisch als weißer Reisring neben der tiefschwarzen Sauce. Leichter: nur 2 EL Öl nehmen.',
+      text: 'Den Tintenfisch herausheben, die Sauce mit dem Stabmixer fein pürieren, abschmecken und den Tintenfisch darin 2 Minuten erhitzen. Mit dem Reis servieren – klassisch als weißer Reisring neben der tiefschwarzen Sauce.',
       settings: [bora('4', { minutes: 2 })],
     },
   ],

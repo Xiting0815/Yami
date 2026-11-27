@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { BakeEntry, Recipe } from '../types'
 import type { Rating } from '../learning'
 import type { PantryLot } from '../kitchen'
-import { PHASE_HINT, PHASE_LABEL, eveningKcal, shortTitle, tapasTimeline } from '../tapas'
+import { PHASE_HINT, PHASE_LABEL, shortTitle, tapasTimeline } from '../tapas'
 import { tapasFactorFor } from '../bakePlan'
 import { formatAmount, scale } from '../shopping'
 import { shortDate, weekdayName } from '../store'
@@ -63,7 +63,7 @@ export function TapasCook({ day, today, entries, pantry, ratings, onFinish, onRa
         <div className="cook-title">
           <h2>🫒 Tapas-Abend</h2>
           <div className="muted small">
-            {weekdayName(day, true)} {shortDate(day)} · {recipes.length} Tapas · ≈ {eveningKcal(recipes).toLocaleString('de-DE')} kcal p. P.
+            {weekdayName(day, true)} {shortDate(day)} · {recipes.length} Tapas
             {factor !== 1 ? ` · Mengen ×${String(factor).replace('.', ',')}` : ''} · {doneCount}/{recipes.length} fertig
           </div>
         </div>
@@ -132,7 +132,7 @@ export function TapasCook({ day, today, entries, pantry, ratings, onFinish, onRa
             </ol>
           </section>
         ))}
-        <p className="muted small">„Fertig ✓“ zieht die Zutaten der Tapa (Menge für diesen Abend) vom Vorrat ab und zählt ihren Anteil in die Tagesbilanz. Die Bewertung merkt sich Yami für die Tapas-Abend-Ideen.</p>
+        <p className="muted small">„Fertig ✓“ zieht die Zutaten der Tapa (Menge für diesen Abend) vom Vorrat ab. Die Bewertung merkt sich Gusto für die Tapas-Abend-Ideen.</p>
         <button className="btn ghost wide" onClick={onClose}>Schließen</button>
       </div>
     </div>

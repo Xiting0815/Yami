@@ -25,7 +25,6 @@ export const tapasFleisch: ExtraGroup = {
     tapa('albondigas-tapa', 'Albóndigas en salsa de tomate (Fleischbällchen in Tomatensauce)',
       {
         group: 'fleisch', time: 40, serve: 'heiss', ahead: 'Albóndigas am Vortag fertig schmoren und zum Servieren aufwärmen – durchgezogen schmecken sie noch besser',
-        lighter: 'Halb Rinderhack (mager) statt gemischtem Hack nehmen und die Bällchen in einer beschichteten Pfanne mit nur 1 TL Öl bräunen – spart rund 40 kcal je Person.',
       },
       '100 g Hackfleisch gemischt | 0.5 Scheibe Weißbrot | 1 EL Milch | 0.5 Stk Ei | 1 Zehe Knoblauch | 0.25 Bund Petersilie | 1 TL Weizenmehl | 2 TL Olivenöl | 0.25 Stk Zwiebel | 0.5 TL Paprikapulver edelsüß | 30 ml Weißwein | 120 g Passierte Tomaten | Salz | Pfeffer',
       [
@@ -37,7 +36,7 @@ export const tapasFleisch: ExtraGroup = {
       ]),
 
     tapa('chorizo-a-la-sidra', 'Chorizo a la sidra (Chorizo in asturischem Apfelwein geschmort)',
-      { group: 'fleisch', time: 20, serve: 'heiss', lighter: 'Das Fett, das sich beim Einkochen oben absetzt, mit einem Löffel abschöpfen – das spart gut 30 kcal je Person, ohne dass Geschmack verloren geht.' },
+      { group: 'fleisch', time: 20, serve: 'heiss' },
       '80 g Chorizo | 150 ml Cidre | 1 Blatt Lorbeerblatt',
       [
         'Eine Chorizo zum Braten nehmen (in Spanien „chorizo para cocinar“ oder „semicurado“, im Supermarkt als Chorizo-Bratwurst bzw. Sarta), nicht die harte Aufschnitt-Chorizo. Die Haut abziehen, wenn sie dick ist, und die Wurst in 1,5 cm dicke Scheiben schneiden.',
@@ -49,7 +48,6 @@ export const tapasFleisch: ExtraGroup = {
     tapa('croquetas-de-jamon', 'Croquetas de jamón (cremige Schinken-Kroketten)',
       {
         group: 'fleisch', time: 50, serve: 'heiss', ahead: 'Béchamel-Masse am Vortag kochen und kalt stellen – oder die panierten Croquetas bis 3 Monate vorher einfrieren und am Abend gefroren in den Airfryer geben',
-        lighter: 'Im Airfryer statt frittiert sparen die Croquetas schon gut die Hälfte des Fetts; noch leichter mit fettarmer Milch (1,5 %) und ohne das Öl zum Einsprühen.',
       },
       '12 g Butter | 15 g Weizenmehl | 125 ml Milch | 25 g Serrano-Schinken | Muskatnuss | 0.5 Stk Ei | 20 g Paniermehl | 1 TL Olivenöl | Salz',
       [
@@ -85,7 +83,6 @@ export const tapasFleisch: ExtraGroup = {
     tapa('morcilla-con-cebolla', 'Morcilla con cebolla y pimientos (gebratene Blutwurst mit geschmorten Zwiebeln und Piquillos)',
       {
         group: 'fleisch', time: 25, serve: 'heiss', ahead: 'Zwiebeln am Nachmittag schmoren und zum Servieren kurz aufwärmen',
-        lighter: 'Die Blutwurst ohne Fett braten – sie gibt selbst genug ab – und dafür mehr Zwiebeln und Piquillos auf den Teller geben.',
       },
       '100 g Blutwurst | 0.5 Stk Zwiebel | 1 TL Olivenöl | 2 Stk Piquillo-Paprika | Salz',
       [

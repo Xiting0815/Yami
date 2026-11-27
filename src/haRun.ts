@@ -56,7 +56,7 @@ const personalOf = (events: HaSettings['events'], me: string) =>
   )
 
 /**
- * Erinnerungen aufteilen (Familie teilen): Meal-Prep, Auftauen, Wiegen gehören der Person dieses Geräts
+ * Erinnerungen aufteilen (Familie teilen): Meal-Prep, Auftauen gehören der Person dieses Geräts
  * (Schlüssel `rem:<Person>:…`, nur lokal gemerkt, unabhängig vom Schreibstab); „läuft morgen ab“ betrifft den
  * geteilten Vorrat → pflegt nur der Halter des Schreibstabs (Schlüssel `rem:exp:…`, Zuordnung im Stab).
  */
@@ -88,7 +88,7 @@ export async function sendAlerts(api: HaApi, h: Pick<HaSettings, 'notify' | 'pus
     if (pushed.includes(a.key)) continue
     try {
       if (h.notify) {
-        await api.callService('notify', h.notify.slice('notify.'.length), { title: a.title, message: a.message, data: { channel: 'Yami', tag: 'yami-alert', clickAction: APP_URL } })
+        await api.callService('notify', h.notify.slice('notify.'.length), { title: a.title, message: a.message, data: { channel: 'Gusto', tag: 'yami-alert', clickAction: APP_URL } })
       } else {
         const start = new Date(now.getTime() + ALERT_LEAD_MIN * 60_000)
         await api.callService('calendar', 'create_event', { summary: a.title, description: a.message, start_date_time: stamp(start), end_date_time: stamp(new Date(start.getTime() + 15 * 60_000)) }, { entity_id: h.reminders })
@@ -139,7 +139,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
   const errText = (e?: string) => (e ? `Nicht alles ließ sich abgleichen: ${e}` : undefined)
   const remindersOf = (state: AppState, trips: Trip[]) =>
     plannedReminders(
-      { breakfastPicks: state.breakfastPicks, prepDays: state.prepDays, prepLate: state.prepLate, bfPreps: state.bfPreps, weighIns: state.weighIns, hasProfile: !!state.profile, pantry: state.pantry, trips: tripReminderInput(trips, state.trips, today) },
+      { breakfastPicks: state.breakfastPicks, prepDays: state.prepDays, prepLate: state.prepLate, bfPreps: state.bfPreps, pantry: state.pantry, trips: tripReminderInput(trips, state.trips, today) },
       now,
     )
 
@@ -148,7 +148,7 @@ export async function haRound(d: HaRunDeps): Promise<HaRunResult> {
     const trips0 = tripsOf(s0, today)
     // Im Haushalt ist auf einem anderen Gerät „Familie teilen“ an → dieses Gerät hat womöglich einen alten Plan und
     // darf Google Tasks und den Abendessen-Kalender nicht anfassen (das macht der Schreibstab). Nur rein persönliche
-    // Erinnerungen (Meal-Prep, Auftauen, Wiegen). Nichts, was am geteilten Plan/Vorrat/Einkauf hängt (Läuft ab,
+    // Erinnerungen (Meal-Prep, Auftauen; „weigh“ nur noch für alte Einträge). Nichts, was am geteilten Plan/Vorrat/Einkauf hängt (Läuft ab,
     // Einkauf freigeben, „Heute fehlt …“) – das wäre hier alter Stand. Die App zeigt einen Hinweis zum Einschalten.
     const other = await otherHousehold(d.api, h0, now.getTime())
     if (other) {

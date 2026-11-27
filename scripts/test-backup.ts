@@ -1,7 +1,7 @@
 // Logiktest Datensicherung:  npx vite-node scripts/test-backup.ts
 import { RECIPES } from '../src/data/recipes'
 import { parseBackup } from '../src/backup'
-import { sanitize } from '../src/store'
+import { LEGACY_KEYS, STATE_KEYS, sanitize } from '../src/store'
 
 let fails = 0
 const ok = (c: boolean, m: string) => { console.log(`${c ? '✓' : '✗'} ${m}`); if (!c) fails++ }
@@ -19,7 +19,7 @@ const state = {
 const wrapped = JSON.stringify({ app: 'yami', version: 1, exportedAt: new Date().toISOString(), state })
 const a = parseBackup(wrapped)
 ok(a.plan['2026-11-16']?.recipeId === rid, 'Hülle: Plan bleibt erhalten')
-ok(a.weighIns.length === 1 && a.weighIns[0].weight === 91.2, 'Hülle: Messungen bleiben erhalten')
+ok(!('weighIns' in a), 'Hülle: alte Messungen (Wiegen gibt es nicht mehr) werden beim Laden verworfen')
 ok(a.lastBackup === '2026-11-01', 'Hülle: lastBackup bleibt erhalten')
 ok(a.defaultServings === 2 && Array.isArray(a.rejects), 'Hülle: fehlende Felder bekommen Startwerte')
 
@@ -72,11 +72,34 @@ ok(Object.keys(s2.plan).length === 1 && s2.plan['2026-11-16'] !== undefined, 'un
   ok(j.pantry.length === 2 && j.pantry.every((l) => typeof l.amount === 'number' && l.amount > 0 && !!l.id), 'Vorrat: kaputte Posten verworfen, Menge als Text umgewandelt, fehlende Id ergänzt')
   ok(j.plan['2026-11-10'].servings === 2 && j.plan['2026-11-10'].consumed!.length === 1, 'Plan: fehlende Portionen = Standard, kaputte „entnommen“-Einträge verworfen')
   ok(j.plan['2026-11-11'].servings === 3 && j.plan['2026-11-11'].status === undefined, 'Plan: unbekannter Status verworfen')
-  ok(j.weighIns.length === 2 && j.weighIns[0].date === '2026-11-02' && j.weighIns[1].fat === undefined, 'Messungen: kaputte verworfen, sortiert, ungültiges Körperfett entfernt')
   ok(j.rejects.length === 1 && Object.keys(j.ratings).join() === '2026-11-10', 'Wischen/Bewertungen: kaputte verworfen')
   ok(Object.keys(j.bought['2026-11-09']).join() === 'Sahne' && Array.isArray(j.checked['2026-11-09']), 'Einkäufe/Haken: kaputte verworfen')
-  ok(j.profile!.weightKg === 90 && Number.isFinite(j.profile!.age) && Number.isFinite(j.profile!.lunchKcal), 'Profil: fehlende Werte bekommen Startwerte (kein NaN-Kalorienziel)')
+  ok(LEGACY_KEYS.every((k) => !(k in j)), 'altes Profil/Messungen werden verworfen, ohne Absturz')
   ok(j.defaultServings === 2, 'Standard-Portionen 0 → 2')
+}
+
+// Alter Stand mit Kalorienziel & Wiegen (vor „Gusto“): lädt, frühere Felder sind weg, alles andere bleibt
+{
+  const old = {
+    app: 'yami', version: 1,
+    state: {
+      ...state,
+      profile: { sex: 'm', age: 40, heightCm: 180, weightKg: 92, activity: 1.3, deficit: 500, lunchKcal: 600, goalWeight: 85 },
+      adjustDecidedAt: 3, profileCreated: '2026-10-01',
+      snacks: [{ date: '2026-11-10', name: 'Bienenstich (selbstgebacken)', kcal: 320, protein: 6, recipeId: 'bienenstich' }],
+      onboarding: 'done',
+    },
+  }
+  const o = parseBackup(JSON.stringify(old))
+  ok(o.plan['2026-11-16']?.recipeId === rid && o.onboarding === 'done', 'alte Sicherung (yami): Plan & Status bleiben')
+  ok(LEGACY_KEYS.every((k) => !(k in o)), 'alte Sicherung: profile, weighIns, adjustDecidedAt, profileCreated verworfen')
+  ok(o.snacks.length === 1 && o.snacks[0].recipeId === 'bienenstich' && !('kcal' in o.snacks[0]), 'alte Sicherung: Gegessenes bleibt fürs Lernen, ohne kcal')
+  ok(LEGACY_KEYS.every((k) => !STATE_KEYS.includes(k)), 'frühere Felder zählen nicht als Stand-Schlüssel')
+  const g = parseBackup(JSON.stringify({ ...old, app: 'gusto' }))
+  ok(g.plan['2026-11-16']?.recipeId === rid, 'Sicherung mit Kennung „gusto“ wird auch gelesen')
+  ok(throws(() => parseBackup(JSON.stringify({ ...old, app: 'andere-app' }))), 'fremde Kennung → Fehlermeldung')
+  const st = sanitize({ profile: { age: 'x' }, weighIns: 'kaputt', snacks: [{ date: '2026-11-10', name: 'x', kcal: 'viel' }] })
+  ok(!('profile' in st) && st.snacks.length === 1, 'kaputte alte Felder → kein Absturz')
 }
 
 if (fails) {

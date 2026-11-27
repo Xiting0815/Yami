@@ -14,7 +14,6 @@ const recipes: RawRecipe[] = [
       time: 100,
       ...weihnacht,
       yields: { name: 'Vanillekipferl (selbstgebacken)', amount: 40, unit: 'Stk', shelf: 28, store: dose, frozen: 90 },
-      lighter: 'Nur 170 g Butter in den Teig geben und die Kipferl dünn statt dick in 40 g Puderzucker wenden – spart rund 10 kcal pro Stück.',
     },
     '280 g Weizenmehl | 200 g Butter | 100 g Mandeln gemahlen | 70 g Zucker | 1 Prise Salz | 1 Stk Eigelb | 3 Pck Vanillezucker | 80 g Puderzucker',
     [
@@ -31,7 +30,6 @@ const recipes: RawRecipe[] = [
       time: 120,
       ...weihnacht,
       yields: { name: 'Butterplätzchen (selbstgebacken)', amount: 50, unit: 'Stk', shelf: 28, store: dose, frozen: 90 },
-      lighter: 'Die Zitronenglasur weglassen und die Plätzchen nur mit dem Eigelb bestreichen – spart rund 8 kcal pro Stück.',
     },
     '300 g Weizenmehl | 200 g Butter | 100 g Zucker | 1 Stk Ei | 1 Stk Eigelb | 1 Pck Vanillezucker | 1 Prise Salz | 1 Stk Zitrone unbehandelt | 100 g Puderzucker',
     [
@@ -48,7 +46,6 @@ const recipes: RawRecipe[] = [
       time: 110,
       ...weihnacht,
       yields: { name: 'Spitzbuben (selbstgebacken)', amount: 30, unit: 'Stk', shelf: 21, store: dose, frozen: 60 },
-      lighter: 'Mit Fruchtaufstrich ohne zugesetzten Zucker füllen und nur dünn bestäuben – spart rund 12 kcal pro Stück.',
     },
     '300 g Weizenmehl | 200 g Butter | 130 g Puderzucker | 1 Stk Ei | 1 Pck Vanillezucker | 1 Prise Salz | 1 Stk Zitrone unbehandelt | 200 g Johannisbeergelee',
     [
@@ -64,7 +61,6 @@ const recipes: RawRecipe[] = [
       time: 90,
       ...weihnacht,
       yields: { name: 'Zimtsterne (selbstgebacken)', amount: 40, unit: 'Stk', shelf: 28, store: dose, frozen: 90 },
-      lighter: 'Den Zuckerguss weglassen und die Sterne nur mit Puderzucker bestäuben – spart rund 6 kcal pro Stück.',
     },
     '300 g Mandeln gemahlen | 250 g Puderzucker | 100 g Eiklar | 2 TL Zimt gemahlen | 1 Prise Salz',
     [
@@ -80,7 +76,6 @@ const recipes: RawRecipe[] = [
       time: 50,
       ...weihnacht,
       yields: { name: 'Kokosmakronen (selbstgebacken)', amount: 30, unit: 'Stk', shelf: 21, store: dose, frozen: 90 },
-      lighter: 'Nur 100 g Zucker nehmen und die Böden nicht in Schokolade tauchen – spart rund 15 kcal pro Stück.',
     },
     '100 g Eiklar | 150 g Zucker | 1 Pck Vanillezucker | 1 Prise Salz | 200 g Kokosraspeln | 50 g Zartbitterschokolade',
     [
@@ -97,7 +92,6 @@ const recipes: RawRecipe[] = [
       time: 180,
       ...weihnacht,
       yields: { name: 'Heidesand (selbstgebacken)', amount: 60, unit: 'Stk', shelf: 28, store: dose, frozen: 90 },
-      lighter: 'Den Zucker im Teig auf 100 g reduzieren und die Rollen nur dünn in Zucker wälzen – spart rund 5 kcal pro Stück.',
     },
     '300 g Weizenmehl | 250 g Butter | 150 g Zucker | 1 Pck Vanillezucker | 1 Prise Salz | 1 Stk Eigelb | 40 g Zucker',
     [
@@ -114,7 +108,6 @@ const recipes: RawRecipe[] = [
       time: 80,
       ...weihnacht,
       yields: { name: 'Spritzgebäck (selbstgebacken)', amount: 60, unit: 'Stk', shelf: 28, store: dose, frozen: 90 },
-      lighter: 'Nur die Spitzen in die Schokolade tauchen und dafür 80 g statt 150 g Zartbitterschokolade nehmen – spart rund 6 kcal pro Stück.',
     },
     '375 g Weizenmehl | 250 g Butter | 125 g Zucker | 1 Pck Vanillezucker | 1 Prise Salz | 1 Stk Ei | 40 ml Milch | 150 g Zartbitterschokolade',
     [
@@ -130,7 +123,6 @@ const recipes: RawRecipe[] = [
       time: 100,
       ...weihnacht,
       yields: { name: 'Nussecken (selbstgebacken)', amount: 30, unit: 'Stk', shelf: 21, store: dose, frozen: 90 },
-      lighter: 'Den Belag mit 150 g statt 200 g Butter und 150 g statt 200 g Zucker kochen – spart rund 20 kcal pro Stück.',
     },
     '300 g Weizenmehl | 325 g Butter | 300 g Zucker | 2 Pck Vanillezucker | 1 Stk Ei | 1 Prise Salz | 200 g Haselnusskerne | 100 g Mandelblättchen | 200 g Aprikosenmarmelade | 150 g Zartbitterschokolade',
     [
@@ -147,7 +139,6 @@ const recipes: RawRecipe[] = [
     {
       time: 55,
       yields: { name: 'Chocolate Chip Cookies (selbstgebacken)', amount: 20, unit: 'Stk', shelf: 10, store: dose, frozen: 90 },
-      lighter: 'Nur 150 g Zartbitterschokolade und 150 g Zucker (insgesamt) nehmen – spart rund 23 kcal pro Stück.',
     },
     '250 g Weizenmehl | 1 TL Backpulver | 1 Prise Salz | 150 g Butter | 100 g Zucker | 100 g Brauner Zucker | 1 Stk Ei | 1 Pck Vanillezucker | 200 g Zartbitterschokolade',
     [
@@ -162,7 +153,6 @@ const recipes: RawRecipe[] = [
     {
       time: 50,
       yields: { name: 'Double Chocolate Cookies (selbstgebacken)', amount: 18, unit: 'Stk', shelf: 10, store: dose, frozen: 90 },
-      lighter: 'Zucker auf zusammen 140 g reduzieren und nur 150 g Zartbitterschokolade verwenden – spart rund 24 kcal pro Stück.',
     },
     '200 g Weizenmehl | 7 EL Backkakao | 1 TL Backpulver | 1 Prise Salz | 150 g Butter | 120 g Brauner Zucker | 60 g Zucker | 1 Stk Ei | 1 Pck Vanillezucker | 200 g Zartbitterschokolade',
     [
@@ -177,7 +167,6 @@ const recipes: RawRecipe[] = [
     {
       time: 45,
       yields: { name: 'Haferflocken-Cranberry-Cookies (selbstgebacken)', amount: 20, unit: 'Stk', shelf: 10, store: dose, frozen: 90 },
-      lighter: 'Die Hälfte der Butter (60 g) durch 60 g Skyr ersetzen – spart rund 20 kcal pro Stück.',
     },
     '150 g Haferflocken | 150 g Weizenmehl | 1 TL Backpulver | 1 TL Zimt gemahlen | 1 Prise Salz | 125 g Butter | 100 g Brauner Zucker | 1 Stk Ei | 1 Pck Vanillezucker | 100 g Cranberries getrocknet | 50 g Walnusskerne',
     [
@@ -192,7 +181,6 @@ const recipes: RawRecipe[] = [
     {
       time: 35,
       yields: { name: 'Erdnussbutter-Cookies (selbstgebacken)', amount: 20, unit: 'Stk', shelf: 10, store: dose, frozen: 90 },
-      lighter: 'Nur 100 g Zucker insgesamt (50 g Brauner Zucker, 50 g Zucker) verwenden – spart rund 10 kcal pro Stück.',
     },
     '250 g Erdnussmus | 100 g Brauner Zucker | 50 g Zucker | 50 g Weizenmehl | 1 Stk Ei | 1 TL Backpulver | 1 Pck Vanillezucker | 1 Prise Salz',
     [
@@ -206,7 +194,6 @@ const recipes: RawRecipe[] = [
     {
       time: 35,
       yields: { name: 'Skyr-Haferflocken-Cookies (selbstgebacken)', amount: 18, unit: 'Stk', shelf: 4, store: 'luftdicht im Kühlschrank', frozen: 90 },
-      lighter: 'Die Schokolade weglassen und dafür 1 geriebenen Apfel unterrühren – spart rund 10 kcal pro Stück.',
     },
     '200 g Haferflocken | 80 g Weizenmehl | 150 g Skyr | 60 g Honig | 1 Stk Ei | 1 TL Backpulver | 1 TL Zimt gemahlen | 1 Prise Salz | 40 g Rosinen | 40 g Zartbitterschokolade',
     [
@@ -222,7 +209,6 @@ const recipes: RawRecipe[] = [
       cuisine: 'it',
       time: 100,
       yields: { name: 'Cantuccini (selbstgebacken)', amount: 40, unit: 'Stk', shelf: 28, store: dose, frozen: 90 },
-      lighter: 'Zucker auf 150 g und Mandeln auf 150 g reduzieren – spart rund 12 kcal pro Stück.',
     },
     '250 g Weizenmehl | 200 g Zucker | 2 Stk Ei | 1 Stk Eigelb | 1 TL Backpulver | 1 Prise Salz | 1 Pck Vanillezucker | 1 Stk Orange | 200 g Mandeln',
     [
@@ -239,7 +225,6 @@ const recipes: RawRecipe[] = [
       cuisine: 'it',
       time: 90,
       yields: { name: 'Amaretti morbidi (selbstgebacken)', amount: 24, unit: 'Stk', shelf: 14, store: dose, frozen: 60 },
-      lighter: 'Nur 160 g Zucker in den Teig geben und die Kugeln nur leicht in Puderzucker wälzen – spart rund 10 kcal pro Stück.',
     },
     '250 g Mandeln gemahlen | 200 g Zucker | 100 g Eiklar | 1 TL Bittermandelaroma | 1 Prise Salz | 40 g Puderzucker',
     [
@@ -254,7 +239,6 @@ const recipes: RawRecipe[] = [
       cuisine: 'it',
       time: 100,
       yields: { name: 'Baci di dama (selbstgebacken)', amount: 25, unit: 'Stk', shelf: 21, store: dose, frozen: 60 },
-      lighter: 'Nur 70 g Zartbitterschokolade zur Füllung und 80 g Zucker im Teig nehmen – spart rund 10 kcal pro Stück.',
     },
     '100 g Haselnusskerne | 100 g Weizenmehl | 100 g Butter | 100 g Zucker | 1 Prise Salz | 100 g Zartbitterschokolade',
     [
@@ -271,7 +255,6 @@ const recipes: RawRecipe[] = [
       cuisine: 'it',
       time: 60,
       yields: { name: 'Biscotti al limone (selbstgebacken)', amount: 30, unit: 'Stk', shelf: 14, store: dose, frozen: 90 },
-      lighter: 'Nur 120 g Zucker im Teig und eine dünne Glasur aus 50 g Puderzucker – spart rund 10 kcal pro Stück.',
     },
     '300 g Weizenmehl | 150 g Zucker | 100 g Butter | 2 Stk Ei | 2 Stk Zitrone unbehandelt | 2 TL Backpulver | 1 Prise Salz | 100 g Puderzucker',
     [

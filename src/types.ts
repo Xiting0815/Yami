@@ -87,8 +87,8 @@ export const KIND_ICON: Record<BasicKind, string> = { grundrezept: '🫙', desse
 
 /**
  * Alles außer Grundrezepten (Backen & Desserts, BBQ, Tapas, Salate): wird über den Backplan eingeplant, „Fertig …“ zählt
- * fürs Lernen (gebacken/gegrillt/gemacht + „Wie war’s?“). Stücke von Gebackenem und Salat-Portionen zählen beim Essen in die
- * Tagesbilanz (BBQ-Reste nicht, siehe `isBbq`).
+ * fürs Lernen (gebacken/gegrillt/gemacht + „Wie war’s?“). „1 gegessen“ bei Stücken von Gebackenem und Salat-Portionen zählt
+ * ebenfalls fürs Lernen (BBQ-Reste nicht, siehe `isBbq`).
  */
 export const isBake = (r: { kind?: BasicKind } | undefined): boolean => !!r?.kind && r.kind !== 'grundrezept'
 /** BBQ-Sparte (Smoker, Grill, Dutch Oven, Burger, Beilagen): eigener Bereich, nie im Wischstapel, frei einplanbar */
@@ -198,8 +198,6 @@ export interface Recipe {
   yields?: BasicYield
   /** Grundrezept, Dessert, Kuchen oder Brot (nur bei `basic`) */
   kind?: BasicKind
-  /** „💡 Leichter:“-Tipp (Backen & Desserts) */
-  lighter?: string
   /** BBQ-Sparte: Untergruppe (auch bei Rubs & Saucen, die Grundrezepte sind) */
   bbq?: BbqGroup
   /** BBQ: Portionen der ganzen Ladung (`nutrition` gilt dann je Portion, `servings` = 1 Ladung); Tapas: 2 (Teller für 2); Salate: Portionen */
@@ -303,6 +301,17 @@ export interface PlanEntry {
    * src/kitchen/swap.ts). Bedarf, Einkauf, Abziehen und Kalender rechnen dann mit dem Ersatz.
    */
   swap?: Record<string, string>
+}
+
+/**
+ * „Gegessen“: Stück Selbstgebackenes, Salat-Portion, Grill- oder Tapas-Abend – nur fürs Lernen (gegessen = mochte man).
+ * Ältere Stände hatten hier noch kcal/Eiweiß; die werden beim Laden verworfen.
+ */
+export interface Snack {
+  date: string
+  name: string
+  /** Rezept (fürs Lernen) */
+  recipeId?: string
 }
 
 /** Eingeplantes Backen an einem Tag: Rezept (Backen & Desserts, Grundrezept) × Rezeptmenge */

@@ -9,7 +9,6 @@ import type { ExtraIngredients } from './extra/types'
  * Anlegen mit `r(id, 'Spanischer Titel (deutsche Erklärung)', 'es', art, minuten, zutaten, schritte, bildsuche)`, Mengen für
  * 2 Portionen. Paella für 2 = Paellapfanne 32 cm auf dem BORA mit Brücke; die große Pfanne (46 cm, Gasgrill, 6+ Portionen)
  * steht als „oder …“-Einstellung (`paella('46', …, { alt: true })`) daneben. Geräte-Schritte: src/data/device-steps/es.ts.
- * Abnehmen: Abendessen ca. 550–750 kcal je Portion; darüber nennt der letzte Schritt „Leichter: …“.
  *
  * Neue Zutaten NUR unten in `esZutaten` (Kategorie, Produkt, Nährwerte, Gewicht …) – sie werden zentral eingetragen
  * (src/data/extra/index.ts). Gemeinsame Spanien-Zutaten (Paellareis, Chorizo, Riesengarnelen mit Kopf TK,
@@ -27,7 +26,7 @@ export const recipesEs = [
       'Sofort 700 ml Wasser angießen (bis knapp unter die Nieten der Griffe), Safranfäden mit dem Einweichwasser zugeben, aufkochen und 20 Minuten kräftig köcheln lassen, damit eine kräftige Brühe entsteht. Abschmecken: leicht übersalzen, der Reis nimmt das Salz auf.',
       'Den Reis gleichmäßig in die Pfanne streuen, einmal mit dem Löffel verteilen – ab jetzt nicht mehr rühren. 10 Minuten bei starker, dann 8 Minuten bei kleiner Hitze garen, bis die Flüssigkeit aufgesogen ist; die Rosmarinzweige die letzten 5 Minuten obenauf legen.',
       'Für das „Socarrat“ (die begehrte, knusprig angeröstete Reisschicht am Boden) die Hitze zum Schluss 2 Minuten hochdrehen, bis es leise knistert und nach geröstetem Reis duftet – nicht verbrennen lassen.',
-      'Vom Feuer nehmen, mit einem sauberen Küchentuch abdecken und 5 Minuten ruhen lassen. Rosmarin entfernen und direkt aus der Pfanne essen. Eine echte Paella valenciana hat weder Chorizo noch Meeresfrüchte, Erbsen oder Zwiebeln. Leichter: die Hähnchenhaut vor dem Anbraten abziehen und nur 1 EL Öl nehmen.',
+      'Vom Feuer nehmen, mit einem sauberen Küchentuch abdecken und 5 Minuten ruhen lassen. Rosmarin entfernen und direkt aus der Pfanne essen. Eine echte Paella valenciana hat weder Chorizo noch Meeresfrüchte, Erbsen oder Zwiebeln.',
     ], 'paella valenciana'),
 
   r('paella-de-marisco', 'Paella de marisco (Meeresfrüchte-Paella mit Garnelen, Muscheln und Tintenfisch)', 'es', 'haupt', 60,
@@ -52,7 +51,7 @@ export const recipesEs = [
       'Den Fischfond angießen, die Tintenfischtinte in einer Kelle Fond auflösen und dazugießen. Aufkochen, 5 Minuten köcheln lassen und kräftig abschmecken (leicht übersalzen).',
       'Den Paellareis gleichmäßig einstreuen und einmal verteilen – ab jetzt nicht mehr rühren. 10 Minuten bei starker, dann 8 Minuten bei kleiner Hitze garen, bis die Flüssigkeit aufgesogen ist.',
       'Für das Socarrat die Hitze 2 Minuten hochdrehen, bis es leise knistert.',
-      'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli (am besten selbstgemacht) aus der Pfanne essen – erst die Alioli macht den Arroz negro rund. Leichter: Alioli nur als Klecks zum Tunken, nicht unterrühren.',
+      'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli (am besten selbstgemacht) aus der Pfanne essen – erst die Alioli macht den Arroz negro rund.',
     ], 'arroz negro'),
 
   r('arroz-a-banda', 'Arroz a banda (Reis aus Alicante im kräftigen Fischsud, mit Alioli)', 'es', 'haupt', 50,
@@ -64,7 +63,7 @@ export const recipesEs = [
       'Sofort den Fischfond und die Safranfäden mit dem Einweichwasser angießen, aufkochen und 3 Minuten köcheln lassen. Kräftig abschmecken (leicht übersalzen).',
       'Den Paellareis einstreuen und einmal verteilen – die Reisschicht ist beim Arroz a banda dünn, nur etwa einen Finger hoch. Ab jetzt nicht mehr rühren: 10 Minuten bei starker, dann 7 Minuten bei kleiner Hitze garen, bis die Flüssigkeit aufgesogen ist.',
       'Für das Socarrat die Hitze 2 Minuten hochdrehen, bis es leise knistert.',
-      'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli servieren (selbstgemacht schmeckt am besten). Leichter: Alioli nur als kleiner Klecks.',
+      'Vom Feuer nehmen, mit einem Tuch abdecken und 5 Minuten ruhen lassen. Mit Alioli servieren (selbstgemacht schmeckt am besten).',
     ], 'arroz a banda'),
 
   r('fideua', 'Fideuà (Nudel-Paella mit Meeresfrüchten aus Gandia)', 'es', 'haupt', 45,
@@ -75,7 +74,7 @@ export const recipesEs = [
       'Knoblauch, geriebene Tomate und Ñora-Fruchtfleisch zugeben und 4 Minuten einkochen (Sofrito), dann das Paprikapulver nur einige Sekunden anrösten.',
       'Den heißen Fond samt Einweichfond angießen und einmal verteilen – ab jetzt nicht mehr rühren. 8 Minuten bei starker Hitze kochen, die Garnelen auflegen und 4 Minuten bei kleiner Hitze garen, bis die Flüssigkeit aufgesogen ist.',
       'Die Hitze 2 Minuten hochdrehen, bis es am Boden leise knistert (Socarrat) und sich die Nudelenden an der Oberfläche aufstellen („de punta“).',
-      'Vom Feuer nehmen, mit einem Tuch abdecken und 3 Minuten ruhen lassen. Mit Alioli servieren – in Gandia gehört sie immer dazu. Leichter: Alioli nur als kleiner Klecks.',
+      'Vom Feuer nehmen, mit einem Tuch abdecken und 3 Minuten ruhen lassen. Mit Alioli servieren – in Gandia gehört sie immer dazu.',
     ], 'fideua'),
 
   r('arroz-caldoso-de-marisco', 'Arroz caldoso de marisco (saftiger Meeresfrüchte-Reis im Sud)', 'es', 'haupt', 50,
@@ -96,7 +95,7 @@ export const recipesEs = [
       'Das Olivenöl in einer Pfanne erhitzen und den Schweinebauch 8 Minuten rundum goldbraun braten. Die Kartoffelscheiben 4 Minuten mitbraten, dann die Blutwurst nur 1 Minute je Seite (sie zerfällt leicht) und alles herausnehmen. Knoblauchknolle und Tomatenhälften mit der Schnittfläche nach unten kurz anbraten.',
       'Die geriebene Tomate im Bratfett 3 Minuten einkochen, das Paprikapulver nur einige Sekunden anrösten, dann den Paellareis und die Kichererbsen 1 Minute darin wenden.',
       'Die Reismischung in einer flachen ofenfesten Form (Cazuela aus Ton oder Auflaufform, ca. 26 cm) verteilen und die heiße Brühe angießen. Knoblauchknolle in die Mitte setzen, Tomatenhälften, Kartoffeln, Schweinebauch und Blutwurst darauf legen. Im Backofen 20 Minuten garen, ohne zu rühren, bis die Brühe aufgesogen ist und die Oberfläche trocken und leicht geröstet ist. Garprobe: Reis weich mit kaum Biss.',
-      '5 Minuten ruhen lassen und in der Form servieren; die weichen Knoblauchzehen aus der Schale drücken und mit dem Reis essen. Leichter: nur 60 g Schweinebauch nehmen und dafür die ganze Dose Kichererbsen.',
+      '5 Minuten ruhen lassen und in der Form servieren; die weichen Knoblauchzehen aus der Schale drücken und mit dem Reis essen.',
     ], 'arroz al horno'),
 
   r('merluza-en-salsa-verde', 'Merluza en salsa verde (Seehecht in grüner Knoblauch-Petersilien-Sauce mit Venusmuscheln)', 'es', 'haupt', 45,
@@ -106,7 +105,7 @@ export const recipesEs = [
       'Kartoffeln in Salzwasser 20 bis 25 Minuten garen, das Ei 10 Minuten hart kochen, abschrecken und schälen.',
       'Das Olivenöl in einer breiten Pfanne oder Cazuela bei kleiner Hitze erwärmen und den Knoblauch 2 Minuten darin ziehen lassen, ohne dass er Farbe nimmt. Das Mehl einstreuen und 1 Minute anschwitzen, mit Weißwein und Fischfond ablöschen und unter Rühren aufkochen.',
       'Den Fisch mit der Hautseite nach oben in die Sauce legen, Muscheln und Erbsen dazugeben und 7 Minuten sanft köcheln lassen; den Fisch nach 4 Minuten wenden. Dabei die Pfanne immer wieder hin und her schwenken („meneo“) – die Gelatine aus dem Fisch bindet so die Sauce. Garprobe: Der Fisch ist innen gerade weiß und blättert, die Muscheln sind offen (geschlossene wegwerfen).',
-      'Die Petersilie unterschwenken, das Ei vierteln und dazulegen und mit den Kartoffeln servieren. Leichter: nur 2 EL Öl nehmen.',
+      'Die Petersilie unterschwenken, das Ei vierteln und dazulegen und mit den Kartoffeln servieren.',
     ], 'merluza salsa verde'),
 
   r('bacalao-a-la-vizcaina', 'Bacalao a la vizcaína (Klippfisch in baskischer Paprika-Zwiebel-Sauce)', 'es', 'haupt', 80,
@@ -118,7 +117,7 @@ export const recipesEs = [
       'Das Fruchtfleisch der Ñoras mit einem Messer von der Haut schaben. Mit dem gewürfelten Weißbrot und 200 ml Einweichwasser zu den Zwiebeln geben, 10 Minuten köcheln lassen, fein pürieren und durch ein Sieb streichen. Die Sauce ist rotbraun, süßlich und sämig. Erst jetzt abschmecken, der Fisch salzt mit.',
       'Inzwischen die Kartoffeln schälen, vierteln und in Salzwasser 20 bis 25 Minuten garen.',
       'Das restliche Öl in einer flachen Pfanne erwärmen und den Fisch mit der Haut nach unten bei kleiner Hitze 4 Minuten braten, wenden und 2 Minuten weiterbraten. Die Sauce angießen, den Fisch mit der Haut nach oben hineinlegen und zugedeckt 8 Minuten sanft ziehen lassen, die Pfanne ab und zu schwenken. Garprobe: Der Fisch zerfällt in große, glasige Blätter.',
-      'Mit den Kartoffeln servieren. Leichter: den Fisch nicht anbraten, sondern direkt in der Sauce garen und nur 2 EL Öl nehmen.',
+      'Mit den Kartoffeln servieren.',
     ], 'bacalao vizcaina'),
 
   r('zarzuela-de-mariscos', 'Zarzuela de mariscos (katalanischer Fisch- und Meeresfrüchtetopf mit Mandel-Picada)', 'es', 'haupt', 60,
@@ -160,7 +159,7 @@ export const recipesEs = [
       'Das restliche Öl in den Topf geben, Zwiebeln und Paprika bei kleiner Hitze 15 Minuten weich und süß braten, dann Knoblauch, geriebene Tomate und Brot zugeben und 5 Minuten einkochen.',
       'Den Tintenfisch zurück in den Topf geben, mit Weißwein ablöschen und 2 Minuten einkochen. Die Tintenfischtinte im Fischfond auflösen, angießen und zugedeckt bei kleiner Hitze 25 Minuten schmoren, bis der Tintenfisch zart ist.',
       'Inzwischen den Reis mit 180 ml Wasser und etwas Salz zugedeckt 20 Minuten bei kleiner Hitze garen.',
-      'Den Tintenfisch herausheben, die Sauce mit dem Stabmixer fein pürieren, abschmecken und den Tintenfisch darin 2 Minuten erhitzen. Mit dem Reis servieren – klassisch als weißer Reisring neben der tiefschwarzen Sauce. Leichter: nur 2 EL Öl nehmen.',
+      'Den Tintenfisch herausheben, die Sauce mit dem Stabmixer fein pürieren, abschmecken und den Tintenfisch darin 2 Minuten erhitzen. Mit dem Reis servieren – klassisch als weißer Reisring neben der tiefschwarzen Sauce.',
     ], 'calamares en su tinta'),
 
   r('marmitako', 'Marmitako (baskischer Thunfisch-Kartoffel-Eintopf)', 'es', 'eintopf', 50,

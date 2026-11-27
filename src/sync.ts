@@ -27,8 +27,8 @@
  * PRO PERSON veröffentlicht (person:<Name>): ratings, rejects, portionFeedback, bakeRatings, baked, bfRatings, bfSatiety
  *   (Frühstück: Bewertung/Sättigung nach dem Vorbereiten – zählt nur fürs eigene Profil, nie als Haushalts-Abendessen).
  *   Persönlich bleibt bfPreps (Vorbereitungen; die Portionen selbst liegen als Posten im geteilten Vorrat).
- * PERSÖNLICH (nie geteilt): profile, weighIns, adjustDecidedAt, profileCreated, breakfast, breakfastPicks, prepDays, prepLate,
- *   prepChecked, bfPreps, bfSatietyDismissed, snacks (kcal), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
+ * PERSÖNLICH (nie geteilt): breakfast, breakfastPicks, prepDays, prepLate,
+ *   prepChecked, bfPreps, bfSatietyDismissed, snacks (Gegessenes, fürs Lernen), ratingDismissed, reviewDismissed, tasteSince, filters, defaultServings, onboarding*,
  *   bfOpen, showClassicSteps, lastBackup, ha (Token, Person, Gerät), sync (dieser Abgleich-Stand).
  *
  * ZUSAMMENFÜHREN (pro Eintrag, „letzte Änderung gewinnt“)
@@ -72,7 +72,8 @@
  *   `main`. Hält ein anderes Gerät den Stab, übernimmt es das (es gleicht ja gerade selbst ab). Was Lisa plant, kommt
  *   so sofort von ihrem Gerät in HA – spätestens, wenn Marc die App öffnet; doppelte Einträge entstehen nicht, weil
  *   beide dieselben Zuordnungen benutzen. In Google Tasks abgehakt → der Stab-Halter markiert gekauft → wandert zu allen.
- *   ERINNERUNGEN: Meal-Prep, Auftauen, Wiegen sind persönlich – jedes Gerät legt sie für SEINE Person an
+ *   (Frühere Felder wie profile/weighIns waren nie geteilt – ältere Geräte schicken sie nicht in die Dokumente.)
+ *   ERINNERUNGEN: Meal-Prep, Auftauen sind persönlich – jedes Gerät legt sie für SEINE Person an
  *   (Schlüssel `rem:<Person>:…`, Zuordnung nur lokal), unabhängig vom Stab; Yami löscht nie Erinnerungen, fremde schon gar
  *   nicht. „Läuft morgen ab“ betrifft den geteilten Vorrat → nur der Stab-Halter (Zuordnung `rem:exp:…` im Stab).
  */
@@ -627,7 +628,7 @@ export function syncRound(inp: RoundInput): RoundResult {
   }
   for (const [by, n] of checkedBy) notices.push({ id: uid(), at: now, by, text: `${by} hat ${n} Artikel auf der Einkaufsliste abgehakt` })
 
-  // dem Haushalt beitreten: keine Start-Checkliste mit Kalorienprofil
+  // dem Haushalt beitreten: keine Start-Checkliste
   if (first && remoteHasData && !next.onboarding) next = { ...next, onboarding: 'done' }
 
   // andere Personen

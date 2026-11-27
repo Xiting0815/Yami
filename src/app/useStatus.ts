@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { defaultReviewMonday, weekReview } from '../review'
-import { suggestion as weightSuggestion, weighedThisWeek } from '../progress'
 import { type AppState, addDays, isoDate, parseIso, sharingActive, weekDays } from '../store'
 import { daysUntil } from '../kitchen'
 import { eveningOn } from '../bbq'
@@ -8,7 +7,7 @@ import type { SetAppState } from './types'
 import type { Calendar } from './useCalendar'
 import type { Ui } from './useUi'
 
-/** Erinnerungen & Hinweise: Start-Checkliste, Wiegetag, Sicherung, Wochenrückblick, bald ablaufender Vorrat */
+/** Erinnerungen & Hinweise: Start-Checkliste, Sicherung, Wochenrückblick, bald ablaufender Vorrat */
 export function useStatus(
   state: AppState,
   setState: SetAppState,
@@ -16,12 +15,6 @@ export function useStatus(
   { tab, reviewMonday }: Pick<Ui, 'tab' | 'reviewMonday'>,
   picks: string[],
 ) {
-  const profile = state.profile
-  // ───── Wiegen & Anpassung ─────
-  const weighIns = state.weighIns
-  const pendingSuggestion = profile ? weightSuggestion(weighIns, profile, state.adjustDecidedAt) : null
-  const needsWeighIn = !!profile && !weighedThisWeek(weighIns, today)
-
   // ───── Start-Checkliste (nur beim allerersten Benutzen) ─────
   const onboarding = !state.onboarding
   // ein Grillabend oder Tapas-Abend (im Backplan) zählt als Abendessen des Tages
@@ -30,8 +23,8 @@ export function useStatus(
   const dinnersDone = plannedCount > 0 && !openDay
   const somethingPlanned = plannedCount > 0 || picks.length > 0
   const listDone = !!state.onboardingListSeen
-  // Familie teilen: Profil und Frühstück sind persönlich und optional – die Checkliste verlangt sie nicht
-  const allDone = (sharingActive(state.ha) || (!!profile && picks.length > 0)) && dinnersDone && listDone
+  // Familie teilen: Frühstück ist persönlich und optional – die Checkliste verlangt es nicht
+  const allDone = (sharingActive(state.ha) || picks.length > 0) && dinnersDone && listDone
   /** Start-Checkliste gerade abgeschlossen → einmal „Alles eingerichtet“ zeigen */
   const [justFinished, setJustFinished] = useState(false)
   const finishShown = useRef(false)
@@ -49,14 +42,12 @@ export function useStatus(
     if (tab === 'woche') finishShown.current = true
     else if (finishShown.current) setJustFinished(false)
   }, [tab, justFinished])
-  // Wiegetag: nicht während der Checkliste und frühestens am Tag nach dem Anlegen des Profils
-  const weighDue = needsWeighIn && !onboarding && (!state.profileCreated || today > state.profileCreated)
   // Sicherung: fehlt oder ist älter als 28 Tage – aber erst, wenn es schon Daten gibt, die älter als eine Woche sind
   const backupDue = (() => {
     const dates = Object.keys(state.plan)
-    if (!profile && dates.length === 0) return false
+    if (dates.length === 0) return false
     const weekAgo = isoDate(addDays(parseIso(today), -7))
-    if (!dates.some((d) => d < weekAgo) && !weighIns.some((w) => w.date < weekAgo)) return false
+    if (!dates.some((d) => d < weekAgo)) return false
     return !state.lastBackup || state.lastBackup < isoDate(addDays(parseIso(today), -28))
   })()
 
@@ -77,7 +68,6 @@ export function useStatus(
   const urgentNames = new Set(state.pantry.filter((l) => daysUntil(l.expires, today) <= 2).map((l) => l.name))
 
   return {
-    pendingSuggestion,
     onboarding,
     plannedCount,
     openDay,
@@ -85,7 +75,6 @@ export function useStatus(
     somethingPlanned,
     listDone,
     justFinished,
-    weighDue,
     backupDue,
     cardMonday,
     cardReview,

@@ -90,7 +90,7 @@ ok(settled.bakePlan[SAT]![0].status === 'baked' && settled.baked.length === 1 &&
 const burgerDay = settleBaked({ pantry: [], bakePlan: addBake({}, SAT, 'bacon-cheeseburger-grill', 1), baked: [] }, SAT, 'bacon-cheeseburger-grill')
 ok(!!burgerDay && burgerDay.pantry.length === 0 && burgerDay.baked.length === 1, 'BBQ ohne Reste (Burger): nur Zutaten abziehen, trotzdem gelernt')
 const meal = bbqMeal(pp, SAT)
-ok(!!meal && meal.kcal === Math.round(pp.nutrition.kcal) && meal.recipeId === PP, `Tagesbilanz: eine Portion (${meal?.kcal} kcal) zählt als Abendessen`)
+ok(!!meal && meal.recipeId === PP && !('kcal' in meal), 'Grillabend zählt fürs Lernen als „gegessen“ (ohne kcal)')
 ok(doneWord(pp) === 'gegrillt' && doneWord(RECIPE_BY_ID['chili-dutch-oven']) === 'gekocht' && doneWord(RECIPE_BY_ID['bienenstich']) === 'gebacken', 'Wortwahl: gegrillt / gekocht / gebacken')
 
 // ───── 5) Resteessen bevorzugt ─────

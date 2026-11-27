@@ -6,7 +6,6 @@ import { isTapa } from '../../types'
 import { shortTitle as tapaTitle } from '../../tapas'
 import { bbqIdeas } from '../../bbq'
 import { householdPreference, pendingRating } from '../../learning'
-import { targetKcal } from '../../energy'
 import { sharingActive, weekdayName } from '../../store'
 import { prepDayText } from '../../breakfast'
 import { plannedBy } from '../../sync'
@@ -24,22 +23,13 @@ import type { AppModel } from '../useAppModel'
 
 /** Tab „Woche“: Plan Mo–So mit Hinweis, Start-Checkliste, Rückblick, Bewertung und Frühstückskarte */
 export function WeekTab({ m }: { m: AppModel }) {
-  const { state, setState, cal, ui, plan, bf, energy, status, act, flash } = m
+  const { state, setState, cal, ui, plan, bf, status, act, flash } = m
   const { today, days } = cal
   const { picks, prep, covered } = bf
-  const profile = state.profile
-  const { onboarding, plannedCount, openDay, dinnersDone, somethingPlanned, listDone, pendingSuggestion, urgentNames } = status
+  const { onboarding, plannedCount, openDay, dinnersDone, somethingPlanned, listDone, urgentNames } = status
 
   const shared = sharingActive(state.ha)
   const allSteps: StartStep[] = [
-    {
-      title: 'Profil anlegen',
-      sub: profile ? `Tagesziel ${targetKcal(profile).toLocaleString('de-DE')} kcal` : 'Alter, Größe, Gewicht – daraus wird dein Kalorienziel',
-      verb: 'Anlegen',
-      done: !!profile,
-      editable: true,
-      onClick: () => ui.setShowProfile(true),
-    },
     {
       title: `Frühstück für ${dayRangeText(covered)} wählen`,
       sub: picks.length ? picks.map((id) => shortTitle(RECIPE_BY_ID[id]?.title ?? '')).join(' + ') : `1–2 Rezepte, einmal vorbereiten (${prepDayText(prep, today)})`,
@@ -77,25 +67,21 @@ export function WeekTab({ m }: { m: AppModel }) {
     },
   ]
 
-  // Familie teilen: Profil (Kalorien) und Frühstück sind persönlich – nicht in die Checkliste drängen
-  const startSteps = shared ? allSteps.slice(2) : allSteps
+  // Familie teilen: Frühstück ist persönlich – nicht in die Checkliste drängen
+  const startSteps = shared ? allSteps.slice(1) : allSteps
   const notices = shared ? (state.sync?.notices ?? []).slice(-3).reverse() : []
   const askWho = !!state.ha?.share && !state.ha.me
   // auf einem anderen Gerät ist „Familie teilen“ an, hier nicht → dieses Gerät schreibt Einkaufsliste/Kalender nicht
   const otherShare = state.ha?.enabled && !state.ha.share ? state.ha.otherShare : undefined
 
-  // höchstens ein Hinweis über dem Plan: Vorrat läuft ab > Vorschlag > Wiegetag
+  // höchstens ein Hinweis über dem Plan: Vorrat läuft ab > Sicherung
   const notice: Notice | undefined = status.justFinished
     ? { text: 'Alles eingerichtet – guten Appetit!', tone: 'ok', icon: 'check' }
     : urgentNames.size > 0
       ? { text: `${urgentNames.size} ${urgentNames.size === 1 ? 'Zutat läuft' : 'Zutaten laufen'} bald ab`, tone: 'warn', icon: 'alert', onClick: () => ui.setTab('vorrat') }
-      : pendingSuggestion
-        ? { text: `Vorschlag: Tagesziel ${pendingSuggestion.title}`, icon: 'trend', onClick: () => ui.setShowProgress(true) }
-        : status.weighDue
-          ? { text: 'Wiegetag – Werte eintragen', icon: 'scale', onClick: () => ui.setShowProgress(true) }
-          : status.backupDue
-            ? { text: 'Lange nicht gesichert – jetzt Sicherung speichern', icon: 'save', onClick: () => ui.setShowProfile(true) }
-            : undefined
+      : status.backupDue
+        ? { text: 'Lange nicht gesichert – jetzt Sicherung speichern', icon: 'save', onClick: () => ui.setShowProfile(true) }
+        : undefined
 
   // Backen: Nachfrage zum ersten unbeantworteten Backtag; sonst höchstens ein sanfter Vorschlag (nur ohne anderen Hinweis)
   const pendingBake = pendingBakes(state.bakePlan, today)[0]
@@ -234,7 +220,7 @@ export function WeekTab({ m }: { m: AppModel }) {
             onOpen={() => ui.setReviewMonday(status.cardMonday)}
             onDismiss={() => {
               setState((s) => ({ ...s, reviewDismissed: [...s.reviewDismissed, status.cardMonday].slice(-60) }))
-              flash('Rückblick ausgeblendet – du findest ihn oben rechts unter „Wiegen & Fortschritt“')
+              flash('Rückblick ausgeblendet – du findest ihn oben rechts unter „Einstellungen“')
             }}
           />
         ) : undefined
@@ -246,7 +232,7 @@ export function WeekTab({ m }: { m: AppModel }) {
             onShare={!state.ha?.share ? () => ui.setShowProfile(true, 'ha') : undefined}
             onDismiss={() => {
               setState((s) => ({ ...s, onboarding: 'dismissed' }))
-              flash('Du findest Profil und Wiegen oben rechts.')
+              flash('Einstellungen und Wochenrückblick findest du oben rechts.')
             }}
           />
         ) : undefined
@@ -256,8 +242,6 @@ export function WeekTab({ m }: { m: AppModel }) {
       onOpen={(r, day) => ui.setSheet({ recipe: r, day, mode: 'view' })}
       onMore={ui.setActionsDay}
       onShop={() => ui.setTab('liste')}
-      balances={energy.balances}
-      portions={energy.portions}
       breakfastSlot={
         onboarding && !picks.length ? undefined : (
           <BreakfastCard

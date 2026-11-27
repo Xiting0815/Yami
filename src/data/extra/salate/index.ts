@@ -9,7 +9,7 @@
  * | salate.ts       | Kartoffel-, Reis-, Bohnen-, Gemüsesalate, Ensaladilla rusa, Pipirrana …       | `salat(…, { group: 'kartoffel' \| 'reis' \| 'bohnen' \| 'gemuese', … })` |
  *
  * Ein Salat (`salat()` aus src/data/define.ts): Zutaten für `portions` Beilagen-Portionen, `name` = Ergebnis im Vorrat
- * („Nudelsalat (selbstgemacht)“, eindeutig), `shelf` = Tage im Kühlschrank, `lighter` = Leichter-Tipp (Pflicht), `cuisine` =
+ * („Nudelsalat (selbstgemacht)“, eindeutig), `shelf` = Tage im Kühlschrank, `cuisine` =
  * Herkunftsküche. Nie im Wischstapel; „Einplanen für“ einen Tag ist ein ZUSATZ zum Abendessen (Grillabend, Gäste, Mitbringsel),
  * „Fertig“ legt alle Portionen in den Vorrat, dort zählt „1 Portion gegessen“ in die Tagesbilanz.
  * Die BBQ-Beilagen (src/data/extra/bbq/beilagen.ts) erscheinen im Bereich „🥗 Salate & Beilagen“ automatisch mit.

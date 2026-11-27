@@ -7,7 +7,6 @@ import {
   type PantryLot, type WeekResult,
 } from '../src/kitchen'
 import { applyBreakfastPicks, assignBreakfasts, prepPlan, resolvePrepDay, workdays } from '../src/breakfast'
-import { dayBalance } from '../src/energy'
 import { buildModel, pendingRating, preference } from '../src/learning'
 import { weekReview, defaultReviewMonday } from '../src/review'
 import { diffTodo, localItems } from '../src/haSync'
@@ -53,8 +52,10 @@ for (const d of workdays(days1)) if (asg.days[d]) breakfast[d] = { recipeId: asg
 let state: AppState = sanitize({
   plan: {}, breakfast, breakfastPicks: { [MON]: BF }, prepDays: { [MON]: MON }, pantry: pantry0,
   spices: { Pfeffer: 'da', Muskatnuss: 'alle' }, onboarding: 'done', defaultServings: 2,
+  // älterer Stand mit Kalorienprofil: lädt, das Profil fällt weg
   profile: { sex: 'm', age: 40, heightCm: 180, weightKg: 92, activity: 1.3, deficit: 500, lunchKcal: 600 },
 })
+ok(!('profile' in state), 'altes Kalorienprofil wird beim Laden verworfen')
 ok(state.pantry.length === pantry0.length && state.breakfast[days1[1]]?.recipeId === 'brot-box', 'Stand übersteht sanitize (Vorrat, Frühstück)')
 ok(!!state.staples.Olivenöl && !!state.staples.Gemüsebrühe && state.staples.Gemüsebrühe.form === 'Gemüsebrühe Würfel', 'Grundzutaten gemerkt: Olivenöl, Gemüsebrühe (Würfel)')
 ok(resolvePrepDay(state.prepDays, days1, MON) === MON, 'Prep-Tag Mo 16.11.')
@@ -128,9 +129,6 @@ const items = localItems(w1.buy)
 const diff = diffTodo(items, [], {})
 ok(diff.add.length === w1.buy.length && diff.add.every((i) => i.summary.startsWith(i.key) && !i.bought), 'HA: jeder Artikel einmal anlegen, Text beginnt mit dem Namen')
 ok(!items.some((i) => ['Bandnudeln', 'Hähnchenbrustfilet', 'Sahne'].includes(i.key)), 'HA: Vorhandenes kommt nicht auf die Liste')
-// Kalorien Mo (kein Frühstück geplant → Schätzwert)
-const bMon = dayBalance(state.profile!, state.breakfast[MON], state.plan[MON])
-ok(!bMon.breakfastPlanned && bMon.dinner != null && Number.isFinite(bMon.total), 'Tagesbilanz Mo: Schätzfrühstück + Abendessen')
 
 // ───── Di 17.11.: Montag gilt als gekocht ─────
 const before = state
@@ -215,12 +213,12 @@ ok(waste!.date === '2026-11-19', 'weggeworfen datiert aufs Ablaufdatum (angebroc
 state = { ...state, pantry: state.pantry.filter((l) => l !== ch), wasted: [...state.wasted, waste!] }
 ok(defaultReviewMonday(today) === MON, 'Sonntag: Rückblick für die Woche ab 16.11.')
 const rev = weekReview(state, days1, today)
-console.log('  Rückblick:', JSON.stringify({ nutrition: rev.nutrition, food: rev.food, spending: rev.spending, tip: rev.tip.kind, rated: rev.highlights.rated.length }))
+console.log('  Rückblick:', JSON.stringify({ variety: rev.variety, food: rev.food, spending: rev.spending, tip: rev.tip.kind, rated: rev.highlights.rated.length }))
 ok(rev.hasData && rev.spending.dinners === 1, 'Rückblick: 1 Abendessen')
 ok(rev.food.waste.count === 1 && rev.food.waste.top === 'Champignons' && rev.tip.kind !== 'empty', 'Rückblick: Champignons weggeworfen')
 ok(rev.food.usedItems > 0 && rev.food.usedEuro > 3, 'Rückblick: aus dem Vorrat verbraucht (Hähnchen, Sahne, Nudeln, Eier …)')
 ok(rev.highlights.rated.length === 1 && rev.highlights.rated[0].day === MON, 'Rückblick: Bewertung vom Montag')
-ok(rev.nutrition.days === 1 && Number.isFinite(rev.nutrition.avgKcal!), 'Rückblick: Ernährung Mo (einziger Tag mit Abendessen)')
+ok(rev.variety.cuisines === 1 && rev.variety.newDishes === 1, 'Rückblick: Abwechslung – 1 Küche, 1 neues Gericht')
 
 // ───── Mo 23.–Di 24.11.: neue Woche, Gericht vom 23. wird gekocht ─────
 today = '2026-11-24'

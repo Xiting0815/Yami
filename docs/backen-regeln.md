@@ -24,7 +24,6 @@ export const kuchen: ExtraGroup = {
         cuisine: 'de',            // optional, Standard 'de' ('it' für Italienisches)
         time: 120,                // Gesamtzeit in Min. inkl. Gehzeit (über Nacht: mitrechnen)
         yields: { name: 'Butterkuchen (selbstgebacken)', amount: 20, unit: 'Stk', shelf: 2, store: 'luftdicht bei Raumtemperatur', frozen: 90 },
-        lighter: 'Ein Satz: was man ändert und was es spart (… spart rund 60 kcal pro Stück).',
       },
       '500 g Weizenmehl | 21 g Hefe frisch | 250 ml Milch | …',   // Zutaten für 1 Rezept (1 Blech/Form/Laib), "|" getrennt
       ['Schritt 1 …', 'Schritt 2 …', 'Schritt 3 …']),            // klassische Schritte (Backofen), mind. 3
@@ -58,9 +57,9 @@ export const kuchen: ExtraGroup = {
 - **Nährwerte je Stück** werden aus den Zutaten berechnet (Summe ÷ Stückzahl). `perPiece` nur angeben, wenn das nicht passt (z. B. Frittiertes).
 - Zutatenmengen gelten für **ein Rezept** (Stepper „Rezeptmenge ×2“ verdoppelt alles).
 
-## 3. Kalorien & „Leichter“
+## 3. Original statt „leicht“
 
-Klassische Rezepte (nicht abspecken). Jedes Dessert/Kuchen/Brot hat `lighter`: **ein** konkreter Satz mit Tausch + Ersparnis, z. B. „Die Hälfte des Mascarpones durch Skyr ersetzen … – spart rund 170 kcal pro Portion.“ Ersparnis grob nachrechnen. Typisch: Skyr/Magerquark statt Sahne/Mascarpone, weniger Zucker, Obst statt Creme, kleinere Stücke (Blech in 24 statt 20), dünnere Scheiben, Vollkornmehl.
+Klassische, authentische Rezepte – nicht abspecken, keine „Leichter“-Tipps und keine Kalorienangaben (Gusto zeigt keine Nährwerte; sie werden nur intern berechnet).
 
 ## 4. Geräte (Werte werden von `npm run check-data` geprüft)
 
@@ -111,4 +110,4 @@ npx vite-node scripts/test-devices.ts
 npx vite-node scripts/test-cook.ts
 ```
 
-`check-data` prüft u. a.: bekannte Zutaten mit Produkt/Nährwerten/Gewicht, keine Doppelten, Geräte-Einstellungen im erlaubten Bereich, Kuchen/Brot mit Geräte-Schritten, Bild-Suchbegriff, `lighter`-Tipp, plausible kcal je Stück, Austausch-Gruppen mit gleicher Einheit.
+`check-data` prüft u. a.: bekannte Zutaten mit Produkt/Nährwerten/Gewicht, keine Doppelten, Geräte-Einstellungen im erlaubten Bereich, Kuchen/Brot mit Geräte-Schritten, Bild-Suchbegriff, plausible Nährwerte (intern) je Stück, Austausch-Gruppen mit gleicher Einheit.

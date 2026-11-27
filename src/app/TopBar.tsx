@@ -1,13 +1,13 @@
 import { weekLabel } from '../store'
 import type { AppModel } from './useAppModel'
 import { Icon } from '../components/Icon'
+import { Logo } from '../components/Logo'
 
-/** Kopfzeile: Logo bzw. Tab-Titel, Wochenwechsel, Wiegen & Profil */
+/** Kopfzeile: Logo bzw. Tab-Titel, Wochenwechsel, Einstellungen */
 export function TopBar({ m }: { m: AppModel }) {
-  const { state, cal, ui, status, act } = m
+  const { cal, ui, act } = m
   const { tab } = ui
   const { monday } = cal
-  const profile = state.profile
   const tabTitle = tab === 'vorrat' ? 'Vorrat' : tab === 'rezepte' ? 'Rezepte' : tab === 'liste' ? 'Einkauf' : null
 
   const weekNav = (
@@ -24,20 +24,12 @@ export function TopBar({ m }: { m: AppModel }) {
   return (
     <header className="topbar">
       <div className="brand">
-        <span className="logo">🍳</span> {tabTitle ? <h1 className="top-title">{tabTitle}</h1> : <span className="brand-name">Yami</span>}
+        <Logo /> {tabTitle ? <h1 className="top-title">{tabTitle}</h1> : <span className="brand-name">Gusto</span>}
       </div>
       <div className="top-right">
         {!tabTitle && weekNav}
-        <button
-          className={`icon-btn profile-btn ${status.weighDue || status.pendingSuggestion ? 'dot-badge' : ''}`}
-          onClick={() => (profile ? ui.setShowProgress(true) : ui.setShowProfile(true))}
-          aria-label="Wiegen & Fortschritt"
-          title="Wiegen & Fortschritt"
-        >
-          <Icon name="scale" />
-        </button>
-        <button className="icon-btn profile-btn" onClick={() => ui.setShowProfile(true)} aria-label="Profil & Kalorienziel" title="Profil & Kalorienziel">
-          <Icon name="user" />
+        <button className="icon-btn profile-btn" onClick={() => ui.setShowProfile(true)} aria-label="Einstellungen" title="Einstellungen">
+          <Icon name="settings" />
         </button>
       </div>
     </header>

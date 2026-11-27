@@ -106,7 +106,6 @@ export const burger: ExtraGroup = {
         time: 180,
         portions: 2,
         eat: 2,
-        lighter: 'Statt im Öl frittieren: die panierten Schenkel mit Öl einsprühen und im Airfryer bei 200 °C 18 bis 20 Minuten backen – spart rund 150 kcal pro Portion.',
       },
       '400 g Hähnchenschenkelfilet | 250 ml Buttermilch | 100 g Weizenmehl | 750 ml Frittieröl | 2 EL Cayennepfeffer | 1 EL Brauner Zucker | 1 TL Paprikapulver geräuchert | 1 TL Knoblauchpulver | 2 Stk Burger-Brötchen | 4 Stk Gewürzgurke | 3 EL Ranch-Dressing | 2 EL Chili-Honig | 0.25 Stk Kopfsalat | Salz | Pfeffer',
       [

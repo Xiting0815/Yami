@@ -24,8 +24,6 @@ export interface RawRecipe {
   basic?: true
   yields?: BasicYield
   kind?: BasicKind
-  /** „💡 Leichter:“-Tipp */
-  lighter?: string
   /** BBQ-Sparte: Untergruppe (siehe `bbq()`; Rubs & Saucen: `backen('grundrezept', …, { bbq: 'rub' })`) */
   bbq?: BbqGroup
   /** BBQ: Portionen der ganzen Ladung */
@@ -163,8 +161,6 @@ export interface BackOptions {
   /** Gesamtzeit in Minuten inkl. Gehzeit (Sauerteig über Nacht: Arbeitszeit + Ruhezeit) */
   time: number
   yields: BackYield
-  /** „💡 Leichter:“-Tipp, ein Satz (Pflicht bei Dessert/Kuchen/Brot) */
-  lighter?: string
   /** Festtags-Fenster (z. B. ['plaetzchen'] für Weihnachtsplätzchen: Backen-Liste sortiert sie in der Saison nach vorn) */
   festive?: Festive[]
   /** nur Rubs & Saucen für die BBQ-Sparte: `'rub'` (erscheint dann auch im BBQ-Bereich unter „Rubs & Saucen“) */
@@ -177,7 +173,7 @@ export interface BackOptions {
  * Backen & Desserts (oder ein Grundrezept wie Anstellgut). Mengen für 1 Rezept (1 Blech, 1 Form, 1 Laib, 1 Ansatz).
  * Kein Abendessen: nicht im Wischstapel, nicht planbar. „Fertig gebacken“ legt `yields` in den Vorrat.
  *
- *   backen('kuchen', 'bienenstich', 'Bienenstich', { time: 150, yields: { name: 'Bienenstich (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 3, store: 'im Kühlschrank' }, lighter: '…' },
+ *   backen('kuchen', 'bienenstich', 'Bienenstich', { time: 150, yields: { name: 'Bienenstich (selbstgebacken)', amount: 12, unit: 'Stk', shelf: 3, store: 'im Kühlschrank' } },
  *     '375 g Weizenmehl | 21 g Hefe frisch | …', ['Schritt 1 …', 'Schritt 2 …', 'Schritt 3 …'])
  */
 export function backen(kind: BasicKind, id: string, title: string, o: BackOptions, ingredients: string, steps: string[]): RawRecipe {
@@ -193,7 +189,6 @@ export function backen(kind: BasicKind, id: string, title: string, o: BackOption
     basic: true,
     yields: { ...o.yields },
     kind,
-    lighter: o.lighter,
     ...(o.festive ? { festive: o.festive } : {}),
     ...(o.bbq ? { bbq: o.bbq } : {}),
     ...(o.tapas ? { tapas: o.tapas } : {}),
@@ -232,8 +227,6 @@ export interface BbqOptions {
   leftover?: BbqLeftover
   /** Küche (Bildsuche/Info), Standard 'us' */
   cuisine?: Cuisine
-  /** „💡 Leichter:“-Tipp (optional) */
-  lighter?: string
   /**
    * Anteil des Fleischfetts, der beim Smoken abtropft bzw. ausgelassen wird (0–0,4): senkt Fett und kcal je Portion
    * und in den Reste-Nährwerten (nur Zutaten aus „Fleisch & Fisch“). Richtwerte: Brisket/Pork Belly 0,35–0,4,
@@ -268,7 +261,6 @@ export function bbq(id: string, title: string, o: BbqOptions, ingredients: strin
     basic: true,
     kind: 'bbq',
     bbq: o.group,
-    lighter: o.lighter,
     ...(o.fatLoss ? { fatLoss: Math.min(0.4, Math.max(0, o.fatLoss)) } : {}),
     ...(o.eaten ? { eaten: o.eaten } : {}),
     ...(l
@@ -309,8 +301,6 @@ export interface TapaOptions {
   ahead?: string
   /** Küche (Bildsuche/Info), Standard 'es' */
   cuisine?: Cuisine
-  /** „💡 Leichter:“-Tipp (optional) */
-  lighter?: string
 }
 
 /**
@@ -337,7 +327,6 @@ export function tapa(id: string, title: string, o: TapaOptions, ingredients: str
     tapas: o.group,
     serve: o.serve,
     ...(o.ahead ? { ahead: o.ahead } : {}),
-    lighter: o.lighter,
   }
 }
 
@@ -359,8 +348,6 @@ export interface SalatOptions {
   shelf: number
   /** Lagerung, Standard „im Kühlschrank (Dose mit Deckel)“ */
   store?: string
-  /** „💡 Leichter:“-Tipp, ein Satz (Pflicht) */
-  lighter: string
 }
 
 /**
@@ -369,7 +356,7 @@ export interface SalatOptions {
  * „Fertig“ zieht die Zutaten ab und legt alle Portionen in den Vorrat (Kühlschrank, `shelf` Tage) – dort „1 Portion gegessen“.
  *
  *   salat('nudelsalat-klassisch', 'Nudelsalat klassisch', { group: 'nudel', cuisine: 'de', time: 40, portions: 6,
- *     name: 'Nudelsalat (selbstgemacht)', shelf: 2, lighter: '…' }, '250 g Fusilli | …', ['Schritt 1 …', '…', '…'])
+ *     name: 'Nudelsalat (selbstgemacht)', shelf: 2 }, '250 g Fusilli | …', ['Schritt 1 …', '…', '…'])
  */
 export function salat(id: string, title: string, o: SalatOptions, ingredients: string, steps: string[]): RawRecipe {
   return {
@@ -385,7 +372,6 @@ export function salat(id: string, title: string, o: SalatOptions, ingredients: s
     basic: true,
     kind: 'salat',
     salat: o.group,
-    lighter: o.lighter,
     yields: { name: o.name, amount: o.portions, unit: 'Portion', shelf: o.shelf, store: o.store ?? 'im Kühlschrank (Dose mit Deckel)', cat: 'molkerei' },
   }
 }

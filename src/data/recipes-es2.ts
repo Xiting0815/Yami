@@ -8,7 +8,6 @@ import type { ExtraIngredients } from './extra/types'
  *
  * Anlegen mit `r(id, 'Spanischer Titel (deutsche Erklärung)', 'es', art, minuten, zutaten, schritte, bildsuche)`, Mengen für
  * 2 Portionen, Einweichzeit über Nacht im ersten Schritt nennen (nicht in `minuten`). Geräte-Schritte: src/data/device-steps/es2.ts.
- * Abnehmen: Abendessen ca. 550–750 kcal je Portion; darüber nennt der letzte Schritt „Leichter: …“.
  *
  * Neue Zutaten NUR unten in `es2Zutaten` – zentral eingetragen über src/data/extra/index.ts. Gemeinsame Spanien-Zutaten
  * (Chorizo, Serrano-Schinken, Fabes getrocknet, Sherry fino, Kaninchenkeule …): src/data/extra/zutaten-es.ts – nicht neu anlegen.
@@ -22,7 +21,7 @@ export const recipesEs2 = [
       'Die Bohnen abgießen und in einen breiten Topf geben, knapp mit kaltem Wasser bedecken. Die halbierte Zwiebel, Knoblauch, Lorbeer sowie Chorizo, Blutwurst (Ersatz für die asturische Morcilla) und Schweinebauch im Ganzen darauflegen – dieses „Compango“ gibt den Geschmack. Langsam aufkochen und den Schaum abschöpfen.',
       'Die Safranfäden und das Paprikapulver in etwas Kochwasser verrühren und zugeben. Den Eintopf zugedeckt 2,5 Stunden ganz leise simmern lassen. Nicht umrühren – die Bohnen platzen sonst –, nur ab und zu den Topf schwenken. Zwei- bis dreimal einen Schuss kaltes Wasser zugeben („asustar las fabes“, die Bohnen erschrecken): so bleibt die Haut zart und ganz.',
       'Wenn die Bohnen butterweich sind, Wurst und Fleisch herausnehmen und in Scheiben schneiden, Zwiebel und Lorbeer entfernen. Erst jetzt salzen, die Wurst gibt viel Salz ab.',
-      'Den Eintopf 15 Minuten ruhen lassen, damit er sämig wird. In tiefen Tellern servieren und das Compango obenauf legen oder getrennt reichen. Leichter: Blutwurst weglassen und den Schweinebauch durch mageren Kochschinken ersetzen – die Fabes und die Chorizo tragen den Geschmack.',
+      'Den Eintopf 15 Minuten ruhen lassen, damit er sämig wird. In tiefen Tellern servieren und das Compango obenauf legen oder getrennt reichen.',
     ], 'fabada asturiana'),
   r('cocido-madrileno', 'Cocido madrileño (Madrider Kichererbsen-Eintopf in zwei Gängen: Suppe, dann Fleisch und Gemüse)', 'es', 'eintopf', 210,
     '100 g Kichererbsen getrocknet | 200 g Suppenfleisch Rind | 1 Stk Hähnchenschenkel | 40 g Schweinebauch geräuchert | 30 g Serrano-Schinken | 50 g Chorizo | 300 g Kartoffeln festkochend | 1 Stk Möhre | 300 g Weißkohl | 2 Zehe Knoblauch | 40 g Suppennudeln | 1 EL Olivenöl | Salz',
@@ -34,7 +33,7 @@ export const recipesEs2 = [
       'Inzwischen den Weißkohl in breite Streifen schneiden und mit der Chorizo getrennt garen – so färbt die Chorizo die Brühe nicht rot. Den Knoblauch in Scheiben im Olivenöl hellgolden braten und den Kohl darin kurz schwenken („rehogar“).',
       'Erster Gang – „Sopa“: Die Brühe durch ein Sieb abgießen (Fleisch, Kichererbsen und Gemüse mit etwas Brühe zugedeckt warm halten). 500 ml davon aufkochen, die Suppennudeln (in Spanien „Fideos finos“) darin 4 Minuten garen und mit Salz abschmecken.',
       'Zweiter Gang – „Vuelco“ (das Umstürzen): Kichererbsen, Kartoffeln, Möhre und Kohl auf einer Platte anrichten, das Fleisch und die Chorizo in Stücke schneiden und dazulegen. Mit einem Spritzer Olivenöl servieren.',
-      'Reste und Vorrat: Übrige Brühe abkühlen lassen und portionsweise vakuumieren oder einfrieren – sie ist die Basis für die nächste Sopa. Übriges Fleisch wird in Madrid am nächsten Tag zu „Ropa vieja“ (mit Zwiebeln in der Pfanne gebraten) oder zu Croquetas. Leichter: Schweinebauch weglassen, die Brühe nach dem Abkühlen entfetten und im zweiten Gang mehr Kohl und weniger Kichererbsen nehmen.',
+      'Reste und Vorrat: Übrige Brühe abkühlen lassen und portionsweise vakuumieren oder einfrieren – sie ist die Basis für die nächste Sopa. Übriges Fleisch wird in Madrid am nächsten Tag zu „Ropa vieja“ (mit Zwiebeln in der Pfanne gebraten) oder zu Croquetas.',
     ], 'cocido madrileño'),
   r('lentejas-con-chorizo', 'Lentejas con chorizo (spanischer Linseneintopf mit Chorizo)', 'es', 'eintopf', 60,
     '160 g Tellerlinsen | 100 g Chorizo | 1 Stk Zwiebel | 0.5 Stk Paprika grün | 1 Stk Möhre | 200 g Kartoffeln festkochend | 2 Zehe Knoblauch | 1 Stk Tomate | 1 Blatt Lorbeerblatt | 1 TL Paprikapulver edelsüß | 1 EL Olivenöl | Salz',
@@ -64,7 +63,7 @@ export const recipesEs2 = [
       '3 EL Olivenöl in einer breiten Pfanne (spanisch „Cazuela“) erhitzen, die Hähnchenstücke mit der Haut nach unten hineinlegen und bei mittlerer Hitze 15 Minuten rundum langsam goldbraun braten.',
       'Knoblauch, Chili (in Spanien „Guindilla“) und Lorbeer zugeben und 3 Minuten mitbraten, bis der Knoblauch duftet und Farbe nimmt – nicht schwarz werden lassen. Mit dem Sherry fino ablöschen (trockener Weißwein geht auch), zugedeckt 15 Minuten schmoren, dann offen einkochen, bis eine kleine, ölige Sauce übrig ist. Garprobe: Der Fleischsaft an der dicksten Stelle läuft klar.',
       'Währenddessen die Kartoffelstäbchen 22 Minuten knusprig backen, zweimal schütteln.',
-      'Die Petersilie hacken, über das Huhn streuen und mit den Kartoffeln servieren; den weichen Knoblauch drückt man bei Tisch aus der Schale. Leichter: die Haut vor dem Braten abziehen, nur 2 EL Öl in die Pfanne geben und statt der Kartoffeln einen grünen Salat reichen.',
+      'Die Petersilie hacken, über das Huhn streuen und mit den Kartoffeln servieren; den weichen Knoblauch drückt man bei Tisch aus der Schale.',
     ], 'pollo al ajillo'),
   r('pollo-en-pepitoria', 'Pollo en pepitoria (Huhn in Mandel-Safran-Sauce mit Eigelb)', 'es', 'haupt', 75,
     '2 Stk Hähnchenschenkel | 30 g Mandeln | 2 Stk Ei | 0.1 g Safranfäden | 1 Stk Zwiebel | 2 Zehe Knoblauch | 1 Scheibe Weißbrot | 100 ml Sherry fino | 250 ml Hühnerbrühe | 1 Blatt Lorbeerblatt | 1 EL Weizenmehl | 0.5 Bund Petersilie | 2 EL Olivenöl | Salz | Pfeffer',
@@ -75,7 +74,7 @@ export const recipesEs2 = [
       'Im selben Öl die Hähnchenteile rundum goldbraun anbraten, die Zwiebel zugeben und weich dünsten. Mit dem Sherry fino ablöschen und kurz einkochen. Hühnerbrühe und Lorbeer zugeben und zugedeckt 35 Minuten leise schmoren.',
       'Inzwischen die Safranfäden in einer trockenen Pfanne wenige Sekunden anrösten und im Mörser mit Mandeln, Knoblauch, Brot, den Eigelben und 3 EL Schmorflüssigkeit zu einer glatten Paste zerstoßen (Blitzhacker geht auch) – das ist die „Pepitoria“.',
       'Die Paste in die Sauce rühren und offen 5 Minuten köcheln, bis sie cremig gebunden ist. Garprobe: Das Fleisch löst sich leicht vom Knochen. Mit Salz abschmecken, Lorbeer entfernen.',
-      'Mit gehacktem Eiweiß und Petersilie bestreut servieren, dazu Brot zum Tunken. Das Gericht stammt aus der kastilischen Küche des 18. Jahrhunderts und ist ein klassisches Sonntagsessen in Madrid. Leichter: die Haut abziehen und die Mandeln auf 20 g reduzieren – die Sauce bindet trotzdem.',
+      'Mit gehacktem Eiweiß und Petersilie bestreut servieren, dazu Brot zum Tunken. Das Gericht stammt aus der kastilischen Küche des 18. Jahrhunderts und ist ein klassisches Sonntagsessen in Madrid.',
     ], 'pollo en pepitoria'),
   r('rabo-de-toro', 'Rabo de toro (geschmorter Ochsenschwanz nach Art von Córdoba)', 'es', 'haupt', 270,
     '700 g Ochsenschwanz | 1 Stk Zwiebel | 2 Stk Möhre | 1 Stk Paprika rot | 3 Zehe Knoblauch | 1 Stk Tomate | 200 ml Rotwein | 300 ml Rinderfond | 30 ml Weinbrand | 1 EL Weizenmehl | 1 Blatt Lorbeerblatt | 2 Zweig Thymian | 2 EL Olivenöl | 250 g Kartoffeln festkochend | Salz | Pfeffer',
@@ -86,7 +85,7 @@ export const recipesEs2 = [
       'Fleisch, Rinderfond, Lorbeer und Thymian in den Bräter geben – das Fleisch soll knapp bedeckt sein. Zugedeckt im Backofen bei 160 °C Ober-/Unterhitze 3,5 Stunden schmoren, nach der Hälfte die Stücke wenden.',
       'In den letzten 30 Minuten die Kartoffeln schälen, vierteln und 25 Minuten dämpfen.',
       'Garprobe: Das Fleisch löst sich mühelos vom Knochen. Die Stücke herausnehmen, die Sauce durch ein Sieb streichen oder pürieren und offen 10 Minuten sämig einkochen, abschmecken.',
-      'Das Fleisch in der Sauce mit den Kartoffeln servieren – in Córdoba gibt es oft Pommes dazu. Rabo de toro schmeckt aufgewärmt noch besser: am Vortag schmoren, über Nacht kalt stellen und die feste Fettschicht abheben. Leichter: genau so entfetten (spart gut 100 kcal je Portion) und mehr Gemüse statt Kartoffeln.',
+      'Das Fleisch in der Sauce mit den Kartoffeln servieren – in Córdoba gibt es oft Pommes dazu. Rabo de toro schmeckt aufgewärmt noch besser: am Vortag schmoren, über Nacht kalt stellen und die feste Fettschicht abheben.',
     ], 'rabo de toro'),
   r('carrillada-iberica-al-pedro-ximenez', 'Carrillada ibérica al Pedro Ximénez (Schweinebäckchen in süßer Sherrysauce mit Püree)', 'es', 'haupt', 180,
     '400 g Schweinebäckchen | 100 ml Sherry Pedro Ximénez | 250 ml Rinderfond | 1 Stk Zwiebel | 1 Stk Möhre | 2 Zehe Knoblauch | 1 Blatt Lorbeerblatt | 2 Zweig Thymian | 1 EL Weizenmehl | 1.5 EL Olivenöl | 400 g Kartoffeln mehligkochend | 80 ml Milch | 10 g Butter | Salz | Pfeffer',
@@ -96,7 +95,7 @@ export const recipesEs2 = [
       'Mit dem Pedro Ximénez ablöschen (ein sehr süßer, fast schwarzer Sherry aus getrockneten Trauben – Weinhandel oder online) und kurz einkochen. Bäckchen, Rinderfond, Lorbeer und Thymian zugeben, aufkochen und zugedeckt 2,5 Stunden ganz leise schmoren, ab und zu wenden.',
       'Für das Püree in den letzten 30 Minuten die Kartoffeln schälen, vierteln und 25 Minuten dämpfen. Mit der warmen Milch und der Butter zerstampfen und salzen.',
       'Garprobe: Die Bäckchen lassen sich mit dem Löffel teilen. Herausnehmen, Lorbeer und Thymian entfernen, die Sauce pürieren und offen 10 Minuten zu einer glänzenden, dicken Sauce einkochen; abschmecken.',
-      'Die Bäckchen in der Sauce wenden und auf dem Püree anrichten. Leichter: statt Püree gedämpfte Kartoffeln ohne Butter und die Sauce vor dem Einkochen entfetten.',
+      'Die Bäckchen in der Sauce wenden und auf dem Püree anrichten.',
     ], 'carrillada al pedro ximenez'),
   r('secreto-iberico-con-patatas-panaderas', 'Secreto ibérico con patatas panaderas (Ibérico-Schwein von der Plancha mit Bäckerinnen-Kartoffeln)', 'es', 'haupt', 70,
     '300 g Secreto ibérico | 500 g Kartoffeln festkochend | 1 Stk Zwiebel | 1 Stk Paprika grün | 2 Zehe Knoblauch | 50 ml Weißwein | 3 EL Olivenöl | 0.5 Bund Petersilie | Salz | Pfeffer',
@@ -105,7 +104,7 @@ export const recipesEs2 = [
       'Alles in einer Auflaufform mit 2 EL Olivenöl, Salz und Pfeffer mischen, den Weißwein und 50 ml Wasser angießen. Bei 180 °C Heißluft 45 Minuten garen und nach 20 Minuten einmal wenden – die „Panaderas“ (früher beim Bäcker in der Restwärme gegart) sollen weich sein und an den Rändern bräunen.',
       'Den Secreto 20 Minuten vor dem Braten aus dem Kühlschrank nehmen und trocken tupfen. Das „Geheimnis“ ist ein dünner, stark marmorierter Muskel zwischen Schulter und Rückenspeck des Ibérico-Schweins (spanische Feinkost-Versände, Großmarkt, oft tiefgekühlt); Ersatz: Schweinenacken in 1,5 cm dicken Scheiben.',
       'Eine Gusseisenpfanne (Plancha) ohne Fett sehr heiß werden lassen. Den Secreto am Stück mit dem restlichen Olivenöl einreiben und 3 Minuten je Seite kräftig bräunen; innen darf er bei Ibérico leicht rosa bleiben.',
-      'Den Secreto 3 Minuten ruhen lassen, quer zur Faser in Streifen schneiden, mit grobem Salz und gehackter Petersilie bestreuen und auf den Kartoffeln servieren. Leichter: Schweinefilet statt Secreto (spart rund 250 kcal je Portion) und nur 1 EL Öl an die Kartoffeln.',
+      'Den Secreto 3 Minuten ruhen lassen, quer zur Faser in Streifen schneiden, mit grobem Salz und gehackter Petersilie bestreuen und auf den Kartoffeln servieren.',
     ], 'secreto iberico'),
   r('cordero-al-chilindron', 'Cordero al chilindrón (Lammragout mit Paprika und Serrano aus Aragón)', 'es', 'haupt', 110,
     '450 g Lammschulter | 2 Stk Paprika rot | 1 Stk Zwiebel | 3 Zehe Knoblauch | 2 Stk Tomate | 40 g Serrano-Schinken | 2 Stk Ñoras getrocknet | 100 ml Weißwein | 1 TL Paprikapulver edelsüß | 1 Blatt Lorbeerblatt | 2 EL Olivenöl | Salz | Pfeffer',
@@ -115,7 +114,7 @@ export const recipesEs2 = [
       'Das Olivenöl im Schmortopf erhitzen und das Lamm in zwei Portionen rundum kräftig anbraten, herausnehmen.',
       'Zwiebel, Paprika, Knoblauch und Serrano-Schinken im Bratfett 10 Minuten weich schmoren. Die Tomaten hineinreiben und 5 Minuten einkochen. Vom Herd ziehen, Paprikapulver und Ñora-Fruchtfleisch einrühren.',
       'Das Lamm zurück in den Topf geben, mit dem Weißwein ablöschen, den Lorbeer zugeben und zugedeckt 75 Minuten leise schmoren; nur so viel Wasser nachgießen, dass eine dicke Sauce bleibt. Garprobe: Das Fleisch lässt sich mit der Gabel zerteilen.',
-      'Abschmecken und mit Brot servieren. Der Name kommt von einem alten Kartenspiel; in Aragón und Navarra wird so auch Huhn geschmort. Leichter: Lammkeule statt Schulter nehmen – sie ist deutlich magerer.',
+      'Abschmecken und mit Brot servieren. Der Name kommt von einem alten Kartenspiel; in Aragón und Navarra wird so auch Huhn geschmort.',
     ], 'cordero al chilindron'),
   r('estofado-de-ternera', 'Estofado de ternera (spanischer Rindfleisch-Schmortopf mit Kartoffeln und Erbsen)', 'es', 'eintopf', 130,
     '500 g Rindergulasch | 400 g Kartoffeln festkochend | 2 Stk Möhre | 100 g Erbsen TK | 1 Stk Zwiebel | 2 Zehe Knoblauch | 1 Stk Tomate | 150 ml Rotwein | 300 ml Rinderfond | 1 Blatt Lorbeerblatt | 1 TL Paprikapulver edelsüß | 2 EL Olivenöl | Salz | Pfeffer',
@@ -125,7 +124,7 @@ export const recipesEs2 = [
       'Zwiebel und Knoblauch im Bratfett glasig dünsten, die Tomate hineinreiben und kurz einkochen. Vom Herd ziehen, das Paprikapulver einrühren und sofort mit dem Rotwein ablöschen.',
       'Fleisch, Rinderfond, Möhren und Lorbeer zugeben, aufkochen und zugedeckt 75 Minuten leise schmoren.',
       'Die Kartoffeln schälen, in Stücke brechen (anschneiden und abbrechen – das bindet die Sauce) und zugeben, bei Bedarf so viel Wasser angießen, dass sie knapp bedeckt sind. Weitere 25 Minuten schmoren, in den letzten 5 Minuten die Erbsen zugeben.',
-      'Garprobe: Fleisch und Kartoffeln sind weich. Abschmecken, Lorbeer entfernen und 10 Minuten ruhen lassen. Leichter: nur 250 g Kartoffeln und dafür mehr Möhren und Erbsen.',
+      'Garprobe: Fleisch und Kartoffeln sind weich. Abschmecken, Lorbeer entfernen und 10 Minuten ruhen lassen.',
     ], 'estofado de ternera'),
   r('solomillo-con-pimientos-asados', 'Solomillo de cerdo con pimientos asados (Schweinefilet mit gerösteter Paprika und Knoblauch)', 'es', 'haupt', 60,
     '400 g Schweinefilet | 3 Stk Paprika rot | 400 g Kartoffeln festkochend | 3 Zehe Knoblauch | 3 EL Olivenöl | 1 EL Sherryessig | Salz | Pfeffer',

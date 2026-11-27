@@ -28,7 +28,6 @@ export const dutchOven: ExtraGroup = {
         portions: 6,
         eat: 2,
         leftover: { name: 'Chili con Carne (vakuumiert)', amount: 4, unit: 'Portion', shelf: 90 },
-        lighter: 'Die Hälfte des Rindfleischs durch eine zweite Dose Kidneybohnen ersetzen – spart rund 150 kcal pro Portion.',
       },
       '1200 g Rindergulasch | 2 EL Sonnenblumenöl | 3 Stk Zwiebel | 4 Zehe Knoblauch | 2 Stk Paprika rot | 2 EL Tomatenmark | 2 TL Kreuzkümmel | 1 EL Paprikapulver geräuchert | 1 TL Oregano getrocknet | 2 TL Chiliflocken | 330 ml Dunkelbier | 2 Dose Gehackte Tomaten | 400 ml Rinderbrühe | 500 g Kidneybohnen | 20 g Zartbitterschokolade | Salz | Pfeffer',
       [
@@ -47,7 +46,6 @@ export const dutchOven: ExtraGroup = {
         portions: 8,
         eat: 2,
         leftover: { name: 'Texas Chili (vakuumiert)', amount: 6, unit: 'Portion', shelf: 90 },
-        lighter: 'Mageres Fleisch aus der Keule nehmen, das Schmalz halbieren und den Cheddar weglassen – spart rund 120 kcal pro Portion.',
       },
       '4 Stk Ancho-Chili getrocknet | 4 Stk Guajillo-Chili getrocknet | 2 Stk Chili getrocknet | 500 ml Rinderbrühe | 1500 g Rinderschulter | 2 Stk Zwiebel | 6 Zehe Knoblauch | 2 EL Schweineschmalz | 1 EL Kreuzkümmel | 2 TL Oregano getrocknet | 1 EL Paprikapulver geräuchert | 2 EL Tomatenmark | 330 ml Dunkelbier | 2 EL Polenta | 1 EL Apfelessig | 15 g Zartbitterschokolade | 1 TL Brauner Zucker | 60 g Cheddar gerieben | Salz | Pfeffer',
       [
@@ -70,7 +68,6 @@ export const dutchOven: ExtraGroup = {
         portions: 8,
         eat: 2,
         leftover: { name: 'Schichtfleisch (vakuumiert)', amount: 6, unit: 'Portion', shelf: 90 },
-        lighter: 'Statt Bacon nur eine dünne Lage Zwiebeln als Boden nehmen und das Fett vor dem Servieren abschöpfen – spart rund 120 kcal pro Portion.',
       },
       '2000 g Schweinenacken | 3 EL Sonnenblumenöl | 2 EL Senf mittelscharf | 2 EL Paprikapulver edelsüß | 1 EL Paprikapulver geräuchert | 4 Zehe Knoblauch | 1 TL Majoran | 6 Stk Zwiebel | 2 Stk Paprika rot | 250 g Bacon | 330 ml Bier hell | Salz | Pfeffer',
       [
@@ -89,7 +86,6 @@ export const dutchOven: ExtraGroup = {
         portions: 6,
         eat: 2,
         leftover: { name: 'Cowboy Beans (vakuumiert)', amount: 4, unit: 'Portion', shelf: 90 },
-        lighter: 'Den Bacon halbieren und den braunen Zucker auf 30 g reduzieren – spart rund 100 kcal pro Portion.',
       },
       '200 g Bacon | 2 Stk Zwiebel | 1 Stk Paprika grün | 3 Zehe Knoblauch | 500 g Kidneybohnen | 2 Dose Weiße Bohnen | 500 g Rinderhackfleisch | 250 ml BBQ-Sauce | 100 ml Tomatenketchup | 60 g Brauner Zucker | 2 EL Senf mittelscharf | 2 EL Apfelessig | 1 EL Worcestersauce | 1 TL Chiliflocken | 1 TL Paprikapulver geräuchert | 200 ml Rinderbrühe | Salz | Pfeffer',
       [
@@ -108,7 +104,6 @@ export const dutchOven: ExtraGroup = {
         portions: 6,
         eat: 2,
         leftover: { name: 'Pulled Chicken (vakuumiert)', amount: 1000, unit: 'g', portion: 250, shelf: 90 },
-        lighter: 'Statt im Brötchen auf Salat oder in einer Vollkorn-Tortilla servieren – spart rund 150 kcal pro Portion.',
       },
       '1500 g Hähnchenschenkelfilet | 3 EL BBQ-Rub | 2 Stk Zwiebel | 3 Zehe Knoblauch | 1 EL Sonnenblumenöl | 200 ml Apfelsaft | 150 ml Hühnerbrühe | 2 EL Apfelessig | 300 ml BBQ-Sauce | 2 Stk Burger-Brötchen | Salz',
       [
@@ -128,7 +123,6 @@ export const dutchOven: ExtraGroup = {
         portions: 6,
         eat: 2,
         leftover: { name: 'Pot Roast (vakuumiert)', amount: 4, unit: 'Portion', shelf: 90 },
-        lighter: 'Mehr Möhren und Sellerie, dafür nur die Hälfte der Kartoffeln – spart rund 60 kcal pro Portion.',
       },
       '1500 g Rinderschulter | 2 EL Weizenmehl | 2 Stk Zwiebel | 4 Zehe Knoblauch | 800 g Kartoffeln festkochend | 4 Stk Möhre | 2 Stk Staudensellerie | 2 EL Sonnenblumenöl | 2 EL Tomatenmark | 250 ml Rotwein | 500 ml Rinderbrühe | 2 EL Worcestersauce | 4 Zweig Thymian | 2 Zweig Rosmarin | 2 Blatt Lorbeerblatt | Salz | Pfeffer',
       [
@@ -143,7 +137,7 @@ export const dutchOven: ExtraGroup = {
       ]),
 
     bbq('peach-cobbler', 'Peach Cobbler aus dem Dutch Oven',
-      { group: 'dutch', time: 80, portions: 6, lighter: 'Den Zucker im Teig auf 100 g reduzieren und statt Eis einen Klecks Joghurt dazu – spart rund 80 kcal pro Portion.' },
+      { group: 'dutch', time: 80, portions: 6 },
       '2 Dose Pfirsichhälften | 60 g Brauner Zucker | 1 TL Zimt gemahlen | 0.5 Stk Zitrone | 180 g Weizenmehl | 150 g Zucker | 1 Pck Vanillezucker | 2 TL Backpulver | 1 Prise Salz | 240 ml Milch | 120 g Butter',
       [
         'Die Pfirsiche abtropfen lassen (100 ml Saft auffangen), in Spalten schneiden und mit braunem Zucker, Zimt, Zitronensaft und dem Saft mischen.',
@@ -173,7 +167,6 @@ export const dutchOven: ExtraGroup = {
         portions: 6,
         eat: 2,
         leftover: { name: 'Brunswick Stew (vakuumiert)', amount: 4, unit: 'Portion', shelf: 90 },
-        lighter: 'Den Rahmmais durch eine zweite Dose Mais ersetzen und die Butter weglassen – spart rund 60 kcal pro Portion.',
       },
       '800 g Hähnchenschenkelfilet | 2 Stk Zwiebel | 3 Zehe Knoblauch | 600 g Kartoffeln festkochend | 1 Dose Weiße Bohnen | 1 Dose Mais | 30 g Butter | 1 Dose Gehackte Tomaten | 1 Dose Rahmmais | 750 ml Hühnerbrühe | 200 ml BBQ-Sauce | 2 EL Worcestersauce | 2 EL Apfelessig | 0.5 TL Cayennepfeffer | 400 g Pulled Pork | Salz | Pfeffer',
       [

@@ -1,6 +1,5 @@
 import { RECIPE_BY_ID } from '../../data/recipes'
 import { BREAKFAST_LABEL, type BreakfastType } from '../../types'
-import { portionFor } from '../../energy'
 import { eveningOn } from '../../bbq'
 import { shortDate, weekdayName } from '../../store'
 import { MealToggle } from '../../components/MealToggle'
@@ -12,7 +11,7 @@ import type { AppModel } from '../useAppModel'
 
 /** Tab „Wischen“: Frühstück (1–2 fürs Prep) oder Abendessen für den gewählten Tag */
 export function SwipeTab({ m }: { m: AppModel }) {
-  const { state, cal, ui, plan, bf, energy, act } = m
+  const { state, cal, ui, plan, bf, act } = m
   const { days } = cal
   const { meal, swipeDay, pantryMode } = ui
   const { picks } = bf
@@ -104,10 +103,6 @@ export function SwipeTab({ m }: { m: AppModel }) {
             </p>
           )}
           <SwipeDeck
-            portionOf={(r) => {
-              const budget = energy.dinnerBudgetFor(swipeDay)
-              return budget != null ? portionFor(r, budget, state.defaultServings) : undefined
-            }}
             deck={plan.deck}
             insights={plan.insights}
             pantryMode={pantryMode}

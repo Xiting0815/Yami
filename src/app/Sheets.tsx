@@ -10,7 +10,6 @@ import { isBbq, isTapa } from '../types'
 import { shortTitle } from '../tapas'
 import { TapasEveningSheet, TapasPlanSheet } from '../components/TapasSheets'
 import { TapasCook } from '../components/TapasCook'
-import { portionFor } from '../energy'
 import { defaultReviewMonday } from '../review'
 import { addDays, isoDate, parseIso, sharingActive, weekdayName } from '../store'
 import { syncStatusText } from '../sync'
@@ -20,8 +19,7 @@ import { DayPicker } from '../components/DayPicker'
 import { FilterSheet } from '../components/FilterBar'
 import { PantryDaySheet } from '../components/PantryDaySheet'
 import { PrepSheet } from '../components/PrepSheet'
-import { ProfileSheet } from '../components/ProfileSheet'
-import { ProgressSheet } from '../components/ProgressSheet'
+import { SettingsSheet } from '../components/SettingsSheet'
 import { RecipeEditor } from '../components/RecipeEditor'
 import { RateSheet } from '../components/RateSheet'
 import { RecipeSheet } from '../components/RecipeSheet'
@@ -33,10 +31,9 @@ import type { AppModel } from './useAppModel'
  * dort hängen sie auch an der Zurück-Taste (useBackStack). Reihenfolge = Stapelreihenfolge im DOM.
  */
 export function Sheets({ m }: { m: AppModel }) {
-  const { state, cal, ui, plan, bf, energy, status, act, ha } = m
+  const { state, cal, ui, plan, bf, status, act, ha } = m
   const { today, days, weekKey } = cal
   const { sheet, editor, actionsDay } = ui
-  const profile = state.profile
   const actionsEntry = actionsDay ? state.plan[actionsDay] : undefined
   const actionsRecipe = actionsEntry ? RECIPE_BY_ID[actionsEntry.recipeId] : undefined
 
@@ -48,14 +45,7 @@ export function Sheets({ m }: { m: AppModel }) {
           recipe={sheet.recipe}
           prices={state.prices}
           insight={plan.insights.get(sheet.recipe.id)}
-          portion={(() => {
-            const day = sheet.day
-            if (sheet.recipe.breakfast || sheet.recipe.basic || !day) return undefined
-            const budget = energy.dinnerBudgetFor(day)
-            return budget != null
-              ? { ...portionFor(sheet.recipe, budget, state.plan[day]?.servings ?? state.defaultServings), budget, household: portionNote(plan.portion) }
-              : undefined
-          })()}
+          householdNote={portionNote(plan.portion)}
           servings={
             sheet.recipe.breakfast
               ? act.prepPortions(sheet.recipe.id)
@@ -296,8 +286,6 @@ export function Sheets({ m }: { m: AppModel }) {
           recipe={actionsRecipe}
           today={today}
           prices={state.prices}
-          balance={energy.balances[actionsDay]}
-          portion={energy.portions[actionsDay]}
           onClose={() => ui.setActionsDay(null)}
           onServings={(n) => act.setEntry(actionsDay, { ...actionsEntry, servings: n })}
           onView={() => {
@@ -394,28 +382,10 @@ export function Sheets({ m }: { m: AppModel }) {
         />
       )}
 
-      {ui.showProgress && profile && (
-        <ProgressSheet
-          profile={profile}
-          weighIns={state.weighIns}
-          today={today}
-          suggestion={status.pendingSuggestion}
-          onReview={() => ui.setReviewMonday(defaultReviewMonday(today))}
-          onClose={() => ui.setShowProgress(false)}
-          onSave={act.saveWeighIn}
-          onDelete={act.deleteWeighIn}
-          onDecide={act.decideAdjust}
-          onGoal={act.setGoal}
-          onMuscleUnit={act.setMuscleUnit}
-        />
-      )}
-
       {ui.showProfile && (
-        <ProfileSheet
-          profile={profile}
+        <SettingsSheet
           learned={summarize(plan.taste)}
           learnedOthers={plan.others.map((o) => ({ name: o.name, learned: summarize(o.model) }))}
-          profileOptional={sharingActive(state.ha)}
           focusHa={ui.profileFocus === 'ha'}
           familyStatus={sharingActive(state.ha) ? syncStatusText(state.sync, state.ha.me, Date.now()) : undefined}
           haMain={state.sync?.main ? { person: state.sync.main.person, mine: state.sync.main.device === state.ha?.device } : undefined}
@@ -432,8 +402,8 @@ export function Sheets({ m }: { m: AppModel }) {
           haSyncing={ha.syncing}
           onExport={act.exportData}
           onImport={act.importData}
+          onReview={() => ui.setReviewMonday(defaultReviewMonday(today))}
           onClose={() => ui.setShowProfile(false)}
-          onSave={act.saveProfile}
         />
       )}
 

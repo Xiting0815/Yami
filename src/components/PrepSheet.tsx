@@ -4,7 +4,6 @@ import { prepKey } from '../breakfastPrep'
 import { formatAmount } from '../shopping'
 import { shortDate, weekdayName } from '../store'
 import type { Recipe } from '../types'
-import { NutritionRow } from './NutritionRow'
 import { PrepDayChip } from './PrepDayChip'
 
 interface Props {
@@ -61,7 +60,6 @@ export function PrepSheet({ items, notes, prep, today, prepChoices, onPrepDay, c
                   für {it.days.map((d) => weekdayName(d, true)).join(', ')}
                   {it.frozenDays.length > 0 && ` · ❄️ ${it.frozenDays.map((d) => weekdayName(d, true)).join(', ')} einfrieren`}
                 </div>
-                <NutritionRow n={r.nutrition} />
 
                 <h4>Zutaten (für {it.portions} Portionen)</h4>
                 <ul className="ingredients compact">

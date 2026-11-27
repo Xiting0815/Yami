@@ -55,7 +55,7 @@ export function TripReview({ trip, states, stockAsk, shopOrder, onHave, onNeed, 
           {stockSuggestion(item.name, states, stockAsk) && (
             <div className="review-stock">
               <p><b>{item.name}</b> hast du meist da – im Vorrat führen?</p>
-              <p className="muted small">Dann zieht Yami beim Kochen ab und setzt es erst auf die Liste, wenn es knapp wird.</p>
+              <p className="muted small">Dann zieht Gusto beim Kochen ab und setzt es erst auf die Liste, wenn es knapp wird.</p>
               <div className="row-btns">
                 <button className="btn ghost grow" onClick={() => onStock(item.name, false)}>Nein</button>
                 <button

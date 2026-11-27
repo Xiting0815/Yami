@@ -5,11 +5,9 @@ import { PRODUCTS } from './data/products'
 import { rememberStaples, sanitizeMemos, sanitizeSpices, type SpiceStatus, type StapleMemos } from './staples'
 import {
   BREAKFAST_LABEL, CUISINE_LABEL, SHOP_LABEL, TYPE_LABEL,
-  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type BakePlan, type PlanEntry, type ShopSection, type WeekPlan,
+  type BreakfastType, type Cuisine, type CustomIngredient, type CustomRecipe, type DishType, type Ingredient, type BakePlan, type PlanEntry, type ShopSection, type Snack, type WeekPlan,
 } from './types'
 import { WASTED_MAX, addDaysIso, toBase, uid, type BoughtMap, type PantryLot, type PriceOverrides, type WastedItem } from './kitchen'
-import { DEFAULT_PROFILE, type Profile, type Snack } from './energy'
-import type { WeighIn } from './progress'
 import type { PortionFeedback, Rating, RejectEvent } from './learning'
 import { type SyncLocal, sanitizeSync } from './syncLocal'
 import { type BakeHint, sanitizeBakeHints, sanitizeBakePlan } from './bakePlan'
@@ -180,12 +178,6 @@ export interface AppState {
   bfSatiety: Record<string, PortionFeedback>
   /** weggeklickte Sättigungsfragen (`Prep-Tag:Rezept-Id`, nur lokal) */
   bfSatietyDismissed: string[]
-  /** Körperdaten & Ziel (optional) */
-  profile?: Profile
-  /** Messungen der Waage (1 pro Woche) */
-  weighIns: WeighIn[]
-  /** Anzahl Messungen beim letzten Ja/Nein zu einem Anpassungsvorschlag */
-  adjustDecidedAt: number
   /** weggewischte Karten (zum Lernen), höchstens die letzten 400 */
   rejects: RejectEvent[]
   /** Bewertungen nach dem Essen: Tag → 👍/🔁/👎 */
@@ -200,8 +192,6 @@ export interface AppState {
   onboarding?: 'done' | 'dismissed'
   /** Checkliste Schritt 4: Einkaufsliste wurde angesehen, während etwas geplant war */
   onboardingListSeen?: boolean
-  /** Tag, an dem das Profil angelegt wurde (ISO) – am selben Tag gibt es noch keinen Wiege-Hinweis */
-  profileCreated?: string
   /** Frühstückszeile in der Wochenansicht aufgeklappt */
   bfOpen?: boolean
   /** Rezeptansicht: klassische Schritte statt der Geräte-Schritte (pro Gerät/Nutzer gemerkt) */
@@ -224,7 +214,7 @@ export interface AppState {
   staples: StapleMemos
   /** Home Assistant (optional) */
   ha?: HaSettings
-  /** gegessene Stücke Selbstgebackenes (Kuchen, Brot, Dessert) – zählen in die Tagesbilanz (höchstens die letzten 400) */
+  /** „gegessen“: Stücke Selbstgebackenes, Salat-Portionen, Grill-/Tapas-Abende – nur fürs Lernen (höchstens die letzten 400) */
   snacks: Snack[]
   /** gebackene Rezepte (Backen & Desserts) mit Datum – fürs Lernen (höchstens die letzten 200) */
   baked: { date: string; recipeId: string }[]
@@ -354,6 +344,12 @@ const validWeekday = (v: unknown): v is number => typeof v === 'number' && Numbe
 /** höchstens so viele gegessene Stücke werden gespeichert */
 export const SNACKS_MAX = 400
 
+/**
+ * Felder früherer App-Stände (Kalorienziel, Wiegen), die es nicht mehr gibt: werden beim Laden (Speicher, Sicherung)
+ * verworfen. Ein älterer Stand mit diesen Feldern lädt ganz normal.
+ */
+export const LEGACY_KEYS = ['profile', 'weighIns', 'adjustDecidedAt', 'profileCreated'] as const
+
 const KEY = 'yami-state-v1'
 
 const INITIAL: AppState = {
@@ -374,8 +370,6 @@ const INITIAL: AppState = {
   bfRatings: {},
   bfSatiety: {},
   bfSatietyDismissed: [],
-  weighIns: [],
-  adjustDecidedAt: 0,
   // immer gespeichert → daran erkennt load() einen Stand von vor der Start-Checkliste
   onboardingListSeen: false,
   rejects: [],
@@ -400,8 +394,8 @@ const INITIAL: AppState = {
   shifts: [],
 }
 
-const hasData = (s: AppState) =>
-  !!s.profile || [s.plan, s.breakfast, s.breakfastPicks].some((o) => o && Object.values(o).some((v) => (Array.isArray(v) ? v.length : v)))
+const hasData = (s: AppState, saved: Record<string, unknown>) =>
+  !!saved.profile || [s.plan, s.breakfast, s.breakfastPicks].some((o) => o && Object.values(o).some((v) => (Array.isArray(v) ? v.length : v)))
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/
 const MAX_IMAGE = 300_000
@@ -483,24 +477,6 @@ function validEntry(e: PlanEntry, defaultServings: number): PlanEntry {
   }
 }
 
-function validWeighIn(x: unknown): x is WeighIn {
-  const w = x as Partial<WeighIn> | null
-  if (!w || typeof w.date !== 'string' || !ISO.test(w.date) || !isNum(w.weight) || w.weight <= 0) return false
-  for (const k of ['fat', 'muscle', 'water'] as const) if (w[k] != null && !isNum(w[k])) delete w[k]
-  return true
-}
-
-/** Profil: fehlende oder kaputte Pflichtwerte bekommen den Startwert (sonst wird das Kalorienziel NaN) */
-function validProfile(x: unknown): Profile | undefined {
-  if (!x || typeof x !== 'object' || Array.isArray(x)) return undefined
-  const p = { ...(x as Partial<Profile>) }
-  const out = { ...DEFAULT_PROFILE, ...p } as Profile
-  for (const k of ['age', 'heightCm', 'weightKg', 'activity', 'deficit', 'lunchKcal'] as const) if (!isNum(out[k])) out[k] = DEFAULT_PROFILE[k]
-  if (out.sex !== 'm' && out.sex !== 'w') out.sex = DEFAULT_PROFILE.sex
-  for (const k of ['fatPct', 'goalWeight', 'adjust'] as const) if (out[k] != null && !isNum(out[k])) delete out[k]
-  return out
-}
-
 const renameKey = (n: string) => RENAMED[n] ?? n
 
 /** Umbenennungen zusammengeführter Zutaten (RENAMED) in einem gespeicherten Stand nachziehen */
@@ -574,7 +550,9 @@ export function sanitize(parsed: unknown): AppState {
     if (Array.isArray(ref) ? Array.isArray(v) : typeof ref === typeof v && !Array.isArray(v)) saved[k] = v
   }
   if (typeof saved.lastBackup !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(saved.lastBackup)) delete saved.lastBackup
-  const state: AppState = { ...INITIAL, ...(saved as Partial<AppState>), filters: { ...EMPTY_FILTERS, ...(saved.filters as object) } }
+  // frühere Felder (Kalorienziel, Wiegen) verwerfen – sie würden sonst unbemerkt weitergespeichert
+  const { profile: _profile, weighIns: _weighIns, adjustDecidedAt: _adjust, profileCreated: _created, ...current } = saved
+  const state: AppState = { ...INITIAL, ...(current as Partial<AppState>), filters: { ...EMPTY_FILTERS, ...(saved.filters as object) } }
   // Neue Küchen („Griechisch“, „Amerikanisch“, „Spanisch“): wer alle bisherigen Küchen gewählt hatte, soll sie ebenfalls sehen
   if (Array.isArray(state.filters.cuisines)) {
     let cs = state.filters.cuisines
@@ -629,7 +607,6 @@ export function sanitize(parsed: unknown): AppState {
   )
   state.spices = sanitizeSpices(state.spices)
   state.staples = rememberStaples(sanitizeMemos(state.staples), Array.isArray(state.pantry) ? state.pantry : [])
-  state.weighIns = state.weighIns.filter(validWeighIn).sort((a, b) => a.date.localeCompare(b.date))
   state.rejects = state.rejects.filter((r) => !!r && typeof r.id === 'string' && typeof r.date === 'string' && ISO.test(r.date)).slice(-400)
   state.ratings = Object.fromEntries(Object.entries(state.ratings).filter(([d, v]) => ISO.test(d) && (v === 'up' || v === 'again' || v === 'down')))
   state.ratingDismissed = state.ratingDismissed.filter((d) => typeof d === 'string')
@@ -652,18 +629,16 @@ export function sanitize(parsed: unknown): AppState {
     ]),
   )
   state.prices = Object.fromEntries(Object.entries(state.prices).filter(([, p]) => !!p && isNum(p.pack) && p.pack > 0 && isNum(p.price) && p.price >= 0))
-  if (state.profile) state.profile = validProfile(state.profile)
-  if (!state.profile) delete state.profile
   if (typeof state.showClassicSteps !== 'boolean') delete state.showClassicSteps
   state.ha = sanitizeHa(saved.ha)
   if (!state.ha) delete state.ha
   state.sync = sanitizeSync(saved.sync)
   if (!state.sync) delete state.sync
   state.reviewDismissed = state.reviewDismissed.filter((k) => typeof k === 'string').slice(-60)
-  // Backen & Desserts: gegessene Stücke, Gebackenes, Bewertungen
+  // Backen & Desserts: Gegessenes (fürs Lernen; frühere kcal/Eiweiß-Angaben fallen weg), Gebackenes, Bewertungen
   state.snacks = state.snacks
-    .filter((x) => !!x && typeof x.date === 'string' && ISO.test(x.date) && typeof x.name === 'string' && x.name !== '' && isNum(x.kcal) && x.kcal >= 0 && x.kcal < 5000 && isNum(x.protein) && x.protein >= 0)
-    .map((x) => ({ date: x.date, name: x.name.slice(0, 80), kcal: x.kcal, protein: x.protein, ...(typeof x.recipeId === 'string' && x.recipeId ? { recipeId: x.recipeId } : {}) }))
+    .filter((x) => !!x && typeof x.date === 'string' && ISO.test(x.date) && typeof x.name === 'string' && x.name !== '')
+    .map((x): Snack => ({ date: x.date, name: x.name.slice(0, 80), ...(typeof x.recipeId === 'string' && x.recipeId ? { recipeId: x.recipeId } : {}) }))
     .slice(-SNACKS_MAX)
   state.baked = state.baked
     .filter((x) => !!x && typeof x.date === 'string' && ISO.test(x.date) && typeof x.recipeId === 'string' && !!RECIPE_BY_ID[x.recipeId])
@@ -694,7 +669,7 @@ export function sanitize(parsed: unknown): AppState {
     Object.entries(state.bought).map(([w, m]) => [w, Object.fromEntries(Object.entries(m).map(([k, b]) => [k, typeof b.at === 'string' && ISO.test(b.at) ? b : { lotId: b.lotId, amount: b.amount }]))]),
   )
   // Stand von vor der Start-Checkliste: wer die App schon benutzt hat, bekommt sie nicht mehr
-  if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state)) state.onboarding = 'done'
+  if (!state.onboarding && !('onboardingListSeen' in saved) && hasData(state, saved)) state.onboarding = 'done'
   return state
 }
 
@@ -765,6 +740,12 @@ export function weekDays(monday: Date): string[] {
 
 const WD = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
 const WD_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+
+/** Arbeitstag Mo–Fr (Lernen: schnell unter der Woche, aufwendig am Wochenende; Verschieben) */
+export function isWorkday(iso: string): boolean {
+  const d = parseIso(iso).getDay()
+  return d >= 1 && d <= 5
+}
 
 export function weekdayName(iso: string, short = false): string {
   const d = parseIso(iso)

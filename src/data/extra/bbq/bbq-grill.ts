@@ -24,7 +24,7 @@ export const bbqGrill: ExtraGroup = {
       ]),
 
     bbq('rumpsteak-gasgrill', 'New York Strip (Rumpsteak) mit Baked Potato',
-      { group: 'grill', time: 100, portions: 2, lighter: 'Statt Baked Potato mit saurer Sahne einen großen grünen Salat servieren und die Kräuterbutter halbieren – spart rund 250 kcal pro Portion.' },
+      { group: 'grill', time: 100, portions: 2 },
       '2 Stk Rumpsteak | 500 g Kartoffeln mehligkochend | 1 TL Sonnenblumenöl | 40 g Butter | 2 Zehe Knoblauch | 2 Zweig Thymian | 100 g Saure Sahne | 0.5 Bund Schnittlauch | Salz | Pfeffer',
       [
         'Die Rumpsteaks (in den USA „New York Strip“, möglichst 2,5–3 cm dick) 30 Minuten vor dem Grillen aus dem Kühlschrank nehmen, trocken tupfen und den Fettrand alle 2 cm einschneiden. Die Kartoffeln einstechen, mit Öl einreiben, salzen und in Alufolie wickeln.',
@@ -37,7 +37,7 @@ export const bbqGrill: ExtraGroup = {
       ]),
 
     bbq('ribeye-reverse-sear', 'Reverse Sear Ribeye (oder Tomahawk)',
-      { group: 'grill', time: 150, portions: 2, lighter: 'Die Butter weglassen, den Fettrand abschneiden und Grillgemüse oder Salat dazu servieren – spart rund 200 kcal pro Portion.' },
+      { group: 'grill', time: 150, portions: 2 },
       '600 g Ribeye-Steak | 6 g Salz | 1 TL Sonnenblumenöl | 20 g Butter | 2 Zehe Knoblauch | 2 Zweig Rosmarin | Pfeffer',
       [
         'Das Ribeye-Steak (4–5 cm dick) rundum salzen und unabgedeckt auf einem Gitter mindestens 1 Stunde, besser über Nacht, im Kühlschrank ruhen lassen (Dry Brine).',
@@ -61,7 +61,7 @@ export const bbqGrill: ExtraGroup = {
       ]),
 
     bbq('chicken-thighs-alabama', 'Grilled Chicken mit Alabama White Sauce',
-      { group: 'grill', time: 90, portions: 2, lighter: 'Für die Sauce die Hälfte der Mayonnaise durch Joghurt ersetzen und die Haut nicht mitessen – spart rund 250 kcal pro Portion.' },
+      { group: 'grill', time: 90, portions: 2 },
       '3 Stk Hähnchenschenkel | 2 EL BBQ-Rub | 100 g Mayonnaise | 60 ml Apfelessig | 1 EL Meerrettich gerieben | 0.5 Stk Zitrone | 1 TL Brauner Zucker | 0.25 TL Cayennepfeffer | 1 TL Pfeffer | Salz',
       [
         'Die Hähnchenschenkel trocken tupfen, am Gelenk einschneiden, mit dem BBQ-Rub würzen und 30 Minuten ziehen lassen.',
@@ -73,7 +73,7 @@ export const bbqGrill: ExtraGroup = {
       ]),
 
     bbq('elote', 'Mexican Street Corn (Elote) vom Grill',
-      { group: 'grill', time: 30, portions: 2, lighter: 'Die Mayonnaise durch Joghurt ersetzen und nur die Hälfte Feta nehmen – spart rund 200 kcal pro Portion.' },
+      { group: 'grill', time: 30, portions: 2 },
       '4 Stk Maiskolben | 1 EL Sonnenblumenöl | 60 g Mayonnaise | 60 g Saure Sahne | 1 Zehe Knoblauch | 1 Stk Limette | 80 g Feta | 0.5 Bund Koriander | 1 TL Paprikapulver geräuchert | 0.25 TL Cayennepfeffer | Salz',
       [
         'Die Maiskolben putzen (vorgegarte nur trocken tupfen), mit Öl einreiben und salzen.',

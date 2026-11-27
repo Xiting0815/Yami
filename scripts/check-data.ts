@@ -122,14 +122,13 @@ for (const r of RAW_BASICS) {
   const st = yieldStock(r.kind, y)
   if (!prod || prod.unit !== st.unit) { console.error(`Grundrezept ${r.id}: Produkt für "${y.name}" fehlt oder Einheit ≠ ${st.unit}`); errors++ }
   if (!(y.amount > 0) || !(y.shelf > 0)) { console.error(`Grundrezept ${r.id}: Menge/Haltbarkeit ungültig`); errors++ }
-  // Backen & Desserts: Einheit, Leichter-Tipp, Nährwerte je Stück (BBQ-Reste: grammweise, siehe oben)
+  // Backen & Desserts: Einheit, Nährwerte je Stück (BBQ-Reste: grammweise, siehe oben)
   if (r.kind && r.kind !== 'grundrezept' && r.kind !== 'bbq') {
     if (!['Stk', 'Portion', 'g', 'ml'].includes(y.unit)) { console.error(`${r.id}: Ergebnis-Einheit "${y.unit}" (erlaubt: Stk, Portion, g, ml)`); errors++ }
     if (r.kind === 'gebaeck' && y.unit !== 'Stk') { console.error(`${r.id}: Plätzchen/Cookies zählen in Stk`); errors++ }
     if (r.kind === 'gebaeck' && !/dose|luftdicht|trocken/i.test(y.store ?? '')) { console.error(`${r.id}: Plätzchen in Blechdose/luftdicht lagern (store)`); errors++ }
     if (r.kind === 'gebaeck' && !r.festive?.length && /plätzchen|kipferl|zimtstern|makrone|spritzgebäck|spitzbuben|heidesand|nussecken/i.test(r.title)) console.warn(`${r.id}: Weihnachtsplätzchen ohne festive: ['plaetzchen']`)
     if (y.unit === 'g' && r.kind !== 'brot') { console.error(`${r.id}: Ergebnis in g nur bei Brot (Laib → Scheiben), sonst Stk/Portion`); errors++ }
-    if (!r.lighter || r.lighter.trim().length < 15) { console.error(`${r.id}: „lighter“-Tipp fehlt`); errors++ }
     if (y.shelf > 14 && !/kühl|tief|einfrier|dose|luftdicht|trocken/i.test(y.store ?? '')) console.warn(`${r.id}: ${y.shelf} Tage haltbar – Lagerung (store) angeben?`)
     const built = BASICS.find((b) => b.id === r.id)
     const pp = built?.yields?.perPiece
@@ -206,11 +205,11 @@ const byType: Record<string, number> = {}
 for (const r of RAW_RECIPES) byType[r.type] = (byType[r.type] ?? 0) + 1
 console.log(`${RAW_RECIPES.length} Rezepte – DE ${by('de')}, IT ${by('it')}, AS ${by('as')}, GR ${by('gr')}, US ${by('us')}, ES ${by('es')}`, byType)
 for (const r of RAW_RECIPES.filter((x) => x.cuisine === 'es')) if (!/\(.+\)/.test(r.title)) console.warn(`${r.id}: spanischer Titel ohne deutsche Erklärung in Klammern`)
-// Frühstücksziele: satt & leicht
+// Frühstücke: sollen bis mittags satt machen (Eiweiß und Ballaststoffe)
 for (const r of BREAKFASTS) {
   const n = r.nutrition
-  if (n.kcal < 330 || n.kcal > 480 || n.protein < 25 || n.fiber < 8) {
-    console.error(`Frühstück ${r.id} verfehlt Ziel: ${n.kcal} kcal, ${n.protein} g Eiweiß, ${n.fiber} g Ballaststoffe`); errors++
+  if (n.protein < 25 || n.fiber < 8) {
+    console.error(`Frühstück ${r.id} macht kaum satt: ${n.protein} g Eiweiß, ${n.fiber} g Ballaststoffe`); errors++
   }
 }
 const byKind = (k: string) => RAW_BASICS.filter((r) => (r.kind ?? 'grundrezept') === k).length

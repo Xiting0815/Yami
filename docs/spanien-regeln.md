@@ -23,8 +23,7 @@ Vorbilder (je Datei ein vollständiges Rezept): `paella-valenciana`, `fabada-ast
 
 ## 1. Was wohin
 
-- **Hauptgerichte → Küche „Spanisch“ im Wischstapel** (`r()`), Mengen für 2 Portionen, Abendessen ca. 550–750 kcal je
-  Portion (darüber: letzter Schritt „Leichter: …“), viel Eiweiß, fast nie vegetarisch (Haushalt: ca. 15 %).
+- **Hauptgerichte → Küche „Spanisch“ im Wischstapel** (`r()`), Mengen für 2 Portionen, authentisch (keine „Leichter“-Sätze), fast nie vegetarisch (Haushalt: ca. 15 %).
 - **Tapas → eigener Bereich „🫒 Tapas“** (`tapa()`), nie im Wischstapel. Man wählt 4–6 aus und plant sie zusammen als
   „Tapas-Abend“ (ersetzt das Abendessen). Eine Tapa = **ein Teller für 2 Personen als eine von ca. 5 Tapas** (`TAPAS_STD`);
   Ziel **ca. 120–200 kcal je Person** (check-data: Fehler unter 50 oder über 400, Warnung über 260) – Yami skaliert je nach
@@ -38,9 +37,9 @@ Vorbilder (je Datei ein vollständiges Rezept): `paella-valenciana`, `fabada-ast
   Yami nimmt Selbstgemachtes automatisch zuerst und schlägt es im Ablaufplan „Vorher“ vor.
 - **Salate & Beilagen → eigener Bereich „🥗 Salate“** für alle Küchen (`salat()`), Zusatz zum Abendessen (ersetzt nichts).
   Mengen für `portions` Beilagen-Portionen (meist 4–8), Ergebnis „… (selbstgemacht)“ in Portionen, `shelf` = Tage im
-  Kühlschrank (Mayo/Ei/Fisch/Wurst 2, Essig-Öl 3, höchstens 5), `lighter` Pflicht. Die BBQ-Beilagen
+  Kühlschrank (Mayo/Ei/Fisch/Wurst 2, Essig-Öl 3, höchstens 5). Die BBQ-Beilagen
   (`src/data/extra/bbq/beilagen.ts`) erscheinen dort automatisch – nichts doppelt anlegen (Coleslaw, Southern Potato Salad …).
-- **Desserts → Backen-Bereich** (`desserts-es.ts`), Regeln wie `docs/backen-regeln.md` (Leichter-Tipp Pflicht).
+- **Desserts → Backen-Bereich** (`desserts-es.ts`), Regeln wie `docs/backen-regeln.md` (ohne Leichter-Tipp).
 
 ## 2. Authentizität
 

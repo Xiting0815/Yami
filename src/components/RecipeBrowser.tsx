@@ -6,13 +6,11 @@ import {
 } from '../types'
 import { bbqSection, leftoverText } from '../bbq'
 import { salatSection } from '../salate'
-import { type TapasIdea, TAPAS_MAX, TAPAS_MIN, eveningKcal, shortTitle, tapasSection } from '../tapas'
+import { type TapasIdea, TAPAS_MAX, TAPAS_MIN, shortTitle, tapasSection } from '../tapas'
 import { isBbqSeason } from '../data/season'
-import { pieceName, yieldText } from '../bake'
-import { yieldStock } from '../data/define'
+import { yieldText } from '../bake'
 import { BASICS, BREAKFASTS, RECIPES } from '../data/recipes'
 import { BREAKFAST_LABEL } from '../types'
-import { NutritionRow } from './NutritionRow'
 import type { Filters } from '../store'
 import { matches, formatTime } from '../filter'
 import { festiveOf, formatEuro, recipeCost } from '../kitchen'
@@ -207,7 +205,6 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
                 <div key={idea.label} className="tapas-idea">
                   <div className="tapas-idea-text">
                     <b>{idea.label}</b>: {idea.recipes.map((r) => shortTitle(r.title)).join(' · ')}
-                    <small className="muted"> · ≈ {idea.kcal.toLocaleString('de-DE')} kcal p. P.</small>
                     <small className="muted tapas-idea-why">{idea.reason}</small>
                   </div>
                   <button className="btn ghost" onClick={() => onTapasPick?.(idea.recipes.map((r) => r.id))}>Auswählen</button>
@@ -223,13 +220,13 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
           {list.length} Rezepte · {isBbqSeason(todayIso()) ? 'Grillsaison! ' : ''}„Einplanen für“ einen Tag setzt die Zutaten auf die Einkaufsliste und ersetzt auf Wunsch das Abendessen. Große Stücke rechnen die ganze Ladung – Reste kommen vakuumiert in den Vorrat.
         </p>
       ) : bake ? (
-        <p className="muted small">{list.length} Rezepte · „Fertig gebacken“ legt alles in den Vorrat, jedes gegessene Stück zählt in die Tagesbilanz.</p>
+        <p className="muted small">{list.length} Rezepte · „Fertig gebacken“ legt alles in den Vorrat – dort tippst du „1 gegessen“.</p>
       ) : basics ? (
         <p className="muted small">{list.length} Grundrezepte · Fond auf Vorrat kochen und portionsweise einfrieren – Braten und Saucen nehmen ihn dann zuerst.</p>
       ) : meal === 'dinner' ? (
         <FilterBar filters={filters} onChange={onFilters} count={list.length} />
       ) : (
-        <p className="muted small">{list.length} Meal-Prep-Frühstücke · je ca. 370–470 kcal, ≥ 25 g Eiweiß, ≥ 8 g Ballaststoffe</p>
+        <p className="muted small">{list.length} Meal-Prep-Frühstücke · einmal vorbereiten, die ganze Woche satt bis mittags</p>
       )}
       {mine && !basics && !area && list.length === 0 && (
         <p className="muted small">Noch kein eigenes Rezept{meal === 'breakfast' ? ' fürs Frühstück' : ' fürs Abendessen'}. Tipp auf „+ Eigenes Rezept“.</p>
@@ -244,7 +241,7 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
                   <div className="tile-title">{shortTitle(r.title)}</div>
                   <div className="muted small">
                     {bakePref?.(r).reason ? '❤️ ' : ''}
-                    {TAPAS_GROUP_ICON[r.tapas!]} {formatTime(r.time)} · {r.nutrition.kcal.toLocaleString('de-DE')} kcal p. P.
+                    {TAPAS_GROUP_ICON[r.tapas!]} {formatTime(r.time)} · {r.serve === 'kalt' ? 'kalt' : r.serve === 'lauwarm' ? 'lauwarm' : 'heiß'}
                   </div>
                 </div>
               </button>
@@ -268,7 +265,7 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
               {isBbq(r) ? (
                 <div className="muted small">
                   {bakePref?.(r).reason ? '❤️ ' : ''}
-                  {r.bbq ? BBQ_GROUP_LABEL[r.bbq] : KIND_LABEL.bbq} · {formatTime(r.time)} · {r.portions ?? 2} Portionen · {r.nutrition.kcal.toLocaleString('de-DE')} kcal/P.
+                  {r.bbq ? BBQ_GROUP_LABEL[r.bbq] : KIND_LABEL.bbq} · {formatTime(r.time)} · {r.portions ?? 2} Portionen
                   {r.yields ? ` · Rest: ${leftoverText(r)}` : ''}
                 </div>
               ) : isStockDish(r) && r.yields ? (
@@ -276,20 +273,16 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
                   {festiveOf(r, todayIso())?.active && <span className="badge eco">{festiveOf(r, todayIso())?.label}</span>}{' '}
                   {bakePref?.(r).reason ? '❤️ ' : ''}
                   {isSalat(r) ? `${CUISINE_LABEL[r.cuisine]} · ` : `${KIND_LABEL[r.kind!]} · `}{formatTime(r.time)} · {yieldText(r, r.servings)}
-                  {r.yields.perPiece ? ` · ${r.yields.perPiece.kcal.toLocaleString('de-DE')} kcal/${pieceName(yieldStock(r.kind, r.yields).unit)}` : ''}
                 </div>
               ) : r.basic && r.yields ? (
                 <div className="muted small">
                   {r.bbq === 'rub' ? `${BBQ_GROUP_ICON.rub} ` : r.tapas === 'sauce' ? `${TAPAS_GROUP_ICON.sauce} ` : ''}Grundrezept · {formatTime(r.time)} · ergibt {formatAmount(r.yields.amount, r.yields.unit)} · ≈ {formatEuro(recipeCost(r, r.servings))}
                 </div>
               ) : r.breakfast ? (
-                <>
-                  <div className="muted small">{BREAKFAST_LABEL[r.breakfast.type]} · hält {r.breakfast.fridgeDays} T.</div>
-                  <NutritionRow n={r.nutrition} className="tiny" />
-                </>
+                <div className="muted small">{BREAKFAST_LABEL[r.breakfast.type]} · hält {r.breakfast.fridgeDays} T.{r.breakfast.freezer ? ' · ❄️' : ''}</div>
               ) : (
                 <div className="muted small">
-                  {CUISINE_LABEL[r.cuisine]} · {formatTime(r.time)} · ≈ {formatEuro(perPortion.get(r.id) ?? 0)}/P. · {r.nutrition.kcal.toLocaleString('de-DE')} kcal
+                  {CUISINE_LABEL[r.cuisine]} · {formatTime(r.time)} · ≈ {formatEuro(perPortion.get(r.id) ?? 0)}/P.
                   {r.vegetarian ? ' · 🌱' : ''}
                 </div>
               )}
@@ -303,7 +296,7 @@ export function RecipeBrowser({ filters, onFilters, onOpen, perPortion, meal, on
           <div className="tapas-bar-text">
             <b>🫒 {picked.length} {picked.length === 1 ? 'Tapa' : 'Tapas'}</b>
             <small>
-              ≈ {eveningKcal(picked).toLocaleString('de-DE')} kcal p. P.{picked.length < 4 ? ' · 4–6 sind ideal' : picked.length > 6 ? ' · viel – 4–6 reichen' : ''}
+              {picked.length < 4 ? '4–6 sind ideal' : picked.length > 6 ? 'viel – 4–6 reichen' : 'passt für einen Abend'}
             </small>
           </div>
           <button className="btn ghost" onClick={() => onTapasPick?.([])}>Leeren</button>

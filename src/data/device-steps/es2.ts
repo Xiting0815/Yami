@@ -18,7 +18,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       settings: [bora('2', { minutes: 150, note: 'Deckel drauf, ganz leise simmern' })],
     },
     { text: 'Wenn die Bohnen butterweich sind, Wurst und Fleisch herausnehmen und in Scheiben schneiden, Zwiebel und Lorbeer entfernen. Erst jetzt salzen, die Wurst gibt viel Salz ab.' },
-    { text: 'Den Eintopf 15 Minuten ruhen lassen, damit er sämig wird. In tiefen Tellern servieren und das Compango obenauf legen oder getrennt reichen. Leichter: Blutwurst weglassen und den Schweinebauch durch mageren Kochschinken ersetzen – die Fabes und die Chorizo tragen den Geschmack.' },
+    { text: 'Den Eintopf 15 Minuten ruhen lassen, damit er sämig wird. In tiefen Tellern servieren und das Compango obenauf legen oder getrennt reichen.' },
   ],
   'cocido-madrileno': [
     { text: 'Die Kichererbsen am Vortag in reichlich lauwarmem Wasser mit 1 TL Salz 12 Stunden einweichen. Den geräucherten Schweinebauch (Ersatz für den spanischen „Tocino“) 1 Stunde wässern.' },
@@ -44,7 +44,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
     },
     { text: 'Zweiter Gang – „Vuelco“ (das Umstürzen): Kichererbsen, Kartoffeln, Möhre und Kohl auf einer Platte anrichten, das Fleisch und die Chorizo in Stücke schneiden und dazulegen. Mit einem Spritzer Olivenöl servieren.' },
     {
-      text: 'Reste und Vorrat: Übrige Brühe abkühlen lassen, im Beutel anfrieren und mit dem Vakuumierer portionsweise vakuumieren – sie ist die Basis für die nächste Sopa. Übriges Fleisch wird in Madrid am nächsten Tag zu „Ropa vieja“ (mit Zwiebeln in der Pfanne gebraten) oder zu Croquetas. Leichter: Schweinebauch weglassen, die Brühe nach dem Abkühlen entfetten und im zweiten Gang mehr Kohl und weniger Kichererbsen nehmen.',
+      text: 'Reste und Vorrat: Übrige Brühe abkühlen lassen, im Beutel anfrieren und mit dem Vakuumierer portionsweise vakuumieren – sie ist die Basis für die nächste Sopa. Übriges Fleisch wird in Madrid am nächsten Tag zu „Ropa vieja“ (mit Zwiebeln in der Pfanne gebraten) oder zu Croquetas.',
       settings: [vakuum('Vakuumieren feucht', 'Brühe angefroren, Beutel à 500 ml')],
     },
   ],
@@ -103,7 +103,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Währenddessen den Airfryer auf 190 °C vorheizen und die Kartoffelstäbchen darin 22 Minuten knusprig backen, zweimal schütteln.',
       settings: [{ device: 'airfryer', mode: 'Heissluft', temp: 190, minutes: 22, note: 'vorheizen, 2× schütteln' }],
     },
-    { text: 'Die Petersilie hacken, über das Huhn streuen und mit den Kartoffeln servieren; den weichen Knoblauch drückt man bei Tisch aus der Schale. Leichter: die Haut vor dem Braten abziehen, nur 2 EL Öl in die Pfanne geben und statt der Kartoffeln einen grünen Salat reichen.' },
+    { text: 'Die Petersilie hacken, über das Huhn streuen und mit den Kartoffeln servieren; den weichen Knoblauch drückt man bei Tisch aus der Schale.' },
   ],
   'pollo-en-pepitoria': [
     { text: 'Die Hähnchenschenkel am Gelenk teilen, salzen, pfeffern und dünn im Weizenmehl wenden. Die Zwiebel fein würfeln.' },
@@ -124,7 +124,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Die Paste in die Sauce rühren und offen 5 Minuten köcheln, bis sie cremig gebunden ist. Garprobe: Das Fleisch löst sich leicht vom Knochen. Mit Salz abschmecken, Lorbeer entfernen.',
       settings: [bora('3', { minutes: 5 })],
     },
-    { text: 'Mit gehacktem Eiweiß und Petersilie bestreut servieren, dazu Brot zum Tunken. Das Gericht stammt aus der kastilischen Küche des 18. Jahrhunderts und ist ein klassisches Sonntagsessen in Madrid. Leichter: die Haut abziehen und die Mandeln auf 20 g reduzieren – die Sauce bindet trotzdem.' },
+    { text: 'Mit gehacktem Eiweiß und Petersilie bestreut servieren, dazu Brot zum Tunken. Das Gericht stammt aus der kastilischen Küche des 18. Jahrhunderts und ist ein klassisches Sonntagsessen in Madrid.' },
   ],
   'rabo-de-toro': [
     { text: 'Den Ochsenschwanz in Scheiben (beim Metzger vorbestellen, oft auch tiefgekühlt; in Córdoba nimmt man den Schwanz des Kampfstiers, hier ist Rind üblich) trocken tupfen, salzen, pfeffern und dünn mit Weizenmehl bestauben. Zwiebel, Möhren, Paprika und Knoblauch würfeln.' },
@@ -148,7 +148,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Garprobe: Das Fleisch löst sich mühelos vom Knochen. Die Stücke herausnehmen, die Sauce durch ein Sieb streichen oder pürieren und auf dem BORA offen 10 Minuten sämig einkochen, abschmecken.',
       settings: [bora('6', { minutes: 10, note: 'offen einkochen' })],
     },
-    { text: 'Das Fleisch in der Sauce mit den Kartoffeln servieren – in Córdoba gibt es oft Pommes dazu. Rabo de toro schmeckt aufgewärmt noch besser: am Vortag schmoren, über Nacht kalt stellen und die feste Fettschicht abheben. Leichter: genau so entfetten (spart gut 100 kcal je Portion) und mehr Gemüse statt Kartoffeln.' },
+    { text: 'Das Fleisch in der Sauce mit den Kartoffeln servieren – in Córdoba gibt es oft Pommes dazu. Rabo de toro schmeckt aufgewärmt noch besser: am Vortag schmoren, über Nacht kalt stellen und die feste Fettschicht abheben.' },
   ],
   'carrillada-iberica-al-pedro-ximenez': [
     { text: 'Die Schweinebäckchen von Sehnen und silbriger Haut befreien (Ibérico-Bäckchen gibt es bei spanischen Feinkost-Versänden und im Großmarkt, normale Schweinebäckchen beim Metzger vorbestellen). Salzen, pfeffern und im Weizenmehl wenden. Zwiebel, Möhre und Knoblauch fein würfeln.' },
@@ -168,7 +168,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Garprobe: Die Bäckchen lassen sich mit dem Löffel teilen. Herausnehmen, Lorbeer und Thymian entfernen, die Sauce pürieren und offen 10 Minuten zu einer glänzenden, dicken Sauce einkochen; abschmecken.',
       settings: [bora('5', { minutes: 10, note: 'offen einkochen' })],
     },
-    { text: 'Die Bäckchen in der Sauce wenden und auf dem Püree anrichten. Leichter: statt Püree gedämpfte Kartoffeln ohne Butter und die Sauce vor dem Einkochen entfetten.' },
+    { text: 'Die Bäckchen in der Sauce wenden und auf dem Püree anrichten.' },
   ],
   'secreto-iberico-con-patatas-panaderas': [
     {
@@ -188,7 +188,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
         plancha('gasgrill', 'Braten', { level: 'hoch', minutes: 6, note: 'Plancha 10 Min. mit Deckel zu vorheizen', alt: true }),
       ],
     },
-    { text: 'Den Secreto 3 Minuten ruhen lassen, quer zur Faser in Streifen schneiden, mit grobem Salz und gehackter Petersilie bestreuen und auf den Kartoffeln servieren. Leichter: Schweinefilet statt Secreto (spart rund 250 kcal je Portion) und nur 1 EL Öl an die Kartoffeln.' },
+    { text: 'Den Secreto 3 Minuten ruhen lassen, quer zur Faser in Streifen schneiden, mit grobem Salz und gehackter Petersilie bestreuen und auf den Kartoffeln servieren.' },
   ],
   'cordero-al-chilindron': [
     { text: 'Die Ñoras (getrocknete runde Paprika; in Aragón nimmt man die ähnliche „Pimiento choricero“) entkernen und 30 Minuten in heißem Wasser einweichen. Danach das rote Fruchtfleisch mit einem Löffel von der Haut kratzen.' },
@@ -205,7 +205,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Das Lamm zurück in den Topf geben, mit dem Weißwein ablöschen, den Lorbeer zugeben und zugedeckt 75 Minuten leise schmoren; nur so viel Wasser nachgießen, dass eine dicke Sauce bleibt. Garprobe: Das Fleisch lässt sich mit der Gabel zerteilen.',
       settings: [bora('2', { minutes: 75, note: 'Deckel drauf' })],
     },
-    { text: 'Abschmecken und mit Brot servieren. Der Name kommt von einem alten Kartenspiel; in Aragón und Navarra wird so auch Huhn geschmort. Leichter: Lammkeule statt Schulter nehmen – sie ist deutlich magerer.' },
+    { text: 'Abschmecken und mit Brot servieren. Der Name kommt von einem alten Kartenspiel; in Aragón und Navarra wird so auch Huhn geschmort.' },
   ],
   'estofado-de-ternera': [
     { text: 'Das Rindergulasch (in Spanien nimmt man „Morcillo“ aus der Hesse oder „Aguja“ aus dem Nacken) trocken tupfen, salzen und pfeffern. Zwiebel und Knoblauch fein würfeln, die Möhren in Scheiben schneiden.' },
@@ -225,7 +225,7 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Die Kartoffeln schälen, in Stücke brechen (anschneiden und abbrechen – das bindet die Sauce) und zugeben, bei Bedarf so viel Wasser angießen, dass sie knapp bedeckt sind. Weitere 25 Minuten schmoren, in den letzten 5 Minuten die Erbsen zugeben.',
       settings: [bora('3', { minutes: 25, note: 'Deckel drauf' })],
     },
-    { text: 'Garprobe: Fleisch und Kartoffeln sind weich. Abschmecken, Lorbeer entfernen und 10 Minuten ruhen lassen. Leichter: nur 250 g Kartoffeln und dafür mehr Möhren und Erbsen.' },
+    { text: 'Garprobe: Fleisch und Kartoffeln sind weich. Abschmecken, Lorbeer entfernen und 10 Minuten ruhen lassen.' },
   ],
   'solomillo-con-pimientos-asados': [
     {

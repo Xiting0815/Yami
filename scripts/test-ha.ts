@@ -3,7 +3,7 @@
 import { HaClient, HaError, normalizeUrl, type WsLike } from '../src/homeassistant'
 import {
   type Desired, type HaApi, type LocalItem, type RemoteTodo, MARKER,
-  diffDinnerEvents, diffTodo, planMoves, plannedDinners, plannedReminders, syncCalendar, syncTodo, usualWeighDay,
+  diffDinnerEvents, diffTodo, planMoves, plannedDinners, plannedReminders, syncCalendar, syncTodo,
 } from '../src/haSync'
 import { backupBody, parseBackup } from '../src/backup'
 import { haRound, otherHousehold, sendAlerts } from '../src/haRun'
@@ -370,21 +370,11 @@ class FakeHa implements HaApi {
 
 // ───── 4) Erinnerungen ─────
 const at = (s: string) => new Date(s.replace(' ', 'T'))
-const base = { breakfastPicks: {} as Record<string, string[]>, weighIns: [] as { date: string; weight: number }[], hasProfile: true, pantry: [] as { id: string; name: string; amount: number; unit: string; expires: string }[] }
+const base = { breakfastPicks: {} as Record<string, string[]>, pantry: [] as { id: string; name: string; amount: number; unit: string; expires: string }[] }
 {
-  // Waage: meist dienstags (2026-11-03, 11-10 = Di) → Dienstag-Erinnerung, wenn diese Woche noch nicht gewogen
-  const w = [{ date: '2026-10-27', weight: 90 }, { date: '2026-11-03', weight: 89.5 }, { date: '2026-11-10', weight: 89 }]
-  ok(usualWeighDay(w) === 2 && usualWeighDay([]) === 1, 'Wiegen: häufigster Wochentag (Di), ohne Messungen Montag')
-  // Montag 16.11. 12:00 → Dienstag 17.11. 07:30 liegt in 48 h
-  const r = plannedReminders({ ...base, weighIns: w }, at('2026-11-16 12:00:00'))
-  const wr = r.find((x) => x.key.startsWith('rem:weigh'))
-  ok(!!wr && wr.summary === '⚖️ Heute wiegen' && wr.start === '2026-11-17 07:30:00' && wr.key === 'rem:weigh:2026-11-17', 'Wiegen: Dienstag 07:30')
-  ok(!plannedReminders({ ...base, weighIns: [...w, { date: '2026-11-16', weight: 88 }] }, at('2026-11-16 12:00:00')).some((x) => x.key.startsWith('rem:weigh')), 'Wiegen: schon gewogen → keine Erinnerung')
-  ok(!plannedReminders({ ...base, weighIns: w, hasProfile: false }, at('2026-11-16 12:00:00')).some((x) => x.key.startsWith('rem:weigh')), 'Wiegen: ohne Profil nichts')
-  ok(!plannedReminders({ ...base, weighIns: w }, at('2026-11-16 12:00:00')).some((x) => x.start > '2026-11-18 12:00:00'), 'Erinnerungen: nur innerhalb von 48 h')
-  // Standard Montag: am Sonntag 15.11. 20:00 → Montag 07:30
-  const rm = plannedReminders(base, at('2026-11-15 20:00:00'))
-  ok(rm.some((x) => x.key === 'rem:weigh:2026-11-16' && x.start === '2026-11-16 07:30:00'), 'Wiegen: Standardtag Montag')
+  // Wiegen gibt es nicht mehr: keine Wiege-Erinnerung, auch nicht am früheren Standardtag Montag
+  ok(!plannedReminders(base, at('2026-11-15 20:00:00')).some((x) => x.key.startsWith('rem:weigh')), 'keine Wiege-Erinnerung mehr')
+  ok(!plannedReminders({ ...base, breakfastPicks: { '2026-11-16': ['oats-apfel-zimt', 'eiermuffins-schinken'] } }, at('2026-11-14 18:00:00')).some((x) => x.start > '2026-11-16 18:00:00'), 'Erinnerungen: nur innerhalb von 48 h')
 
   // Meal-Prep Sonntag 10:00 (Frühstück für die Woche ab 16.11.)
   const picks = { '2026-11-16': ['oats-apfel-zimt', 'eiermuffins-schinken'] }
@@ -620,12 +610,12 @@ const plan = (o: Record<string, [string, number]>) => Object.fromEntries(Object.
   ok(!fam.events.some((e) => e.summary.startsWith('⚠️')), 'zweites Gerät: kein „Heute fehlt …“ aus altem Plan aufs Handy')
   ok(b.s.ha!.otherShare?.person === 'Marc', 'zweites Gerät: Hinweis „anderes Gerät teilt“ gespeichert')
   ok(sanitize(JSON.parse(JSON.stringify(b.s))).ha?.otherShare?.person === 'Marc', 'Hinweis übersteht Neuladen')
-  // persönliche Erinnerung (Wiegen) darf es weiter anlegen
-  const withProfile = { ...mkState(), profile: { sex: 'm', age: 40, heightCm: 180, weightKg: 92, activity: 1.3, deficit: 500, lunchKcal: 600 } as AppState['profile'], weighIns: [{ date: '2026-11-18', weight: 92 }] }
+  // persönliche Erinnerung (Meal-Prep heute) darf es weiter anlegen
+  const withPrep = { ...mkState(), breakfastPicks: { '2026-11-23': ['oats-apfel-zimt', 'eiermuffins-schinken'] }, prepDays: { '2026-11-23': '2026-11-24' } }
   const fam2 = new FakeHa()
   fam2.syncTodos = fam.syncTodos
-  const c = await runOnce(fam2, withProfile)
-  ok(!c.r.wrote && fam2.events.some((e) => e.summary.includes('wiegen')) && !fam2.events.some((e) => e.summary.startsWith('🍽️')), 'zweites Gerät: persönliche Erinnerung ja, Abendessen nein')
+  const c = await runOnce(fam2, withPrep)
+  ok(!c.r.wrote && fam2.events.some((e) => e.summary.includes('Meal-Prep')) && !fam2.events.some((e) => e.summary.startsWith('🍽️')), 'zweites Gerät: persönliche Erinnerung ja, Abendessen nein')
   // Haushalt seit über 14 Tagen still → wieder normal
   ok((await otherHousehold(fam, { syncList: 'todo.yami_sync', device: 'x' }, Date.parse('2026-12-20T12:00:00'))) === null, 'Haushalt seit über 14 Tagen inaktiv → kein Haushalt')
   ok((await otherHousehold(single, { syncList: 'todo.yami_sync', device: 'x' }, Date.now())) === null, 'Sync-Liste fehlt → kein Haushalt')

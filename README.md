@@ -1,4 +1,6 @@
-# Yami – Wochenplaner per Wischen
+# Gusto – Rezepte & Wochenplan
+
+(früher „Yami“; Repo und Adresse heißen weiter /Yami/.) Abwechslungsreich und saisonal kochen, Vorrat aufbrauchen statt wegwerfen, günstig einkaufen – mit authentischen Original-Rezepten.
 
 Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und bekomme am Ende eine sortierte Einkaufsliste.
 
@@ -20,36 +22,25 @@ Plane deine Abendessen für die Woche, indem du durch Gerichte wischst, und beko
 
 ### Frühstück & Meal-Prep
 
-- **27 Meal-Prep-Frühstücke** (süß & kalt, herzhaft, warm aus der Mikrowelle), je ca. 370–470 kcal, ≥ 25 g Eiweiß, ≥ 8 g Ballaststoffe – sättigend und gut zum Abnehmen. Mengen jeweils für 1 Portion (`src/data/breakfasts.ts`).
+- **27 Meal-Prep-Frühstücke** (süß & kalt, herzhaft, warm aus der Mikrowelle), mit viel Eiweiß und Ballaststoffen – machen bis mittags satt. Mengen jeweils für 1 Portion (`src/data/breakfasts.ts`).
 - **Wählen:** Unter „Wischen“ auf „☀️ Frühstück“ umschalten und 1–2 Frühstücke für Mo–Fr wählen. Beim zweiten kommen automatisch Kombinationen nach vorne, die die ganze Woche abdecken.
 - **Haltbarkeit:** Das kürzer haltbare Frühstück kommt Mo–Mi, das länger haltbare Do–Fr. Was nicht so lange hält, aber einfrierbar ist, wird zum Einfrieren eingeplant (mit Hinweis, wann es in den Kühlschrank muss).
 - **Prep-Liste für Sonntag:** Zutaten hochgerechnet, Ofengerichte zuerst, Schritte zum Abhaken und was morgens/auf der Arbeit zu tun ist.
 - **Einkauf & Vorrat:** Frühstückszutaten landen auf derselben Einkaufsliste und werden wie Abendessen vom Vorrat abgezogen.
 - **Lebensmittel sparen:** Beim Wischen kommen Frühstücke zuerst, die Vorrat und Reste (auch vom Abendessen) nutzen und deren Zukauf lange hält (Haferflocken, Chiasamen, TK-Obst). Würde ein verderblicher Rest übrig bleiben (z. B. halber Becher Quark), rutscht das Rezept nach hinten und die Karte zeigt „🗑️ Rest: …“. Filter „🧺 Nur mit Vorrat“ zeigt nur Gerichte mit max. 1,50 € Zukauf.
 - **Frische nach Wochentag (Abendessen):** Für spätere Wochentage bevorzugt die App Gerichte, deren Zutaten dann noch frisch sind – Fisch und Hack eher Mo–Mi.
-- **Nährwerte für alles:** Jede Zutat hat Richtwerte pro 100 g (`src/data/nutrition.ts`), daraus werden kcal, Eiweiß, Ballaststoffe, Kohlenhydrate und Fett pro Portion berechnet – auch für alle Abendessen.
+- **Nährwerte nur intern:** Jede Zutat hat Richtwerte pro 100 g (`src/data/nutrition.ts`); die App zeigt keine Kalorien, nutzt sie aber z. B., um bei „Frühstück macht nicht satt“ sättigendere Frühstücke vorzuschlagen.
 
-### Kalorienziel & Tagesbilanz (Mo–Fr)
+### Portionen
 
-- **Profil** (👤 oben rechts): Geschlecht, Alter, Größe, Gewicht, Aktivität, Abnehmtempo und eine Mittags-Pauschale (Standard 600 kcal, wird nicht geplant).
-- **Berechnung:** Grundumsatz nach Mifflin-St Jeor (10 × kg + 6,25 × cm − 5 × Alter + 5 bzw. − 161) × Aktivitätsfaktor (1,2–1,725) − Defizit (250/500/750 kcal). Untergrenze 1.500 kcal (Männer) bzw. 1.200 kcal (Frauen).
-- **Tagesbilanz:** Für Mo–Fr zeigt die Woche einen Balken: ☀️ Frühstück + 🥪 Mittag + 🌙 deine Abendportion im Vergleich zum Ziel. Sa/So sind ausgenommen.
-- **Deine Portion:** Abendessen bleiben für 2 Personen. Die App rechnet aus, welcher Anteil (⅓, ½, ⅔, ¾ oder voll) ins Abendbudget passt, und gibt bei gehaltvollen Gerichten einen Gemüse-/Salat-Tipp. Die Reihenfolge beim Wischen ändert sich dadurch nicht.
-
-### Wiegen & Fortschritt
-
-- **1× pro Woche wiegen** (⚖️ oben rechts): Gewicht, Körperfett %, Muskelmasse (kg oder %) und Körperwasser %. Eine zweite Messung in derselben Woche ersetzt die erste. Ab Montag erinnert die Wochenansicht, solange für die Woche nichts eingetragen ist.
-- **Genauerer Bedarf mit Körperfett:** Sobald Körperfett eingetragen ist, rechnet die App mit Katch-McArdle (370 + 21,6 × fettfreie Masse) statt Mifflin-St Jeor. Gewicht und Körperfett im Profil folgen automatisch der neuesten Messung.
-- **Verlauf:** Kennzahlen mit Veränderung zur Vorwoche und seit Start, je ein Diagramm für Gewicht (mit Ziellinie) und Körperfett, Tabelle aller Messungen.
-- **Zielgewicht:** Fortschritt in % und geschätztes Datum – ab 4 Messungen nach deinem echten Trend, vorher nach dem geplanten Tempo.
-- **Vorschläge zum Bestätigen:** frühestens nach 3 Messungen und nicht öfter als alle 2 Wochen: −100 kcal, wenn in 2 Wochen weniger als ¼ der erwarteten Abnahme erreicht wurde; +100 kcal, wenn es schneller als 1 % des Gewichts pro Woche geht. Hinweis, wenn das Gewicht sinkt, der Körperfettanteil aber steigt (Muskelabbau). Bestätigte Anpassungen stehen im Profil und lassen sich zurücksetzen.
+- **Standard = Haushalt** (2 Portionen, einstellbar je Gericht). Nach dem Essen fragt die App „zu wenig / passt / zu viel“ und lernt daraus, mit wie viel sie beim Einkaufen rechnet.
 
 ### Lernende Vorschläge
 
 - Die App lernt aus dem, was du **wischst** (nehmen / wegwischen), was du **wirklich kochst** (oder als „nicht gekocht“ markierst) und aus der **Bewertung am Tag danach** (👍 Gut · 🔁 Bald wieder · 👎 Nicht so).
 - Gelernt wird pro Gericht **und** pro Muster: Küche, Gerichtart, Hauptzutat (Rind, Schwein, Geflügel, Fisch, Hack, Wurst …), schnell/aufwendig an Werktagen bzw. am Wochenende, Frühstückstyp. So bekommen auch nie gesehene Gerichte einen passenden Platz.
 - Ältere Signale verblassen (Halbwertszeit 60 Tage). Das Gelernte zählt „mittel“ – etwa so viel wie Vorrat und Preis; Abwechslung und Resteverwertung bleiben wichtig.
-- Sichtbar auf den Karten („❤️ magst du“, „👍 Eintopf magst du“) und im Profil unter „Das habe ich gelernt“ (mit Zurücksetzen). Logik in `src/learning.ts`.
+- Sichtbar auf den Karten („❤️ magst du“, „👍 Eintopf magst du“) und in den Einstellungen unter „Das habe ich gelernt“ (mit Zurücksetzen). Logik in `src/learning.ts`.
 
 Alle Daten bleiben lokal im Browser (kein Konto, kein Server). Die App ist eine PWA und lässt sich auf den Homescreen legen und offline nutzen.
 
@@ -63,8 +54,6 @@ npm run check-data   # prüft Rezeptdatenbank, Produkte & Einheiten
 npx vite-node scripts/test-kitchen.ts   # Logiktests Vorrat/Einkauf/Empfehlungen
 npx vite-node scripts/test-breakfast.ts # Logiktests Frühstück/Meal-Prep
 npx vite-node scripts/test-leftovers.ts # Logiktests Reste/Vorrat/Frische
-npx vite-node scripts/test-energy.ts    # Logiktests Kalorienbedarf/Portionen
-npx vite-node scripts/test-progress.ts  # Logiktests Wiegen/Trend/Vorschläge
 npx vite-node scripts/test-learning.ts  # Logiktests lernende Vorlieben
 ```
 

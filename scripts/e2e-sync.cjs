@@ -125,8 +125,8 @@ const marcState = {
 
   // ── Lisa: frisch installiert → Checkliste mit „mit jemandem zusammen“ ──
   const lisa = await phone('Lisa', null)
-  const share = lisa.getByRole('button', { name: /Ich nutze Yami mit jemandem zusammen/ })
-  ok(await share.isVisible(), 'Lisa (frisch): Link „Ich nutze Yami mit jemandem zusammen → mit Home Assistant verbinden“')
+  const share = lisa.getByRole('button', { name: /Ich nutze Gusto mit jemandem zusammen/ })
+  ok(await share.isVisible(), 'Lisa (frisch): Link „Ich nutze Gusto mit jemandem zusammen → mit Home Assistant verbinden“')
   await lisa.screenshot({ path: `${SHOT}/sync-1-lisa-frisch.png` })
   await share.click()
   await lisa.waitForSelector('#ha')
@@ -140,13 +140,12 @@ const marcState = {
   ok(await until(async () => (await st(lisa)).plan?.['2026-11-16']?.recipeId === 'haehnchen-rahm-bandnudeln'), 'Lisa: bekommt Marcs Plan')
   ok(await until(async () => (await lisa.locator('#ha').innerText()).includes('mit Marc')), 'Lisa: Status „Synchronisiert … · mit Marc“')
   const s0 = await st(lisa)
-  ok(s0.onboarding === 'done' && !s0.profile, 'Lisa: Beitritt → Checkliste erledigt, kein Kalorienprofil verlangt')
-  ok(await lisa.getByText('Optional: eigenes Kalorienziel.').isVisible(), 'Lisa: Profil als „Optional: eigenes Kalorienziel“')
+  ok(s0.onboarding === 'done' && !('profile' in s0), 'Lisa: Beitritt → Checkliste erledigt, kein Profil')
+  ok(!(await lisa.getByText(/Kalorie|kcal/).count()), 'Lisa: Einstellungen ohne Kalorien')
   await lisa.locator('#ha').scrollIntoViewIfNeeded()
   await lisa.screenshot({ path: `${SHOT}/sync-2-lisa-ha.png` })
-  ok(await lisa.getByRole('button', { name: 'Kalorienziel speichern' }).isVisible(), 'Lisa: Profil-Sheet bietet „Schließen“ statt Profil anzulegen')
-  await lisa.locator('.sheet-footer .btn.primary', { hasText: 'Schließen' }).click()
-  ok(!(await st(lisa)).profile, 'Lisa: Schließen legt kein Profil an')
+  await lisa.locator('.sheet-footer .btn.primary', { hasText: 'Fertig' }).click()
+  ok(!('profile' in (await st(lisa))), 'Lisa: Einstellungen schließen legt nichts Kalorienbezogenes an')
   ok(!(await lisa.locator('.start-card').count()), 'Lisa: Woche ohne Start-Checkliste')
 
   // ── Lisa plant Dienstag ──

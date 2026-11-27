@@ -93,9 +93,6 @@ export function BreakfastCard({ picks, assignment, prep, today, prepChoices, cov
               <span className="bf-text">
                 <span className="bf-days">{dayRange(ds) || '–'}{ds.some((d) => assignment.frozen.includes(d)) ? ' · ❄️' : ''}</span>
                 <span className="bf-title">{r.title}</span>
-                <span className="bf-nutri">
-                  {r.nutrition.kcal.toLocaleString('de-DE')} kcal · {Math.round(r.nutrition.protein)} g Eiweiß · {Math.round(r.nutrition.fiber)} g Ballaststoffe
-                </span>
               </span>
             </button>
           ))}

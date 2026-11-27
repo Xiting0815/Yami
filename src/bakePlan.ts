@@ -75,7 +75,7 @@ export const tapasEntries = (bp: BakePlan, day: string): BakeEntry[] =>
 /**
  * Mengenfaktor je Tapa an einem Tapas-Abend: Rezepte sind ein Teller für 2 als eine von TAPAS_STD (5) Tapas –
  * bei 4 Tapas wird jede ×1,25 größer, bei 6 ×0,83 kleiner (mindestens 3 Tapas gerechnet). So bleibt der Abend
- * (Einkauf, kcal) etwa gleich groß, egal wie viele Tapas gewählt sind.
+ * (Einkauf, Portion) etwa gleich groß, egal wie viele Tapas gewählt sind.
  */
 export function tapasFactorFor(count: number): number {
   return Math.round((TAPAS_STD / Math.max(3, count)) * 100) / 100

@@ -26,7 +26,7 @@ interface Props {
   /** ganz neue Zutat anlegen und gleich in den Vorrat legen */
   onCreate: (c: CustomIngredient, lot: PantryLot) => void
   onCook: () => void
-  /** „1 gegessen“ bei Selbstgebackenem (Kuchen, Brot, Dessert) → zählt in die Tagesbilanz */
+  /** „1 gegessen“ bei Selbstgebackenem (Kuchen, Brot, Dessert): Stück abziehen (zählt fürs Lernen) */
   onEat?: (lotId: string) => void
 }
 
@@ -251,7 +251,7 @@ export function PantryView({ pantry, leftovers, today, hints = {}, spices = {}, 
                       {hint && <small className={`exp ${hint.low ? 'low' : ''}`}>⏳ {key === l.name ? l.name : key} {hint.text}</small>}
                       {eat && (
                         <button className="chip eat-btn" onClick={() => onEat!(l.id)} aria-label={`${eat.label}: ${l.name}`}>
-                          🍽️ {eat.label}<span className="muted">{`\u00a0· ${eat.recipe.yields!.perPiece!.kcal} kcal`}</span>
+                          🍽️ {eat.label}
                         </button>
                       )}
                     </span>

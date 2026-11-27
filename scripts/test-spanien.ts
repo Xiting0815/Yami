@@ -15,7 +15,7 @@ import { cookBasic, planWeek } from '../src/kitchen'
 import { addBake, bakeEntriesOf, settleBaked, tapasFactor, tapasFactorFor } from '../src/bakePlan'
 import { bbqOn, dinnerToReplace, eveningOn, planWord } from '../src/bbq'
 import {
-  eveningKcal, moveTapasEvening, pantryHits, planTapasEvening, removeTapasEvening, shortTitle, tapasFavorites, tapasIdeas, tapasMeal,
+  moveTapasEvening, pantryHits, planTapasEvening, removeTapasEvening, shortTitle, tapasFavorites, tapasIdeas, tapasMeal,
   tapasPairs, tapasSection, tapasTimeline, type TapasInput,
 } from '../src/tapas'
 import { buildModel, featureLabel, features } from '../src/learning'
@@ -78,8 +78,6 @@ ok(Math.abs(garn - 180 * f3) < 1 && need(w1, 'Schweinefilet') > 160 && need(w1, 
 ok(w1.buy.some((b) => b.name === 'Garnelen roh TK' && b.recipes.includes(gambas.title)), 'Einkaufsartikel nennt die Tapa')
 const five = planTapasEvening({ plan: {}, bakePlan: {} }, SAT, [...ids, 'tortilla-de-patatas'], true)
 ok((five.bakePlan[SAT] ?? []).length === 3, 'jede Tapa nur einmal je Abend')
-const kcal3 = eveningKcal([gambas, pinchos, tortilla])
-ok(kcal3 > 500 && kcal3 < 1100 && kcal3 === Math.round((gambas.nutrition.kcal + pinchos.nutrition.kcal + tortilla.nutrition.kcal) * f3), `Abend gesamt ≈ ${kcal3} kcal p. P.`)
 
 // neue Auswahl für denselben Tag ersetzt den vorherigen (offenen) Tapas-Abend
 const re = planTapasEvening(ev, SAT, [GAMBAS, TORTILLA], true)
@@ -104,13 +102,13 @@ ok(/Garnelen roh TK – 300 g/.test(sat.description) && /🫒 Pinchos morunos/.t
 const diff = diffDinnerEvents(cal, {}, [{ uid: 'old', summary: `🍽️ ${jamb.title}`, date: SAT }], TODAY)
 ok(diff.create.filter((d) => d.key === `dinner:${SAT}`).length === 1 && diff.del.some((d) => d.uids.includes('old')), 'Kalenderabgleich: alter Abendessen-Termin weg, ein Tapas-Termin neu')
 
-// Fertig: Zutaten abziehen (Menge des Abends), Anteil in die Tagesbilanz, fürs Lernen gemerkt
+// Fertig: Zutaten abziehen (Menge des Abends), fürs Lernen gemerkt
 const lot = { id: 'g', name: 'Garnelen roh TK', amount: 500, unit: 'g', expires: '2027-01-01' }
 const s1 = settleBaked({ pantry: [lot], bakePlan: ev.bakePlan, baked: [] }, SAT, GAMBAS)!
 ok(!!s1 && Math.abs(s1.pantry.find((l) => l.id === 'g')!.amount - (500 - 180 * f3)) < 0.5, `Fertig: ${Math.round(180 * f3)} g Garnelen abgezogen`)
 ok(s1.bakePlan[SAT]!.find((e) => e.recipeId === GAMBAS)?.status === 'baked' && s1.baked.length === 1 && settleBaked(s1, SAT, GAMBAS) === null, 'als gemacht markiert, gemerkt, nie zweimal abgezogen')
-const meal = tapasMeal(gambas, SAT, f3)
-ok(!!meal && meal.kcal === Math.round(gambas.nutrition.kcal * f3) && meal.recipeId === GAMBAS, `Tagesbilanz: Anteil der Tapa (${meal?.kcal} kcal)`)
+const meal = tapasMeal(gambas, SAT)
+ok(!!meal && meal.recipeId === GAMBAS && !('kcal' in meal), 'Tapa zählt fürs Lernen als „gegessen“ (ohne kcal)')
 ok(tapasFactor(s1.bakePlan, SAT) === f3, 'Faktor bleibt nach „Fertig“ gleich')
 
 // ───── 4) Lernen: Lieblinge, Kombinationen, Ideen ─────
@@ -120,7 +118,7 @@ ok(featureLabel('tapas:fisch') === 'Tapas: Fisch & Meeresfrüchte' && featureLab
 const base = (extra: Partial<TapasInput> = {}): TapasInput => ({ today: TODAY, baked: [], bakeRatings: {}, bakePlan: {}, ...extra })
 const ideas0 = tapasIdeas(base())
 ok(ideas0.length >= 1 && ideas0[0].recipes.length >= 3 && ['fisch', 'fleisch', 'ei'].every((g) => ideas0[0].recipes.some((r) => r.tapas === g)), `Ideen: je eine aus Fisch, Fleisch, Ei/Kartoffel (${ideas0[0]?.recipes.map((r) => r.id).join(', ')})`)
-ok(ideas0[0].kcal === eveningKcal(ideas0[0].recipes) && /Fisch & Meeresfrüchte/.test(ideas0[0].reason), 'Idee mit kcal des Abends und Begründung')
+ok(!('kcal' in ideas0[0]) && /Fisch & Meeresfrüchte/.test(ideas0[0].reason), 'Idee mit Begründung (ohne kcal)')
 const night = '2026-11-07'
 const liked: TapasInput = base({ baked: [GAMBAS, PINCHOS, TORTILLA].map((recipeId) => ({ date: night, recipeId })), bakeRatings: { [`${night}:${PINCHOS}`]: 'again', [`${night}:${TORTILLA}`]: 'up', [`${night}:${GAMBAS}`]: 'down' } })
 const pairs = tapasPairs(liked)
@@ -172,7 +170,7 @@ const sS = settleBaked({ pantry: [], bakePlan: bpS, baked: [] }, SAT, NUDEL)!
 const rest = sS.pantry.find((l) => l.name === 'Nudelsalat (selbstgemacht)')
 ok(!!rest && rest.amount === 6 && rest.unit === 'Portion' && rest.expires === '2026-11-30' && CATALOG['Nudelsalat (selbstgemacht)'] === 'molkerei' && NON_VEG.has('Nudelsalat (selbstgemacht)'), 'Fertig: 6 Portionen in den Vorrat (Kühlschrank, 2 Tage)')
 const eat = eatOne(sS.pantry, rest!.id, SAT)
-ok(eat.snack?.kcal === nudel.yields!.perPiece!.kcal && eat.pantry.find((l) => l.id === rest!.id)?.amount === 5, `„1 Portion gegessen“: ${eat.snack?.kcal} kcal in die Tagesbilanz`)
+ok(eat.snack?.recipeId === NUDEL && eat.pantry.find((l) => l.id === rest!.id)?.amount === 5, '„1 Portion gegessen“: 5 Portionen übrig, fürs Lernen gemerkt')
 const mS = buildModel({ plan: {}, breakfast: {}, breakfastPicks: {}, rejects: [], ratings: {}, today: TODAY, bakePlan: bpS, baked: sS.baked, bakeRatings: { [`${SAT}:${NUDEL}`]: 'again' } })
 ok((mS.feature.get('salat:nudel')?.sum ?? 0) > 0 && (mS.recipe.get(NUDEL)?.sum ?? 0) > 2, 'Lernen: geplant, gemacht, bewertet (Muster „Nudelsalate“)')
 

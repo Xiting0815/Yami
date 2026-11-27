@@ -672,7 +672,7 @@ export const recipesIt = [
       'Kartoffelwürfel zugeben und weitere 30 Minuten garen.',
     ], 'Spezzatino'),
 
-  // ───────────── Leicht & sättigend (Abnehm-Abendessen) ─────────────
+  // ───────────── Leicht & sättigend ─────────────
   r('cacciatora-leggera', 'Pollo alla Cacciatora leggero mit Polenta', 'it', 'haupt', 45,
     '350 g Hähnchenschenkelfilet | 2 Stk Paprika rot | 1 Stk Zwiebel | 200 g Champignons | 2 Zehe Knoblauch | 1 Dose Geschälte Tomaten | 80 ml Weißwein | 30 g Oliven schwarz | 1 EL Kapern | 1 Zweig Rosmarin | 1 EL Olivenöl | 60 g Polenta | Salz | Pfeffer',
     [

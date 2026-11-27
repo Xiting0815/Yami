@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { formatEuro } from '../kitchen'
 import { type WeekReview } from '../review'
 import { addDays, isoDate, parseIso, shortDate } from '../store'
-import { de1, reviewStats, signedKg } from './ReviewCard'
+import { reviewStats } from './ReviewCard'
 
 interface Props {
   review: WeekReview
@@ -11,8 +11,6 @@ interface Props {
   onWeek: (delta: number) => void
   onClose: () => void
 }
-
-const kcal = (n: number) => n.toLocaleString('de-DE')
 
 export function ReviewSheet({ review: r, canNext, onWeek, onClose }: Props) {
   useEffect(() => {
@@ -24,8 +22,6 @@ export function ReviewSheet({ review: r, canNext, onWeek, onClose }: Props) {
   const s = reviewStats(r)
   const mon = parseIso(r.weekKey)
   const range = `${shortDate(r.weekKey)}–${shortDate(isoDate(addDays(mon, 6)))}`
-  const n = r.nutrition
-  const w = r.weight
 
   return (
     <div className="sheet-backdrop" onClick={onClose}>
@@ -44,50 +40,21 @@ export function ReviewSheet({ review: r, canNext, onWeek, onClose }: Props) {
           {!r.hasData && <p className="muted">Für diese Woche gibt es noch nichts zu berichten.</p>}
 
           <div className="stat-grid">
-            <div><span>Gewicht</span><b>{s.weight}</b><small>{s.weightSub}</small></div>
-            <div><span>Ernährung</span><b>{s.kcal}</b><small>{s.kcalSub}</small></div>
+            <div><span>Abwechslung</span><b>{s.cuisines}</b><small>{s.cuisinesSub}</small></div>
+            <div><span>Neu probiert</span><b>{s.fresh}</b><small>{s.freshSub}</small></div>
             <div><span>Ausgaben</span><b>{s.spend}</b><small>{s.spendSub}</small></div>
             <div><span>Lebensmittel</span><b>{s.waste}</b><small>{s.wasteSub}</small></div>
           </div>
 
           <section className="card-box review-sec">
-            <h3>⚖️ Gewicht</h3>
-            {w.current ? (
-              <>
-                <p>
-                  {de1(w.current.weight)} kg
-                  {w.delta != null && (
-                    <>
-                      {' '}
-                      · <b className={w.delta < 0 ? 'good' : ''}>{signedKg(w.delta)} kg</b> seit der letzten Messung
-                    </>
-                  )}
-                </p>
-                {w.goal != null && w.remaining != null && (
-                  <p className="muted">{w.remaining > 0 ? `Noch ${de1(w.remaining)} kg bis zu deinem Ziel von ${de1(w.goal)} kg.` : 'Ziel erreicht! 🎉'}</p>
-                )}
-              </>
+            <h3>🌍 Abwechslung</h3>
+            {r.variety.cuisines > 0 ? (
+              <p>
+                {r.variety.cuisines} {r.variety.cuisines === 1 ? 'Küche' : 'Küchen'} auf dem Tisch
+                {r.variety.newDishes > 0 ? ` · ${r.variety.newDishes} ${r.variety.newDishes === 1 ? 'Gericht' : 'Gerichte'} zum ersten Mal` : ''}
+              </p>
             ) : (
-              <p className="muted">In dieser Woche hast du dich nicht gewogen.</p>
-            )}
-          </section>
-
-          <section className="card-box review-sec">
-            <h3>🍽️ Ernährung Mo–Fr</h3>
-            {n.days > 0 && n.avgKcal != null ? (
-              <>
-                <p>
-                  Ø <b>{kcal(n.avgKcal)} kcal</b> pro Tag (Ziel {kcal(n.target!)})
-                </p>
-                <p>
-                  Ø <b>{n.avgProtein} g</b> Eiweiß (Ziel {n.proteinTarget} g)
-                </p>
-                <p className="muted">
-                  {n.inTarget} von {n.days} Tagen im Ziel
-                </p>
-              </>
-            ) : (
-              <p className="muted">Ohne Profil oder geplante Abendessen gibt es hier keine Werte.</p>
+              <p className="muted">Keine Abendessen geplant.</p>
             )}
           </section>
 

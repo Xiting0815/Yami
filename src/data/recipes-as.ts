@@ -395,7 +395,7 @@ export const recipesAs = [
       'Entenstücke auf Reis anrichten und die Soße darübergeben.',
     ], 'crispy duck sweet and sour'),
 
-  // ───────────── Leicht & sättigend (Abnehm-Abendessen) ─────────────
+  // ───────────── Leicht & sättigend ─────────────
   r('haehnchen-brokkoli-kanton', 'Hähnchen mit Brokkoli nach Kantoner Art', 'as', 'haupt', 25,
     '300 g Hähnchenbrustfilet | 400 g Brokkoli | 2 Zehe Knoblauch | 15 g Ingwer | 1 EL Shaoxing-Reiswein | 2 EL Sojasauce | 1 EL Austernsauce | 1 EL Speisestärke | 100 ml Hühnerbrühe | 1 TL Sesamöl | 1 EL Sonnenblumenöl | 120 g Jasminreis',
     [

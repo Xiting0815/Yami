@@ -8,7 +8,6 @@ import { useSnapshot, useToast } from './useToast'
 import { useUpkeep } from './upkeep'
 import { usePlanning } from './usePlanning'
 import { useBreakfastPlan } from './useBreakfastPlan'
-import { useBalances } from './useBalances'
 import { useStatus } from './useStatus'
 import type { ActionContext } from './actions/context'
 import { planActions } from './actions/plan'
@@ -34,7 +33,6 @@ export function useAppModel() {
 
   const plan = usePlanning(state, cal, ui)
   const bf = useBreakfastPlan(state, cal, ui, plan)
-  const energy = useBalances(state, cal.days)
   const status = useStatus(state, setState, cal, ui, bf.picks)
 
   const ctx: ActionContext = { state, setState, cal, ui, flash, setToast, snapshot }
@@ -46,7 +44,7 @@ export function useAppModel() {
     ...pantryActions(ctx),
     ...shortageActions(ctx),
     ...recipeActions(ctx),
-    ...profileActions(ctx, status.pendingSuggestion),
+    ...profileActions(ctx),
   }
 
   function undo() {
@@ -87,7 +85,7 @@ export function useAppModel() {
     },
   })
 
-  return { state, setState, cal, ui, toast, flash, snapshot, undo, plan, bf, energy, status, act, ha }
+  return { state, setState, cal, ui, toast, flash, snapshot, undo, plan, bf, status, act, ha }
 }
 
 export type AppModel = ReturnType<typeof useAppModel>

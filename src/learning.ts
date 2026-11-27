@@ -25,9 +25,8 @@ import { CATALOG } from './data/catalog'
 import { RECIPE_BY_ID } from './data/recipes'
 import { interchangeable } from './data/substitutes'
 import { gramsOf } from './data/nutrition-calc'
-import { isWorkday } from './energy'
 import { type WastedItem, canonical, daysUntil, needsOf } from './kitchen'
-import { isoDate, mondayOf, parseIso } from './store'
+import { isWorkday, isoDate, mondayOf, parseIso } from './store'
 import { BBQ_GROUP_LABEL, BREAKFAST_LABEL, CUISINE_LABEL, KIND_LABEL, SALAT_GROUP_LABEL, TAPAS_GROUP_LABEL, TYPE_LABEL, type BakePlan, type BasicKind, type BbqGroup, type Recipe, type SalatGroup, type TapasGroup, type WeekPlan } from './types'
 
 export type Rating = 'up' | 'again' | 'down'
@@ -392,7 +391,7 @@ const PORTION_MIN_FEEDBACK = 2
 /**
  * Gelernter Portionsfaktor des Haushalts (Abendessen). „Zu wenig“ hebt ihn, „zu viel“ senkt ihn – mit Zeitverfall
  * (Halbwertszeit 60 Tage), gedämpft (zwei gedachte „passt“-Werte ziehen zur 1,0), in 5-%-Schritten, begrenzt auf 0,85–1,2.
- * Erst ab 2 Rückmeldungen. Das ist die Menge fürs Einkaufen/Planen – nicht deine persönliche Kalorienportion.
+ * Erst ab 2 Rückmeldungen. Das ist die Menge fürs Einkaufen/Planen.
  */
 export function portionFactor(feedback: Record<string, PortionFeedback> | (Record<string, PortionFeedback> | undefined)[] | undefined, today: string): number {
   // mehrere Personen (Familien-Abgleich): alle Rückmeldungen zählen für den gemeinsamen Faktor
