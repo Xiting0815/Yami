@@ -1,3 +1,5 @@
+brisket-chili
+brisket-hash
 paella-valenciana
 paella-de-marisco
 arroz-negro
@@ -62,6 +64,7 @@ patatas-alioli
 papas-arrugadas
 huevos-rellenos
 pimientos-de-padron
+calcots-con-romesco
 champinones-al-ajillo
 berenjenas-con-miel
 espinacas-con-garbanzos

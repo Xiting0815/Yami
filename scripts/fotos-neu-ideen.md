@@ -1,3 +1,0 @@
-| brisket-chili | Bowl of Texas-style chili with chunks of smoked pulled brisket, kidney beans and dark red ancho chili sauce, topped with grated cheddar, a dollop of sour cream and sliced spring onions, rustic wooden table |
-| brisket-hash | Cast-iron skillet of crispy diced potato hash with smoked brisket pieces, red bell pepper and onion, four sunny-side-up eggs with runny yolks, sprinkled with spring onions, hot sauce bottle beside it |
-| calcots-con-romesco | Catalan calçotada: charred blackened grilled spring onions and young leeks bundled on a terracotta roof tile, one peeled showing the soft white inside, small bowl of orange-red romesco sauce with almonds |

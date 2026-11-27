@@ -106,7 +106,7 @@ const amt = (s, name) => s.pantry.filter((l) => l.name === name).reduce((a, l) =
     await page.getByRole('button', { name: /Gut/ }).click()
     await page.waitForTimeout(200)
     s = await st()
-    ok(s.ratings['2026-11-16'] === 'up' && !(await page.locator('.rate-card').isVisible()), 'Bewertung 👍 gespeichert, Karte weg')
+    ok(s.ratings['2026-11-16:haehnchen-rahm-bandnudeln'] === 'up' && Object.keys(s.ratings).length === 1 && !(await page.locator('.rate-card').isVisible()), 'Bewertung 👍 gespeichert, Karte weg')
   })
 
   // ── Mi 18.11.: Gestern (Di) ein Gericht nachtragen → sofort als gekocht abgezogen (Regression) ──

@@ -29,7 +29,11 @@ const initial = { plan: {}, onboarding: 'done', onboardingListSeen: true, defaul
     saved = await page.evaluate((k) => localStorage.getItem(k), KEY)
     await ctx.close()
   }
-  const tab = (page, label) => page.locator('.tabbar button', { hasText: label }).click()
+  // Tabs werden bei Bedarf nachgeladen (src/app/lazy.tsx): erst lesen, wenn die Ansicht Inhalt hat
+  const tab = async (page, label) => {
+    await page.locator('.tabbar button', { hasText: label }).click()
+    await page.waitForFunction(() => (document.querySelector('.tab-content, main')?.textContent ?? '').trim().length > 0, null, { timeout: 5000 })
+  }
 
   // ── Mi 18.11.: Bienenstich für Samstag einplanen ──
   await day('2026-11-18', '10:00', async (page, st) => {

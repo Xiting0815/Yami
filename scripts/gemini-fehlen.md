@@ -1,5 +1,7 @@
 | Datei-Name | Gericht |
 |---|---|
+| brisket-chili | Bowl of Texas-style chili with chunks of smoked pulled brisket, kidney beans and dark red ancho chili sauce, topped with grated cheddar, a dollop of sour cream and sliced spring onions, rustic wooden table |
+| brisket-hash | Cast-iron skillet of crispy diced potato hash with smoked brisket pieces, red bell pepper and onion, four sunny-side-up eggs with runny yolks, sprinkled with spring onions, hot sauce bottle beside it |
 | paella-valenciana | Paella valenciana in einer flachen Paellapfanne: safrangelber Reis mit Hähnchen- und Kaninchenstücken, breiten grünen Bohnen, weißen Bohnen und Rosmarinzweig, knusprige Reiskruste am Rand |
 | paella-de-marisco | Seafood paella in a shallow paella pan: saffron-yellow rice topped with whole red prawns with heads, open mussels, squid rings, red pepper strips and lemon wedges, crispy rice crust at the edge |
 | arroz-negro | Spanish black rice (arroz negro) in a paella pan, jet-black squid-ink rice with pieces of squid, a bowl of creamy white alioli beside it |
@@ -64,6 +66,7 @@
 | papas-arrugadas | Papas arrugadas: small wrinkled Canarian potatoes with white salt crust on a plate, two small bowls of red mojo picón and green coriander mojo beside them |
 | huevos-rellenos | Huevos rellenos: halved hard-boiled eggs filled with tuna and mayonnaise cream, topped with thin red piquillo pepper strips and grated yolk, on a white platter |
 | pimientos-de-padron | Pimientos de Padrón: blistered small green peppers with charred spots, sprinkled with coarse sea salt flakes, in a terracotta cazuela |
+| calcots-con-romesco | Catalan calçotada: charred blackened grilled spring onions and young leeks bundled on a terracotta roof tile, one peeled showing the soft white inside, small bowl of orange-red romesco sauce with almonds |
 | champinones-al-ajillo | Champiñones al ajillo: golden sautéed button mushrooms in sizzling olive oil with sliced garlic, dried chili and chopped parsley, in a small terracotta dish |
 | berenjenas-con-miel | Berenjenas con miel de caña: crispy fried eggplant sticks drizzled with dark cane molasses, flaky salt, on a white plate, Andalusian tapas style |
 | espinacas-con-garbanzos | Espinacas con garbanzos: Sevillian spinach and chickpea stew with paprika-cumin sauce in a small terracotta cazuela, a few toasted bread croutons |
