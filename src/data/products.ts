@@ -216,7 +216,8 @@ export const PRODUCTS: Record<string, Product> = {
   'Brötchen vom Vortag': p(1, 'Stk', 0.25, 4),
   'Burger-Brötchen': p(4, 'Stk', 1.99, 5, 2, 'Pck'),
   Laugenbrezel: p(1, 'Stk', 0.59, 2),
-  Ciabatta: p(1, 'Stk', 0.99, 3),
+  // Ciabatta im Vorrat in Scheiben à 30 g (1 Stk ≈ 300 g = 10 Scheiben) – wie das selbstgebackene, „1 Scheibe gegessen“
+  Ciabatta: p(10, 'Scheibe', 0.99, 3, 3, 'Stk'),
   Printen: p(10, 'Stk', 2.49, 90, 30, 'Pck'),
   Toastbrot: p(20, 'Scheibe', 0.99, 7, 5, 'Pck'),
   'Toskanisches Brot': p(500, 'g', 1.99, 4, 4, 'Laib'),
@@ -478,6 +479,7 @@ export const CONVERT: Record<string, Record<string, number>> = {
   Salsiccia: { Stk: 100 },
   Salbei: { Blatt: 1 / 15 },
   'Toskanisches Brot': { Scheibe: 40 },
+  Ciabatta: { Stk: 10, g: 1 / 30 },
   Weißkohl: { Stk: 1500 },
   Zwiebel: { g: 1 / 100, kg: 10 },
   Möhre: { g: 1 / 100 },
@@ -534,5 +536,6 @@ for (const { recipe, name } of EXTRA_YIELDS) {
   const st = yieldStock(recipe.kind, recipe.yields!)
   // BBQ-Reste: nur der Anteil der Ladung, der in den Vorrat geht (`share`)
   PRODUCTS[name] = { pack: st.amount, unit: st.unit, price: Math.round(batchCost(recipe) * (recipe.yields!.share ?? 1) * 100) / 100, shelf: recipe.yields!.shelf }
-  if (st.unit === 'Scheibe') CONVERT[name] = { g: 1 / sliceG(recipe.yields), kg: 1000 / sliceG(recipe.yields) }
+  // Scheiben: g/kg aus dem Scheibengewicht; eigene Umrechnungen aus der Gruppe (z. B. 1 Stk Ciabatta = 8,7 Scheiben) bleiben
+  if (st.unit === 'Scheibe') CONVERT[name] = { ...CONVERT[name], g: 1 / sliceG(recipe.yields), kg: 1000 / sliceG(recipe.yields) }
 }

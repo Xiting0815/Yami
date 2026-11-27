@@ -10,8 +10,8 @@ import type { ExtraIngredients } from './extra/types'
  * Gewicht, ggf. Gewürz) – sie werden zentral eingetragen (src/data/extra/index.ts), catalog.ts/products.ts/nutrition.ts
  * bleiben unberührt. Neue Fotos: Zeile in scripts/fotos-neu-beilagen-us.md.
  *
- * Resteessen: Zutat „Pulled Pork“ (kaufbar, bbq-smoker.ts) – liegt vakuumiertes „Pulled Pork (vakuumiert)“ im Vorrat,
- * nimmt Yami das zuerst und zieht solche Gerichte im Stapel nach vorn (Vorrat-Priorisierung).
+ * Resteessen: Zutat „Pulled Pork“ bzw. „Pulled Beef“ (kaufbar, bbq-smoker.ts) – liegt vakuumiertes „Pulled Pork (vakuumiert)“
+ * bzw. „Brisket (vakuumiert)“ im Vorrat, nimmt Yami das zuerst und zieht solche Gerichte im Stapel nach vorn (Vorrat-Priorisierung).
  */
 export const recipesUs = [
   r('jambalaya', 'Jambalaya mit Hähnchen, Wurst und Garnelen', 'us', 'haupt', 50,
@@ -164,6 +164,29 @@ export const recipesUs = [
       'Die Chips auf dem Blech eng zusammenschieben, Pulled Pork, Bohnen, Mais und Cheddar darauf verteilen und 5 Minuten backen, bis der Käse schmilzt.',
       'Für das Pico de Gallo Tomaten, Zwiebel und Chili fein würfeln, mit Limettensaft, gehacktem Koriander und Salz mischen. Die Nachos mit Pico de Gallo und Saurer Sahne direkt vom Blech servieren.',
     ], 'pulled pork nachos'),
+
+  // ───────────── Resteessen mit Brisket aus dem Vorrat (Zutat „Pulled Beef“ → „Brisket (vakuumiert)“ geht vor) ─────────────
+  r('brisket-chili', 'Brisket Chili mit Ancho und Bohnen (Texas)', 'us', 'eintopf', 55,
+    '300 g Pulled Beef | 2 Stk Ancho-Chili getrocknet | 250 ml Rinderbrühe | 1 Stk Zwiebel | 1 Stk Paprika rot | 1 Stk Jalapeño | 3 Zehe Knoblauch | 1 EL Sonnenblumenöl | 1 EL Tomatenmark | 2 TL Kreuzkümmel | 1 TL Paprikapulver geräuchert | 1 TL Oregano getrocknet | 165 ml Dunkelbier | 1 Dose Gehackte Tomaten | 1 Dose Kidneybohnen | 1 TL Brauner Zucker | 1 TL Apfelessig | 40 g Cheddar gerieben | 60 g Saure Sahne | 2 Stk Frühlingszwiebel | Salz | Pfeffer',
+    [
+      'Das Pulled Beef bzw. den Brisket-Rest (aus dem Vorrat am Vortag im Kühlschrank auftauen) grob zerzupfen. Fett und Bark (die dunkle Gewürzkruste vom Smoker) dranlassen – sie bringen den Rauchgeschmack ins Chili.',
+      'Von den Ancho-Chilis Stiele und Kerne entfernen, die Schoten in einer trockenen Pfanne je Seite 20 Sekunden rösten, bis sie duften, und in der heißen Rinderbrühe 15 Minuten einweichen. Dann mit der Brühe glatt pürieren. Ancho ist getrocknete Poblano: mild, fruchtig, leicht rosinig.',
+      'Zwiebel, Paprika und Jalapeño würfeln, Knoblauch hacken. Im Öl in einem Topf 6 Minuten weich dünsten, Knoblauch, Tomatenmark, Kreuzkümmel, geräuchertes Paprikapulver und Oregano 1 Minute mitrösten.',
+      'Mit dem Dunkelbier ablöschen, Chili-Paste, Gehackte Tomaten und das Brisket zugeben und offen 25 Minuten leise köcheln, ab und zu umrühren.',
+      'Die Kidneybohnen abspülen und mit braunem Zucker und Apfelessig unterrühren, weitere 10 Minuten köcheln und mit Salz und Pfeffer abschmecken. Der texanische „Bowl of Red“ kommt ohne Bohnen aus – Brisket Chili mit Bohnen ist dagegen das typische Resteessen der BBQ-Lokale in Texas.',
+      'In Schalen füllen und mit Cheddar, einem Klecks Saurer Sahne und Frühlingszwiebelringen servieren. Dazu passt Cornbread.',
+    ], 'brisket chili'),
+
+  r('brisket-hash', 'Brisket Hash mit Bratkartoffeln und Spiegelei', 'us', 'haupt', 40,
+    '500 g Kartoffeln festkochend | 250 g Pulled Beef | 1 Stk Zwiebel | 1 Stk Paprika rot | 1 Stk Jalapeño | 2 Zehe Knoblauch | 2 EL Sonnenblumenöl | 15 g Butter | 1 TL Paprikapulver geräuchert | 1 TL Worcestersauce | 4 Stk Ei | 2 Stk Frühlingszwiebel | 1 TL Hot Sauce | Salz | Pfeffer',
+    [
+      'Die Kartoffeln schälen, in 1,5 cm große Würfel schneiden und in Salzwasser 7 Minuten bissfest vorkochen. Abgießen und gut ausdampfen lassen – nur trockene Kartoffeln werden knusprig.',
+      'Das Pulled Beef bzw. den Brisket-Rest (aus dem Vorrat am Vortag im Kühlschrank auftauen) in kleine Stücke zupfen. Zwiebel, Paprika und Jalapeño würfeln, Knoblauch hacken.',
+      'Das Öl in einer großen (am besten gusseisernen) Pfanne stark erhitzen, die Kartoffeln in einer Lage hineingeben und 5 Minuten braten, ohne zu rühren, bis sich eine Kruste bildet. Wenden und weitere 5 Minuten braten.',
+      'Butter, Zwiebel, Paprika und Jalapeño zugeben und 4 Minuten mitbraten. Knoblauch, Brisket, geräuchertes Paprikapulver und Worcestersauce untermischen und 3 Minuten braten, bis das Fleisch heiß ist und an den Rändern knusprig wird. Salzen und pfeffern.',
+      'Vier Mulden in den Hash drücken, je ein Ei hineinschlagen, leicht salzen und mit Deckel bei kleiner Hitze 4 bis 5 Minuten stocken lassen, bis das Eiweiß fest und das Eigelb noch flüssig ist.',
+      'Mit Frühlingszwiebelringen bestreuen und mit Hot Sauce direkt aus der Pfanne servieren. „Hash“ kommt vom französischen „hacher“ (hacken): In Texas macht man ihn aus den Brisket-Resten vom Wochenende.',
+    ], 'brisket hash fried egg'),
 ]
 
 /** Neue Zutaten der Küche „Amerikanisch“ (Form wie die Extra-Gruppen, ohne Rezepte) */

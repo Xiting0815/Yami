@@ -466,7 +466,7 @@ export const GRAMS: Record<string, Record<string, number>> = {
   Backkakao: { EL: 6, TL: 2 }, 'Erdnüsse geröstet': { EL: 10 }, Haferflocken: { EL: 10 }, Paniermehl: { EL: 8 },
   Pinienkerne: { EL: 10 }, Walnusskerne: { EL: 8 }, Kürbiskerne: { EL: 10 }, Röstzwiebeln: { EL: 5 }, Sesam: { TL: 3 },
   Kapern: { EL: 10, TL: 3 },
-  'Brötchen vom Vortag': { Stk: 55 }, Ciabatta: { Stk: 300 }, Printen: { Stk: 20 }, Toastbrot: { Scheibe: 25 },
+  'Brötchen vom Vortag': { Stk: 55 }, Ciabatta: { Stk: 300, Scheibe: 30 }, Printen: { Stk: 20 }, Toastbrot: { Scheibe: 25 },
   'Toskanisches Brot': { Scheibe: 40 }, Weißbrot: { Scheibe: 30 }, Vollkornbrot: { Scheibe: 50 },
   'Vollkorn-Knäckebrot': { Scheibe: 10 }, 'Vollkorn-Tortilla': { Stk: 62 },
   Cannelloni: { Stk: 10 }, Lasagneplatten: { Stk: 20 }, Ei: { Stk: 60 }, 'Ei hart gekocht': { Stk: 60 }, Eigelb: { Stk: 18 },

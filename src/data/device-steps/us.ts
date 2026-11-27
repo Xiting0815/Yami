@@ -318,4 +318,52 @@ export const DEVICE_STEPS: Record<string, DeviceStep[]> = {
       text: 'Für das Pico de Gallo Tomaten, rote Zwiebel und Chili fein würfeln, mit Limettensaft, gehacktem Koriander und Salz mischen. Die Nachos mit Pico de Gallo und Saurer Sahne direkt vom Blech servieren.',
     },
   ],
+  'brisket-chili': [
+    {
+      text: 'Das Pulled Beef bzw. den Brisket-Rest (aus dem Vorrat am Vortag im Kühlschrank auftauen) grob zerzupfen. Fett und Bark (die dunkle Gewürzkruste vom Smoker) dranlassen – sie bringen den Rauchgeschmack ins Chili.',
+    },
+    {
+      text: 'Von den Ancho-Chilis Stiele und Kerne entfernen und die Schoten in der trockenen Pfanne je Seite 20 Sekunden rösten, bis sie duften – nicht schwärzen, sonst werden sie bitter. In der heißen Rinderbrühe 15 Minuten einweichen und mit dem Stabmixer glatt pürieren. Ancho ist getrocknete Poblano: mild, fruchtig, leicht rosinig.',
+      settings: [bora('5', { minutes: 1, note: 'trocken rösten' })],
+    },
+    {
+      text: 'Zwiebel, Paprika und Jalapeño würfeln, Knoblauch hacken. Im Sonnenblumenöl im Topf 6 Minuten weich dünsten, Knoblauch, Tomatenmark, Kreuzkümmel, geräuchertes Paprikapulver und Oregano 1 Minute mitrösten.',
+      settings: [bora('4', { minutes: 7 })],
+    },
+    {
+      text: 'Mit dem Dunkelbier ablöschen, Chili-Paste, Gehackte Tomaten und das Brisket zugeben. Auf Powerstufe aufkochen und offen 25 Minuten leise köcheln, ab und zu umrühren.',
+      settings: [bora('Power', { note: 'aufkochen' }), bora('3', { minutes: 25, note: 'ohne Deckel' })],
+    },
+    {
+      text: 'Die Kidneybohnen abspülen und mit braunem Zucker und Apfelessig unterrühren, weitere 10 Minuten köcheln und mit Salz und Pfeffer abschmecken. Der texanische „Bowl of Red“ kommt ohne Bohnen aus – Brisket Chili mit Bohnen ist dagegen das typische Resteessen der BBQ-Lokale in Texas.',
+      settings: [bora('3', { minutes: 10 })],
+    },
+    {
+      text: 'In Schalen füllen und mit Cheddar, einem Klecks Saurer Sahne und Frühlingszwiebelringen servieren. Dazu passt Cornbread.',
+    },
+  ],
+  'brisket-hash': [
+    {
+      text: 'Den Wasserbehälter des CombiSteamers füllen. Die Kartoffeln schälen, in 1,5 cm große Würfel schneiden, im gelochten Garbehälter auf Ebene 2 bei 100 °C 12 Minuten bissfest dämpfen und offen ausdampfen lassen – nur trockene Kartoffeln werden knusprig.',
+      settings: [vzug('steamer', 'Dämpfen', 100, { minutes: 12, note: 'gelochter Garbehälter, Ebene 2' })],
+    },
+    {
+      text: 'Inzwischen das Pulled Beef bzw. den Brisket-Rest (aus dem Vorrat am Vortag im Kühlschrank auftauen) in kleine Stücke zupfen. Zwiebel, Paprika und Jalapeño würfeln, Knoblauch hacken.',
+    },
+    {
+      text: 'Die große Pfanne (am besten Gusseisen) auf dem BORA 2 Minuten vorheizen, das Sonnenblumenöl hineingeben und die Kartoffeln in einer Lage 5 Minuten braten, ohne zu rühren, bis sich eine Kruste bildet. Wenden und weitere 5 Minuten braten.',
+      settings: [bora('8', { note: 'Pfanne vorheizen' }), bora('6', { minutes: 10, note: 'nach 5 Min. wenden' })],
+    },
+    {
+      text: 'Butter, Zwiebel, Paprika und Jalapeño zugeben und 4 Minuten mitbraten. Knoblauch, Brisket, geräuchertes Paprikapulver und Worcestersauce untermischen und 3 Minuten braten, bis das Fleisch heiß ist und an den Rändern knusprig wird. Mit Salz und Pfeffer würzen.',
+      settings: [bora('6', { minutes: 7 })],
+    },
+    {
+      text: 'Vier Mulden in den Hash drücken, je ein Ei hineinschlagen, leicht salzen und mit Deckel 4 bis 5 Minuten stocken lassen, bis das Eiweiß fest und das Eigelb noch flüssig ist.',
+      settings: [bora('3', { minutes: 5, note: 'Deckel drauf' })],
+    },
+    {
+      text: 'Mit Frühlingszwiebelringen bestreuen und mit Hot Sauce direkt aus der Pfanne servieren. „Hash“ kommt vom französischen „hacher“ (hacken): In Texas macht man ihn aus den Brisket-Resten vom Wochenende.',
+    },
+  ],
 }

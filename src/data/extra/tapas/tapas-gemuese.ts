@@ -1,5 +1,5 @@
 import { prod, tapa } from '../../define'
-import { bora, plancha, vzug } from '../../device-helpers'
+import { bora, gasgrill, plancha, vzug } from '../../device-helpers'
 import type { DeviceSetting, DeviceStep } from '../../../types'
 import type { ExtraGroup } from '../types'
 
@@ -102,6 +102,17 @@ export const tapasGemuese: ExtraGroup = {
         'Eine schwere Pfanne oder Plancha sehr heiß werden lassen.',
         'Das Olivenöl hineingeben, die Paprika darin 4 Minuten braten und dabei oft wenden, bis die Haut Blasen wirft und stellenweise braun wird, das Fruchtfleisch aber noch Biss hat.',
         'Auf einen Teller geben und kräftig mit grobem Salz („sal gorda“ oder Meersalzflocken) bestreuen. Sofort servieren – „unos pican y otros no“: etwa jede zehnte ist scharf.',
+      ]),
+
+    tapa('calcots-con-romesco', 'Calçots con romesco (gegrillte Lauchzwiebeln mit Romesco, Calçotada-Art)',
+      { group: 'gemuese', time: 35, serve: 'heiss', ahead: 'Romesco am Vortag selbst machen (Grundrezept) und 30 Minuten vorher aus dem Kühlschrank nehmen' },
+      '2 Stk Lauch | 6 Stk Frühlingszwiebel | 2 TL Olivenöl | 60 g Romesco | Salz',
+      [
+        'Echte Calçots – milde, lange Lauchzwiebeln aus Valls in Katalonien, Saison Januar bis April – gibt es bei uns kaum; dünner junger Lauch und kräftige Frühlingszwiebeln kommen ihnen am nächsten. Die Wurzeln knapp abschneiden, das dunkle Grün bis etwa 5 cm über dem hellen Teil kürzen, dicken Lauch längs halbieren. Gründlich abspülen und trocken tupfen.',
+        'Einen Grill (in Katalonien ein offenes Feuer aus Rebholz) sehr heiß werden lassen. Lauch und Frühlingszwiebeln mit dem Olivenöl einreiben und direkt auf den Rost legen.',
+        'Bei starker Hitze 8 bis 10 Minuten grillen und mehrmals wenden, bis die Außenhaut rundum schwarz verkohlt ist – das ist gewollt, innen garen sie im eigenen Saft weich. Die Frühlingszwiebeln nach etwa 5 Minuten herunternehmen.',
+        'Sofort eng in Backpapier und ein Küchentuch wickeln und 10 Minuten nachdämpfen lassen. In Katalonien kommen sie im Bündel in Zeitungspapier oder auf Dachziegeln an den Tisch.',
+        'Die Romesco in Schälchen füllen. Zum Essen die verkohlte Außenschicht am Wurzelende festhalten und nach oben abziehen, das weiche Innere tief in die Romesco tunken, leicht salzen und von oben in den Mund gleiten lassen – bei einer „Calçotada“ isst man mit den Händen und Lätzchen.',
       ]),
 
     tapa('champinones-al-ajillo', 'Champiñones al ajillo (Knoblauch-Champignons mit Sherry)',
@@ -238,6 +249,19 @@ export const tapasGemuese: ExtraGroup = {
       },
       { text: 'Auf einen Teller geben und kräftig mit grobem Salz („sal gorda“ oder Meersalzflocken) bestreuen. Sofort servieren – „unos pican y otros no“: etwa jede zehnte ist scharf.' },
     ],
+    'calcots-con-romesco': [
+      { text: 'Echte Calçots – milde, lange Lauchzwiebeln aus Valls in Katalonien, Saison Januar bis April – gibt es bei uns kaum; dünner junger Lauch und kräftige Frühlingszwiebeln kommen ihnen am nächsten. Die Wurzeln knapp abschneiden, das dunkle Grün bis etwa 5 cm über dem hellen Teil kürzen, dicken Lauch längs halbieren. Gründlich abspülen und trocken tupfen.' },
+      {
+        text: 'Den Gasgrill mit allen Brennern auf hoch und geschlossenem Deckel 10 Minuten vorheizen (ohne Grill: die Plancha auf dem BORA 5 Minuten trocken vorheizen). Lauch und Frühlingszwiebeln mit dem Olivenöl einreiben.',
+        settings: [gasgrill('Vorheizen', undefined, 'hoch', 'alle', { minutes: 10, note: 'Deckel zu' }), plancha('bora', 'Vorheizen', { level: '8', minutes: 5, alt: true })],
+      },
+      {
+        text: 'Lauch und Frühlingszwiebeln direkt auf den Rost legen und bei offenem Deckel, alle Brenner auf hoch, 8 bis 10 Minuten grillen und mehrmals wenden, bis die Außenhaut rundum schwarz verkohlt ist – das ist gewollt, innen garen sie im eigenen Saft weich. Die Frühlingszwiebeln nach etwa 5 Minuten herunternehmen.',
+        settings: [gasgrill('Direkt', undefined, 'hoch', 'alle', { minutes: 10, note: 'Deckel offen, oft wenden' }), plancha('bora', 'Braten', { level: '8', minutes: 10, note: 'oft wenden', alt: true })],
+      },
+      { text: 'Sofort eng in Backpapier und ein Küchentuch wickeln und 10 Minuten nachdämpfen lassen. In Katalonien kommen sie im Bündel in Zeitungspapier oder auf Dachziegeln an den Tisch.' },
+      { text: 'Die Romesco in Schälchen füllen. Zum Essen die verkohlte Außenschicht am Wurzelende festhalten und nach oben abziehen, das weiche Innere tief in die Romesco tunken, leicht salzen und von oben in den Mund gleiten lassen – bei einer „Calçotada“ isst man mit den Händen und Lätzchen.' },
+    ],
     'champinones-al-ajillo': [
       { text: 'Die Champignons mit einem Pinsel oder Küchenpapier säubern (nicht waschen, sonst saugen sie Wasser) und halbieren, große vierteln. Den Knoblauch in dünne Scheiben schneiden, die getrocknete Chili („Guindilla“) zerbröseln, die Petersilie hacken.' },
       {
@@ -296,6 +320,7 @@ export const tapasGemuese: ExtraGroup = {
     'papas-arrugadas': 'papas arrugadas mojo',
     'huevos-rellenos': 'huevos rellenos',
     'pimientos-de-padron': 'pimientos de padron',
+    'calcots-con-romesco': 'calcots romesco',
     'champinones-al-ajillo': 'champiñones al ajillo',
     'berenjenas-con-miel': 'berenjenas con miel',
     'espinacas-con-garbanzos': 'espinacas con garbanzos',

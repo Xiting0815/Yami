@@ -145,7 +145,8 @@ export const brot: ExtraGroup = {
       {
         cuisine: 'it',
         time: 1050,
-        yields: { name: 'Ciabatta selbstgebacken', amount: 3, unit: 'Stk', shelf: 2, store: 'in Papier bei Raumtemperatur', frozen: 90 },
+        // 3 Ciabatta à ca. 260 g, im Vorrat in Scheiben à 30 g wie gekauftes Ciabatta (1 Stk = 10 Scheiben)
+        yields: { name: 'Ciabatta selbstgebacken', amount: 780, unit: 'g', slice: 30, shelf: 2, store: 'in Papier bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
       },
       '500 g Weizenmehl Tipo 00 | 10 g Salz | 4 g Hefe frisch | 20 ml Olivenöl',
       [
@@ -348,7 +349,8 @@ export const brot: ExtraGroup = {
     backen('brot', 'baguette-poolish', 'Baguette mit Poolish',
       {
         time: 960,
-        yields: { name: 'Baguette selbstgebacken', amount: 3, unit: 'Stk', shelf: 1, store: 'in Papier bei Raumtemperatur', frozen: 90 },
+        // 3 Baguettes à ca. 240 g, im Vorrat in Stücken à 30 g (wie eine Scheibe Weißbrot)
+        yields: { name: 'Baguette selbstgebacken', amount: 720, unit: 'g', slice: 30, shelf: 1, store: 'in Papier bei Raumtemperatur (in Scheiben eingefroren bis 3 Monate)', frozen: 90 },
       },
       '500 g Weizenmehl | 10 g Salz | 4 g Hefe frisch',
       [
@@ -406,12 +408,18 @@ export const brot: ExtraGroup = {
   },
   convert: {
     Roggenmehl: { EL: 10 },
+    // ganze Laibe in Vorrats-Scheiben (auch für ältere Vorratsposten, die noch in Stück gezählt waren)
+    'Ciabatta selbstgebacken': { Stk: 26 / 3 },
+    'Baguette selbstgebacken': { Stk: 8 },
   },
   substitutes: {
     // selbstgebackenes Brot (im Vorrat in Scheiben à 50 g) deckt Vollkornbrot, z. B. in den Frühstücksboxen – und wird zuerst genommen
     groups: {
       'brot-scheibe': ['Bauernbrot selbstgebacken', 'Dinkelvollkornbrot selbstgebacken', 'Roggenmischbrot selbstgebacken', 'Pane pugliese selbstgebacken', 'Hefe-Bauernbrot selbstgebacken', 'Soda Bread selbstgebacken'],
+      // Ciabatta (Scheiben à 30 g): gekauftes Ciabatta liegt ebenfalls in Scheiben im Vorrat (1 Stk = 10 Scheiben)
       ciabatta: ['Ciabatta selbstgebacken'],
+      // Weißbrot (Scheiben à 30 g): selbstgebackenes Baguette deckt Weißbrot (z. B. eingeweicht für Polpette/Albóndigas)
+      weissbrot: ['Weißbrot', 'Baguette selbstgebacken'],
       // Brötchen (Stk): selbstgebackene vor „Brötchen vom Vortag“; Laugengebäck deckt Laugenbrezeln
       broetchen: ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken', 'Quarkbrötchen selbstgebacken', 'Körnerbrötchen selbstgebacken', 'Wasserweck selbstgebacken'],
       // Toastbrot (Scheiben): selbstgebackener Toast vor dem gekauften; Toast liegt wie gekaufter in 25-g-Scheiben im Vorrat (`slice: 25`)
@@ -424,6 +432,7 @@ export const brot: ExtraGroup = {
       Vollkornbrot: ['Bauernbrot selbstgebacken', 'Dinkelvollkornbrot selbstgebacken', 'Roggenmischbrot selbstgebacken', 'Hefe-Bauernbrot selbstgebacken', 'Soda Bread selbstgebacken'],
       Toastbrot: ['Toastbrot selbstgebacken', 'Dinkel-Vollkorntoast selbstgebacken', 'Milchtoast selbstgebacken'],
       Ciabatta: ['Ciabatta selbstgebacken'],
+      Weißbrot: ['Baguette selbstgebacken'],
       'Brötchen vom Vortag': ['Dinkelbrötchen selbstgebacken', 'Kaiserbrötchen selbstgebacken', 'Quarkbrötchen selbstgebacken', 'Körnerbrötchen selbstgebacken', 'Wasserweck selbstgebacken'],
       Laugenbrezel: ['Laugenbrötchen selbstgebacken'],
       'Burger-Brötchen': ['Burger-Buns selbstgebacken'],
@@ -508,7 +517,7 @@ export const brot: ExtraGroup = {
       st('Die Ciabatta auf dem Kuchenblech im CombiSteamer 30 Minuten ruhen lassen.', gare(30, 'Kuchenblech Ebene 2')),
       st('Das Blech herausnehmen und die Ciabatta mit dem Backpapier auf ein Brett ziehen. Das leere Blech wieder auf Ebene 2 einschieben, den Wasserbehälter füllen und den CombiSteamer vorheizen. Dann die Ciabatta mit dem Backpapier auf das heiße Blech ziehen.', preheat()),
       st('Die Ciabatta 10 Minuten mit Dampf backen – die Tür dabei geschlossen lassen.', steamer('Heißluft mit Beschwaden', 230, 10, 'Ebene 2')),
-      st('Auf Heißluft ohne Dampf umschalten und weitere 15 Minuten backen, bis die Kruste goldbraun ist. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 210, 15, 'trocken, für die Kruste')),
+      st('Auf Heißluft ohne Dampf umschalten und weitere 15 Minuten backen, bis die Kruste goldbraun ist. Auf einem Gitter auskühlen lassen; was nicht in 2 Tagen gegessen wird, in Scheiben schneiden und einfrieren.', steamer('Heißluft', 210, 15, 'trocken, für die Kruste')),
     ],
     'focaccia-genovese': [
       kn('Die Hefe frisch mit dem Honig in 300 ml lauwarmem Wasser auflösen. Mit Weizenmehl, 10 g vom Salz und 60 ml vom Olivenöl 8 Minuten zu einem weichen, glänzenden Teig kneten.', 8),
@@ -617,7 +626,7 @@ export const brot: ExtraGroup = {
       st('Die Baguettes auf dem Kuchenblech im CombiSteamer 35 Minuten gehen lassen.', gare(35, 'Kuchenblech Ebene 2')),
       st('Das Blech herausnehmen und die Baguettes mit dem Backpapier auf ein Brett ziehen. Das leere Blech wieder auf Ebene 2 einschieben, den Wasserbehälter füllen und den CombiSteamer vorheizen. Die Baguettes mit einer Rasierklinge oder einem sehr scharfen Messer dreimal schräg und flach einschneiden.', preheat()),
       st('Die Baguettes mit dem Backpapier auf das heiße Blech ziehen und 12 Minuten mit Dampf backen – die Tür dabei geschlossen lassen.', steamer('Heißluft mit Beschwaden', 230, 12, 'Ebene 2')),
-      st('Auf Heißluft ohne Dampf umschalten und weitere 12 Minuten backen, bis die Kruste kräftig braun ist und knistert. Auf einem Gitter auskühlen lassen.', steamer('Heißluft', 220, 12, 'trocken, für die Kruste')),
+      st('Auf Heißluft ohne Dampf umschalten und weitere 12 Minuten backen, bis die Kruste kräftig braun ist und knistert. Auf einem Gitter auskühlen lassen; was am Backtag übrig bleibt, in Stücke schneiden und einfrieren.', steamer('Heißluft', 220, 12, 'trocken, für die Kruste')),
     ],
     'wasserweck': [
       st('Die Hefe frisch mit dem Zucker in 300 ml lauwarmem Wasser auflösen. Mit Weizenmehl, Salz und Sonnenblumenöl im Famag 10 Minuten zu einem glatten, festen Teig kneten.', famag(10)),
